@@ -1,6 +1,7 @@
 ﻿namespace Listen2MeRefined.WPF;
 
 using Autofac;
+using Listen2MeRefined.Infrastructure.Mvvm;
 using Serilog;
 
 internal static class IocContainer
@@ -13,6 +14,10 @@ internal static class IocContainer
 
         #region Windows and Pages
         builder.RegisterType<MainWindow>().SingleInstance();
+        #endregion
+
+        #region ViewModels
+        builder.RegisterType<MainWindowViewModel>();
         #endregion
 
         #region Logger
