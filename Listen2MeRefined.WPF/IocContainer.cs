@@ -1,6 +1,7 @@
 ﻿namespace Listen2MeRefined.WPF;
 
 using Autofac;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Serilog;
 
@@ -24,6 +25,8 @@ internal static class IocContainer
         builder.Register(_ => CreateLogger())
             .As<ILogger>().SingleInstance();
         #endregion
+
+        builder.RegisterType<MusicPlayer>().As<IMediaController>();
 
         return builder.Build();
     }

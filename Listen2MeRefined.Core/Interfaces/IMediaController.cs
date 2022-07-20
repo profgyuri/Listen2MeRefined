@@ -24,4 +24,9 @@ public interface IMediaController
     ///     Jump to the previous media element.
     /// </summary>
     void Previous();
+
+    /// <summary>
+    ///     Randomizes the order of the elements.
+    /// </summary>
+    void Shuffle();
 }
