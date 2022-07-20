@@ -11,7 +11,7 @@ using System;
 internal static class IocContainer
 {
     const string seqConnection = "http://localhost:5341";
-    static HashSet<ConsoleKey> lowLevelKeys = 
+    static readonly HashSet<ConsoleKey> lowLevelKeys = 
         new(){
                     ConsoleKey.MediaPlay,
                     ConsoleKey.MediaStop,
