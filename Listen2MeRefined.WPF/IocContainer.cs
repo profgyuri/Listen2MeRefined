@@ -26,7 +26,10 @@ internal static class IocContainer
             .As<ILogger>().SingleInstance();
         #endregion
 
-        builder.RegisterType<MusicPlayer>().As<IMediaController>();
+        builder
+            .RegisterType<MusicPlayer>()
+            .As<IMediaController>()
+            .SingleInstance();
 
         return builder.Build();
     }
