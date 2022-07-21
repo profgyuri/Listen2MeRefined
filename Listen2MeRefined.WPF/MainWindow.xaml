@@ -52,21 +52,28 @@
 					Grid.ColumnSpan="4"/>
 
                 <Button
+                    x:Name="SettingsWindow"
+                    Click="SettingsWindow_Click"
 					Grid.Column="1"
 					Style="{StaticResource TitleBarButton}"
 					Content="{materialDesign:PackIcon Kind=Gear,Size=15}"/>
                 <Button
 					x:Name="MinimizeWindow"
+                    Click="MinimizeWindow_Click"
 					Grid.Column="2"
 					Padding="0 0 0 5"
 					Style="{StaticResource TitleBarButton}"
 					Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
 					VerticalContentAlignment="Bottom"/>
                 <Button
+                    x:Name="MaximizeWindow"
+                    Click="MaximizeWindow_Click"
 					Grid.Column="3"
 					Style="{StaticResource TitleBarButton}"
 					Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}"/>
                 <Button
+                    x:Name="CloseWindow"
+                    Click="CloseWindow_Click"
 					Grid.Column="4"
 					Content="{materialDesign:PackIcon Kind=Close,Size=15}"
                     Style="{StaticResource WindowCloseButton}"/>

@@ -13,4 +13,27 @@ public partial class MainWindow : Window
 
         DataContext = viewModel;
     }
+
+    private void CloseWindow_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
+    }
+
+    private void MaximizeWindow_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = 
+            WindowState == WindowState.Maximized 
+            ? WindowState.Normal 
+            : WindowState.Maximized;
+    }
+
+    private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void SettingsWindow_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
 }

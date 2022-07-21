@@ -46,7 +46,4 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <Style TargetType="TextBlock" x:Key="WithForeground">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-    </Style>
 </ResourceDictionary>
