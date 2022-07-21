@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <AssemblyName>Listen2Me</AssemblyName>
+    <ApplicationIcon>Listen2Me.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Listen2Me.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.4.0" />
