@@ -36,4 +36,17 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Margin" Value="0 1 0 0" />
     </Style>
+    <Style TargetType="Button" x:Key="WindowCloseButton" BasedOn="{StaticResource TitleBarButton}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#970000"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="#6f0000"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="TextBlock" x:Key="WithForeground">
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+    </Style>
 </ResourceDictionary>

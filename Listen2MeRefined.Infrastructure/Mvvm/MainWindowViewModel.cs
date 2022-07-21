@@ -3,13 +3,20 @@
 [INotifyPropertyChanged]
 public partial class MainWindowViewModel
 {
+    #region Fields
     private IMediaController _mediaController;
+    #endregion
+
+    #region Properties
+    [ObservableProperty] private string _fontFamily;
+    #endregion
 
     public MainWindowViewModel(IMediaController mediaController)
     {
         _mediaController = mediaController;
     }
 
+    #region Commands
     [ICommand]
     public void PlayPause()
     {
@@ -39,4 +46,5 @@ public partial class MainWindowViewModel
     {
         _mediaController.Shuffle();
     }
+    #endregion
 }

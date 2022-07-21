@@ -6,9 +6,73 @@
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        WindowStartupLocation="Manual"
+		WindowStyle="None"
+        FontFamily="{Binding FontFamily}"
+		BorderThickness="0"
+		FontSize="16"
+		Background="Transparent"
+		AllowsTransparency="True"
+		Foreground="{StaticResource SecondaryBrush}"
+		Title="Listen2Me"
+		MinHeight="302" MinWidth="530">
 
-    <Grid>
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+			x:Name="WindowChrome"
+			CaptionHeight="32"/>
+    </WindowChrome.WindowChrome>
 
-    </Grid>
+    <Border
+        BorderThickness="2"
+		BorderBrush="{StaticResource ThirnaryBrush}"
+		Background="{StaticResource PrimaryBrush}"
+		CornerRadius="8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!--Title bar -->
+            <Grid
+				VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+					Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"
+					Grid.ColumnSpan="4"/>
+
+                <Button
+					Grid.Column="1"
+					Style="{StaticResource TitleBarButton}"
+					Content="{materialDesign:PackIcon Kind=Gear,Size=15}"/>
+                <Button
+					x:Name="MinimizeWindow"
+					Grid.Column="2"
+					Padding="0 0 0 5"
+					Style="{StaticResource TitleBarButton}"
+					Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
+					VerticalContentAlignment="Bottom"/>
+                <Button
+					Grid.Column="3"
+					Style="{StaticResource TitleBarButton}"
+					Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}"/>
+                <Button
+					Grid.Column="4"
+					Content="{materialDesign:PackIcon Kind=Close,Size=15}"
+                    Style="{StaticResource WindowCloseButton}"/>
+            </Grid>
+
+        </Grid>
+
+    </Border>
 </Window>
