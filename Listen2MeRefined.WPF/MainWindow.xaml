@@ -84,7 +84,7 @@
                 Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*" MinHeight="150"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -93,17 +93,46 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Player controls -->
-                <Grid>
+                <Grid
+                    Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto" MinWidth="100"/>
+                        <ColumnDefinition Width="Auto" MinWidth="100"/>
+                        <ColumnDefinition Width="Auto" MinWidth="100"/>
+                        <ColumnDefinition Width="Auto" MinWidth="100"/>
+                        <ColumnDefinition Width="Auto" MinWidth="100"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button/>
+                    <Button
+                        Grid.Column="1"
+                        Style="{StaticResource PlayerButton}"
+                        Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
+                    <Button
+                        Grid.Column="2"
+                        Style="{StaticResource PlayerButton}"
+                        Content="{materialDesign:PackIcon Kind=Stop,Size=20}"/>
+                    <Button
+                        Grid.Column="3"
+                        Style="{StaticResource PlayerButton}"
+                        Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}"/>
+                    <Button
+                        Grid.Column="4"
+                        Style="{StaticResource PlayerButton}"
+                        Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}"/>
+                    <Button
+                        Grid.Column="5"
+                        Style="{StaticResource PlayerButton}"
+                        Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"/>
+                    <Slider
+                        Grid.Row="1"
+                        Grid.ColumnSpan="7"
+                        MinWidth="500"/>
 
                 </Grid>
 
@@ -117,13 +146,15 @@
                     Grid.Column="1"/>
 
                 <!-- Searchbar -->
-                <Grid>
+                <Grid
+                    Grid.Row="2"
+                    Grid.ColumnSpan="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBox/>
+                    <TextBox Text="Searchbox"/>
 
                 </Grid>
 
