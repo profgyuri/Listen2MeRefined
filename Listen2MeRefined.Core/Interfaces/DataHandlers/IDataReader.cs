@@ -2,5 +2,5 @@
 
 public interface IDataReader
 {
-    IList<T> Read<T>();
+    IList<T> Read<T>() where T: class;
 }

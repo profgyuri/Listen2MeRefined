@@ -2,5 +2,5 @@
 
 public interface IDataUpdater
 {
-    void Update<T>(T data);
+    void Update<T>(T data) where T : class;
 }

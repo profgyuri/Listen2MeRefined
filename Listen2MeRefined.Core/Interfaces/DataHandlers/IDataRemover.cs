@@ -1,5 +1,5 @@
 ﻿namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
 public interface IDataRemover
 {
-    void Remove<T>(T data);
+    void Remove<T>(T data) where T : class;
 }

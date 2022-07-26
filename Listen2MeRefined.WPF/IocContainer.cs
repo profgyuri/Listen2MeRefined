@@ -8,6 +8,8 @@ using Serilog;
 using System.Collections.Generic;
 using System;
 using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Core.Interfaces.DataHandlers;
 
 internal static class IocContainer
 {
@@ -38,6 +40,26 @@ internal static class IocContainer
         #endregion
 
         #region Data Access
+        builder
+            .RegisterType<DataContext>()
+            .SingleInstance();
+
+        builder
+            .RegisterType<EntityFrameworkRemover>()
+            .As<IDataRemover>();
+        
+        builder
+            .RegisterType<EntityFrameworkReader>()
+            .As<IDataReader>();
+        
+        builder
+            .RegisterType<EntityFrameworkSaver>()
+            .As<IDataSaver>();
+        
+        builder
+            .RegisterType<EntityFrameworkUpdater>()
+            .As<IDataUpdater>();
+        
         builder
             .RegisterType<AudioRepository>()
             .As<IRepository<AudioModel>>();

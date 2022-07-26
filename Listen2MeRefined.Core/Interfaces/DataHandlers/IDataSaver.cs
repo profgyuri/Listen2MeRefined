@@ -2,5 +2,5 @@
 
 public interface IDataSaver
 {
-    void Save<T>(T data);
+    void Save<T>(T data) where T : class;
 }
