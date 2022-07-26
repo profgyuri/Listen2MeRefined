@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 public class DataContext : DbContext
 {
+    private const string mssqlConnectionString = "Data Source=.;Initial Catalog=listentome;Integrated Security=True";
+    private const string sqliteConnectionString = "Data Source=listentome.db;";
+
 #pragma warning disable CS8618
     public DbSet<AudioModel> AudioModels { get; set; }
 #pragma warning restore CS8618
@@ -12,6 +15,7 @@ public class DataContext : DbContext
     {
         base.OnConfiguring(optionsBuilder);
 
-        optionsBuilder.UseSqlServer(@"Data Source=.;Initial Catalog=listentome;Integrated Security=True");
+        //optionsBuilder.UseSqlServer(mssqlConnectionString);
+        optionsBuilder.UseSqlite(sqliteConnectionString);
     }
 }
