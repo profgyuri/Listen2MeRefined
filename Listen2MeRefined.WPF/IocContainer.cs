@@ -7,6 +7,7 @@ using Listen2MeRefined.Infrastructure.Mvvm;
 using Serilog;
 using System.Collections.Generic;
 using System;
+using Listen2MeRefined.Infrastructure.Data;
 
 internal static class IocContainer
 {
@@ -34,6 +35,12 @@ internal static class IocContainer
         #region Logger
         builder.Register(_ => CreateLogger())
             .As<ILogger>().SingleInstance();
+        #endregion
+
+        #region Data Access
+        builder
+            .RegisterType<AudioRepository>()
+            .As<IRepository<AudioModel>>();
         #endregion
 
         builder
