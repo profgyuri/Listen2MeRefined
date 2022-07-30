@@ -10,6 +10,7 @@ using System;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Core.Interfaces.DataHandlers;
+using Listen2MeRefined.Infrastructure.Data.Dapper;
 
 internal static class IocContainer
 {
@@ -49,7 +50,7 @@ internal static class IocContainer
             .As<IDataRemover>();
         
         builder
-            .RegisterType<EntityFrameworkReader>()
+            .RegisterType<DapperReader>()
             .As<IDataReader>();
         
         builder
