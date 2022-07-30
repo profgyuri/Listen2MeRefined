@@ -7,4 +7,10 @@ public interface IDataReader
     /// </summary>
     /// <typeparam name="T">The type of the model to look for.</typeparam>
     IList<T> Read<T>() where T: class;
+
+    /// <summary>
+    ///     Returns every entry for the matching <typeparamref name="T"/> type from the database asynchronously.
+    /// </summary>
+    /// <typeparam name="T">The type of the model to look for.</typeparam>
+    Task<IList<T>> ReadAsync<T>() where T : class;
 }

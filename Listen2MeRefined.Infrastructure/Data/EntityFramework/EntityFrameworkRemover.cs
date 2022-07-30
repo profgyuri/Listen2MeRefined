@@ -1,5 +1,8 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 public class EntityFrameworkRemover : IDataRemover
 {
     private readonly DataContext _dataContext;
@@ -12,5 +15,24 @@ public class EntityFrameworkRemover : IDataRemover
     public void Remove<T>(T data) where T : class
     {
         _dataContext.Set<T>().Remove(data);
+        _dataContext.SaveChanges();
+    }
+
+    public void Remove<T>(IList<T> list) where T : class
+    {
+        _dataContext.Set<T>().RemoveRange(list);
+        _dataContext.SaveChanges();
+    }
+
+    public async Task RemoveAsync<T>(T data) where T : class
+    {
+        _dataContext.Set<T>().Remove(data);
+        await _dataContext.SaveChangesAsync();
+    }
+
+    public async Task RemoveAsync<T>(IList<T> list) where T : class
+    {
+        _dataContext.Set<T>().RemoveRange(list);
+        await _dataContext.SaveChangesAsync();
     }
 }

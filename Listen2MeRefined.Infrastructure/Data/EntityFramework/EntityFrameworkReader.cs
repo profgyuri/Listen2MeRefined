@@ -1,6 +1,8 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class EntityFrameworkReader : IDataReader
 {
@@ -14,5 +16,10 @@ public class EntityFrameworkReader : IDataReader
     public IList<T> Read<T>() where T: class
     {
         return _dataContext.Set<T>().ToList();
+    }
+
+    public async Task<IList<T>> ReadAsync<T>() where T : class
+    {
+        return await _dataContext.Set<T>().ToListAsync();
     }
 }

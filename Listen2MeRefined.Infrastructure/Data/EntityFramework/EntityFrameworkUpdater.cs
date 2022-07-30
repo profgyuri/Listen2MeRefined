@@ -1,5 +1,8 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 public class EntityFrameworkUpdater : IDataUpdater
 {
     private readonly DataContext _dataContext;
@@ -13,5 +16,23 @@ public class EntityFrameworkUpdater : IDataUpdater
     {
         _dataContext.Set<T>().Update(data);
         _dataContext.SaveChanges();
+    }
+
+    public void Update<T>(IList<T> list) where T : class
+    {
+        _dataContext.Set<T>().UpdateRange(list);
+        _dataContext.SaveChanges();
+    }
+
+    public async Task UpdateAsync<T>(T data) where T : class
+    {
+        _dataContext.Set<T>().Update(data);
+        await _dataContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync<T>(IList<T> list) where T : class
+    {
+        _dataContext.Set<T>().UpdateRange(list);
+        await _dataContext.SaveChangesAsync();
     }
 }

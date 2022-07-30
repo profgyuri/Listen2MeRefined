@@ -1,6 +1,7 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data;
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class AudioRepository : IRepository<AudioModel>
 {
@@ -24,9 +25,39 @@ public class AudioRepository : IRepository<AudioModel>
         _dataSaver.Save(data);
     }
 
+    public void Create(IList<AudioModel> data)
+    {
+        _dataSaver.Save(data);
+    }
+
+    public async Task CreateAsync(AudioModel data)
+    {
+        await _dataSaver.SaveAsync(data);
+    }
+
+    public async Task CreateAsync(IList<AudioModel> data)
+    {
+        await _dataSaver.SaveAsync(data);
+    }
+
     public void Delete(AudioModel data)
     {
         _dataRemover.Remove(data);
+    }
+
+    public void Delete(IList<AudioModel> data)
+    {
+        _dataRemover.Remove(data);
+    }
+
+    public async Task DeleteAsync(AudioModel data)
+    {
+        await _dataRemover.RemoveAsync(data);
+    }
+
+    public async Task DeleteAsync(IList<AudioModel> data)
+    {
+        await _dataRemover.RemoveAsync(data);
     }
 
     public IList<AudioModel> Read()
@@ -34,8 +65,28 @@ public class AudioRepository : IRepository<AudioModel>
         return _dataReader.Read<AudioModel>();
     }
 
+    public async Task<IList<AudioModel>> ReadAsync()
+    {
+        return await _dataReader.ReadAsync<AudioModel>();
+    }
+
     public void Update(AudioModel data)
     {
         _dataUpdater.Update(data);
+    }
+
+    public void Update(IList<AudioModel> data)
+    {
+        _dataUpdater.Update(data);
+    }
+
+    public async Task UpdateAsync(AudioModel data)
+    {
+        await _dataUpdater.UpdateAsync(data);
+    }
+
+    public async Task UpdateAsync(IList<AudioModel> data)
+    {
+        await _dataUpdater.UpdateAsync(data);
     }
 }
