@@ -11,12 +11,12 @@ public class EntityFrameworkReader : IDataReader
         _dataContext = dataContext;
     }
 
-    public IList<T> Read<T>() where T: class
+    public IList<T> Read<T>() where T: Model
     {
         return _dataContext.Set<T>().ToList();
     }
 
-    public async Task<IList<T>> ReadAsync<T>() where T : class
+    public async Task<IList<T>> ReadAsync<T>() where T : Model
     {
         return await _dataContext.Set<T>().ToListAsync();
     }

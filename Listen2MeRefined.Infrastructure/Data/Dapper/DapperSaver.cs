@@ -1,24 +1,33 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
+using global::Dapper.Contrib.Extensions;
+
 public class DapperSaver : IDataSaver
 {
-    public void Save<T>(T data) where T : class
+    private readonly IDbConnection _connection;
+
+    public DapperSaver(IDbConnection connection)
     {
-        throw new NotImplementedException();
+        _connection = connection;
     }
 
-    public void Save<T>(IList<T> list) where T : class
+    public void Save<T>(T data) where T : Model
     {
-        throw new NotImplementedException();
+        _connection.Insert(data);
     }
 
-    public Task SaveAsync<T>(T data) where T : class
+    public void Save<T>(IList<T> list) where T : Model
     {
-        throw new NotImplementedException();
+        _connection.Insert(list);
     }
 
-    public Task SaveAsync<T>(IList<T> list) where T : class
+    public async Task SaveAsync<T>(T data) where T : Model
     {
-        throw new NotImplementedException();
+        await _connection.InsertAsync(data);
+    }
+
+    public async Task SaveAsync<T>(IList<T> list) where T : Model
+    {
+        await _connection.InsertAsync(list);
     }
 }

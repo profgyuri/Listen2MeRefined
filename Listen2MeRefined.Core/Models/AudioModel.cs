@@ -5,11 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 [Table("songs")]
-public class AudioModel
+public class AudioModel : Model
 {
     private string? _title;
-
-    [Key] public int Id { get; init; }
 
     public string? Artist { get; set; }
 

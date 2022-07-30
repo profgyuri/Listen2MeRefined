@@ -1,24 +1,33 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
+using global::Dapper.Contrib.Extensions;
+
 public class DapperUpdater : IDataUpdater
 {
-    public void Update<T>(T data) where T : class
+    private readonly IDbConnection _connection;
+
+    public DapperUpdater(IDbConnection connection)
     {
-        throw new NotImplementedException();
+        _connection = connection;
     }
 
-    public void Update<T>(IList<T> list) where T : class
+    public void Update<T>(T data) where T : Model
     {
-        throw new NotImplementedException();
+        _connection.Update(data);
     }
 
-    public Task UpdateAsync<T>(T data) where T : class
+    public void Update<T>(IList<T> list) where T : Model
     {
-        throw new NotImplementedException();
+        _connection.Update(list);
     }
 
-    public Task UpdateAsync<T>(IList<T> list) where T : class
+    public async Task UpdateAsync<T>(T data) where T : Model
     {
-        throw new NotImplementedException();
+        await _connection.UpdateAsync(data);
+    }
+
+    public async Task UpdateAsync<T>(IList<T> list) where T : Model
+    {
+        await _connection.UpdateAsync(list);
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
 
+using Listen2MeRefined.Core.Models;
+
 public interface IDataUpdater
 {
     /// <summary>
@@ -8,7 +10,7 @@ public interface IDataUpdater
     /// </summary>
     /// <typeparam name="T">The type of the model to update.</typeparam>
     /// <param name="data">Entity to update. Usually tracked by the Id column.</param>
-    void Update<T>(T data) where T : class;
+    void Update<T>(T data) where T : Model;
 
     /// <summary>
     ///     Updates a single <typeparamref name="T"/> item in the database asynchronously. 
@@ -16,7 +18,7 @@ public interface IDataUpdater
     /// </summary>
     /// <typeparam name="T">The type of the model to update.</typeparam>
     /// <param name="data">Entity to update. Usually tracked by the Id column.</param>
-    Task UpdateAsync<T>(T data) where T : class;
+    Task UpdateAsync<T>(T data) where T : Model;
 
     /// <summary>
     ///     Updates multiple <typeparamref name="T"/> items in the database. 
@@ -24,7 +26,7 @@ public interface IDataUpdater
     /// </summary>
     /// <typeparam name="T">The type of the models to update.</typeparam>
     /// <param name="list">List of entities to update. Usually tracked by the Id column.</param>
-    void Update<T>(IList<T> list) where T : class;
+    void Update<T>(IList<T> list) where T : Model;
 
     /// <summary>
     ///     Updates multiple <typeparamref name="T"/> items in the database asynchronously. 
@@ -32,5 +34,5 @@ public interface IDataUpdater
     /// </summary>
     /// <typeparam name="T">The type of the models to update.</typeparam>
     /// <param name="list">List of entities to update. Usually tracked by the Id column.</param>
-    Task UpdateAsync<T>(IList<T> list) where T : class;
+    Task UpdateAsync<T>(IList<T> list) where T : Model;
 }

@@ -1,14 +1,26 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
+using global::Dapper;
+
 public class DapperReader : IDataReader
 {
-    public IList<T> Read<T>() where T : class
+    private readonly IDbConnection _connection;
+
+    public DapperReader(IDbConnection connection)
     {
-        throw new NotImplementedException();
+        _connection = connection;
     }
 
-    public Task<IList<T>> ReadAsync<T>() where T : class
+    public IList<T> Read<T>() where T : Model
     {
-        throw new NotImplementedException();
+        var sql = $"SELECT * FROM {typeof(T).Name}s";
+        return _connection.Query<T>(sql).ToList();
+    }
+
+    public async Task<IList<T>> ReadAsync<T>() where T : Model
+    {
+        var sql = $"SELECT * FROM {typeof(T).Name}s";
+        var result = await _connection.QueryAsync<T>(sql);
+        return result.ToList();
     }
 }

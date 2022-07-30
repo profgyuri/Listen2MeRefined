@@ -8,4 +8,8 @@ global using CommunityToolkit.Mvvm.Input;
 global using Serilog;
 global using Listen2MeRefined.Core.EventArgs;
 global using System.Collections.Generic;
+global using System.Data;
 global using System.Threading.Tasks;
+global using Microsoft.Data.SqlClient;
+
+global using IDataReader = Listen2MeRefined.Core.Interfaces.DataHandlers.IDataReader;

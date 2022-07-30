@@ -8,9 +8,12 @@ using Serilog;
 using System.Collections.Generic;
 using System;
 using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Core.Interfaces.DataHandlers;
-using Listen2MeRefined.Infrastructure.Data.Dapper;
+using System.Data;
+using IDataReader = IDataReader;
+using Microsoft.Data.SqlClient;
 
 internal static class IocContainer
 {
@@ -43,6 +46,15 @@ internal static class IocContainer
         #region Data Access
         builder
             .RegisterType<DataContext>()
+            .SingleInstance();
+
+        builder
+            .RegisterType<DbConnection>()
+            .SingleInstance();
+
+        builder
+            .Register(_ => new SqlConnection(DbInfo.SqliteConnectionString))
+            .As<IDbConnection>()
             .SingleInstance();
 
         builder
