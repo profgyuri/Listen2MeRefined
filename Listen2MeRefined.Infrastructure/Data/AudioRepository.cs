@@ -1,8 +1,5 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data;
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 public class AudioRepository : IRepository<AudioModel>
 {
     private readonly IDataReader _dataReader;
@@ -20,6 +17,7 @@ public class AudioRepository : IRepository<AudioModel>
         _logger = logger;
     }
 
+    #region IDataSaver
     public void Create(AudioModel data)
     {
         _dataSaver.Save(data);
@@ -39,7 +37,9 @@ public class AudioRepository : IRepository<AudioModel>
     {
         await _dataSaver.SaveAsync(data);
     }
+    #endregion
 
+    #region IDataRemover
     public void Delete(AudioModel data)
     {
         _dataRemover.Remove(data);
@@ -59,7 +59,9 @@ public class AudioRepository : IRepository<AudioModel>
     {
         await _dataRemover.RemoveAsync(data);
     }
+    #endregion
 
+    #region IDataReader
     public IList<AudioModel> Read()
     {
         return _dataReader.Read<AudioModel>();
@@ -69,7 +71,9 @@ public class AudioRepository : IRepository<AudioModel>
     {
         return await _dataReader.ReadAsync<AudioModel>();
     }
+    #endregion
 
+    #region IDataUpdater
     public void Update(AudioModel data)
     {
         _dataUpdater.Update(data);
@@ -89,4 +93,5 @@ public class AudioRepository : IRepository<AudioModel>
     {
         await _dataUpdater.UpdateAsync(data);
     }
+    #endregion
 }

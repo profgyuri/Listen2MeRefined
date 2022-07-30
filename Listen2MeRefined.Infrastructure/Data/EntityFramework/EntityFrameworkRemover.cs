@@ -1,8 +1,5 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 public class EntityFrameworkRemover : IDataRemover
 {
     private readonly DataContext _dataContext;

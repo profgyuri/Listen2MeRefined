@@ -1,8 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 public class EntityFrameworkReader : IDataReader
 {
