@@ -7,11 +7,14 @@ using System.Windows;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow(MainWindowViewModel viewModel)
+    private readonly FolderBrowserWindow _folderBrowserWindow;
+
+    public MainWindow(MainWindowViewModel viewModel, FolderBrowserWindow folderBrowserWindow)
     {
         InitializeComponent();
 
         DataContext = viewModel;
+        _folderBrowserWindow = folderBrowserWindow;
     }
 
     private void CloseWindow_Click(object sender, RoutedEventArgs e)

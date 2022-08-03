@@ -1,6 +1,5 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Media;
 
-using Ardalis.GuardClauses;
 using NAudio.Wave;
 using System.Collections.ObjectModel;
 

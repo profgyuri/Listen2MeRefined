@@ -10,10 +10,12 @@ using System;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.Core.Interfaces.DataHandlers;
 using System.Data;
 using IDataReader = IDataReader;
 using Microsoft.Data.SqlClient;
+using MediatR.Extensions.Autofac.DependencyInjection;
 
 internal static class IocContainer
 {
@@ -32,10 +34,12 @@ internal static class IocContainer
 
         #region Windows and Pages
         builder.RegisterType<MainWindow>().SingleInstance();
+        builder.RegisterType<FolderBrowserWindow>().InstancePerLifetimeScope();
         #endregion
 
         #region ViewModels
         builder.RegisterType<MainWindowViewModel>();
+        builder.RegisterType<FolderBrowserViewModel>();
         #endregion
 
         #region Logger
@@ -86,6 +90,13 @@ internal static class IocContainer
         builder
             .Register(_ => new KeyboardHook(lowLevelKeys))
             .SingleInstance();
+
+        builder
+            .RegisterMediatR(typeof(MainWindowViewModel).Assembly);
+
+        builder
+            .RegisterType<FolderBrowser>()
+            .As<IFolderBrowser>();
 
         return builder.Build();
     }

@@ -119,6 +119,7 @@
                         Content="{materialDesign:PackIcon Kind=Stop,Size=20}"/>
                     <Button
                         Grid.Column="3"
+                        Command="{Binding PlayPauseCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}"/>
                     <Button

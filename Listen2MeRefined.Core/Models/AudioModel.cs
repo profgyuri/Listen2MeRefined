@@ -1,7 +1,6 @@
 ﻿namespace Listen2MeRefined.Core.Models;
 
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 [Table("songs")]
