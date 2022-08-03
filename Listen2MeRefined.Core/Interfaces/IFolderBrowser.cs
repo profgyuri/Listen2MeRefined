@@ -10,7 +10,7 @@ public interface IFolderBrowser
     IEnumerable<string> GetSubFolders(string path);
 
     /// <summary>
-    ///     Returns a list of the phisycal drives.
+    ///     Returns a list of the logical drives.
     /// </summary>
     /// <returns></returns>
     IEnumerable<string> GetDrives();

@@ -26,7 +26,20 @@ public partial class FolderBrowserViewModel
     [ICommand]
     private void ChangeDirectory()
     {
-        
+        _fullPath = _selectedFolder switch
+        {
+            ".." => Path.GetDirectoryName(_fullPath) ?? "",
+            _ => Path.Combine(_fullPath, _selectedFolder),
+        };
+
+        if (string.IsNullOrEmpty(_fullPath))
+        {
+            GetDriveNames();
+        }
+        else
+        {
+            GetFolderNames();
+        }
     }
 
     /// <summary>
@@ -36,6 +49,34 @@ public partial class FolderBrowserViewModel
     [ICommand]
     private async Task HandleSelectedPath()
     {
-        await _mediator.Publish(new FolderBrowserNotification(SelectedFolder));
+        if (!string.IsNullOrEmpty(_selectedFolder))
+        {
+            _fullPath = Path.Combine(_fullPath, _selectedFolder);
+        }
+
+        _logger.Debug("Publishing {0} from the folder browser dialog.", _fullPath);
+
+        var notification = new FolderBrowserNotification(_fullPath);
+        await _mediator.Publish(notification);
+    }
+
+    private void GetDriveNames()
+    {
+        _folders.Clear();
+
+        foreach (var drive in _folderBrowser.GetDrives())
+        {
+            _folders.Add(drive);
+        }
+    }
+
+    private void GetFolderNames()
+    {
+        _folders.Clear();
+
+        foreach (var folder in _folderBrowser.GetSubFolders(_fullPath))
+        {
+            _folders.Add(folder);
+        }
     }
 }

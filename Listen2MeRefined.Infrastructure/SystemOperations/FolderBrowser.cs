@@ -5,11 +5,12 @@ public class FolderBrowser : IFolderBrowser
 {
     public IEnumerable<string> GetDrives()
     {
-        return new List<string>();
+        return Directory.GetLogicalDrives();
     }
 
     public IEnumerable<string> GetSubFolders(string path)
     {
-        return new List<string>();
+        return Directory.GetDirectories(path)
+            .Select(x => new DirectoryInfo(x).Name);
     }
 }
