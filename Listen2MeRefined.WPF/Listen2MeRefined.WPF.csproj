@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Listen2Me.ico" />
+    <Content Include="Resources\Listen2Me.ico" />
   </ItemGroup>
 
   <ItemGroup>
