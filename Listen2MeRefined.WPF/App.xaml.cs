@@ -17,7 +17,7 @@ public partial class App : Application
 
     private void ShowMainWindow()
     {
-        var container = IocContainer.RegisterDependencies();
+        var container = IocContainer.GetContainer();
         using var scope = container.BeginLifetimeScope();
         var main = scope.Resolve<MainWindow>();
         main.Show();

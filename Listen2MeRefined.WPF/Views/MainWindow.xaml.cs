@@ -1,5 +1,7 @@
 ﻿namespace Listen2MeRefined.WPF;
 
+using Autofac;
+using Listen2MeRefined.WPF.Views;
 using System.Windows;
 
 /// <summary>
@@ -35,6 +37,11 @@ public partial class MainWindow : Window
 
     private void SettingsWindow_Click(object sender, RoutedEventArgs e)
     {
+        WindowManager.ShowWindow<SettingsWindow>();
+    }
 
+    private void AdvancedSearchWindow_Click(object sender, RoutedEventArgs e)
+    {
+        WindowManager.ShowWindow<AdvancedSearchWindow>();
     }
 }

@@ -20,6 +20,8 @@ using Listen2MeRefined.WPF.Views;
 
 internal static class IocContainer
 {
+    private static IContainer? _container;
+
     const string seqConnection = "http://localhost:5341";
     static readonly HashSet<ConsoleKey> lowLevelKeys = 
         new(){
@@ -29,8 +31,13 @@ internal static class IocContainer
                     ConsoleKey.MediaNext
                 };
 
-    internal static IContainer RegisterDependencies()
+    internal static IContainer GetContainer()
     {
+        if (_container is not null)
+        {
+            return _container;
+        }
+        
         var builder = new ContainerBuilder();
 
         #region Windows and Pages
@@ -103,7 +110,7 @@ internal static class IocContainer
             .RegisterType<FolderBrowser>()
             .As<IFolderBrowser>();
 
-        return builder.Build();
+        return _container = builder.Build();
     }
 
     private static Serilog.Core.Logger CreateLogger()

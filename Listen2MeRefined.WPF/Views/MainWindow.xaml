@@ -218,11 +218,12 @@
                         Content="{materialDesign:PackIcon Kind=Search,Size=20}"
                         ToolTip="Quick Search"/>
                     <Button
+                        x:Name="AdvancedSearchWindow"
                         Grid.Column="2"
                         Margin="20 0 0 0"
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=BookOpenOutline}"
-                        ToolTip="Advanced Search"/>
+                        ToolTip="Advanced Search" Click="AdvancedSearchWindow_Click"/>
 
                 </Grid>
 
