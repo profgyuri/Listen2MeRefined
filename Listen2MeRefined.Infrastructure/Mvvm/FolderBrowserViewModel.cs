@@ -40,6 +40,8 @@ public partial class FolderBrowserViewModel
         {
             GetFolderNames();
         }
+
+        _selectedFolder = "";
     }
 
     /// <summary>
