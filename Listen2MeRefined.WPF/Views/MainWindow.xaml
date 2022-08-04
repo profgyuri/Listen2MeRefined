@@ -130,10 +130,11 @@
                         Grid.Column="5"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"/>
-                    <Slider
+                    <Slider Style="{DynamicResource NoHaloSlider}"
                         Foreground="{StaticResource ThirnaryBrush}"
                         materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
                         Grid.Row="1"
+                        Margin="0 10"
                         Grid.ColumnSpan="7"
                         MinWidth="500"/>
 
