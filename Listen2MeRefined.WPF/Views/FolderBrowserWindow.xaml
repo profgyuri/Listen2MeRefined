@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Listen2MeRefined.WPF"
         mc:Ignorable="d"
-        Title="FolderBrowserWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        FontFamily="{Binding FontFamily}"
+		BorderThickness="0"
+		FontSize="16"
+		Background="Transparent"
+		AllowsTransparency="True"
+		Foreground="{StaticResource SecondaryBrush}"
+        Title="FolderBrowserWindow" Height="250" Width="450">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+			x:Name="WindowChrome"
+			CaptionHeight="32"/>
+    </WindowChrome.WindowChrome>
+
+    <Border
+        BorderThickness="2"
+		BorderBrush="{StaticResource ThirnaryBrush}"
+		Background="{StaticResource PrimaryBrush}"
+		CornerRadius="8">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                Text="File Browser"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontWeight="Bold"/>
+
+        </Grid>
+
+    </Border>
 </Window>
