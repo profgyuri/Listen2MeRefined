@@ -1,6 +1,5 @@
 ﻿namespace Listen2MeRefined.WPF;
 
-using Autofac;
 using Listen2MeRefined.WPF.Views;
 using System.Windows;
 
