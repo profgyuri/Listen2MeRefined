@@ -1,8 +1,11 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+﻿<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf">
+    
     <Style TargetType="ListView" x:Key="VirtualizedListView" BasedOn="{StaticResource {x:Type ListView}}">
         <Setter Property="ItemsPanel">
             <Setter.Value>
@@ -11,6 +14,77 @@
                                 VirtualizingPanel.ScrollUnit="Item"
                                 VirtualizingPanel.VirtualizationMode="Recycling"/>
                 </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ListView" x:Key="SongsListView" BasedOn="{StaticResource VirtualizedListView}">
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid
+                        MinWidth="320"
+                        ToolTip="{Binding Display}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Rectangle
+                            Grid.RowSpan="2"
+                            Fill="Transparent"/>
+
+                        <resources:HorizontalSeparator
+                            Grid.Row="1"
+                            VerticalAlignment="Bottom"/>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Text="{Binding Display, FallbackValue=Track}"
+                            FontSize="16"
+                            TextTrimming="CharacterEllipsis"
+                            HorizontalAlignment="Center"
+                            FontWeight="Bold"/>
+
+                        <Grid
+                            Grid.Row="1"
+                            Grid.ColumnSpan="2"
+                            Margin="0 0 0 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                 Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
+                                 TextTrimming="CharacterEllipsis"
+                                 HorizontalAlignment="Center"/>
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
+                                TextTrimming="CharacterEllipsis"
+                                HorizontalAlignment="Center"/>
+                            <TextBlock
+                                Grid.Column="2"
+                                Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                TextTrimming="CharacterEllipsis"
+                                HorizontalAlignment="Center"/>
+                            <TextBlock
+                               Grid.Column="3"
+                               Text="{Binding Genre, FallbackValue=Genre}"
+                               TextTrimming="CharacterEllipsis"
+                               HorizontalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
             </Setter.Value>
         </Setter>
     </Style>

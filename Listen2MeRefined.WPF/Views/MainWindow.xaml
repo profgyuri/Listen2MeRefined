@@ -14,7 +14,8 @@
 		AllowsTransparency="True"
 		Foreground="{StaticResource SecondaryBrush}"
 		Title="Listen2Me"
-		MinHeight="302" MinWidth="530">
+		MinHeight="302" MinWidth="530"
+        MaxHeight="702" MaxWidth="730">
 
     <WindowChrome.WindowChrome>
         <WindowChrome 
@@ -134,7 +135,7 @@
                         Foreground="{StaticResource ThirnaryBrush}"
                         materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
                         Grid.Row="1"
-                        Margin="0 10"
+                        Margin="0 5"
                         Grid.ColumnSpan="7"
                         MinWidth="500"/>
 
