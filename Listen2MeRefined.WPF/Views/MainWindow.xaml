@@ -131,6 +131,8 @@
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"/>
                     <Slider
+                        Foreground="{StaticResource ThirnaryBrush}"
+                        materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
                         Grid.Row="1"
                         Grid.ColumnSpan="7"
                         MinWidth="500"/>

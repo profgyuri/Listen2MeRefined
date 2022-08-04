@@ -17,6 +17,7 @@ public partial class MainWindow : Window
     private void CloseWindow_Click(object sender, RoutedEventArgs e)
     {
         this.Close();
+        System.Environment.Exit(0);
     }
 
     private void MaximizeWindow_Click(object sender, RoutedEventArgs e)
