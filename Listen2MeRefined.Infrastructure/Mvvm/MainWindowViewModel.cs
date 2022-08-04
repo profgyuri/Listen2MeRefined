@@ -14,6 +14,7 @@ public partial class MainWindowViewModel
     public MainWindowViewModel(IMediaController mediaController)
     {
         _mediaController = mediaController;
+        _fontFamily = "Comic Sans MS";
     }
 
     #region Commands
