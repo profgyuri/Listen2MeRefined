@@ -50,7 +50,8 @@
 					Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
 					HorizontalAlignment="Center"
 					VerticalAlignment="Center"
-					Grid.ColumnSpan="4"/>
+					Grid.ColumnSpan="4"
+                    FontWeight="Bold"/>
 
                 <Button
                     x:Name="SettingsWindow"
