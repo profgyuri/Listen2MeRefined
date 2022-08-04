@@ -18,8 +18,10 @@ using System.Windows.Shapes;
 /// </summary>
 public partial class SettingsWindow : Window
 {
-    public SettingsWindow()
+    public SettingsWindow(SettingsWindowViewModel viewModel)
     {
         InitializeComponent();
+
+        DataContext = viewModel;
     }
 }

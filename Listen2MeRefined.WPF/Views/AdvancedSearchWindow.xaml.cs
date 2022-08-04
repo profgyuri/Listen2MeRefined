@@ -18,8 +18,10 @@ using System.Windows.Shapes;
 /// </summary>
 public partial class AdvancedSearchWindow : Window
 {
-    public AdvancedSearchWindow()
+    public AdvancedSearchWindow(AdvancedSearchViewModel viewModel)
     {
         InitializeComponent();
+
+        DataContext = viewModel;
     }
 }

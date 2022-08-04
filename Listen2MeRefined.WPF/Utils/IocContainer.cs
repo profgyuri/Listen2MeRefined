@@ -16,6 +16,7 @@ using System.Data;
 using IDataReader = IDataReader;
 using Microsoft.Data.SqlClient;
 using MediatR.Extensions.Autofac.DependencyInjection;
+using Listen2MeRefined.WPF.Views;
 
 internal static class IocContainer
 {
@@ -35,11 +36,15 @@ internal static class IocContainer
         #region Windows and Pages
         builder.RegisterType<MainWindow>().SingleInstance();
         builder.RegisterType<FolderBrowserWindow>().InstancePerLifetimeScope();
+        builder.RegisterType<AdvancedSearchWindow>().InstancePerLifetimeScope();
+        builder.RegisterType<SettingsWindow>().InstancePerLifetimeScope();
         #endregion
 
         #region ViewModels
         builder.RegisterType<MainWindowViewModel>();
         builder.RegisterType<FolderBrowserViewModel>();
+        builder.RegisterType<AdvancedSearchViewModel>();
+        builder.RegisterType<SettingsWindowViewModel>();
         #endregion
 
         #region Logger
