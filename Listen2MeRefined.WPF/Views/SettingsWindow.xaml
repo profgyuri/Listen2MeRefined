@@ -1,9 +1,9 @@
-﻿<Window x:Class="Listen2MeRefined.WPF.FolderBrowserWindow"
+﻿<Window x:Class="Listen2MeRefined.WPF.Views.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Listen2MeRefined.WPF"
+        xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views"
         mc:Ignorable="d"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -13,7 +13,7 @@
 		Background="Transparent"
 		AllowsTransparency="True"
 		Foreground="{StaticResource SecondaryBrush}"
-        Title="FolderBrowserWindow" Height="250" Width="450">
+        Title="SettingsWindow" Height="300" Width="350">
 
     <WindowChrome.WindowChrome>
         <WindowChrome 
@@ -34,7 +34,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock
-                Text="Folder Browser"
+                Text="Settings"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontWeight="Bold"/>
