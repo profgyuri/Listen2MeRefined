@@ -7,15 +7,10 @@
         xmlns:local="clr-namespace:Listen2MeRefined.WPF"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        WindowStyle="None"
-        ResizeMode="NoResize"
-        FontFamily="{Binding FontFamily}"
-		BorderThickness="0"
-		FontSize="16"
-		Background="Transparent"
-		AllowsTransparency="True"
+        Style="{StaticResource BasicWindow}"
 		Foreground="{StaticResource SecondaryBrush}"
-        Title="FolderBrowserWindow" Height="250" Width="400">
+        Title="FolderBrowserWindow"
+        Height="250" Width="400">
 
     <WindowChrome.WindowChrome>
         <WindowChrome 

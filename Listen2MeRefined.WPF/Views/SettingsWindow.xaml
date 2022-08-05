@@ -5,15 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views"
         mc:Ignorable="d"
-        WindowStyle="None"
+        Style="{StaticResource BasicWindow}"
         ResizeMode="NoResize"
-        FontFamily="{Binding FontFamily}"
-		BorderThickness="0"
-		FontSize="16"
-		Background="Transparent"
-		AllowsTransparency="True"
-		Foreground="{StaticResource SecondaryBrush}"
-        Title="SettingsWindow" Height="300" Width="350">
+        Title="SettingsWindow"
+        Height="300" Width="350">
 
     <WindowChrome.WindowChrome>
         <WindowChrome 
