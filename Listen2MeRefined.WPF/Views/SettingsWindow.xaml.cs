@@ -24,4 +24,9 @@ public partial class SettingsWindow : Window
 
         DataContext = viewModel;
     }
+
+    private void OpenFolderBrowser_Click(object sender, RoutedEventArgs e)
+    {
+        WindowManager.ShowWindow<FolderBrowserWindow>();
+    }
 }

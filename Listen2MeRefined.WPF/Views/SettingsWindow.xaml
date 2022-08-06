@@ -3,12 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views"
+        xmlns:local="clr-namespace:Listen2MeRefined.WPF"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Style="{StaticResource BasicWindow}"
         ResizeMode="NoResize"
         Title="SettingsWindow"
-        Height="300" Width="350">
+        Height="300" Width="400">
+
+    <Window.Resources>
+        <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter"/>
+    </Window.Resources>
 
     <WindowChrome.WindowChrome>
         <WindowChrome 
@@ -33,6 +38,69 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontWeight="Bold"/>
+
+            <Grid
+                Grid.Row="1"
+                Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Text="Local folders: "/>
+                <Grid
+                    Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <ListView
+                        Grid.RowSpan ="2"
+                        Style="{StaticResource VirtualizedListView}"
+                        MaxHeight="128"
+                        MinHeight="42"
+                        Margin="0 0 10 0"
+                        ItemsSource="{Binding Folders}"
+                        SelectedItem="{Binding SelectedFolder}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding}"
+                                    Foreground="{StaticResource SecondaryBrush}"
+                                    TextTrimming="CharacterEllipsis"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <Button
+                        x:Name="OpenFolderBrowser"
+                        Style="{StaticResource InteractionButton}"
+                        Click="OpenFolderBrowser_Click"
+                        Grid.Column="1"
+                        Content="{materialDesign:PackIcon Kind=FolderAddOutline}"
+                        ToolTip="Browse"
+                        Margin="0 0 0 10"/>
+                    <Button
+                        x:Name="RemoveFolder"
+                        Style="{StaticResource InteractionButton}"
+                        Command="{Binding RemoveFolderCommand}"
+                        IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Content="{materialDesign:PackIcon Kind=FolderRemoveOutline}"
+                        ToolTip="Remove Selected"/>
+                </Grid>
+
+            </Grid>
 
         </Grid>
 
