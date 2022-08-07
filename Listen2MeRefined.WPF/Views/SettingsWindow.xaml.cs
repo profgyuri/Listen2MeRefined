@@ -29,4 +29,9 @@ public partial class SettingsWindow : Window
     {
         WindowManager.ShowWindow<FolderBrowserWindow>();
     }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }

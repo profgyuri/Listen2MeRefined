@@ -45,6 +45,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -99,6 +100,15 @@
                         Content="{materialDesign:PackIcon Kind=FolderRemoveOutline}"
                         ToolTip="Remove Selected"/>
                 </Grid>
+
+                <Button
+                    x:Name="CloseButton"
+                    Grid.Row="100"
+                    Grid.ColumnSpan="2"
+                    Style="{StaticResource InteractionButton}"
+                    Content="Done"
+                    Width="120"
+                    Click="CloseButton_Click"/>
 
             </Grid>
 
