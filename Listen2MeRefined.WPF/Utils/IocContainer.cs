@@ -17,6 +17,8 @@ using IDataReader = IDataReader;
 using Microsoft.Data.SqlClient;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using Listen2MeRefined.WPF.Views;
+using MediatR;
+using Listen2MeRefined.Infrastructure.Notifications;
 
 internal static class IocContainer
 {
@@ -51,7 +53,11 @@ internal static class IocContainer
         builder.RegisterType<MainWindowViewModel>();
         builder.RegisterType<FolderBrowserViewModel>();
         builder.RegisterType<AdvancedSearchViewModel>();
-        builder.RegisterType<SettingsWindowViewModel>();
+        builder
+            .RegisterType<SettingsWindowViewModel>()
+            .AsSelf()
+            .As<INotificationHandler<FolderBrowserNotification>>()
+            .SingleInstance();
         #endregion
 
         #region Logger
@@ -104,7 +110,15 @@ internal static class IocContainer
             .SingleInstance();
 
         builder
-            .RegisterMediatR(typeof(MainWindowViewModel).Assembly);
+            .RegisterType<Mediator>()
+            .As<IMediator>()
+            .InstancePerLifetimeScope();
+
+        builder.Register<ServiceFactory>(context =>
+        {
+            var c = context.Resolve<IComponentContext>();
+            return t => c.Resolve(t);
+        });
 
         builder
             .RegisterType<FolderBrowser>()
@@ -119,6 +133,8 @@ internal static class IocContainer
 
         config
             .WriteTo.Async(conf => conf.Seq(seqConnection));
+        config
+            .MinimumLevel.Debug();
 
         return config.CreateLogger();
     }

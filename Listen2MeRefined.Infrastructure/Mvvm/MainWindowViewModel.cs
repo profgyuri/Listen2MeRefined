@@ -18,31 +18,31 @@ public partial class MainWindowViewModel
     }
 
     #region Commands
-    [ICommand]
+    [RelayCommand]
     public void PlayPause()
     {
         _mediaController.PlayPause();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void Stop()
     {
         _mediaController.Stop();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void Next()
     {
         _mediaController.Next();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void Previous()
     {
         _mediaController.Previous();
     }
 
-    [ICommand]
+    [RelayCommand]
     public void Shuffle()
     {
         _mediaController.Shuffle();

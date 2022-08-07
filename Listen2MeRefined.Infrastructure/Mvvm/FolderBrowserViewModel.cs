@@ -21,9 +21,11 @@ public partial class FolderBrowserViewModel
         _logger = logger;
         _folderBrowser = folderBrowser;
         _mediator = mediator;
+
+        ChangeDirectory();
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ChangeDirectory()
     {
         _fullPath = _selectedFolder switch
@@ -48,7 +50,7 @@ public partial class FolderBrowserViewModel
     ///     This method should be called when the browsing is done, 
     ///     and we have a selected path.
     /// </summary>
-    [ICommand]
+    [RelayCommand]
     private async Task HandleSelectedPath()
     {
         if (!string.IsNullOrEmpty(_selectedFolder))

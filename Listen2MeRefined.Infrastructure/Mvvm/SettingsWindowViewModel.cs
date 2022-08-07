@@ -11,14 +11,14 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
     [ObservableProperty] private string _fontFamily = "Helvetica";
     [ObservableProperty] private string? _selectedFolder;
-    [ObservableProperty] private ObservableCollection<string> _folders = new();
+    [ObservableProperty] private ObservableCollection<string> _folders = new() { "toDelete"};
 
     public SettingsWindowViewModel(ILogger logger)
     {
         _logger = logger;
     }
 
-    [ICommand]
+    [RelayCommand]
     private void RemoveFolder()
     {
         Folders.Remove(SelectedFolder!);
@@ -29,7 +29,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     {
         _logger.Debug("Folder received in settings window from folder browser: {0}", notification.Path);
         
-        _folders.Add(notification.Path);
+        Folders.Add(notification.Path);
         return Task.CompletedTask;
     }
     #endregion
