@@ -39,10 +39,14 @@
                 FontWeight="Bold"/>
 
             <ListView
+                x:Name="FolderList"
                 Grid.Row="1"
                 ItemsSource="{Binding Folders}"
                 SelectedItem="{Binding SelectedFolder}"
                 Style="{StaticResource VirtualizedListView}">
+                <ListView.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding ChangeDirectoryCommand}"/>
+                </ListView.InputBindings>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock
@@ -51,6 +55,11 @@
                             TextWrapping="Wrap"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding ChangeDirectoryCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
             </ListView>
 
             <TextBox
@@ -60,7 +69,7 @@
                 Foreground="{StaticResource SecondaryBrush}"
                 Grid.Row="2"
                 Margin="20 10 20 0"
-                Text="{Binding FullPath, UpdateSourceTrigger=PropertyChanged}"/>
+                Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Grid
                 Grid.Row="3"
@@ -86,10 +95,12 @@
                     </i:Interaction.Triggers>
                 </Button>
                 <Button
+                    x:Name="CancelButton"
                     Grid.Column="2"
-                    Content="Cancel"
+                    Content="_Cancel"
                     Style="{StaticResource InteractionButton}"
-                    Width="100"/>
+                    Width="100"
+                    Click="CancelButton_Click"/>
             </Grid>
 
         </Grid>

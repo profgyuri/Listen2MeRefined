@@ -28,11 +28,13 @@ public partial class FolderBrowserViewModel
     [RelayCommand]
     private void ChangeDirectory()
     {
-        _fullPath = _selectedFolder switch
+        FullPath = _selectedFolder switch
         {
             ".." => Path.GetDirectoryName(_fullPath) ?? "",
             _ => Path.Combine(_fullPath, _selectedFolder),
         };
+
+        _folders.Clear();
 
         if (string.IsNullOrEmpty(_fullPath))
         {
@@ -53,9 +55,14 @@ public partial class FolderBrowserViewModel
     [RelayCommand]
     private async Task HandleSelectedPath()
     {
-        if (!string.IsNullOrEmpty(_selectedFolder))
+        if (!string.IsNullOrEmpty(_selectedFolder) && _selectedFolder != "..")
         {
-            _fullPath = Path.Combine(_fullPath, _selectedFolder);
+            FullPath = Path.Combine(_fullPath, _selectedFolder);
+        }
+
+        if (!File.Exists(_fullPath))
+        {
+            return;
         }
 
         _logger.Debug("Publishing {0} from the folder browser dialog.", _fullPath);
@@ -66,8 +73,6 @@ public partial class FolderBrowserViewModel
 
     private void GetDriveNames()
     {
-        _folders.Clear();
-
         foreach (var drive in _folderBrowser.GetDrives())
         {
             _folders.Add(drive);
@@ -76,7 +81,7 @@ public partial class FolderBrowserViewModel
 
     private void GetFolderNames()
     {
-        _folders.Clear();
+        _folders.Add("..");
 
         foreach (var folder in _folderBrowser.GetSubFolders(_fullPath))
         {

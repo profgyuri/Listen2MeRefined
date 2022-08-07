@@ -15,7 +15,6 @@ using Listen2MeRefined.Core.Interfaces.DataHandlers;
 using System.Data;
 using IDataReader = IDataReader;
 using Microsoft.Data.SqlClient;
-using MediatR.Extensions.Autofac.DependencyInjection;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
 using Listen2MeRefined.Infrastructure.Notifications;
@@ -109,6 +108,7 @@ internal static class IocContainer
             .Register(_ => new KeyboardHook(lowLevelKeys))
             .SingleInstance();
 
+        #region MediatR
         builder
             .RegisterType<Mediator>()
             .As<IMediator>()
@@ -119,6 +119,7 @@ internal static class IocContainer
             var c = context.Resolve<IComponentContext>();
             return t => c.Resolve(t);
         });
+        #endregion
 
         builder
             .RegisterType<FolderBrowser>()

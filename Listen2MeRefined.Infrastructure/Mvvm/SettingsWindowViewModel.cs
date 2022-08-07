@@ -11,7 +11,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
     [ObservableProperty] private string _fontFamily = "Helvetica";
     [ObservableProperty] private string? _selectedFolder;
-    [ObservableProperty] private ObservableCollection<string> _folders = new() { "toDelete"};
+    [ObservableProperty] private ObservableCollection<string> _folders = new();
 
     public SettingsWindowViewModel(ILogger logger)
     {

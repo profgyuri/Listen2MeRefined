@@ -10,5 +10,11 @@ public partial class FolderBrowserWindow : Window
     {
         InitializeComponent();
         DataContext = viewModel;
+        FolderList.Focus();
+    }
+
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }
