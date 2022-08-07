@@ -60,7 +60,7 @@ public partial class FolderBrowserViewModel
             FullPath = Path.Combine(_fullPath, _selectedFolder);
         }
 
-        if (!File.Exists(_fullPath))
+        if (string.IsNullOrEmpty(_fullPath) || !new DirectoryInfo(_fullPath).Exists)
         {
             return;
         }
