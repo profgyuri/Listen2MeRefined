@@ -1,7 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
 using Ardalis.GuardClauses;
-using System.Collections.Concurrent;
 using TagLib;
 
 public class SoundFileAnalyzer : IFileAnalyzer<AudioModel>

@@ -2,7 +2,6 @@
 
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
-using System;
 using System.Collections.ObjectModel;
 
 [INotifyPropertyChanged]
