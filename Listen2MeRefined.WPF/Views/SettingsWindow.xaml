@@ -13,6 +13,7 @@
 
     <Window.Resources>
         <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter"/>
+        <local:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter"/>
     </Window.Resources>
 
     <WindowChrome.WindowChrome>
@@ -72,13 +73,20 @@
                         MinHeight="42"
                         Margin="0 0 10 0"
                         ItemsSource="{Binding Folders}"
-                        SelectedItem="{Binding SelectedFolder}">
+                        SelectedItem="{Binding SelectedFolder}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding}"
                                     Foreground="{StaticResource SecondaryBrush}"
-                                    TextTrimming="CharacterEllipsis"/>
+                                    TextTrimming="CharacterEllipsis">
+                                    <TextBlock.ToolTip>
+                                        <ToolTip
+                                            Visibility="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTextBlockVisibilityConverter}}"
+                                            Content="{Binding}"/>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
