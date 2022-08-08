@@ -27,4 +27,25 @@ internal static class WindowManager
             return null;
         }
     }
+
+    internal static bool? ShowWindow<T>(double left, double top, bool isModal = true)
+        where T : Window
+    {
+        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
+        var window = scope.Resolve<T>();
+
+        window.Left = left - window.Width / 2;
+        window.Top = top - window.Height / 2;
+
+        if (isModal)
+        {
+            var result = window.ShowDialog();
+            return result;
+        }
+        else
+        {
+            window.Show();
+            return null;
+        }
+    }
 }

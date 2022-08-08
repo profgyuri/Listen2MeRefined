@@ -27,7 +27,7 @@ public partial class SettingsWindow : Window
 
     private void OpenFolderBrowser_Click(object sender, RoutedEventArgs e)
     {
-        WindowManager.ShowWindow<FolderBrowserWindow>();
+        WindowManager.ShowWindow<FolderBrowserWindow>(Left + Width / 2, Top + Height / 2);
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)

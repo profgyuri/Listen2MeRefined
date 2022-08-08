@@ -36,11 +36,11 @@ public partial class MainWindow : Window
 
     private void SettingsWindow_Click(object sender, RoutedEventArgs e)
     {
-        WindowManager.ShowWindow<SettingsWindow>();
+        WindowManager.ShowWindow<SettingsWindow>(Left + Width / 2, Top + Height / 2);
     }
 
     private void AdvancedSearchWindow_Click(object sender, RoutedEventArgs e)
     {
-        WindowManager.ShowWindow<AdvancedSearchWindow>();
+        WindowManager.ShowWindow<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
     }
 }
