@@ -129,6 +129,10 @@ internal static class IocContainer
             .RegisterType<FileSettingsManager>()
             .As<ISettingsManager>();
 
+        builder
+            .RegisterType<SoundFileAnalyzer>()
+            .As<IFileAnalyzer<AudioModel>>();
+
         return _container = builder.Build();
     }
 
