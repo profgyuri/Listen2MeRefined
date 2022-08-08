@@ -46,6 +46,13 @@ public class FileSettingsManager : ISettingsManager
         return _settings;
     }
 
+    /// <summary>
+    ///     Saves the settings to a file.
+    /// </summary>
+    /// <param name="settings">Delegete, where you can specify only the settings you want to save.</param>
+    /// <example>
+    ///     _iSettingsManager.Save(settings => settings.FontFamily = selectedFont);
+    /// </example>
     public void Save(Action<SettingsModel> settings)
     {
         _logger.Debug("Saving settings...");
