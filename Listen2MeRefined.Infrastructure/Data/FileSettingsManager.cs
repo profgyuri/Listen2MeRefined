@@ -10,7 +10,11 @@ public class FileSettingsManager : ISettingsManager
 {
     private const string SettingsFileName = "settings.json";
 
+    private SettingsModel _settings = new();
+
     private readonly ILogger _logger;
+
+    public SettingsModel Settings => _settings;
 
     public FileSettingsManager(ILogger logger)
     {
@@ -25,12 +29,10 @@ public class FileSettingsManager : ISettingsManager
     {
         _logger.Debug("Loading settings...");
 
-        var settings = new SettingsModel();
-
         try
         {
             var text = File.ReadAllText(SettingsFileName);
-            settings = JsonConvert.DeserializeObject<SettingsModel>(text)!;
+            _settings = JsonConvert.DeserializeObject<SettingsModel>(text)!;
         }
         catch (FileNotFoundException ex)
         {
@@ -41,16 +43,18 @@ public class FileSettingsManager : ISettingsManager
             _logger.Error(ex, "Couldn't load settings!");
         }
 
-        return settings;
+        return _settings;
     }
 
-    public void Save(SettingsModel settings)
+    public void Save(Action<SettingsModel> settings)
     {
         _logger.Debug("Saving settings...");
 
+        settings.Invoke(_settings);
+
         try
         {
-            var text = JsonConvert.SerializeObject(settings);
+            var text = JsonConvert.SerializeObject(_settings);
             File.WriteAllText(SettingsFileName, text);
         }
         catch (Exception ex)

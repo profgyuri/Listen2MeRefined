@@ -4,6 +4,6 @@ using Listen2MeRefined.Core.Models;
 
 public interface ISettingsManager
 {
-    void Save(SettingsModel settings);
+    void Save(Action<SettingsModel> settings);
     SettingsModel Load();
 }
