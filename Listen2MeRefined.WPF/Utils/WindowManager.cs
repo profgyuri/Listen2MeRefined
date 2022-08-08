@@ -28,6 +28,14 @@ internal static class WindowManager
         }
     }
 
+    /// <summary>
+    ///     Shows a window registered in the dependency framework.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="left"></param>
+    /// <param name="top"></param>
+    /// <param name="isModal"></param>
+    /// <returns></returns>
     internal static bool? ShowWindow<T>(double left, double top, bool isModal = true)
         where T : Window
     {

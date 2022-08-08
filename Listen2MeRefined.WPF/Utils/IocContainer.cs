@@ -126,7 +126,7 @@ internal static class IocContainer
             .As<IFolderBrowser>();
 
         builder
-            .RegisterType<SettingsManager>()
+            .RegisterType<FileSettingsManager>()
             .As<ISettingsManager>();
 
         return _container = builder.Build();
