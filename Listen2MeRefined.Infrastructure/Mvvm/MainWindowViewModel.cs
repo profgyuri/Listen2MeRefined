@@ -1,23 +1,32 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
+using System.Collections.ObjectModel;
+
 [INotifyPropertyChanged]
 public partial class MainWindowViewModel
 {
-    #region Fields
-    private IMediaController _mediaController;
-    #endregion
+    private readonly ILogger _logger;
+    private readonly IMediaController _mediaController;
 
-    #region Properties
-    [ObservableProperty] private string _fontFamily;
-    #endregion
+    [ObservableProperty] private string _fontFamily = "Comic Sans MS";
+    [ObservableProperty] private string _searchTerm = "";
+    [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
+    [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
 
-    public MainWindowViewModel(IMediaController mediaController)
+    public MainWindowViewModel(IMediaController mediaController, ILogger logger)
     {
         _mediaController = mediaController;
-        _fontFamily = "Comic Sans MS";
+        _logger = logger;
     }
 
     #region Commands
+    [RelayCommand]
+    public void QuickSearch()
+    {
+        _logger.Information($"Searching for '{_searchTerm}'");
+        _searchResults.Clear();
+    }
+
     [RelayCommand]
     public void PlayPause()
     {

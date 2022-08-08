@@ -6,15 +6,9 @@ using System.Text;
 [Table("songs")]
 public class AudioModel : Model
 {
-    private string? _title;
-
     public string? Artist { get; set; }
 
-    public string Title
-    {
-        get => _title ?? Display;
-        set => _title = value;
-    }
+    public string Title { get; set; }
 
     public string? Genre { get; set; }
 

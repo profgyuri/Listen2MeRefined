@@ -174,19 +174,21 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        Margin="10 5 0 5"
+                        Margin="20 5 10 5"
                         Grid.ColumnSpan="5"
-                        MinWidth="500"/>
+                        MinWidth="470"/>
 
                 </Grid>
 
                 <!-- Search results -->
                 <ListView
+                    ItemsSource="{Binding SearchResults}"
                     Style="{StaticResource SongsListView}"
                     Grid.Row="1"/>
 
                 <!-- Playlist -->
                 <ListView
+                    ItemsSource="{Binding PlayList}"
                     Style="{StaticResource SongsListView}"
                     Grid.Row="1"
                     Grid.Column="1"/>
@@ -203,11 +205,13 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBox
-                        Text="Searchbox"
+                        Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        materialDesign:HintAssist.Hint="Search For:"
                         materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource SecondaryBrush}"/>
                     <Button
                         Grid.Column="1"
                         Margin="20 0 0 0"
+                        Command="{Binding QuickSearchCommand}"
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=Search,Size=20}"
                         ToolTip="Quick Search"/>
@@ -217,7 +221,8 @@
                         Margin="20 0 0 0"
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=BookOpenOutline}"
-                        ToolTip="Advanced Search" Click="AdvancedSearchWindow_Click"/>
+                        ToolTip="Advanced Search"
+                        Click="AdvancedSearchWindow_Click"/>
 
                 </Grid>
 
