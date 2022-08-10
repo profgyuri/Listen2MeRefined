@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 /// <summary>
 ///     Wrapper class for NAudio.
 /// </summary>
-public sealed class MusicPlayer : IMediaController
+public sealed class MusicPlayer : IMediaController, IPlaylistReference
 {
     private bool _startSongAutomatically = false;
     private int _playlistIndex = 0;
@@ -171,4 +171,10 @@ public sealed class MusicPlayer : IMediaController
         }
     }
     #endregion
+
+    /// <inheritdoc />
+    public void PassPlaylist(ref ObservableCollection<AudioModel> playlist)
+    {
+        _playlist = playlist;
+    }
 }

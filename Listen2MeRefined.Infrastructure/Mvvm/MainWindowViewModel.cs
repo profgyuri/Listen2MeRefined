@@ -7,16 +7,20 @@ public partial class MainWindowViewModel
 {
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
+    private readonly  IPlaylistReference _playlistReference;
 
     [ObservableProperty] private string _fontFamily = "Comic Sans MS";
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
 
-    public MainWindowViewModel(IMediaController mediaController, ILogger logger)
+    public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference)
     {
         _mediaController = mediaController;
         _logger = logger;
+        _playlistReference = playlistReference;
+        
+        _playlistReference.PassPlaylist(ref _playList);
     }
 
     #region Commands

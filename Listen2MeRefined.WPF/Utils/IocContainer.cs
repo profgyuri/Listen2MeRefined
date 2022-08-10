@@ -102,6 +102,7 @@ internal static class IocContainer
         builder
             .RegisterType<MusicPlayer>()
             .As<IMediaController>()
+            .As<IPlaylistReference>()
             .SingleInstance();
 
         builder
