@@ -23,7 +23,7 @@ public partial class MainWindowViewModel
     [RelayCommand]
     public void QuickSearch()
     {
-        _logger.Information($"Searching for '{_searchTerm}'");
+        _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
         _searchResults.Clear();
     }
 
