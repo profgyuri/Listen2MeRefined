@@ -18,7 +18,7 @@ public sealed class MusicPlayer : IMediaController
     private PlaybackStoppedFor _stoppedFor = PlaybackStoppedFor.EndOfTrack;
     private PlaybackState _playbackState = PlaybackState.Stopped;
 
-    private ILogger _logger;
+    private readonly ILogger _logger;
 
     public MusicPlayer(ILogger logger)
     {
@@ -34,11 +34,14 @@ public sealed class MusicPlayer : IMediaController
         {
             _waveOutEvent?.Pause();
             _startSongAutomatically = false;
+            _playbackState = PlaybackState.Paused;
 
             _logger.Debug("Playback paused");
 
             return;
         }
+        
+        _playbackState = PlaybackState.Playing;
 
         if (_currentSong is null && _playlist.Any())
         {
@@ -54,6 +57,7 @@ public sealed class MusicPlayer : IMediaController
     {
         _waveOutEvent?.Stop();
         _stoppedFor = PlaybackStoppedFor.UserInput;
+        _playbackState = PlaybackState.Stopped;
 
         _logger.Debug("Playback stopped by user");
 
@@ -145,7 +149,7 @@ public sealed class MusicPlayer : IMediaController
         {
             if (_waveOutEvent is not null)
             {
-                _waveOutEvent.Stop();   //todo: watch out for possible unintentional song skipping
+                _waveOutEvent.Stop();
             }
 
             _waveOutEvent = new WaveOutEvent();
