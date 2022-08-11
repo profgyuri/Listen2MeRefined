@@ -71,6 +71,26 @@ public class AudioRepository : IRepository<AudioModel>
     {
         return await _dataReader.ReadAsync<AudioModel>();
     }
+    
+    public IEnumerable<AudioModel> Read(string searchTerm)
+    {
+        return _dataReader.Read<AudioModel>(searchTerm);
+    }
+    
+    public async Task<IEnumerable<AudioModel>> ReadAsync(string searchTerm)
+    {
+        return await _dataReader.ReadAsync<AudioModel>(searchTerm);
+    }
+    
+    public IEnumerable<AudioModel> Read(AudioModel model)
+    {
+        return _dataReader.Read(model, false);
+    }
+    
+    public async Task<IEnumerable<AudioModel>> ReadAsync(AudioModel model)
+    {
+        return await _dataReader.ReadAsync(model, false);
+    }
     #endregion
 
     #region IDataUpdater

@@ -12,6 +12,10 @@ public interface IRepository<T>
     Task CreateAsync(IEnumerable<T> data);
     IEnumerable<T> Read();
     Task<IEnumerable<T>> ReadAsync();
+    IEnumerable<T> Read(string searchTerm);
+    Task<IEnumerable<T>> ReadAsync(string searchTerm);
+    IEnumerable<T> Read(T model);
+    Task<IEnumerable<T>> ReadAsync(T model);
     void Update(T data);
     Task UpdateAsync(T data);
     void Update(IEnumerable<T> data);
