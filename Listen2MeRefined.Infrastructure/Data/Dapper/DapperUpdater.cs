@@ -16,7 +16,7 @@ public class DapperUpdater : IDataUpdater
         _connection.Update(data);
     }
 
-    public void Update<T>(IList<T> list) where T : Model
+    public void Update<T>(IEnumerable<T> list) where T : Model
     {
         _connection.Update(list);
     }
@@ -26,7 +26,7 @@ public class DapperUpdater : IDataUpdater
         await _connection.UpdateAsync(data);
     }
 
-    public async Task UpdateAsync<T>(IList<T> list) where T : Model
+    public async Task UpdateAsync<T>(IEnumerable<T> list) where T : Model
     {
         await _connection.UpdateAsync(list);
     }

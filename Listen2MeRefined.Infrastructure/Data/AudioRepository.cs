@@ -23,7 +23,7 @@ public class AudioRepository : IRepository<AudioModel>
         _dataSaver.Save(data);
     }
 
-    public void Create(IList<AudioModel> data)
+    public void Create(IEnumerable<AudioModel> data)
     {
         _dataSaver.Save(data);
     }
@@ -33,7 +33,7 @@ public class AudioRepository : IRepository<AudioModel>
         await _dataSaver.SaveAsync(data);
     }
 
-    public async Task CreateAsync(IList<AudioModel> data)
+    public async Task CreateAsync(IEnumerable<AudioModel> data)
     {
         await _dataSaver.SaveAsync(data);
     }
@@ -45,7 +45,7 @@ public class AudioRepository : IRepository<AudioModel>
         _dataRemover.Remove(data);
     }
 
-    public void Delete(IList<AudioModel> data)
+    public void Delete(IEnumerable<AudioModel> data)
     {
         _dataRemover.Remove(data);
     }
@@ -55,19 +55,19 @@ public class AudioRepository : IRepository<AudioModel>
         await _dataRemover.RemoveAsync(data);
     }
 
-    public async Task DeleteAsync(IList<AudioModel> data)
+    public async Task DeleteAsync(IEnumerable<AudioModel> data)
     {
         await _dataRemover.RemoveAsync(data);
     }
     #endregion
 
     #region IDataReader
-    public IList<AudioModel> Read()
+    public IEnumerable<AudioModel> Read()
     {
         return _dataReader.Read<AudioModel>();
     }
 
-    public async Task<IList<AudioModel>> ReadAsync()
+    public async Task<IEnumerable<AudioModel>> ReadAsync()
     {
         return await _dataReader.ReadAsync<AudioModel>();
     }
@@ -79,7 +79,7 @@ public class AudioRepository : IRepository<AudioModel>
         _dataUpdater.Update(data);
     }
 
-    public void Update(IList<AudioModel> data)
+    public void Update(IEnumerable<AudioModel> data)
     {
         _dataUpdater.Update(data);
     }
@@ -89,7 +89,7 @@ public class AudioRepository : IRepository<AudioModel>
         await _dataUpdater.UpdateAsync(data);
     }
 
-    public async Task UpdateAsync(IList<AudioModel> data)
+    public async Task UpdateAsync(IEnumerable<AudioModel> data)
     {
         await _dataUpdater.UpdateAsync(data);
     }

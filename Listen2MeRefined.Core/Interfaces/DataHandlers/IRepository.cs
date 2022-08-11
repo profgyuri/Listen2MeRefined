@@ -8,16 +8,16 @@ public interface IRepository<T>
 {
     void Create(T data);
     Task CreateAsync(T data);
-    void Create(IList<T> data);
-    Task CreateAsync(IList<T> data);
-    IList<T> Read();
-    Task<IList<T>> ReadAsync();
+    void Create(IEnumerable<T> data);
+    Task CreateAsync(IEnumerable<T> data);
+    IEnumerable<T> Read();
+    Task<IEnumerable<T>> ReadAsync();
     void Update(T data);
     Task UpdateAsync(T data);
-    void Update(IList<T> data);
-    Task UpdateAsync(IList<T> data);
+    void Update(IEnumerable<T> data);
+    Task UpdateAsync(IEnumerable<T> data);
     void Delete(T data);
     Task DeleteAsync(T data);
-    void Delete(IList<T> data);
-    Task DeleteAsync(IList<T> data);
+    void Delete(IEnumerable<T> data);
+    Task DeleteAsync(IEnumerable<T> data);
 }

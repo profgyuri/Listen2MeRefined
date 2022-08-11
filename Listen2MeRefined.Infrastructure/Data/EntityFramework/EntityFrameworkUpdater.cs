@@ -15,7 +15,7 @@ public class EntityFrameworkUpdater : IDataUpdater
         _dataContext.SaveChanges();
     }
 
-    public void Update<T>(IList<T> list) where T : Model
+    public void Update<T>(IEnumerable<T> list) where T : Model
     {
         _dataContext.Set<T>().UpdateRange(list);
         _dataContext.SaveChanges();
@@ -27,7 +27,7 @@ public class EntityFrameworkUpdater : IDataUpdater
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync<T>(IList<T> list) where T : Model
+    public async Task UpdateAsync<T>(IEnumerable<T> list) where T : Model
     {
         _dataContext.Set<T>().UpdateRange(list);
         await _dataContext.SaveChangesAsync();

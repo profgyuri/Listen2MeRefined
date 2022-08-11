@@ -23,12 +23,12 @@ public interface IDataSaver
     /// </summary>
     /// <typeparam name="T">The type of the model to save to the database.</typeparam>
     /// <param name="list">List of entities to save to the database.</param>
-    void Save<T>(IList<T> list) where T : Model;
+    void Save<T>(IEnumerable<T> list) where T : Model;
 
     /// <summary>
     ///     Saves multiple <typeparamref name="T"/> entities to the database asynvhronously.
     /// </summary>
     /// <typeparam name="T">The type of the model to save to the database.</typeparam>
     /// <param name="list">List of entities to save to the database.</param>
-    Task SaveAsync<T>(IList<T> list) where T : Model;
+    Task SaveAsync<T>(IEnumerable<T> list) where T : Model;
 }

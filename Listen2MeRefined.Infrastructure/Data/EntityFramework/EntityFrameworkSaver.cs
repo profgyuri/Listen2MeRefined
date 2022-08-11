@@ -15,7 +15,7 @@ public class EntityFrameworkSaver : IDataSaver
         _dataContext.SaveChanges();
     }
 
-    public void Save<T>(IList<T> list) where T : Model
+    public void Save<T>(IEnumerable<T> list) where T : Model
     {
         _dataContext.Set<T>().AddRange(list);
         _dataContext.SaveChanges();
@@ -27,7 +27,7 @@ public class EntityFrameworkSaver : IDataSaver
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task SaveAsync<T>(IList<T> list) where T : Model
+    public async Task SaveAsync<T>(IEnumerable<T> list) where T : Model
     {
         _dataContext.Set<T>().AddRange(list);
         await _dataContext.SaveChangesAsync();

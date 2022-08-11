@@ -15,7 +15,7 @@ public class EntityFrameworkRemover : IDataRemover
         _dataContext.SaveChanges();
     }
 
-    public void Remove<T>(IList<T> list) where T : Model
+    public void Remove<T>(IEnumerable<T> list) where T : Model
     {
         _dataContext.Set<T>().RemoveRange(list);
         _dataContext.SaveChanges();
@@ -27,7 +27,7 @@ public class EntityFrameworkRemover : IDataRemover
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task RemoveAsync<T>(IList<T> list) where T : Model
+    public async Task RemoveAsync<T>(IEnumerable<T> list) where T : Model
     {
         _dataContext.Set<T>().RemoveRange(list);
         await _dataContext.SaveChangesAsync();

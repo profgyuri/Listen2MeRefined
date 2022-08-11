@@ -11,4 +11,12 @@ internal static class Extensions
             throw new ArgumentException($"There is no file under this path: {path}", parameterName);
         }
     }
+    
+    internal  static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            collection.Add(item);
+        }
+    }
 }

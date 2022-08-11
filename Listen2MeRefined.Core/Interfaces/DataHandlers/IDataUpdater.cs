@@ -26,7 +26,7 @@ public interface IDataUpdater
     /// </summary>
     /// <typeparam name="T">The type of the models to update.</typeparam>
     /// <param name="list">List of entities to update. Usually tracked by the Id column.</param>
-    void Update<T>(IList<T> list) where T : Model;
+    void Update<T>(IEnumerable<T> list) where T : Model;
 
     /// <summary>
     ///     Updates multiple <typeparamref name="T"/> items in the database asynchronously. 
@@ -34,5 +34,5 @@ public interface IDataUpdater
     /// </summary>
     /// <typeparam name="T">The type of the models to update.</typeparam>
     /// <param name="list">List of entities to update. Usually tracked by the Id column.</param>
-    Task UpdateAsync<T>(IList<T> list) where T : Model;
+    Task UpdateAsync<T>(IEnumerable<T> list) where T : Model;
 }

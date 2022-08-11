@@ -17,7 +17,7 @@ public class DapperRemover : IDataRemover
         _connection.Execute(sql, new { data.Id });
     }
 
-    public void Remove<T>(IList<T> list) where T : Model
+    public void Remove<T>(IEnumerable<T> list) where T : Model
     {
         var sql = $"DELETE FROM {typeof(T).Name}s WHERE Id IN @Ids";
         _connection.Execute(sql, new { Ids = list.Select(x => x.Id) });
@@ -29,7 +29,7 @@ public class DapperRemover : IDataRemover
         await _connection.ExecuteAsync(sql, new { data.Id });
     }
 
-    public async Task RemoveAsync<T>(IList<T> list) where T : Model
+    public async Task RemoveAsync<T>(IEnumerable<T> list) where T : Model
     {
         var sql = $"DELETE FROM {typeof(T).Name}s WHERE Id IN @Ids";
         await _connection.ExecuteAsync(sql, new { Ids = list.Select(x => x.Id) });
