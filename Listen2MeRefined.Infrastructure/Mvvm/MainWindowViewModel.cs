@@ -32,7 +32,7 @@ public partial class MainWindowViewModel
     {
         _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
         _searchResults.Clear();
-        _searchResults.AddRange(await _audioRepository.ReadAsync());
+        _searchResults.AddRange(await _audioRepository.ReadAsync(_searchTerm));
     }
 
     [RelayCommand]

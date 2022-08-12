@@ -11,25 +11,25 @@ public class EntityFrameworkSaver : IDataSaver
 
     public void Save<T>(T data) where T : Model
     {
-        _dataContext.Set<T>().Add(data);
+        _dataContext.AddIfDoesNotExist(data);
         _dataContext.SaveChanges();
     }
 
     public void Save<T>(IEnumerable<T> list) where T : Model
     {
-        _dataContext.Set<T>().AddRange(list);
+        _dataContext.AddIfDoesNotExist(list);
         _dataContext.SaveChanges();
     }
 
     public async Task SaveAsync<T>(T data) where T : Model
     {
-        _dataContext.Set<T>().Add(data);
+        _dataContext.AddIfDoesNotExist(data);
         await _dataContext.SaveChangesAsync();
     }
 
     public async Task SaveAsync<T>(IEnumerable<T> list) where T : Model
     {
-        _dataContext.Set<T>().AddRange(list);
+        await _dataContext.AddIfDoesNotExistAsync(list);
         await _dataContext.SaveChangesAsync();
     }
 }

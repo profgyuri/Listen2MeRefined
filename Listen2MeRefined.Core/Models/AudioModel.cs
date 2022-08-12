@@ -1,9 +1,11 @@
-﻿namespace Listen2MeRefined.Core.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Dapper.Contrib.Extensions;
 
-using System.ComponentModel.DataAnnotations.Schema;
+namespace Listen2MeRefined.Core.Models;
+
 using System.Text;
 
-[Table("songs")]
+[System.ComponentModel.DataAnnotations.Schema.Table("Songs")]
 public class AudioModel : Model
 {
     public string? Artist { get; set; }
@@ -16,6 +18,7 @@ public class AudioModel : Model
 
     public short Bitrate { get; set; }
 
+    [NotMapped]
     public string Display =>
         string.IsNullOrEmpty(Artist)
             ? $"{Path?.Split(System.IO.Path.PathSeparator)[^1] ?? ""}"
@@ -23,6 +26,15 @@ public class AudioModel : Model
 
     public TimeSpan Length { get; set; }
     public string? Path { get; set; }
+
+    #region Overrides of Object
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        // only true when the 2 paths are the same
+        return obj is AudioModel audio &&
+            string.Equals(Path, audio.Path, StringComparison.OrdinalIgnoreCase);
+    }
 
     public override string ToString()
     {
@@ -35,4 +47,5 @@ public class AudioModel : Model
         builder.AppendLine("}");
         return builder.ToString();
     }
+    #endregion
 }

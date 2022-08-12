@@ -1,9 +1,13 @@
-﻿namespace Listen2MeRefined.Infrastructure;
+﻿using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+
+namespace Listen2MeRefined.Infrastructure;
 
 using Ardalis.GuardClauses;
 
 internal static class Extensions
 {
+    private static object _contextLock = new object();
+    
     internal static void NotExistingFile(this IGuardClause clause, string path, string parameterName)
     {
         if (!File.Exists(path))
@@ -18,5 +22,40 @@ internal static class Extensions
         {
             collection.Add(item);
         }
+    }
+    
+    internal static void AddIfDoesNotExist<T>(this DataContext context, T item) where T : class
+    {
+        if (!context.Set<T>().Any(x => x.Equals(item)))
+        {
+            context.Set<T>().Add(item);
+        }
+    }
+    
+    internal static void AddIfDoesNotExist<T>(this DataContext context, IEnumerable<T> items) where T : class
+    {
+        foreach (var item in items)
+        {
+            context.AddIfDoesNotExist(item);
+        }
+    }
+    
+    internal static async Task AddIfDoesNotExistAsync<T>(this DataContext context, IEnumerable<T> items) where T : class
+    {
+        await Task.Run(() =>
+        {
+            foreach (var item in items)
+            {
+                Monitor.Enter(_contextLock);
+                try
+                {
+                    context.AddIfDoesNotExist(item);
+                }
+                finally
+                {
+                    Monitor.Exit(_contextLock);
+                }
+            }
+        }).ConfigureAwait(false);
     }
 }

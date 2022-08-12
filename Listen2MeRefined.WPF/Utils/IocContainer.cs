@@ -14,7 +14,7 @@ using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.Core.Interfaces.DataHandlers;
 using System.Data;
 using IDataReader = IDataReader;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
 using Listen2MeRefined.Infrastructure.Notifications;
@@ -74,7 +74,12 @@ internal static class IocContainer
             .SingleInstance();
 
         builder
-            .Register(_ => new SqlConnection(DbInfo.SqliteConnectionString))
+            .Register(_ =>
+            {
+                var conn = new SqliteConnection(DbInfo.SqliteConnectionString);
+                conn.Open();
+                return conn;
+            })
             .As<IDbConnection>()
             .SingleInstance();
 
@@ -133,6 +138,10 @@ internal static class IocContainer
         builder
             .RegisterType<SoundFileAnalyzer>()
             .As<IFileAnalyzer<AudioModel>>();
+        
+        builder
+            .RegisterType<FileEnumerator>()
+            .As<IFileEnumerator>();
 
         return _container = builder.Build();
     }

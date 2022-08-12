@@ -52,7 +52,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
 
                     b.HasIndex("PlaylistModelId");
 
-                    b.ToTable("songs");
+                    b.ToTable("Songs");
                 });
 
             modelBuilder.Entity("Listen2MeRefined.Core.Models.PlaylistModel", b =>
