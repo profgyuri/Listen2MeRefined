@@ -11,18 +11,20 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     private readonly ISettingsManager _settingsManager;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
+    private readonly IRepository<AudioModel> _audioRepository;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
     [ObservableProperty] private ObservableCollection<string> _folders;
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IFileEnumerator fileEnumerator)
+        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository)
     {
         _logger = logger;
         _settingsManager = settingsManager;
         _audioFileAnalyzer = audioFileAnalyzer;
         _fileEnumerator = fileEnumerator;
+        _audioRepository = audioRepository;
 
         Init();
     }
@@ -55,7 +57,8 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         
         _logger.Information("Scanning folder for audio files: {Path}", notification.Path);
         var files = await _fileEnumerator.EnumerateFilesAsync(notification.Path);
-        await _audioFileAnalyzer.AnalyzeAsync(files);
+        var songs = await _audioFileAnalyzer.AnalyzeAsync(files);
+        await _audioRepository.CreateAsync(songs);
     }
     #endregion
 }

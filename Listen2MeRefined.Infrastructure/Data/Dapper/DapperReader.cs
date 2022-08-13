@@ -158,7 +158,7 @@ public class DapperReader : IDataReader
         var properties = typeof(T)
             .GetProperties()
             .Select(p => p.Name)
-            .Where(p => p != "Display");
+            .Where(p => p != "Display" && p != "Id");
 
         return properties;
     }

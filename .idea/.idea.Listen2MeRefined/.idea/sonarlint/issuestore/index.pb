@@ -23,16 +23,10 @@ Z
 *Listen2MeRefined.WPF/Views/MainWindow.xaml,b\8\b8ae0b7e204a2c65fbe3dc637c2b76f0b1ef15a5
 l
 <Listen2MeRefined.Core/Interfaces/DataHandlers/IDataReader.cs,e\7\e767518470ff0b811d22b40aca21d5c489671716
-g
-7Listen2MeRefined.Infrastructure/Data/AudioRepository.cs,b\3\b335c0c353e189edc00fd87b3cebe492096e6590
 l
 <Listen2MeRefined.Core/Interfaces/DataHandlers/IRepository.cs,7\1\7150565a22f0674e42bb4adc8f617782c0f0c007
 ^
 .Listen2MeRefined.WPF/Views/SettingsWindow.xaml,b\4\b444d8bde0cecf65b0f301e2570178d976e2b394
-u
-EListen2MeRefined.Infrastructure/SystemOperations/SoundFileAnalyzer.cs,a\0\a00963f0d696b20353e3d9fa1cfa964dae2b09b5
-a
-1Listen2MeRefined.Core/Interfaces/IFileAnalyzer.cs,9\6\96fc8152ae5491412357b26e159e645dde9b2978
 q
 AListen2MeRefined.Infrastructure/SystemOperations/FolderBrowser.cs,3\a\3ac7542470859e530ffa1bdfa486767fda6bbb33
 d

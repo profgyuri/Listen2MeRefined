@@ -20,21 +20,27 @@ public class AudioRepository : IRepository<AudioModel>
     #region IDataSaver
     public void Create(AudioModel data)
     {
+        _logger.Information("Saving audio to database: {Audio}", data.Display);
         _dataSaver.Save(data);
     }
 
     public void Create(IEnumerable<AudioModel> data)
     {
+        data.TryGetNonEnumeratedCount(out var count);
+        _logger.Information("Saving audio list to database: {Count}", count);
         _dataSaver.Save(data);
     }
 
     public async Task CreateAsync(AudioModel data)
     {
+        _logger.Information("Saving audio to database: {Audio}", data.Display);
         await _dataSaver.SaveAsync(data);
     }
 
     public async Task CreateAsync(IEnumerable<AudioModel> data)
     {
+        data.TryGetNonEnumeratedCount(out var count);
+        _logger.Information("Saving audio list to database: {Count}", count);
         await _dataSaver.SaveAsync(data);
     }
     #endregion
