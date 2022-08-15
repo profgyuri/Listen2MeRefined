@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Listen2MeRefined.WPF"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -184,6 +185,8 @@
                 <!-- Search results -->
                 <ListView
                     x:Name="SearchResults"
+                    dd:DragDrop.IsDragSource="True"
+                    dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding SearchResults}"
                     Style="{StaticResource SongsListView}"
                     Grid.Row="1">
@@ -199,6 +202,8 @@
 
                 <!-- Playlist -->
                 <ListView
+                    dd:DragDrop.IsDragSource="True"
+                    dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding PlayList}"
                     Style="{StaticResource SongsListView}"
                     Grid.Row="1"
