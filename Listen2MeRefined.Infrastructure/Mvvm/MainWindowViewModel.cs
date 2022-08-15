@@ -15,6 +15,8 @@ public partial class MainWindowViewModel
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
 
+    private HashSet<AudioModel> _selectedSearchResults;
+
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
         IRepository<AudioModel> audioRepository)
     {
@@ -28,11 +30,20 @@ public partial class MainWindowViewModel
 
     #region Commands
     [RelayCommand]
+    public void HandleSelectedItems(IEnumerable<object> selectedItems)
+    {
+        _selectedSearchResults = new(selectedItems.Cast<AudioModel>());
+    }
+    
+    [RelayCommand]
     public async Task QuickSearch()
     {
         _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
         _searchResults.Clear();
-        var results = await _audioRepository.ReadAsync(_searchTerm);
+        var results = 
+            string.IsNullOrEmpty(_searchTerm) 
+                ? await _audioRepository.ReadAsync() 
+                : await _audioRepository.ReadAsync(_searchTerm);
         _searchResults.AddRange(results);
     }
 
