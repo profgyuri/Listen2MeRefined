@@ -65,8 +65,6 @@ P
  Listen2MeRefined.WPF/App.xaml.cs,b\c\bcfa5eae421bd806f243d1ea596a8fdf11e3a2b9
 Z
 *Listen2MeRefined.Core/Models/AudioModel.cs,f\c\fc23ff1c538a934825572164db4e487bfde7d9c3
-[
-+Listen2MeRefined.WPF/Utils/WindowManager.cs,9\0\90af055c4b4e2fac5947e6aeddea39804714b926
 r
 BListen2MeRefined.Infrastructure/SystemOperations/FileEnumerator.cs,b\2\b2e79ca29584af3c18ad16e85fcebbca0ebe28e7
 o
@@ -85,3 +83,7 @@ x
 HListen2MeRefined.Infrastructure/Notifications/CurrentSongNotification.cs,d\0\d0a8eec54d49b4e31b992d023bd72f02f4c34b88
 n
 >Listen2MeRefined.Infrastructure/Mvvm/FolderBrowserViewModel.cs,8\b\8bfa7cad80d6ef47a99b3daea9eeec962f6ac599
+R
+"Listen2MeRefined.Core/TimedTask.cs,4\9\491051a7daa6b3263175aa39360a4b56cc441ca3
+[
++Listen2MeRefined.WPF/Utils/WindowManager.cs,9\0\90af055c4b4e2fac5947e6aeddea39804714b926

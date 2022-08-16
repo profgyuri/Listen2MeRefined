@@ -11,8 +11,8 @@ using System.Collections.ObjectModel;
 /// </summary>
 public sealed class MusicPlayer : IMediaController, IPlaylistReference
 {
-    private bool _startSongAutomatically = false;
-    private int _playlistIndex = 0;
+    private bool _startSongAutomatically;
+    private int _playlistIndex;
     private double _previousTimeStamp = -1;
     private AudioModel? _currentSong;
     private AudioFileReader? _fileReader;
@@ -23,6 +23,26 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
+
+    public double CurrentTime
+    {
+        get => _fileReader?.CurrentTime.TotalMilliseconds ?? 0;
+        set
+        {
+            if (_fileReader == null)
+            {
+                return;
+            }
+            
+            _fileReader.CurrentTime = TimeSpan.FromMilliseconds(value);
+        }
+    }
+
+    public float Volume
+    {
+        get => _waveOutEvent.Volume;
+        set => _waveOutEvent.Volume = value;
+    }
 
     public MusicPlayer(ILogger logger, IMediator mediator)
     {

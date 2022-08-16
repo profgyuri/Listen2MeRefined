@@ -184,6 +184,7 @@
                         Margin="20 5 10 5"
                         Minimum="0"
                         Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
+                        Value="{Binding CurrentTime, UpdateSourceTrigger=PropertyChanged}"
                         Grid.ColumnSpan="5"
                         MinWidth="470"/>
 

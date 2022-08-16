@@ -29,4 +29,8 @@ public interface IMediaController
     ///     Randomizes the order of the elements.
     /// </summary>
     void Shuffle();
+    
+    double CurrentTime { get; set; }
+    
+    float Volume { get; set; }
 }

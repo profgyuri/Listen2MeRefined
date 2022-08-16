@@ -5,27 +5,40 @@ using MediatR;
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
-public partial class MainWindowViewModel : INotificationHandler<CurrentSongNotification>
+public partial class MainWindowViewModel : 
+    INotificationHandler<CurrentSongNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
+    
+    private readonly TimedTask _timedTask;
 
     [ObservableProperty] private string _fontFamily = "Comic Sans MS";
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
-    [ObservableProperty] private double _currentTime;
+    
+    public double CurrentTime
+    {
+        get => _mediaController?.CurrentTime ?? 0;
+        set  {
+            _mediaController.CurrentTime = value;
+            OnPropertyChanged();
+        }
+    }
 
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository)
+        IRepository<AudioModel> audioRepository, TimedTask timedTask)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
+        _timedTask = timedTask;
 
         playlistReference.PassPlaylist(ref _playList);
+        _timedTask.Start(() => OnPropertyChanged(nameof(CurrentTime)));
     }
 
     #region Implementation of INotificationHandler<in CurrentSongNotification>

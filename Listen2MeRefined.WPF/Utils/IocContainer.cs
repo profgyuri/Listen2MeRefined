@@ -54,14 +54,14 @@ internal static class IocContainer
         builder
             .RegisterType<MainWindowViewModel>()
             .AsSelf()
-            .As<INotificationHandler<CurrentSongNotification>>()
+            .AsImplementedInterfaces()
             .SingleInstance();
         builder.RegisterType<FolderBrowserViewModel>();
         builder.RegisterType<AdvancedSearchViewModel>();
         builder
             .RegisterType<SettingsWindowViewModel>()
             .AsSelf()
-            .As<INotificationHandler<FolderBrowserNotification>>()
+            .AsImplementedInterfaces()
             .SingleInstance();
         #endregion
 
@@ -150,7 +150,7 @@ internal static class IocContainer
             .As<IFileEnumerator>();
 
         builder
-            .RegisterType<TimedTask>()
+            .Register(_ => new TimedTask(TimeSpan.FromMilliseconds(500)))
             .InstancePerDependency();
 
         return _container = builder.Build();
