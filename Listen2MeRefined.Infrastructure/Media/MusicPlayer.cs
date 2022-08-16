@@ -1,4 +1,7 @@
-﻿namespace Listen2MeRefined.Infrastructure.Media;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
+using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Media;
 
 using NAudio.Wave;
 using System.Collections.ObjectModel;
@@ -19,10 +22,12 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
     private PlaybackState _playbackState = PlaybackState.Stopped;
 
     private readonly ILogger _logger;
+    private readonly IMediator _mediator;
 
-    public MusicPlayer(ILogger logger)
+    public MusicPlayer(ILogger logger, IMediator mediator)
     {
         _logger = logger;
+        _mediator = mediator;
 
         _waveOutEvent.PlaybackStopped += PlaybackStoppedEvent;
     }
@@ -130,6 +135,8 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
         {
             _logger.Error(ex, "An unexpected error occured!");
         }
+        
+        _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
 

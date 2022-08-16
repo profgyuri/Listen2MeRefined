@@ -1,6 +1,4 @@
 
-f
-6Listen2MeRefined.Core/Interfaces/IPlaylistReference.cs,9\5\9564991edc1f19448076e50bcf92186d869c1b0c
 j
 :Listen2MeRefined.Infrastructure/Data/Dapper/DapperSaver.cs,a\3\a388018a6e4226a9e2cf8a788eefdcf5f1ca98fa
 l
@@ -43,8 +41,6 @@ b
 2Listen2MeRefined.Core/Listen2MeRefined.Core.csproj,7\e\7e4cb3a455fee51db7f25f82e625ec4cec417bd4
 |
 LListen2MeRefined.Infrastructure/Data/EntityFramework/EntityFrameworkSaver.cs,a\9\a91f751062f3a596a87b145fd3ba44158e50e79e
-Z
-*Listen2MeRefined.WPF/Utils/IocContainer.cs,e\8\e8b6f6ca82794e3f68b1e480a09c24032af7be41
 u
 EListen2MeRefined.Infrastructure/SystemOperations/SoundFileAnalyzer.cs,a\0\a00963f0d696b20353e3d9fa1cfa964dae2b09b5
 a

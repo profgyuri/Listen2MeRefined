@@ -1,17 +1,19 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Infrastructure.Notifications;
+using MediatR;
 
-using System.Collections.ObjectModel;
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
-public partial class MainWindowViewModel
+public partial class MainWindowViewModel : INotificationHandler<CurrentSongNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
-    private readonly  IPlaylistReference _playlistReference;
-    private readonly  IRepository<AudioModel> _audioRepository;
+    private readonly IRepository<AudioModel> _audioRepository;
 
     [ObservableProperty] private string _fontFamily = "Comic Sans MS";
     [ObservableProperty] private string _searchTerm = "";
+    [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
 
@@ -22,27 +24,26 @@ public partial class MainWindowViewModel
     {
         _mediaController = mediaController;
         _logger = logger;
-        _playlistReference = playlistReference;
         _audioRepository = audioRepository;
 
-        _playlistReference.PassPlaylist(ref _playList);
+        playlistReference.PassPlaylist(ref _playList);
     }
 
     #region Commands
     [RelayCommand]
     public void HandleSelectedItems(IEnumerable<object> selectedItems)
     {
-        _selectedSearchResults = new(selectedItems.Cast<AudioModel>());
+        _selectedSearchResults = new HashSet<AudioModel>(selectedItems.Cast<AudioModel>());
     }
-    
+
     [RelayCommand]
     public async Task QuickSearch()
     {
         _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
         _searchResults.Clear();
-        var results = 
-            string.IsNullOrEmpty(_searchTerm) 
-                ? await _audioRepository.ReadAsync() 
+        var results =
+            string.IsNullOrEmpty(_searchTerm)
+                ? await _audioRepository.ReadAsync()
                 : await _audioRepository.ReadAsync(_searchTerm);
         _searchResults.AddRange(results);
     }
@@ -75,6 +76,15 @@ public partial class MainWindowViewModel
     public void Shuffle()
     {
         _mediaController.Shuffle();
+    }
+    #endregion
+
+    #region Implementation of INotificationHandler<in CurrentSongNotification>
+    /// <inheritdoc />
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        SelectedSong = notification.Audio;
+        return Task.CompletedTask;
     }
     #endregion
 }

@@ -134,17 +134,17 @@
                                 Text="{Binding SelectedSong.Display, FallbackValue=Display Name}"/>
                             <TextBlock
                                 Grid.Row="1"
-                                Text="{Binding SelectedSong.BPM, FallbackValue=150 BPM}"/>
+                                Text="{Binding SelectedSong.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}"/>
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="1"
                                 Margin="10 0"
                                 HorizontalAlignment="Center"
-                                Text="{Binding SelectedSong.Genre, FallbackValue=Hardstyle}"/>
+                                Text="{Binding SelectedSong.Genre, FallbackValue=Genre}"/>
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{Binding SelectedSong.Genre, FallbackValue=1411 kbps}"/>
+                                Text="{Binding SelectedSong.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}"/>
 
                         </Grid>
                     </Border>
@@ -174,7 +174,8 @@
                         Command="{Binding ShuffleCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"/>
-                    <Slider Style="{DynamicResource NoHaloSlider}"
+                    <Slider 
+                        Style="{DynamicResource NoHaloSlider}"
                         Foreground="{StaticResource ThirnaryBrush}"
                         materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
                         Grid.Row="1"

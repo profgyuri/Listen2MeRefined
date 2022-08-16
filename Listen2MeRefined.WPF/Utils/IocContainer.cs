@@ -49,7 +49,11 @@ internal static class IocContainer
         #endregion
 
         #region ViewModels
-        builder.RegisterType<MainWindowViewModel>();
+        builder
+            .RegisterType<MainWindowViewModel>()
+            .AsSelf()
+            .As<INotificationHandler<CurrentSongNotification>>()
+            .SingleInstance();
         builder.RegisterType<FolderBrowserViewModel>();
         builder.RegisterType<AdvancedSearchViewModel>();
         builder
