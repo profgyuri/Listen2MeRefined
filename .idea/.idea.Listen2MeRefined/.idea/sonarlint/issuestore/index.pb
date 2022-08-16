@@ -71,3 +71,15 @@ a
 MListen2MeRefined.Tests/Infrastructure/SystemOperations/FileEnumeratorTests.cs,5\a\5a5a0ce78d26b204a0e5fc38d5014303ad605451
 P
  Listen2MeRefined.WPF/App.xaml.cs,b\c\bcfa5eae421bd806f243d1ea596a8fdf11e3a2b9
+Z
+*Listen2MeRefined.Core/Models/AudioModel.cs,f\c\fc23ff1c538a934825572164db4e487bfde7d9c3
+[
++Listen2MeRefined.WPF/Utils/WindowManager.cs,9\0\90af055c4b4e2fac5947e6aeddea39804714b926
+r
+BListen2MeRefined.Infrastructure/SystemOperations/FileEnumerator.cs,b\2\b2e79ca29584af3c18ad16e85fcebbca0ebe28e7
+o
+?Listen2MeRefined.Infrastructure/Mvvm/SettingsWindowViewModel.cs,8\0\8043a4ed295c99708c393b0437d1e752669850a7
+^
+.Listen2MeRefined.WPF/Views/SettingsWindow.xaml,b\4\b444d8bde0cecf65b0f301e2570178d976e2b394
+`
+0Listen2MeRefined.WPF/Listen2MeRefined.WPF.csproj,b\7\b723af8f94e245fa2c4f304fc922e14cf1607217
