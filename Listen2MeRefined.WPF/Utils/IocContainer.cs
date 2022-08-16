@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF;
+﻿using Listen2MeRefined.Core;
+
+namespace Listen2MeRefined.WPF;
 
 using Autofac;
 using Listen2MeRefined.Infrastructure.LowLevel;
@@ -146,6 +148,10 @@ internal static class IocContainer
         builder
             .RegisterType<FileEnumerator>()
             .As<IFileEnumerator>();
+
+        builder
+            .RegisterType<TimedTask>()
+            .InstancePerDependency();
 
         return _container = builder.Build();
     }

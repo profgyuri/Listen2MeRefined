@@ -182,6 +182,8 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         Margin="20 5 10 5"
+                        Minimum="0"
+                        Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
                         Grid.ColumnSpan="5"
                         MinWidth="470"/>
 
@@ -194,16 +196,7 @@
                     dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding SearchResults}"
                     Style="{StaticResource SongsListView}"
-                    Grid.Row="1">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction
-                                Command="{Binding HandleSelectedItemsCommand}"
-                                CommandParameter="{Binding Path=SelectedItems, ElementName=SearchResults}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-
-                </ListView>
+                    Grid.Row="1"/>
 
                 <!-- Playlist -->
                 <ListView

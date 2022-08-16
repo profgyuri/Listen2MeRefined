@@ -75,3 +75,13 @@ o
 .Listen2MeRefined.WPF/Views/SettingsWindow.xaml,b\4\b444d8bde0cecf65b0f301e2570178d976e2b394
 `
 0Listen2MeRefined.WPF/Listen2MeRefined.WPF.csproj,b\7\b723af8f94e245fa2c4f304fc922e14cf1607217
+c
+3Listen2MeRefined.WPF/Views/FolderBrowserWindow.xaml,b\a\baf1d6d524f79eeb17bb8d3837499659c9f0c2e2
+f
+6Listen2MeRefined.Core/Interfaces/IPlaylistReference.cs,9\5\9564991edc1f19448076e50bcf92186d869c1b0c
+z
+JListen2MeRefined.Infrastructure/Notifications/FolderBrowserNotification.cs,d\e\de51963c29ab11c1807e7a3bc2a860aec8cda554
+x
+HListen2MeRefined.Infrastructure/Notifications/CurrentSongNotification.cs,d\0\d0a8eec54d49b4e31b992d023bd72f02f4c34b88
+n
+>Listen2MeRefined.Infrastructure/Mvvm/FolderBrowserViewModel.cs,8\b\8bfa7cad80d6ef47a99b3daea9eeec962f6ac599

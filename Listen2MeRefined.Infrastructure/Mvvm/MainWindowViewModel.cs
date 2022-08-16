@@ -16,8 +16,7 @@ public partial class MainWindowViewModel : INotificationHandler<CurrentSongNotif
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
-
-    private HashSet<AudioModel> _selectedSearchResults;
+    [ObservableProperty] private double _currentTime;
 
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
         IRepository<AudioModel> audioRepository)
@@ -29,13 +28,16 @@ public partial class MainWindowViewModel : INotificationHandler<CurrentSongNotif
         playlistReference.PassPlaylist(ref _playList);
     }
 
-    #region Commands
-    [RelayCommand]
-    public void HandleSelectedItems(IEnumerable<object> selectedItems)
+    #region Implementation of INotificationHandler<in CurrentSongNotification>
+    /// <inheritdoc />
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        _selectedSearchResults = new HashSet<AudioModel>(selectedItems.Cast<AudioModel>());
+        SelectedSong = notification.Audio;
+        return Task.CompletedTask;
     }
+    #endregion
 
+    #region Commands
     [RelayCommand]
     public async Task QuickSearch()
     {
@@ -76,15 +78,6 @@ public partial class MainWindowViewModel : INotificationHandler<CurrentSongNotif
     public void Shuffle()
     {
         _mediaController.Shuffle();
-    }
-    #endregion
-
-    #region Implementation of INotificationHandler<in CurrentSongNotification>
-    /// <inheritdoc />
-    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        SelectedSong = notification.Audio;
-        return Task.CompletedTask;
     }
     #endregion
 }

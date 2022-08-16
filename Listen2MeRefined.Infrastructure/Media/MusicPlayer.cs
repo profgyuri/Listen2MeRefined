@@ -154,11 +154,7 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
 
         try
         {
-            if (_waveOutEvent is not null)
-            {
-                _waveOutEvent.Stop();
-            }
-
+            _waveOutEvent?.Dispose();
             _waveOutEvent = new WaveOutEvent();
             _waveOutEvent.Init(_fileReader);
         }
