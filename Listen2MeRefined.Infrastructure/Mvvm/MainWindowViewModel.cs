@@ -11,8 +11,6 @@ public partial class MainWindowViewModel :
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
-    
-    private readonly TimedTask _timedTask;
 
     [ObservableProperty] private string _fontFamily = "Comic Sans MS";
     [ObservableProperty] private string _searchTerm = "";
@@ -22,8 +20,9 @@ public partial class MainWindowViewModel :
     
     public double CurrentTime
     {
-        get => _mediaController?.CurrentTime ?? 0;
-        set  {
+        get => _mediaController.CurrentTime;
+        set  
+        {
             _mediaController.CurrentTime = value;
             OnPropertyChanged();
         }
@@ -35,10 +34,9 @@ public partial class MainWindowViewModel :
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
-        _timedTask = timedTask;
 
         playlistReference.PassPlaylist(ref _playList);
-        _timedTask.Start(() => OnPropertyChanged(nameof(CurrentTime)));
+        timedTask.Start(() => OnPropertyChanged(nameof(CurrentTime)));
     }
 
     #region Implementation of INotificationHandler<in CurrentSongNotification>

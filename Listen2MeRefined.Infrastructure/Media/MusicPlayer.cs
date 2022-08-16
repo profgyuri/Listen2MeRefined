@@ -13,7 +13,7 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
 {
     private bool _startSongAutomatically;
     private int _playlistIndex;
-    private double _previousTimeStamp = -1;
+    private double _previousTimeStamp = 0;
     private AudioModel? _currentSong;
     private AudioFileReader? _fileReader;
     private WaveOutEvent _waveOutEvent = new();
@@ -44,12 +44,13 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
         set => _waveOutEvent.Volume = value;
     }
 
-    public MusicPlayer(ILogger logger, IMediator mediator)
+    public MusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask)
     {
         _logger = logger;
         _mediator = mediator;
 
         _waveOutEvent.PlaybackStopped += PlaybackStoppedEvent;
+        timedTask.Start(CurrentTimeCheck);
     }
 
     #region IMediaController
@@ -80,7 +81,7 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
 
     public void Stop()
     {
-        _waveOutEvent?.Stop();
+        _waveOutEvent.Stop();
         _stoppedFor = PlaybackStoppedFor.UserInput;
         _playbackState = PlaybackState.Stopped;
 
@@ -181,6 +182,26 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
         catch (Exception e)
         {
             _logger.Error(e, "Waveout event failed to load!");
+        }
+    }
+
+    private void CurrentTimeCheck()
+    {
+        if (_fileReader is null)
+        {
+            return;
+        }
+
+        if (Math.Abs(_fileReader.CurrentTime.TotalMilliseconds - _previousTimeStamp) < 0.1
+            && _playbackState == PlaybackState.Playing
+            && _previousTimeStamp >= 300)
+        {
+            Next();
+        }
+
+        if (_playbackState is PlaybackState.Playing)
+        {
+            _previousTimeStamp = _fileReader.CurrentTime.TotalMilliseconds;
         }
     }
     #endregion
