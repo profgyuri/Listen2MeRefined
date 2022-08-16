@@ -19,10 +19,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     private AudioFileReader? _fileReader;
     private WaveOutEvent _waveOutEvent = new();
     private ObservableCollection<AudioModel> _playlist = new();
-    private PlaybackStoppedFor _stoppedFor = PlaybackStoppedFor.EndOfTrack;
     private PlaybackState _playbackState = PlaybackState.Stopped;
-
-    private readonly KeyboardHook _keyboardHook;
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
@@ -52,10 +49,9 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     {
         _logger = logger;
         _mediator = mediator;
-        _keyboardHook = keyboardHook;
 
         timedTask.Start(CurrentTimeCheck);
-        _keyboardHook.KeyboardPressed += KeyboardPressedEvent;
+        keyboardHook.KeyboardPressed += KeyboardPressedEvent;
     }
 
     #region IMediaController
@@ -81,13 +77,11 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 
         _startSongAutomatically = true;
         _waveOutEvent?.Play();
-        _stoppedFor = PlaybackStoppedFor.EndOfTrack;
     }
 
     public void Stop()
     {
         _waveOutEvent.Stop();
-        _stoppedFor = PlaybackStoppedFor.UserInput;
         _playbackState = PlaybackState.Stopped;
 
         _logger.Debug("Playback stopped by user");
