@@ -1,6 +1,4 @@
 
-d
-4Listen2MeRefined.Core/Interfaces/IMediaController.cs,f\0\f09afab6ea5d570a3568848d3d9ea3892388e48b
 f
 6Listen2MeRefined.Core/Interfaces/IPlaylistReference.cs,9\5\9564991edc1f19448076e50bcf92186d869c1b0c
 j
@@ -25,8 +23,6 @@ l
 <Listen2MeRefined.Core/Interfaces/DataHandlers/IRepository.cs,7\1\7150565a22f0674e42bb4adc8f617782c0f0c007
 q
 AListen2MeRefined.Infrastructure/SystemOperations/FolderBrowser.cs,3\a\3ac7542470859e530ffa1bdfa486767fda6bbb33
-d
-4Listen2MeRefined.Infrastructure/Media/MusicPlayer.cs,6\a\6a89b86ad9f174c0cec3a479b6d12e4576857e04
 ]
 -Listen2MeRefined.Core/Models/PlaylistModel.cs,1\4\147a173010ce6e52e314b6fb16bb5d29f4dcebe9
 }

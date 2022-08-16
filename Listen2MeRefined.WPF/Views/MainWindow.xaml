@@ -151,10 +151,12 @@
 
                     <Button
                         Grid.Column="1"
+                        Command="{Binding PreviousCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
                     <Button
                         Grid.Column="2"
+                        Command="{Binding StopCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Stop,Size=20}"/>
                     <Button
@@ -164,10 +166,12 @@
                         Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}"/>
                     <Button
                         Grid.Column="4"
+                        Command="{Binding NextCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}"/>
                     <Button
                         Grid.Column="5"
+                        Command="{Binding ShuffleCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"/>
                     <Slider Style="{DynamicResource NoHaloSlider}"
