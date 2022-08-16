@@ -1,4 +1,5 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Infrastructure.LowLevel;
+using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Media;
@@ -9,7 +10,7 @@ using System.Collections.ObjectModel;
 /// <summary>
 ///     Wrapper class for NAudio.
 /// </summary>
-public sealed class MusicPlayer : IMediaController, IPlaylistReference
+public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 {
     private bool _startSongAutomatically;
     private int _playlistIndex;
@@ -20,6 +21,8 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
     private ObservableCollection<AudioModel> _playlist = new();
     private PlaybackStoppedFor _stoppedFor = PlaybackStoppedFor.EndOfTrack;
     private PlaybackState _playbackState = PlaybackState.Stopped;
+
+    private readonly KeyboardHook _keyboardHook;
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
@@ -44,13 +47,15 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
         set => _waveOutEvent.Volume = value;
     }
 
-    public MusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask)
+    public WindowsMusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask,
+        KeyboardHook keyboardHook)
     {
         _logger = logger;
         _mediator = mediator;
+        _keyboardHook = keyboardHook;
 
-        _waveOutEvent.PlaybackStopped += PlaybackStoppedEvent;
         timedTask.Start(CurrentTimeCheck);
+        _keyboardHook.KeyboardPressed += KeyboardPressedEvent;
     }
 
     #region IMediaController
@@ -207,11 +212,30 @@ public sealed class MusicPlayer : IMediaController, IPlaylistReference
     #endregion
 
     #region Event handlers
-    private void PlaybackStoppedEvent(object? sender, StoppedEventArgs e)
+    private void KeyboardPressedEvent(object? sender, KeyboardHookEventArgs e)
     {
-        if (_stoppedFor == PlaybackStoppedFor.EndOfTrack)
+        if (e.KeyboardState == KeyboardState.KeyUp)
         {
-            Next();
+            return;
+        }
+        
+        switch (e.KeyboardData.Key)
+        {
+            case ConsoleKey.MediaPlay:
+                PlayPause();
+                break;
+            case ConsoleKey.MediaStop:
+                Stop();
+                break;
+            case ConsoleKey.MediaNext:
+                Next();
+                break;
+            case ConsoleKey.MediaPrevious:
+                Previous();
+                break;
+
+            default:
+                break;
         }
     }
     #endregion

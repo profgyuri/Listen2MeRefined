@@ -87,9 +87,5 @@ R
 "Listen2MeRefined.Core/TimedTask.cs,4\9\491051a7daa6b3263175aa39360a4b56cc441ca3
 [
 +Listen2MeRefined.WPF/Utils/WindowManager.cs,9\0\90af055c4b4e2fac5947e6aeddea39804714b926
-Z
-*Listen2MeRefined.WPF/Utils/IocContainer.cs,e\8\e8b6f6ca82794e3f68b1e480a09c24032af7be41
-Z
-*Listen2MeRefined.WPF/Views/MainWindow.xaml,b\8\b8ae0b7e204a2c65fbe3dc637c2b76f0b1ef15a5
 ]
 -Listen2MeRefined.WPF/Utils/ValueConverters.cs,d\1\d1e6327bcf694c0604d8f969e1ca3e1dee648c39

@@ -111,7 +111,7 @@ internal static class IocContainer
         #endregion
 
         builder
-            .RegisterType<MusicPlayer>()
+            .RegisterType<WindowsMusicPlayer>()
             .As<IMediaController>()
             .As<IPlaylistReference>()
             .SingleInstance();
