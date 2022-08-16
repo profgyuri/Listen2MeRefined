@@ -14,7 +14,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 {
     private bool _startSongAutomatically;
     private int _playlistIndex;
-    private double _previousTimeStamp = 0;
+    private double _previousTimeStamp;
     private AudioModel? _currentSong;
     private AudioFileReader? _fileReader;
     private WaveOutEvent _waveOutEvent = new();
@@ -23,6 +23,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
+    private readonly IRepository<AudioModel> _audioRepository;
 
     public double CurrentTime
     {
@@ -45,10 +46,11 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     }
 
     public WindowsMusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask,
-        KeyboardHook keyboardHook)
+        KeyboardHook keyboardHook, IRepository<AudioModel> audioRepository)
     {
         _logger = logger;
         _mediator = mediator;
+        _audioRepository = audioRepository;
 
         timedTask.Start(CurrentTimeCheck);
         keyboardHook.KeyboardPressed += KeyboardPressedEvent;
@@ -59,7 +61,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     {
         if (_playbackState == PlaybackState.Playing)
         {
-            _waveOutEvent?.Pause();
+            _waveOutEvent.Pause();
             _startSongAutomatically = false;
             _playbackState = PlaybackState.Paused;
 
@@ -76,7 +78,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         }
 
         _startSongAutomatically = true;
-        _waveOutEvent?.Play();
+        _waveOutEvent.Play();
     }
 
     public void Stop()
@@ -143,13 +145,13 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         }
         catch (NullReferenceException)
         {
-            _logger.Error("{song} was null", nameof(_currentSong));
+            _logger.Error("{Song} was null", nameof(_currentSong));
+            Next();
         }
         catch (FileNotFoundException)
         {
             _logger.Warning("File was not found at: {Path} - Trying to remove entry from database...", _currentSong.Path);
-            //todo: remove missing file from database
-            throw new NotImplementedException("Deletion should be implemented!");
+            _audioRepository.Delete(_currentSong);
         }
         catch (Exception ex)
         {
@@ -174,7 +176,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 
         try
         {
-            _waveOutEvent?.Dispose();
+            _waveOutEvent.Dispose();
             _waveOutEvent = new WaveOutEvent();
             _waveOutEvent.Init(_fileReader);
         }
@@ -226,9 +228,6 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
                 break;
             case ConsoleKey.MediaPrevious:
                 Previous();
-                break;
-
-            default:
                 break;
         }
     }
