@@ -29,6 +29,7 @@
     </Style>
     <Style TargetType="ListView" x:Key="SongsListView" BasedOn="{StaticResource VirtualizedListView}">
         <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="ListViewItem">

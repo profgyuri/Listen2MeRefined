@@ -193,6 +193,7 @@
                 <!-- Search results -->
                 <ListView
                     x:Name="SearchResults"
+                    Margin="0 20 10 20"
                     dd:DragDrop.IsDragSource="True"
                     dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding SearchResults}"
@@ -201,6 +202,7 @@
 
                 <!-- Playlist -->
                 <ListView
+                    Margin="10 20 0 20"
                     dd:DragDrop.IsDragSource="True"
                     dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding PlayList}"
