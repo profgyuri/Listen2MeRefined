@@ -24,6 +24,12 @@ public interface IMediaController
     ///     Jump to the previous media element.
     /// </summary>
     void Previous();
+    
+    /// <summary>
+    ///     Jump to the specified media element.
+    /// </summary>
+    /// <param name="index">The position of the media element.</param>
+    void JumpToIndex(int index);
 
     /// <summary>
     ///     Randomizes the order of the elements.

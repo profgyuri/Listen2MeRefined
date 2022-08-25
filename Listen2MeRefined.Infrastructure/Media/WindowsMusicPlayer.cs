@@ -115,6 +115,12 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _logger.Debug("Jumping to the previous song at index {Current} with the maximum possible index of {Maximum}...",
             _playlistIndex, _playlist.Count - 1);
     }
+    
+    public void JumpToIndex(int index)
+    {
+        _playlistIndex = index;
+        LoadCurrentSong();
+    }
 
     public void Shuffle()
     {

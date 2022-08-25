@@ -69,12 +69,8 @@ r
 BListen2MeRefined.Infrastructure/SystemOperations/FileEnumerator.cs,b\2\b2e79ca29584af3c18ad16e85fcebbca0ebe28e7
 o
 ?Listen2MeRefined.Infrastructure/Mvvm/SettingsWindowViewModel.cs,8\0\8043a4ed295c99708c393b0437d1e752669850a7
-^
-.Listen2MeRefined.WPF/Views/SettingsWindow.xaml,b\4\b444d8bde0cecf65b0f301e2570178d976e2b394
 `
 0Listen2MeRefined.WPF/Listen2MeRefined.WPF.csproj,b\7\b723af8f94e245fa2c4f304fc922e14cf1607217
-c
-3Listen2MeRefined.WPF/Views/FolderBrowserWindow.xaml,b\a\baf1d6d524f79eeb17bb8d3837499659c9f0c2e2
 f
 6Listen2MeRefined.Core/Interfaces/IPlaylistReference.cs,9\5\9564991edc1f19448076e50bcf92186d869c1b0c
 z

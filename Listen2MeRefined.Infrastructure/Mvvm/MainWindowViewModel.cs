@@ -15,6 +15,7 @@ public partial class MainWindowViewModel :
     [ObservableProperty] private string _fontFamily = "Comic Sans MS";
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private AudioModel? _selectedSong;
+    [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
     
@@ -61,6 +62,15 @@ public partial class MainWindowViewModel :
         _searchResults.AddRange(results);
     }
 
+    [RelayCommand]
+    public void JumpToSelecteSong()
+    {
+        if (_selectedIndex > -1)
+        {
+            _mediaController.JumpToIndex(_selectedIndex);
+        }
+    }
+    
     [RelayCommand]
     public void PlayPause()
     {

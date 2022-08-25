@@ -205,8 +205,15 @@
                     dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding PlayList}"
                     Style="{StaticResource SongsListView}"
+                    SelectedIndex="{Binding SelectedIndex}"
                     Grid.Row="1"
-                    Grid.Column="1"/>
+                    Grid.Column="1">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ListView>
 
                 <!-- Searchbar -->
                 <Grid
