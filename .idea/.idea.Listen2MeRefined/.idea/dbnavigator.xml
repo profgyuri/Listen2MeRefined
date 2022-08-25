@@ -37,7 +37,7 @@
     <retain-sticky-names value="false" />
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
-    <mapping file-url="file://$APPLICATION_CONFIG_DIR$/consoles/db/7da5bbb6-e757-4ccf-84ba-f8b85593f784" connection-id="virtual-sqlite-connection" session-id="" current-schema="" />
+    <mapping file-url="file://$APPLICATION_CONFIG_DIR$/consoles/db/7da5bbb6-e757-4ccf-84ba-f8b85593f784" connection-id="virtual-sqlite-connection" session-id="MAIN" current-schema="" />
   </component>
   <component name="DBNavigator.Project.MethodExecutionManager">
     <method-browser />
