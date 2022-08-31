@@ -124,6 +124,9 @@
                     Grid.Column="1"
                     Style="{StaticResource CustomComboBox}"
                     materialDesign:HintAssist.Hint="FontFamily"
+                    materialDesign:HintAssist.FontFamily="{Binding SelectedFontFamily}"
+                    Foreground="{StaticResource SecondaryBrush}"
+                    BorderBrush="{StaticResource ThirnaryBrush}"
                     SelectedItem="{Binding SelectedFontFamily}"
                     ItemsSource="{Binding FontFamilies}">
                     <ComboBox.ItemTemplate>

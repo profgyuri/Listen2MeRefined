@@ -10,11 +10,11 @@ public class FileSettingsManager : ISettingsManager
 {
     private const string SettingsFileName = "settings.json";
 
-    private SettingsModel _settings = new();
+    private SettingsModel? _settings;
 
     private readonly ILogger _logger;
 
-    public SettingsModel Settings => _settings;
+    public SettingsModel Settings => _settings ??= Load();
 
     public FileSettingsManager(ILogger logger)
     {

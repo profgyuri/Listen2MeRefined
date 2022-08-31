@@ -101,9 +101,6 @@
         </Setter>
     </Style>
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
-        <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThirnaryBrush}" />
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
         <Setter Property="Padding" Value="5" />
         <Setter Property="ItemsPanel">

@@ -14,6 +14,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IMediator _mediator;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
@@ -22,14 +23,16 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     [ObservableProperty] private ObservableCollection<FontFamily> _fontFamilies;
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository)
+        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
     {
         _logger = logger;
         _settingsManager = settingsManager;
         _audioFileAnalyzer = audioFileAnalyzer;
         _fileEnumerator = fileEnumerator;
         _audioRepository = audioRepository;
+        _mediator = mediator;
         _fontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
+        _selectedFontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
 
         Init();
     }
@@ -68,4 +71,11 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         await _audioRepository.CreateAsync(songs);
     }
     #endregion
+
+    partial void OnSelectedFontFamilyChanged(FontFamily value)
+    {
+        OnPropertyChanged(nameof(SelectedFontFamily));
+        _settingsManager.Save(s => s.FontFamily = value.Source);
+        _mediator.Publish(new FontFamilyChangedNotification(value));
+    }
 }
