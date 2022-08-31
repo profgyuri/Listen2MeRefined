@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using System.Windows.Media;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
@@ -6,21 +8,27 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 [INotifyPropertyChanged]
-public partial class FolderBrowserViewModel
+public partial class FolderBrowserViewModel :
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IFolderBrowser _folderBrowser;
+    private readonly ISettingsManager _settingsManager;
 
+    [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _fullPath = "";
     [ObservableProperty] private string _selectedFolder = "";
     [ObservableProperty] private ObservableCollection<string> _folders = new();
 
-    public FolderBrowserViewModel(ILogger logger, IFolderBrowser folderBrowser, IMediator mediator)
+    public FolderBrowserViewModel(ILogger logger, IFolderBrowser folderBrowser, IMediator mediator,
+        ISettingsManager settingsManager)
     {
         _logger = logger;
         _folderBrowser = folderBrowser;
         _mediator = mediator;
+        _settingsManager = settingsManager;
+        _fontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
 
         ChangeDirectory();
     }
@@ -88,4 +96,12 @@ public partial class FolderBrowserViewModel
             _folders.Add(folder);
         }
     }
+
+    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
+    /// <inheritdoc />
+    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        FontFamily = notification.FontFamily;
+    }
+    #endregion
 }

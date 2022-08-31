@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 
@@ -6,13 +7,15 @@ namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
 public partial class MainWindowViewModel : 
-    INotificationHandler<CurrentSongNotification>
+    INotificationHandler<CurrentSongNotification>,
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly ISettingsManager _settingsManager;
 
-    [ObservableProperty] private string _fontFamily = "Comic Sans MS";
+    [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
@@ -30,24 +33,17 @@ public partial class MainWindowViewModel :
     }
 
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository, TimedTask timedTask)
+        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager settingsManager)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
+        _settingsManager = settingsManager;
+        _fontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(() => OnPropertyChanged(nameof(CurrentTime)));
     }
-
-    #region Implementation of INotificationHandler<in CurrentSongNotification>
-    /// <inheritdoc />
-    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        SelectedSong = notification.Audio;
-        return Task.CompletedTask;
-    }
-    #endregion
 
     #region Commands
     [RelayCommand]
@@ -99,6 +95,24 @@ public partial class MainWindowViewModel :
     public void Shuffle()
     {
         _mediaController.Shuffle();
+    }
+    #endregion
+
+    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
+    /// <inheritdoc />
+    Task INotificationHandler<FontFamilyChangedNotification>.Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        FontFamily = notification.FontFamily;
+        return Task.CompletedTask;
+    }
+    #endregion
+    
+    #region Implementation of INotificationHandler<in CurrentSongNotification>
+    /// <inheritdoc />
+    Task INotificationHandler<CurrentSongNotification>.Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        SelectedSong = notification.Audio;
+        return Task.CompletedTask;
     }
     #endregion
 }

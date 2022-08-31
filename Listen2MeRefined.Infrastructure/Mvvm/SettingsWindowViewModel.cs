@@ -1,30 +1,39 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using System.Windows.Media;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using System.Collections.ObjectModel;
 
 [INotifyPropertyChanged]
-public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowserNotification>
+public partial class SettingsWindowViewModel : 
+    INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager _settingsManager;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IMediator _mediator;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
+    [ObservableProperty] private FontFamily _selectedFontFamily;
     [ObservableProperty] private ObservableCollection<string> _folders;
+    [ObservableProperty] private ObservableCollection<FontFamily> _fontFamilies;
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository)
+        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
     {
         _logger = logger;
         _settingsManager = settingsManager;
         _audioFileAnalyzer = audioFileAnalyzer;
         _fileEnumerator = fileEnumerator;
         _audioRepository = audioRepository;
+        _mediator = mediator;
+        _fontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
+        _selectedFontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
 
         Init();
     }
@@ -34,6 +43,8 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         var settings = _settingsManager.Load();
         Folders = new(settings.MusicFolders);
         FontFamily = settings.FontFamily;
+        SelectedFontFamily = new FontFamily(settings.FontFamily);
+        FontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
     }
 
     [RelayCommand]
@@ -61,4 +72,11 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         await _audioRepository.CreateAsync(songs);
     }
     #endregion
+
+    partial void OnSelectedFontFamilyChanged(FontFamily value)
+    {
+        OnPropertyChanged(nameof(SelectedFontFamily));
+        _settingsManager.Save(s => s.FontFamily = value.Source);
+        _mediator.Publish(new FontFamilyChangedNotification(value));
+    }
 }
