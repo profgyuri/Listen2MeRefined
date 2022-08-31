@@ -26,7 +26,7 @@ public partial class AdvancedSearchViewModel :
     /// <inheritdoc />
     Task INotificationHandler<FontFamilyChangedNotification>.Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
-        _fontFamily = notification.FontFamily;
+        FontFamily = notification.FontFamily;
         return Task.CompletedTask;
     }
     #endregion

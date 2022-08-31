@@ -101,7 +101,7 @@ public partial class FolderBrowserViewModel :
     /// <inheritdoc />
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
-        _fontFamily = notification.FontFamily;
+        FontFamily = notification.FontFamily;
     }
     #endregion
 }

@@ -8,8 +8,6 @@
         mc:Ignorable="d"
         Style="{StaticResource BasicWindow}"
         FontFamily="{Binding SelectedFontFamily}"
-        FontStyle="{Binding SelectedFontFamily.Style}"
-        FontWeight="{Binding SelectedFontFamily.Weight}"
         ResizeMode="NoResize"
         Title="SettingsWindow"
         Height="300" Width="400">
