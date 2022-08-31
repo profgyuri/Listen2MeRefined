@@ -1,8 +1,9 @@
 ﻿using System.Windows.Media;
+using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Notifications;
 
-public class FontFamilyChangedNotification
+public class FontFamilyChangedNotification : INotification
 {
     public FontFamilyChangedNotification(FontFamily fontFamily)
     {

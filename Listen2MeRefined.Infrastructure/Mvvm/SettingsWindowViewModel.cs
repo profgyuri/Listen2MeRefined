@@ -7,7 +7,8 @@ using MediatR;
 using System.Collections.ObjectModel;
 
 [INotifyPropertyChanged]
-public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowserNotification>
+public partial class SettingsWindowViewModel : 
+    INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager _settingsManager;
