@@ -7,6 +7,9 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Style="{StaticResource BasicWindow}"
+        FontFamily="{Binding SelectedFontFamily}"
+        FontStyle="{Binding SelectedFontFamily.Style}"
+        FontWeight="{Binding SelectedFontFamily.Weight}"
         ResizeMode="NoResize"
         Title="SettingsWindow"
         Height="300" Width="400">
@@ -45,6 +48,7 @@
                 Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
@@ -56,7 +60,8 @@
                 <TextBlock
                     Text="Local folders: "/>
                 <Grid
-                    Grid.Column="1">
+                    Grid.Column="1"
+                    Margin="0 0 0 15">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
@@ -108,6 +113,27 @@
                         Content="{materialDesign:PackIcon Kind=FolderRemoveOutline}"
                         ToolTip="Remove Selected"/>
                 </Grid>
+
+                <TextBlock
+                    Grid.Row="1"
+                    Text="Font settings:"
+                    VerticalAlignment="Center"/>
+                <ComboBox
+                    x:Name="FontFamily"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Style="{StaticResource CustomComboBox}"
+                    materialDesign:HintAssist.Hint="FontFamily"
+                    SelectedItem="{Binding SelectedFontFamily}"
+                    ItemsSource="{Binding FontFamilies}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                Text="{Binding}"
+                                FontFamily="{Binding}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <Button
                     x:Name="CloseButton"

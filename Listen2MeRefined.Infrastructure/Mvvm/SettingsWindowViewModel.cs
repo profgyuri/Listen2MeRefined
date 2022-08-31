@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using System.Windows.Media;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
@@ -15,7 +17,9 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
+    [ObservableProperty] private FontFamily _selectedFontFamily;
     [ObservableProperty] private ObservableCollection<string> _folders;
+    [ObservableProperty] private ObservableCollection<FontFamily> _fontFamilies;
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository)
@@ -25,6 +29,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         _audioFileAnalyzer = audioFileAnalyzer;
         _fileEnumerator = fileEnumerator;
         _audioRepository = audioRepository;
+        _fontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
 
         Init();
     }
@@ -34,6 +39,8 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         var settings = _settingsManager.Load();
         Folders = new(settings.MusicFolders);
         FontFamily = settings.FontFamily;
+        SelectedFontFamily = new FontFamily(settings.FontFamily);
+        FontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
     }
 
     [RelayCommand]

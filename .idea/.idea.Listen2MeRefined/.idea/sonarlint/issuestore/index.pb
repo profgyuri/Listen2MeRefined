@@ -13,8 +13,6 @@ k
 ;Listen2MeRefined.Infrastructure/Data/FileSettingsManager.cs,f\4\f43df6e3503eeb0a4544a4c98daa3258c1139535
 d
 4Listen2MeRefined.Core/Interfaces/ISettingsManager.cs,b\e\be4f5e8db66e8592477a614f262ecd77067f30de
-o
-?Listen2MeRefined.Infrastructure/Mvvm/SettingsWindowViewModel.cs,8\0\8043a4ed295c99708c393b0437d1e752669850a7
 `
 0Listen2MeRefined.WPF/Listen2MeRefined.WPF.csproj,b\7\b723af8f94e245fa2c4f304fc922e14cf1607217
 f
@@ -31,3 +29,17 @@ R
 +Listen2MeRefined.WPF/Utils/WindowManager.cs,9\0\90af055c4b4e2fac5947e6aeddea39804714b926
 ]
 -Listen2MeRefined.WPF/Views/MainWindow.xaml.cs,4\4\44ba61e48586af83286c0e926ab012cbba9a76f2
+^
+.Listen2MeRefined.WPF/Styles/ControlStyles.xaml,c\8\c89b6243c1479c212e2d185f3bda63d7ba0a23b7
+c
+3Listen2MeRefined.WPF/Views/FolderBrowserWindow.xaml,b\a\baf1d6d524f79eeb17bb8d3837499659c9f0c2e2
+^
+.Listen2MeRefined.WPF/Views/SettingsWindow.xaml,b\4\b444d8bde0cecf65b0f301e2570178d976e2b394
+k
+;Listen2MeRefined.Infrastructure/Media/WindowsMusicPlayer.cs,0\1\01414e40047fbb106a566ce6e93727a37aab627d
+d
+4Listen2MeRefined.Core/Interfaces/IMediaController.cs,f\0\f09afab6ea5d570a3568848d3d9ea3892388e48b
+k
+;Listen2MeRefined.Infrastructure/Mvvm/MainWindowViewModel.cs,d\2\d2da972a3be210652ea6f958d1557a013c6eb362
+Z
+*Listen2MeRefined.WPF/Views/MainWindow.xaml,b\8\b8ae0b7e204a2c65fbe3dc637c2b76f0b1ef15a5

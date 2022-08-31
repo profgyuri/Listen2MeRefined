@@ -30,4 +30,10 @@
     <ProjectReference Include="..\Listen2MeRefined.Core\Listen2MeRefined.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <HintPath>C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\6.0.8\PresentationCore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
