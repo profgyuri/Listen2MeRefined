@@ -32,4 +32,18 @@ public class EntityFrameworkRemover : IDataRemover
         _dataContext.Set<T>().RemoveRange(list);
         await _dataContext.SaveChangesAsync();
     }
+
+    /// <inheritdoc />
+    public void RemoveAll<T>() where T : Model
+    {
+        _dataContext.Set<T>().RemoveRange(_dataContext.Set<T>());
+        _dataContext.SaveChanges();
+    }
+    
+    /// <inheritdoc />
+    public async Task RemoveAllAsync<T>() where T : Model
+    {
+        _dataContext.Set<T>().RemoveRange(_dataContext.Set<T>());
+        await _dataContext.SaveChangesAsync();
+    }
 }

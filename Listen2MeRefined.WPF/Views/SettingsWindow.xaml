@@ -10,11 +10,22 @@
         FontFamily="{Binding SelectedFontFamily}"
         ResizeMode="NoResize"
         Title="SettingsWindow"
-        Height="300" Width="400">
+        Height="300" Width="450">
 
     <Window.Resources>
         <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter"/>
         <local:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter"/>
+        <Style x:Key="SettingsMenuItem" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="{StaticResource ThirnaryBrush}"/>
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
+        </Style>
+        <Style x:Key="SeparatorMenuItem" TargetType="MenuItem">
+            <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Width" Value="4" />
+        </Style>
     </Window.Resources>
 
     <WindowChrome.WindowChrome>
@@ -43,16 +54,18 @@
 
             <Grid
                 Grid.Row="1"
-                Margin="10">
+                Margin="10"
+                ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
@@ -136,6 +149,11 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
+                <TextBlock
+                    Grid.Row="2"
+                    Text="Metadata actions:"
+                    Margin="0 10"/>
+
                 <Button
                     x:Name="CloseButton"
                     Grid.Row="100"
@@ -144,6 +162,24 @@
                     Content="Done"
                     Width="120"
                     Click="CloseButton_Click"/>
+                <materialDesign:Card
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Background="Transparent"
+                    VerticalAlignment="Center"
+                    Margin="0 2 0 0">
+                    <Menu>
+                        <MenuItem
+                            Style="{StaticResource SettingsMenuItem}"
+                            Header="Delete All"
+                            Command="{Binding ClearMetadataCommand}"/>
+                        <MenuItem
+                            Style="{StaticResource SeparatorMenuItem}"/>
+                        <MenuItem
+                            Style="{StaticResource SettingsMenuItem}"
+                            Header="Force Scan"/>
+                    </Menu>
+                </materialDesign:Card>
 
             </Grid>
 

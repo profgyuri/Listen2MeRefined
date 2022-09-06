@@ -47,6 +47,7 @@ public partial class SettingsWindowViewModel :
         FontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
     }
 
+    #region Commands
     [RelayCommand]
     private void RemoveFolder()
     {
@@ -56,6 +57,17 @@ public partial class SettingsWindowViewModel :
 
         _settingsManager.Save(s => s.MusicFolders = _folders);
     }
+    
+    [RelayCommand]
+    private async Task ClearMetadata()
+    {
+        _logger.Debug("Clearing metadata...");
+        
+        await _audioRepository.DeleteAllAsync();
+        
+        _logger.Debug("Metadata cleared");
+    }
+    #endregion
 
     #region Notification Handlers
     public async Task Handle(FolderBrowserNotification notification, CancellationToken cancellationToken)

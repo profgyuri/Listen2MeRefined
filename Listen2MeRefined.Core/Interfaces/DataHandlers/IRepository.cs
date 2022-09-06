@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
+﻿using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
 
 /// <summary>
 ///     Interface to provide CRUD operations.
@@ -24,4 +26,6 @@ public interface IRepository<T>
     Task DeleteAsync(T data);
     void Delete(IEnumerable<T> data);
     Task DeleteAsync(IEnumerable<T> data);
+    void DeleteAll();
+    Task DeleteAllAsync();
 }

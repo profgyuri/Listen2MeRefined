@@ -34,4 +34,18 @@ public class DapperRemover : IDataRemover
         var sql = $"DELETE FROM {typeof(T).Name}s WHERE Id IN @Ids";
         await _connection.ExecuteAsync(sql, new { Ids = list.Select(x => x.Id) });
     }
+
+    /// <inheritdoc />
+    public void RemoveAll<T>() where T : Model
+    {
+        var sql = $"DELETE FROM {typeof(T).Name}s";
+        _connection.Execute(sql);
+    }
+
+    /// <inheritdoc />
+    public async Task RemoveAllAsync<T>() where T : Model
+    {
+        var sql = $"DELETE FROM {typeof(T).Name}s";
+        await _connection.ExecuteAsync(sql);
+    }
 }
