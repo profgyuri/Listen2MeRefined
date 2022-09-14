@@ -17,7 +17,8 @@ public partial class SettingsWindowViewModel :
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IMediator _mediator;
     
-    private  TimedTask? _timedTask;
+    private TimedTask? _timedTask;
+    private int _secondsToCancelClear = 5;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
@@ -67,34 +68,40 @@ public partial class SettingsWindowViewModel :
     private void ClearMetadata()
     {
         _logger.Debug("Clearing metadata...");
-        
-        var seconds = 0;
 
         _timedTask = new(TimeSpan.FromSeconds(1));
         _timedTask.Start(async () =>
         {
-            if (seconds == 5)
+            if (_secondsToCancelClear == 0)
             {
-                //await _audioRepository.DeleteAllAsync();
+                 await _audioRepository.DeleteAllAsync();
 
-                await CancelClearMetadataAsync();
+                await _timedTask?.StopAsync()!;
+                IsClearMetadataButtonVisible = true;
+                IsCancelClearMetadataButtonVisible = false;
+                _secondsToCancelClear = 5;
+                CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+                
+                _logger.Debug("Metadata cleared");
             }
 
-            seconds++;
-            CancelClearMetadataButtonContent = $"Cancel({5 - seconds})";
+            _secondsToCancelClear--;
+            CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
         });
         IsClearMetadataButtonVisible = false;
         IsCancelClearMetadataButtonVisible = true;
-        
-        _logger.Debug("Metadata cleared");
     }
     
     [RelayCommand]
     private async Task CancelClearMetadataAsync()
     {
-        await _timedTask?.StopAsync();
+        _logger.Debug("Clearing metadata canceled");
+        
+        await _timedTask?.StopAsync()!;
         IsClearMetadataButtonVisible = true;
         IsCancelClearMetadataButtonVisible = false;
+        _secondsToCancelClear = 5;
+        CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
     }
     #endregion
 
