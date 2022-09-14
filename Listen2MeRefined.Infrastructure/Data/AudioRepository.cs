@@ -65,6 +65,16 @@ public class AudioRepository : IRepository<AudioModel>
     {
         await _dataRemover.RemoveAsync(data);
     }
+    
+    public void DeleteAll()
+    {
+        _dataRemover.RemoveAll<AudioModel>();
+    }
+    
+    public async Task DeleteAllAsync()
+    {
+        await _dataRemover.RemoveAllAsync<AudioModel>();
+    }
     #endregion
 
     #region IDataReader

@@ -14,7 +14,7 @@ public sealed class TimedTask : IAsyncDisposable
     
     public void Start(Action action)
     {
-        _timerTask = DoWorkAsync(action);
+        _timerTask ??= DoWorkAsync(action);
     }
     
     private async Task DoWorkAsync(Action action)

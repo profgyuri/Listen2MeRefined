@@ -4,17 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Listen2MeRefined.WPF"
+        xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:SettingsWindowViewModel}"
         Style="{StaticResource BasicWindow}"
         FontFamily="{Binding SelectedFontFamily}"
         ResizeMode="NoResize"
         Title="SettingsWindow"
-        Height="300" Width="400">
+        Height="300" Width="450">
 
     <Window.Resources>
         <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter"/>
         <local:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter"/>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Window.Resources>
 
     <WindowChrome.WindowChrome>
@@ -43,16 +46,18 @@
 
             <Grid
                 Grid.Row="1"
-                Margin="10">
+                Margin="10"
+                ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
@@ -135,6 +140,48 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+
+                <TextBlock
+                    Grid.Row="2"
+                    Text="Metadata actions:"
+                    Margin="0 10"
+                    VerticalAlignment="Center"/>
+                <Grid
+                    Grid.Row="2"
+                    Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button
+                        x:Name="ClearMetadataButton"
+                        Style="{StaticResource InteractionButton}"
+                        Content="Clear Metadata"
+                        Command="{Binding ClearMetadataCommand}"
+                        Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Width="120"
+                        Margin="0 10"
+                        ToolTip="Clears all metadata stored in the local database file."/>
+                    <Button
+                        x:Name="CanclerClearMetadataButton"
+                        Grid.Column="0"
+                        Style="{StaticResource InteractionButton}"
+                        Content="{Binding CancelClearMetadataButtonContent}"
+                        Visibility="{Binding IsCancelClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Command="{Binding CancelClearMetadataCommand}"
+                        Width="120"
+                        Margin="0 10"/>
+                    <Button
+                        Grid.Column="1"
+                        Style="{StaticResource InteractionButton}"
+                        Content="Rescan Now"
+                        Width="120"
+                        IsEnabled="False"
+                        Margin="0 10"
+                        ToolTip="Scan all of your folders set up above."/>
+
+                </Grid>
 
                 <Button
                     x:Name="CloseButton"

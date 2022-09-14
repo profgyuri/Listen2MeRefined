@@ -16,12 +16,18 @@ public partial class SettingsWindowViewModel :
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IMediator _mediator;
+    
+    private TimedTask? _timedTask;
+    private int _secondsToCancelClear = 5;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
     [ObservableProperty] private FontFamily _selectedFontFamily;
     [ObservableProperty] private ObservableCollection<string> _folders;
     [ObservableProperty] private ObservableCollection<FontFamily> _fontFamilies;
+    [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
+    [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
+    [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
@@ -47,6 +53,7 @@ public partial class SettingsWindowViewModel :
         FontFamilies = new ObservableCollection<FontFamily>(Fonts.SystemFontFamilies);
     }
 
+    #region Commands
     [RelayCommand]
     private void RemoveFolder()
     {
@@ -56,6 +63,47 @@ public partial class SettingsWindowViewModel :
 
         _settingsManager.Save(s => s.MusicFolders = _folders);
     }
+    
+    [RelayCommand]
+    private void ClearMetadata()
+    {
+        _logger.Debug("Clearing metadata...");
+
+        _timedTask = new(TimeSpan.FromSeconds(1));
+        _timedTask.Start(async () =>
+        {
+            if (_secondsToCancelClear == 0)
+            {
+                 await _audioRepository.DeleteAllAsync();
+
+                await _timedTask?.StopAsync()!;
+                IsClearMetadataButtonVisible = true;
+                IsCancelClearMetadataButtonVisible = false;
+                _secondsToCancelClear = 5;
+                CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+                
+                _logger.Debug("Metadata cleared");
+            }
+
+            _secondsToCancelClear--;
+            CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+        });
+        IsClearMetadataButtonVisible = false;
+        IsCancelClearMetadataButtonVisible = true;
+    }
+    
+    [RelayCommand]
+    private async Task CancelClearMetadataAsync()
+    {
+        _logger.Debug("Clearing metadata canceled");
+        
+        await _timedTask?.StopAsync()!;
+        IsClearMetadataButtonVisible = true;
+        IsCancelClearMetadataButtonVisible = false;
+        _secondsToCancelClear = 5;
+        CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+    }
+    #endregion
 
     #region Notification Handlers
     public async Task Handle(FolderBrowserNotification notification, CancellationToken cancellationToken)
