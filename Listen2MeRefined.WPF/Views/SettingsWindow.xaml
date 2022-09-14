@@ -162,9 +162,9 @@
                         ToolTip="Clears all metadata stored in the local database file."/>
                     <Button
                         Style="{StaticResource InteractionButton}"
-                        Content="Cancel"
+                        Content="{Binding CancelClearMetadataButtonContent}"
                         Visibility="{Binding IsCancelClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                        Command="{Binding ClearMetadataCommand}"
+                        Command="{Binding CancelClearMetadataAsyncCommand}"
                         Width="120"
                         Margin="0 10"/>
                     <Button

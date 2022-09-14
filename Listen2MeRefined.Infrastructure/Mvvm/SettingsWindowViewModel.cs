@@ -16,6 +16,8 @@ public partial class SettingsWindowViewModel :
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IMediator _mediator;
+    
+    private  TimedTask? _timedTask;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
@@ -24,6 +26,7 @@ public partial class SettingsWindowViewModel :
     [ObservableProperty] private ObservableCollection<FontFamily> _fontFamilies;
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
+    [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
@@ -61,15 +64,37 @@ public partial class SettingsWindowViewModel :
     }
     
     [RelayCommand]
-    private async Task ClearMetadata()
+    private void ClearMetadata()
     {
         _logger.Debug("Clearing metadata...");
         
-        //await _audioRepository.DeleteAllAsync();
+        var seconds = 0;
+
+        _timedTask = new(TimeSpan.FromSeconds(1));
+        _timedTask.Start(async () =>
+        {
+            if (seconds == 5)
+            {
+                //await _audioRepository.DeleteAllAsync();
+
+                await CancelClearMetadataAsync();
+            }
+
+            seconds++;
+            CancelClearMetadataButtonContent = $"Cancel({5 - seconds})";
+        });
         IsClearMetadataButtonVisible = false;
         IsCancelClearMetadataButtonVisible = true;
         
         _logger.Debug("Metadata cleared");
+    }
+    
+    [RelayCommand]
+    private async Task CancelClearMetadataAsync()
+    {
+        await _timedTask?.StopAsync();
+        IsClearMetadataButtonVisible = true;
+        IsCancelClearMetadataButtonVisible = false;
     }
     #endregion
 
