@@ -22,6 +22,8 @@ public partial class SettingsWindowViewModel :
     [ObservableProperty] private FontFamily _selectedFontFamily;
     [ObservableProperty] private ObservableCollection<string> _folders;
     [ObservableProperty] private ObservableCollection<FontFamily> _fontFamilies;
+    [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
+    [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
 
     public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
@@ -63,7 +65,9 @@ public partial class SettingsWindowViewModel :
     {
         _logger.Debug("Clearing metadata...");
         
-        await _audioRepository.DeleteAllAsync();
+        //await _audioRepository.DeleteAllAsync();
+        IsClearMetadataButtonVisible = false;
+        IsCancelClearMetadataButtonVisible = true;
         
         _logger.Debug("Metadata cleared");
     }
