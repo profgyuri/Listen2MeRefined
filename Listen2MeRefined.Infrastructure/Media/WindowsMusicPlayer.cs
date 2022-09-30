@@ -1,6 +1,8 @@
-﻿using Listen2MeRefined.Infrastructure.LowLevel;
-using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using Source;
+using Source.Extensions;
+using Source.KeyboardHook;
 
 namespace Listen2MeRefined.Infrastructure.Media;
 
@@ -52,7 +54,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _mediator = mediator;
         _audioRepository = audioRepository;
 
-        timedTask.Start(CurrentTimeCheck);
+        timedTask.Start(TimeSpan.FromMilliseconds(500), CurrentTimeCheck);
         keyboardHook.KeyboardPressed += KeyboardPressedEvent;
     }
 

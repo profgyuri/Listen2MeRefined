@@ -1,6 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
-public class FileEnumerator : IFileEnumerator
+public sealed class FileEnumerator : IFileEnumerator
 {
     private static void ThrowIfNotDirectory(string path)
     {

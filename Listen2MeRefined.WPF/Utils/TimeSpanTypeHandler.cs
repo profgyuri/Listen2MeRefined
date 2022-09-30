@@ -4,7 +4,7 @@ using Dapper;
 
 namespace Listen2MeRefined.WPF;
 
-public class TimeSpanTypeHandler : SqlMapper.TypeHandler<TimeSpan>
+public sealed class TimeSpanTypeHandler : SqlMapper.TypeHandler<TimeSpan>
 {
     /// <inheritdoc />
     public override void SetValue(IDbDataParameter parameter, TimeSpan value)

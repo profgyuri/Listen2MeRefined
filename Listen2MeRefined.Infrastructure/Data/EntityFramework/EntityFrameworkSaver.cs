@@ -1,6 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
-public class EntityFrameworkSaver : IDataSaver
+public sealed class EntityFrameworkSaver : IDataSaver
 {
     private readonly DataContext _dataContext;
 

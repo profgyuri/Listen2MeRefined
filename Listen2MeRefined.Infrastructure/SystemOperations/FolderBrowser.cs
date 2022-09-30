@@ -1,7 +1,7 @@
 ﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
 using System.Collections.Generic;
 
-public class FolderBrowser : IFolderBrowser
+public sealed class FolderBrowser : IFolderBrowser
 {
     public IEnumerable<string> GetDrives()
     {

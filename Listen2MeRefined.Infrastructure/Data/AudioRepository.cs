@@ -1,6 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data;
 
-public class AudioRepository : IRepository<AudioModel>
+public sealed class AudioRepository : IRepository<AudioModel>
 {
     private readonly IDataReader _dataReader;
     private readonly IDataSaver _dataSaver;

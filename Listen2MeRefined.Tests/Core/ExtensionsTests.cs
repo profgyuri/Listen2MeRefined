@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Tests.Core;
+﻿using Source.Extensions;
+
+namespace Listen2MeRefined.Tests.Core;
 
 using Listen2MeRefined.Core;
 using NUnit.Framework;

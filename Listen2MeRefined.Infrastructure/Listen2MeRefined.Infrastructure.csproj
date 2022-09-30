@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\My Utils\Source\Source\Source.csproj" />
     <ProjectReference Include="..\Listen2MeRefined.Core\Listen2MeRefined.Core.csproj" />
   </ItemGroup>
 

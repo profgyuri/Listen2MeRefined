@@ -10,7 +10,7 @@ using System.Windows.Data;
 ///     if there is any folder selected for removal. <para/>
 ///     Used to enable or disable the Remove Folder button.
 /// </summary>
-internal class IsFolderSelectedConverter : IValueConverter
+internal sealed class IsFolderSelectedConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -23,7 +23,7 @@ internal class IsFolderSelectedConverter : IValueConverter
     }
 }
 
-public class BoolToVisibilityConverter : IValueConverter
+public sealed class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -36,7 +36,7 @@ public class BoolToVisibilityConverter : IValueConverter
     }
 }
 
-public class TrimmedTextBlockVisibilityConverter : IValueConverter
+public sealed class TrimmedTextBlockVisibilityConverter : IValueConverter
 {
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

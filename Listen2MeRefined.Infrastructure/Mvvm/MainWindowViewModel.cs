@@ -1,7 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Media;
+using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using Source;
+using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -13,7 +16,7 @@ public partial class MainWindowViewModel :
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
-    private readonly ISettingsManager _settingsManager;
+    private readonly ISettingsManager<SettingsModel> _settingsManager;
 
     [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
@@ -33,7 +36,7 @@ public partial class MainWindowViewModel :
     }
 
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager settingsManager)
+        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager<SettingsModel> settingsManager)
     {
         _mediaController = mediaController;
         _logger = logger;
@@ -42,7 +45,9 @@ public partial class MainWindowViewModel :
         _fontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
 
         playlistReference.PassPlaylist(ref _playList);
-        timedTask.Start(() => OnPropertyChanged(nameof(CurrentTime)));
+        timedTask.Start(
+            TimeSpan.FromMilliseconds(500), 
+            () => OnPropertyChanged(nameof(CurrentTime)));
     }
 
     #region Commands

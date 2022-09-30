@@ -1,4 +1,7 @@
 ﻿using System.Windows.Media;
+using Listen2MeRefined.Infrastructure.Data;
+using Source;
+using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -11,7 +14,7 @@ public partial class SettingsWindowViewModel :
     INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
-    private readonly ISettingsManager _settingsManager;
+    private readonly ISettingsManager<SettingsModel> _settingsManager;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
@@ -29,7 +32,7 @@ public partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
 
-    public SettingsWindowViewModel(ILogger logger, ISettingsManager settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
+    public SettingsWindowViewModel(ILogger logger, ISettingsManager<SettingsModel> settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
     {
         _logger = logger;
@@ -46,7 +49,7 @@ public partial class SettingsWindowViewModel :
 
     private void Init()
     {
-        var settings = _settingsManager.Load();
+        var settings = _settingsManager.Settings;
         Folders = new(settings.MusicFolders);
         FontFamily = settings.FontFamily;
         SelectedFontFamily = new FontFamily(settings.FontFamily);
@@ -61,7 +64,7 @@ public partial class SettingsWindowViewModel :
 
         Folders.Remove(SelectedFolder!);
 
-        _settingsManager.Save(s => s.MusicFolders = _folders);
+        _settingsManager.SaveSettings(s => s.MusicFolders = _folders);
     }
     
     [RelayCommand]
@@ -69,8 +72,8 @@ public partial class SettingsWindowViewModel :
     {
         _logger.Debug("Clearing metadata...");
 
-        _timedTask = new(TimeSpan.FromSeconds(1));
-        _timedTask.Start(async () =>
+        _timedTask = new();
+        _timedTask.Start(TimeSpan.FromSeconds(1), async () =>
         {
             if (_secondsToCancelClear == 0)
             {
@@ -112,7 +115,7 @@ public partial class SettingsWindowViewModel :
         
         Folders.Add(notification.Path);
         
-        _settingsManager.Save(s => s.MusicFolders = _folders);
+        _settingsManager.SaveSettings(s => s.MusicFolders = _folders);
         
         _logger.Information("Scanning folder for audio files: {Path}", notification.Path);
         var files = await _fileEnumerator.EnumerateFilesAsync(notification.Path);
@@ -124,7 +127,7 @@ public partial class SettingsWindowViewModel :
     partial void OnSelectedFontFamilyChanged(FontFamily value)
     {
         OnPropertyChanged(nameof(SelectedFontFamily));
-        _settingsManager.Save(s => s.FontFamily = value.Source);
+        _settingsManager.SaveSettings(s => s.FontFamily = value.Source);
         _mediator.Publish(new FontFamilyChangedNotification(value));
     }
 }

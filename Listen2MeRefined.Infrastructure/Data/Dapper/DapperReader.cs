@@ -6,7 +6,7 @@ namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
 using global::Dapper;
 
-public class DapperReader : IDataReader
+public sealed class DapperReader : IDataReader
 {
     private readonly IDbConnection _connection;
     private readonly DataContext _dataContext;

@@ -1,9 +1,11 @@
 ﻿using Listen2MeRefined.Core;
+using Source;
+using Source.KeyboardHook;
+using Source.Storage;
 
 namespace Listen2MeRefined.WPF;
 
 using Autofac;
-using Listen2MeRefined.Infrastructure.LowLevel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Serilog;
@@ -19,7 +21,6 @@ using IDataReader = IDataReader;
 using Microsoft.Data.Sqlite;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
-using Listen2MeRefined.Infrastructure.Notifications;
 
 internal static class IocContainer
 {
@@ -138,8 +139,8 @@ internal static class IocContainer
             .As<IFolderBrowser>();
 
         builder
-            .RegisterType<FileSettingsManager>()
-            .As<ISettingsManager>();
+            .RegisterType<FileSettingsManager<SettingsModel>>()
+            .As<ISettingsManager<SettingsModel>>();
 
         builder
             .RegisterType<SoundFileAnalyzer>()
@@ -150,7 +151,7 @@ internal static class IocContainer
             .As<IFileEnumerator>();
 
         builder
-            .Register(_ => new TimedTask(TimeSpan.FromMilliseconds(500)))
+            .Register(_ => new TimedTask())
             .InstancePerDependency();
 
         return _container = builder.Build();

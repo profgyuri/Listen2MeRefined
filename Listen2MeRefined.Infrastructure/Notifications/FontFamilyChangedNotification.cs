@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Notifications;
 
-public class FontFamilyChangedNotification : INotification
+public sealed class FontFamilyChangedNotification : INotification
 {
     public FontFamilyChangedNotification(FontFamily fontFamily)
     {

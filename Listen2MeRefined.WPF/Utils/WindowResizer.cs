@@ -124,7 +124,7 @@ public enum MonitorOptions : uint
 }
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-public class MonitorInfo
+public sealed class MonitorInfo
 {
     public Rectangle rcMonitor = new();
     public Rectangle rcWork = new();

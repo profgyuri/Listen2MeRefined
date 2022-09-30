@@ -1,4 +1,6 @@
 ﻿using System.Windows.Media;
+using Listen2MeRefined.Infrastructure.Data;
+using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -14,7 +16,7 @@ public partial class FolderBrowserViewModel :
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IFolderBrowser _folderBrowser;
-    private readonly ISettingsManager _settingsManager;
+    private readonly ISettingsManager<SettingsModel> _settingsManager;
 
     [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _fullPath = "";
@@ -22,7 +24,7 @@ public partial class FolderBrowserViewModel :
     [ObservableProperty] private ObservableCollection<string> _folders = new();
 
     public FolderBrowserViewModel(ILogger logger, IFolderBrowser folderBrowser, IMediator mediator,
-        ISettingsManager settingsManager)
+        ISettingsManager<SettingsModel> settingsManager)
     {
         _logger = logger;
         _folderBrowser = folderBrowser;

@@ -1,6 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
-public class EntityFrameworkRemover : IDataRemover
+public sealed class EntityFrameworkRemover : IDataRemover
 {
     private readonly DataContext _dataContext;
 

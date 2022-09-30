@@ -2,7 +2,7 @@
 
 using MediatR;
 
-public class FolderBrowserNotification : INotification
+public sealed class FolderBrowserNotification : INotification
 {
     public string Path { get; init; }
 

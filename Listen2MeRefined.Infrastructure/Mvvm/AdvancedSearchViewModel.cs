@@ -1,6 +1,8 @@
 ﻿using System.Windows.Media;
+using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -10,11 +12,11 @@ public partial class AdvancedSearchViewModel :
 {
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
-    private readonly ISettingsManager _settingsManager;
+    private readonly ISettingsManager<SettingsModel> _settingsManager;
     
     [ObservableProperty] private FontFamily _fontFamily;
 
-    public AdvancedSearchViewModel(IMediator mediator, ILogger logger, ISettingsManager settingsManager)
+    public AdvancedSearchViewModel(IMediator mediator, ILogger logger, ISettingsManager<SettingsModel> settingsManager)
     {
         _mediator = mediator;
         _logger = logger;

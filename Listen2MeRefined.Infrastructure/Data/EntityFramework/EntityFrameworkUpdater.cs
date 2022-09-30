@@ -1,6 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
-public class EntityFrameworkUpdater : IDataUpdater
+public sealed class EntityFrameworkUpdater : IDataUpdater
 {
     private readonly DataContext _dataContext;
 
