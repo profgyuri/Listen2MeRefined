@@ -16,7 +16,7 @@ public partial class FolderBrowserViewModel :
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IFolderBrowser _folderBrowser;
-    private readonly ISettingsManager<SettingsModel> _settingsManager;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
 
     [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _fullPath = "";
@@ -24,7 +24,7 @@ public partial class FolderBrowserViewModel :
     [ObservableProperty] private ObservableCollection<string> _folders = new();
 
     public FolderBrowserViewModel(ILogger logger, IFolderBrowser folderBrowser, IMediator mediator,
-        ISettingsManager<SettingsModel> settingsManager)
+        ISettingsManager<AppSettings> settingsManager)
     {
         _logger = logger;
         _folderBrowser = folderBrowser;

@@ -12,11 +12,11 @@ public partial class AdvancedSearchViewModel :
 {
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
-    private readonly ISettingsManager<SettingsModel> _settingsManager;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
     
     [ObservableProperty] private FontFamily _fontFamily;
 
-    public AdvancedSearchViewModel(IMediator mediator, ILogger logger, ISettingsManager<SettingsModel> settingsManager)
+    public AdvancedSearchViewModel(IMediator mediator, ILogger logger, ISettingsManager<AppSettings> settingsManager)
     {
         _mediator = mediator;
         _logger = logger;

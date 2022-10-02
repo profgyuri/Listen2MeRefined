@@ -139,8 +139,8 @@ internal static class IocContainer
             .As<IFolderBrowser>();
 
         builder
-            .RegisterType<FileSettingsManager<SettingsModel>>()
-            .As<ISettingsManager<SettingsModel>>();
+            .RegisterType<FileSettingsManager<AppSettings>>()
+            .As<ISettingsManager<AppSettings>>();
 
         builder
             .RegisterType<SoundFileAnalyzer>()

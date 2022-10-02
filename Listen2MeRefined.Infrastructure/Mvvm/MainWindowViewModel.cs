@@ -16,7 +16,7 @@ public partial class MainWindowViewModel :
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
-    private readonly ISettingsManager<SettingsModel> _settingsManager;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
 
     [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
@@ -36,7 +36,7 @@ public partial class MainWindowViewModel :
     }
 
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager<SettingsModel> settingsManager)
+        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager<AppSettings> settingsManager)
     {
         _mediaController = mediaController;
         _logger = logger;

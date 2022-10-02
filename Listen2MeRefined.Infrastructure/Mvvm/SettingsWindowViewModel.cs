@@ -14,7 +14,7 @@ public partial class SettingsWindowViewModel :
     INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
-    private readonly ISettingsManager<SettingsModel> _settingsManager;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
@@ -32,7 +32,7 @@ public partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
 
-    public SettingsWindowViewModel(ILogger logger, ISettingsManager<SettingsModel> settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
+    public SettingsWindowViewModel(ILogger logger, ISettingsManager<AppSettings> settingsManager, IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator)
     {
         _logger = logger;
