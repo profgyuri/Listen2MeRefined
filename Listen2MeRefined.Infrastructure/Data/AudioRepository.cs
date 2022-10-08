@@ -82,25 +82,25 @@ public sealed class AudioRepository : IRepository<AudioModel>
     {
         return _dataReader.Read<AudioModel>();
     }
-
-    public async Task<IEnumerable<AudioModel>> ReadAsync()
-    {
-        return await _dataReader.ReadAsync<AudioModel>();
-    }
     
     public IEnumerable<AudioModel> Read(string searchTerm)
     {
         return _dataReader.Read<AudioModel>(searchTerm);
     }
     
-    public async Task<IEnumerable<AudioModel>> ReadAsync(string searchTerm)
-    {
-        return await _dataReader.ReadAsync<AudioModel>(searchTerm);
-    }
-    
     public IEnumerable<AudioModel> Read(AudioModel model)
     {
         return _dataReader.Read(model, false);
+    }
+    
+    public async Task<IEnumerable<AudioModel>> ReadAsync()
+    {
+        return await _dataReader.ReadAsync<AudioModel>();
+    }
+    
+    public async Task<IEnumerable<AudioModel>> ReadAsync(string searchTerm)
+    {
+        return await _dataReader.ReadAsync<AudioModel>(searchTerm);
     }
     
     public async Task<IEnumerable<AudioModel>> ReadAsync(AudioModel model)
