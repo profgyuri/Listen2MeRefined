@@ -9,16 +9,15 @@ using System.Windows.Media.Animation;
 [TemplatePart(Name = "PART_AniHorizontalScrollBar", Type = typeof(ScrollBar))]
 public class SmoothScrollViewer : ScrollViewer
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     private ScrollBar _aniHorizontalScrollBar;
     private ScrollBar _aniVerticalScrollBar;
 
     public static readonly DependencyProperty _targetVerticalOffsetProperty =
-        DependencyProperty.Register("TargetVerticalOffset", typeof(double), typeof(SmoothScrollViewer),
+        DependencyProperty.Register(nameof(TargetVerticalOffset), typeof(double), typeof(SmoothScrollViewer),
             new PropertyMetadata(0.0, OnTargetVerticalOffsetChanged));
 
     public static readonly DependencyProperty _targetHorizontalOffsetProperty =
-        DependencyProperty.Register("TargetHorizontalOffset", typeof(double), typeof(SmoothScrollViewer),
+        DependencyProperty.Register(nameof(TargetHorizontalOffset), typeof(double), typeof(SmoothScrollViewer),
             new PropertyMetadata(0.0, OnTargetHorizontalOffsetChanged));
 
     public static readonly DependencyProperty _horizontalScrollOffsetProperty =
@@ -115,7 +114,6 @@ public class SmoothScrollViewer : ScrollViewer
         var newHorizontalPos = thisScroller.TargetHorizontalOffset;
         bool isKeyHandled;
 
-        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
         switch (keyPressed)
         {
             //Vertical Key Strokes code
@@ -138,9 +136,7 @@ public class SmoothScrollViewer : ScrollViewer
                 isKeyHandled = true;
                 break;
             default:
-#pragma warning disable CA2208
-                throw new ArgumentOutOfRangeException();
-#pragma warning restore CA2208
+                throw new ArgumentOutOfRangeException(nameof(e), "Unhandled navigation key pressed!");
         }
 
         if (Math.Abs(newVerticalPos - thisScroller.TargetVerticalOffset) > 0.0F)
@@ -148,16 +144,17 @@ public class SmoothScrollViewer : ScrollViewer
             thisScroller.TargetVerticalOffset = newVerticalPos;
         }
 
-        //Horizontal Key Strokes Code
-        if (keyPressed == Key.Right)
+        switch (keyPressed)
         {
-            newHorizontalPos = NormalizeScrollPos(thisScroller, newHorizontalPos + 16, Orientation.Horizontal);
-            isKeyHandled = true;
-        }
-        else if (keyPressed == Key.Left)
-        {
-            newHorizontalPos = NormalizeScrollPos(thisScroller, newHorizontalPos - 16, Orientation.Horizontal);
-            isKeyHandled = true;
+            //Horizontal Key Strokes Code
+            case Key.Right:
+                newHorizontalPos = NormalizeScrollPos(thisScroller, newHorizontalPos + 16, Orientation.Horizontal);
+                isKeyHandled = true;
+                break;
+            case Key.Left:
+                newHorizontalPos = NormalizeScrollPos(thisScroller, newHorizontalPos - 16, Orientation.Horizontal);
+                isKeyHandled = true;
+                break;
         }
 
         if (Math.Abs(newHorizontalPos - thisScroller.TargetHorizontalOffset) > 0.0F)
@@ -219,7 +216,7 @@ public class SmoothScrollViewer : ScrollViewer
         var oldTargetVOffset = e.OldValue;
         var newTargetVOffset = e.NewValue;
 
-        if (!(Math.Abs(newTargetVOffset - thisScroller.TargetVerticalOffset) > 0.0F))
+        if (Math.Abs(newTargetVOffset - thisScroller.TargetVerticalOffset) <= 0.0F)
         {
             return;
         }
@@ -244,7 +241,7 @@ public class SmoothScrollViewer : ScrollViewer
         var oldTargetHOffset = e.OldValue;
         var newTargetHOffset = e.NewValue;
 
-        if (!(Math.Abs(newTargetHOffset - thisScroller.TargetHorizontalOffset) > 0.0F))
+        if (Math.Abs(newTargetHOffset - thisScroller.TargetHorizontalOffset) <= 0.0F)
         {
             return;
         }

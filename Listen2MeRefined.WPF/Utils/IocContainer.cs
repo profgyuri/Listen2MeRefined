@@ -26,8 +26,8 @@ internal static class IocContainer
 {
     private static IContainer? _container;
 
-    const string seqConnection = "http://localhost:5341";
-    static readonly HashSet<ConsoleKey> lowLevelKeys = 
+    private const string SeqConnection = "http://localhost:5341";
+    private static readonly HashSet<ConsoleKey> _lowLevelKeys = 
         new(){
                     ConsoleKey.MediaPlay,
                     ConsoleKey.MediaStop,
@@ -118,7 +118,7 @@ internal static class IocContainer
             .SingleInstance();
 
         builder
-            .Register(_ => new KeyboardHook(lowLevelKeys))
+            .Register(_ => new KeyboardHook(_lowLevelKeys))
             .SingleInstance();
 
         #region MediatR
@@ -162,7 +162,7 @@ internal static class IocContainer
         var config = new LoggerConfiguration();
 
         config
-            .WriteTo.Async(conf => conf.Seq(seqConnection));
+            .WriteTo.Async(conf => conf.Seq(SeqConnection));
         config
             .MinimumLevel.Debug();
 

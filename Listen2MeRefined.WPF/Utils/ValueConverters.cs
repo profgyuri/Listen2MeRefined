@@ -23,7 +23,7 @@ internal sealed class IsFolderSelectedConverter : IValueConverter
     }
 }
 
-public sealed class BoolToVisibilityConverter : IValueConverter
+internal sealed class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -36,22 +36,23 @@ public sealed class BoolToVisibilityConverter : IValueConverter
     }
 }
 
-public sealed class TrimmedTextBlockVisibilityConverter : IValueConverter
+internal sealed class TrimmedTextBlockVisibilityConverter : IValueConverter
 {
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null)
+        {
             return Visibility.Collapsed;
+        }
 
-        FrameworkElement textBlock = (FrameworkElement)value;
+        var textBlock = (FrameworkElement)value;
 
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
-        if (((FrameworkElement)value).ActualWidth < ((FrameworkElement)value).DesiredSize.Width)
-            return Visibility.Visible;
-        else
-            return Visibility.Collapsed;
+        return ((FrameworkElement)value).ActualWidth < ((FrameworkElement)value).DesiredSize.Width 
+            ? Visibility.Visible 
+            : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
