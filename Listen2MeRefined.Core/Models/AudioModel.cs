@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Dapper.Contrib.Extensions;
 
 namespace Listen2MeRefined.Core.Models;
 
 using System.Text;
 
 [System.ComponentModel.DataAnnotations.Schema.Table("Songs")]
-public class AudioModel : Model
+public sealed class AudioModel : Model
 {
     public string? Artist { get; set; }
 

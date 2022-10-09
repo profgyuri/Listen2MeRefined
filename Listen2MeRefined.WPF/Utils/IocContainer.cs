@@ -1,9 +1,11 @@
 ﻿using Listen2MeRefined.Core;
+using Source;
+using Source.KeyboardHook;
+using Source.Storage;
 
 namespace Listen2MeRefined.WPF;
 
 using Autofac;
-using Listen2MeRefined.Infrastructure.LowLevel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Serilog;
@@ -19,14 +21,13 @@ using IDataReader = IDataReader;
 using Microsoft.Data.Sqlite;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
-using Listen2MeRefined.Infrastructure.Notifications;
 
 internal static class IocContainer
 {
     private static IContainer? _container;
 
-    const string seqConnection = "http://localhost:5341";
-    static readonly HashSet<ConsoleKey> lowLevelKeys = 
+    private const string SeqConnection = "http://localhost:5341";
+    private static readonly HashSet<ConsoleKey> _lowLevelKeys = 
         new(){
                     ConsoleKey.MediaPlay,
                     ConsoleKey.MediaStop,
@@ -117,7 +118,7 @@ internal static class IocContainer
             .SingleInstance();
 
         builder
-            .Register(_ => new KeyboardHook(lowLevelKeys))
+            .Register(_ => new KeyboardHook(_lowLevelKeys))
             .SingleInstance();
 
         #region MediatR
@@ -138,8 +139,8 @@ internal static class IocContainer
             .As<IFolderBrowser>();
 
         builder
-            .RegisterType<FileSettingsManager>()
-            .As<ISettingsManager>();
+            .RegisterType<FileSettingsManager<AppSettings>>()
+            .As<ISettingsManager<AppSettings>>();
 
         builder
             .RegisterType<SoundFileAnalyzer>()
@@ -150,7 +151,7 @@ internal static class IocContainer
             .As<IFileEnumerator>();
 
         builder
-            .Register(_ => new TimedTask(TimeSpan.FromMilliseconds(500)))
+            .Register(_ => new TimedTask())
             .InstancePerDependency();
 
         return _container = builder.Build();
@@ -161,7 +162,7 @@ internal static class IocContainer
         var config = new LoggerConfiguration();
 
         config
-            .WriteTo.Async(conf => conf.Seq(seqConnection));
+            .WriteTo.Async(conf => conf.Seq(SeqConnection));
         config
             .MinimumLevel.Debug();
 

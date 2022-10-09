@@ -10,7 +10,7 @@ using System.Windows.Data;
 ///     if there is any folder selected for removal. <para/>
 ///     Used to enable or disable the Remove Folder button.
 /// </summary>
-internal class IsFolderSelectedConverter : IValueConverter
+internal sealed class IsFolderSelectedConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -23,7 +23,7 @@ internal class IsFolderSelectedConverter : IValueConverter
     }
 }
 
-public class BoolToVisibilityConverter : IValueConverter
+internal sealed class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -36,22 +36,23 @@ public class BoolToVisibilityConverter : IValueConverter
     }
 }
 
-public class TrimmedTextBlockVisibilityConverter : IValueConverter
+internal sealed class TrimmedTextBlockVisibilityConverter : IValueConverter
 {
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null)
+        {
             return Visibility.Collapsed;
+        }
 
-        FrameworkElement textBlock = (FrameworkElement)value;
+        var textBlock = (FrameworkElement)value;
 
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
-        if (((FrameworkElement)value).ActualWidth < ((FrameworkElement)value).DesiredSize.Width)
-            return Visibility.Visible;
-        else
-            return Visibility.Collapsed;
+        return ((FrameworkElement)value).ActualWidth < ((FrameworkElement)value).DesiredSize.Width 
+            ? Visibility.Visible 
+            : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

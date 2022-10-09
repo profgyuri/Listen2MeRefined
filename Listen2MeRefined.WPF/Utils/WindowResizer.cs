@@ -68,7 +68,7 @@ public class WindowResizer
         switch (msg)
         {
             // Handle the GetMinMaxInfo of the Window
-            case 0x0024: /* WM_GETMINMAXINFO */
+            case 0x0024:
                 WmGetMinMaxInfo(lParam);
                 handled = true;
                 break;
@@ -117,21 +117,21 @@ public class WindowResizer
     }
 }
 
-public enum MonitorOptions : uint
+internal enum MonitorOptions : uint
 {
     MonitorDefaulttoprimary = 0x00000001,
     MonitorDefaulttonearest = 0x00000002
 }
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-public class MonitorInfo
+internal sealed class MonitorInfo
 {
     public Rectangle rcMonitor = new();
     public Rectangle rcWork = new();
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Rectangle
+internal struct Rectangle
 {
     public readonly int Left;
     public readonly int Top;
@@ -142,15 +142,12 @@ public struct Rectangle
 [StructLayout(LayoutKind.Sequential)]
 public struct MinMaxInfo
 {
-    private readonly Point ptReserved;
-    public Point ptMaxSize;
-    public Point ptMaxPosition;
-    private readonly Point ptMinTrackSize;
-    private readonly Point ptMaxTrackSize;
+    internal Point ptMaxSize;
+    internal Point ptMaxPosition;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Point
+internal struct Point
 {
     public int X;
     public int Y;

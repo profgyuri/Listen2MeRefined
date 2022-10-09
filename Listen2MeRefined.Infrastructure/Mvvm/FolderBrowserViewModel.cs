@@ -1,4 +1,6 @@
 ﻿using System.Windows.Media;
+using Listen2MeRefined.Infrastructure.Data;
+using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -14,7 +16,7 @@ public partial class FolderBrowserViewModel :
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IFolderBrowser _folderBrowser;
-    private readonly ISettingsManager _settingsManager;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
 
     [ObservableProperty] private FontFamily _fontFamily;
     [ObservableProperty] private string _fullPath = "";
@@ -22,7 +24,7 @@ public partial class FolderBrowserViewModel :
     [ObservableProperty] private ObservableCollection<string> _folders = new();
 
     public FolderBrowserViewModel(ILogger logger, IFolderBrowser folderBrowser, IMediator mediator,
-        ISettingsManager settingsManager)
+        ISettingsManager<AppSettings> settingsManager)
     {
         _logger = logger;
         _folderBrowser = folderBrowser;
@@ -38,7 +40,7 @@ public partial class FolderBrowserViewModel :
     {
         FullPath = _selectedFolder switch
         {
-            ".." => Path.GetDirectoryName(_fullPath) ?? "",
+            GlobalConstants.ParentPathItem => Path.GetDirectoryName(_fullPath) ?? "",
             _ => Path.Combine(_fullPath, _selectedFolder),
         };
 
@@ -63,17 +65,19 @@ public partial class FolderBrowserViewModel :
     [RelayCommand]
     private async Task HandleSelectedPath()
     {
-        if (!string.IsNullOrEmpty(_selectedFolder) && _selectedFolder != "..")
+        var hasSelectedChildPath = !string.IsNullOrEmpty(_selectedFolder) && _selectedFolder != GlobalConstants.ParentPathItem;
+        if (hasSelectedChildPath)
         {
             FullPath = Path.Combine(_fullPath, _selectedFolder);
         }
 
-        if (string.IsNullOrEmpty(_fullPath) || !new DirectoryInfo(_fullPath).Exists)
+        var isFullPathInvalid = string.IsNullOrEmpty(_fullPath) || !new DirectoryInfo(_fullPath).Exists;
+        if (isFullPathInvalid)
         {
             return;
         }
 
-        _logger.Debug("Publishing {0} from the folder browser dialog.", _fullPath);
+        _logger.Debug("Publishing {FullPath} from the folder browser dialog", _fullPath);
 
         var notification = new FolderBrowserNotification(_fullPath);
         await _mediator.Publish(notification);
@@ -89,7 +93,7 @@ public partial class FolderBrowserViewModel :
 
     private void GetFolderNames()
     {
-        _folders.Add("..");
+        _folders.Add(GlobalConstants.ParentPathItem);
 
         foreach (var folder in _folderBrowser.GetSubFolders(_fullPath))
         {
@@ -102,6 +106,7 @@ public partial class FolderBrowserViewModel :
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         FontFamily = notification.FontFamily;
+        await Task.CompletedTask;
     }
     #endregion
 }

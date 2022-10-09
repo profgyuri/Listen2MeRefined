@@ -4,7 +4,7 @@ using System.Windows;
 /// <summary>
 /// Interaction logic for AdvancedSearchWindow.xaml
 /// </summary>
-public partial class AdvancedSearchWindow : Window
+public sealed partial class AdvancedSearchWindow : Window
 {
     public AdvancedSearchWindow(AdvancedSearchViewModel viewModel)
     {

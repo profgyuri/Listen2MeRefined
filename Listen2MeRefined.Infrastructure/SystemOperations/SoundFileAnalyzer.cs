@@ -3,7 +3,7 @@
 using Ardalis.GuardClauses;
 using TagLib;
 
-public class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
+public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
 {
     /// <summary>
     ///     Gets an <see cref="AudioModel"/> after analyzing the file at <paramref name="path"/>.

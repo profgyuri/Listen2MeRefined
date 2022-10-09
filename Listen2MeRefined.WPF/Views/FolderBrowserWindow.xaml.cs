@@ -4,7 +4,7 @@ using System.Windows;
 /// <summary>
 /// Interaction logic for FolderBrowserWindow.xaml
 /// </summary>
-public partial class FolderBrowserWindow : Window
+public sealed partial class FolderBrowserWindow : Window
 {
     public FolderBrowserWindow(FolderBrowserViewModel viewModel)
     {

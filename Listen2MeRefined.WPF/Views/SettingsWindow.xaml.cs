@@ -4,7 +4,7 @@ using System.Windows;
 /// <summary>
 /// Interaction logic for SettingsWindow.xaml
 /// </summary>
-public partial class SettingsWindow : Window
+public sealed partial class SettingsWindow : Window
 {
     public SettingsWindow(SettingsWindowViewModel viewModel)
     {

@@ -16,16 +16,15 @@ internal static class WindowManager
     {
         using var scope = IocContainer.GetContainer().BeginLifetimeScope();
         var window = scope.Resolve<T>();
+        
         if (isModal)
         {
             var result = window.ShowDialog();
             return result;
         }
-        else
-        {
-            window.Show();
-            return null;
-        }
+
+        window.Show();
+        return null;
     }
 
     /// <summary>
@@ -50,10 +49,8 @@ internal static class WindowManager
             var result = window.ShowDialog();
             return result;
         }
-        else
-        {
-            window.Show();
-            return null;
-        }
+
+        window.Show();
+        return null;
     }
 }
