@@ -60,7 +60,7 @@ public partial class SettingsWindowViewModel :
     [RelayCommand]
     private void RemoveFolder()
     {
-        _logger.Debug("Removing folder: {0}", SelectedFolder);
+        _logger.Debug("Removing folder: {Folder}", SelectedFolder);
 
         Folders.Remove(SelectedFolder!);
 
