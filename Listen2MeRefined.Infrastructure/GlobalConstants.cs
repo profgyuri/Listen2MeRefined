@@ -9,4 +9,6 @@ internal static class GlobalConstants
         ".mpp", ".ogg", ".oga",
         ".wav", ".wma", ".wv", ".webm"
     };
+    
+    public const string ParentPathItem = "..";
 }
