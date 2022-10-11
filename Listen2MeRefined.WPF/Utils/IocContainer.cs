@@ -1,39 +1,37 @@
-﻿using Listen2MeRefined.Core;
-using Source;
-using Source.KeyboardHook;
-using Source.Storage;
-
-namespace Listen2MeRefined.WPF;
-
-using Autofac;
-using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.Infrastructure.Mvvm;
-using Serilog;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using System.Data;
+using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.SystemOperations;
-using Listen2MeRefined.Core.Interfaces.DataHandlers;
-using System.Data;
-using IDataReader = IDataReader;
-using Microsoft.Data.Sqlite;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
+using Microsoft.Data.Sqlite;
+using Serilog;
+using Source;
+using Source.KeyboardHook;
+using Source.Storage;
+using IDataReader = Listen2MeRefined.Core.Interfaces.DataHandlers.IDataReader;
+
+namespace Listen2MeRefined.WPF;
 
 internal static class IocContainer
 {
     private static IContainer? _container;
 
     private const string SeqConnection = "http://localhost:5341";
-    private static readonly HashSet<ConsoleKey> _lowLevelKeys = 
-        new(){
-                    ConsoleKey.MediaPlay,
-                    ConsoleKey.MediaStop,
-                    ConsoleKey.MediaPrevious,
-                    ConsoleKey.MediaNext
-                };
+
+    private static readonly HashSet<ConsoleKey> _lowLevelKeys =
+        new()
+        {
+            ConsoleKey.MediaPlay,
+            ConsoleKey.MediaStop,
+            ConsoleKey.MediaPrevious,
+            ConsoleKey.MediaNext
+        };
 
     internal static IContainer GetContainer()
     {
@@ -41,7 +39,7 @@ internal static class IocContainer
         {
             return _container;
         }
-        
+
         var builder = new ContainerBuilder();
 
         #region Windows and Pages
@@ -49,6 +47,7 @@ internal static class IocContainer
         builder.RegisterType<FolderBrowserWindow>().InstancePerLifetimeScope();
         builder.RegisterType<AdvancedSearchWindow>().InstancePerLifetimeScope();
         builder.RegisterType<SettingsWindow>().InstancePerLifetimeScope();
+        builder.RegisterType<NewSongWindow>().InstancePerLifetimeScope();
         #endregion
 
         #region ViewModels
@@ -57,10 +56,21 @@ internal static class IocContainer
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
-        builder.RegisterType<FolderBrowserViewModel>();
-        builder.RegisterType<AdvancedSearchViewModel>();
+        builder.RegisterType<FolderBrowserViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder.RegisterType<AdvancedSearchViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
         builder
             .RegisterType<SettingsWindowViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<NewSongWindowViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
@@ -93,19 +103,19 @@ internal static class IocContainer
         builder
             .RegisterType<EntityFrameworkRemover>()
             .As<IDataRemover>();
-        
+
         builder
             .RegisterType<DapperReader>()
             .As<IDataReader>();
-        
+
         builder
             .RegisterType<EntityFrameworkSaver>()
             .As<IDataSaver>();
-        
+
         builder
             .RegisterType<EntityFrameworkUpdater>()
             .As<IDataUpdater>();
-        
+
         builder
             .RegisterType<AudioRepository>()
             .As<IRepository<AudioModel>>();
@@ -145,7 +155,7 @@ internal static class IocContainer
         builder
             .RegisterType<SoundFileAnalyzer>()
             .As<IFileAnalyzer<AudioModel>>();
-        
+
         builder
             .RegisterType<FileEnumerator>()
             .As<IFileEnumerator>();

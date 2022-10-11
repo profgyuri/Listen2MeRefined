@@ -1,11 +1,11 @@
-﻿using Dapper;
+﻿using System.Windows;
+using Dapper;
+using Listen2MeRefined.WPF.Views;
 
 namespace Listen2MeRefined.WPF;
 
-using System.Windows;
-
 /// <summary>
-/// Interaction logic for App.xaml
+///     Interaction logic for App.xaml
 /// </summary>
 public sealed partial class App : Application
 {
@@ -19,6 +19,6 @@ public sealed partial class App : Application
 
     private void ShowMainWindow()
     {
-        WindowManager.ShowWindow<MainWindow>(false);
+        WindowManager.ShowWindow<NewSongWindow>(false);
     }
 }
