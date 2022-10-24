@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Media;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
@@ -18,7 +17,7 @@ public partial class MainWindowViewModel :
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly ISettingsManager<AppSettings> _settingsManager;
 
-    [ObservableProperty] private FontFamily _fontFamily;
+    [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
@@ -42,7 +41,7 @@ public partial class MainWindowViewModel :
         _logger = logger;
         _audioRepository = audioRepository;
         _settingsManager = settingsManager;
-        _fontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
+        _fontFamily = _settingsManager.Settings.FontFamily;
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(

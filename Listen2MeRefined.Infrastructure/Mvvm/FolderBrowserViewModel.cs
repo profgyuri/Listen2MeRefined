@@ -1,5 +1,4 @@
-﻿using System.Windows.Media;
-using Listen2MeRefined.Infrastructure.Data;
+﻿using Listen2MeRefined.Infrastructure.Data;
 using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
@@ -18,7 +17,7 @@ public partial class FolderBrowserViewModel :
     private readonly IFolderBrowser _folderBrowser;
     private readonly ISettingsManager<AppSettings> _settingsManager;
 
-    [ObservableProperty] private FontFamily _fontFamily;
+    [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string _fullPath = "";
     [ObservableProperty] private string _selectedFolder = "";
     [ObservableProperty] private ObservableCollection<string> _folders = new();
@@ -30,7 +29,7 @@ public partial class FolderBrowserViewModel :
         _folderBrowser = folderBrowser;
         _mediator = mediator;
         _settingsManager = settingsManager;
-        _fontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
+        _fontFamily = _settingsManager.Settings.FontFamily;
 
         ChangeDirectory();
     }
