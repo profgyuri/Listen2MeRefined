@@ -1,14 +1,13 @@
-﻿using System.Windows.Media;
-using MediatR;
+﻿using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Notifications;
 
 public sealed class FontFamilyChangedNotification : INotification
 {
-    public FontFamilyChangedNotification(FontFamily fontFamily)
+    public FontFamilyChangedNotification(string fontFamily)
     {
         FontFamily = fontFamily;
     }
     
-    public FontFamily FontFamily { get; }
+    public string FontFamily { get; }
 }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Windows.Media;
 using Autofac;
+using Listen2MeRefined.Core;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
@@ -47,7 +50,6 @@ internal static class IocContainer
         builder.RegisterType<FolderBrowserWindow>().InstancePerLifetimeScope();
         builder.RegisterType<AdvancedSearchWindow>().InstancePerLifetimeScope();
         builder.RegisterType<SettingsWindow>().InstancePerLifetimeScope();
-        builder.RegisterType<NewSongWindow>().InstancePerLifetimeScope();
         #endregion
 
         #region ViewModels
@@ -56,21 +58,10 @@ internal static class IocContainer
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
-        builder.RegisterType<FolderBrowserViewModel>()
-            .AsSelf()
-            .AsImplementedInterfaces()
-            .SingleInstance();
-        builder.RegisterType<AdvancedSearchViewModel>()
-            .AsSelf()
-            .AsImplementedInterfaces()
-            .SingleInstance();
+        builder.RegisterType<FolderBrowserViewModel>();
+        builder.RegisterType<AdvancedSearchViewModel>();
         builder
             .RegisterType<SettingsWindowViewModel>()
-            .AsSelf()
-            .AsImplementedInterfaces()
-            .SingleInstance();
-        builder
-            .RegisterType<NewSongWindowViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
@@ -163,6 +154,10 @@ internal static class IocContainer
         builder
             .Register(_ => new TimedTask())
             .InstancePerDependency();
+
+        builder
+            .Register(_ => new FontFamilies(Fonts.SystemFontFamilies.Select(f => f.Source)))
+            .SingleInstance();
 
         return _container = builder.Build();
     }

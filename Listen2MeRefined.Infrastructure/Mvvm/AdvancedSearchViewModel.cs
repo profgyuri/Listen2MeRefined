@@ -1,5 +1,4 @@
-﻿using System.Windows.Media;
-using Listen2MeRefined.Infrastructure.Data;
+﻿using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Source.Storage;
@@ -14,14 +13,14 @@ public partial class AdvancedSearchViewModel :
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     
-    [ObservableProperty] private FontFamily _fontFamily;
+    [ObservableProperty] private string _fontFamily;
 
     public AdvancedSearchViewModel(IMediator mediator, ILogger logger, ISettingsManager<AppSettings> settingsManager)
     {
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
-        _fontFamily = new FontFamily(_settingsManager.Settings.FontFamily);
+        _fontFamily = _settingsManager.Settings.FontFamily;
     }
     
     #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
