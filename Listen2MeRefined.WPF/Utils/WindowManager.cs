@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF;
+﻿using Listen2MeRefined.WPF.Views;
+
+namespace Listen2MeRefined.WPF;
 
 using Autofac;
 using System.Windows;
@@ -52,5 +54,36 @@ internal static class WindowManager
 
         window.Show();
         return null;
+    }
+
+    /// <summary>
+    /// Shows the New Song Window when the mouse coordinates are in a corner.
+    /// </summary>
+    /// <param name="x">X parameter of mouse position.</param>
+    /// <param name="y">Y parameter of mouse position.</param>
+    internal static void ShowNewSongWindow(int x, int y)
+    {
+        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
+        var window = scope.Resolve<NewSongWindow>();
+
+        if (x <= 5)
+        {
+            window.Left = 0;
+        }
+        else if (x >= SystemParameters.PrimaryScreenWidth - 5)
+        {
+            window.Left = SystemParameters.PrimaryScreenWidth - window.Width;
+        }
+        
+        if (y <= 5)
+        {
+            window.Top = 0;
+        }
+        else if (y >= SystemParameters.PrimaryScreenHeight - 5)
+        {
+            window.Top = SystemParameters.PrimaryScreenHeight - window.Height;
+        }
+        
+        window.Show();
     }
 }

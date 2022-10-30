@@ -43,6 +43,7 @@ internal static class IocContainer
         builder.RegisterType<FolderBrowserWindow>().InstancePerLifetimeScope();
         builder.RegisterType<AdvancedSearchWindow>().InstancePerLifetimeScope();
         builder.RegisterType<SettingsWindow>().InstancePerLifetimeScope();
+        builder.RegisterType<NewSongWindow>().InstancePerDependency();
         #endregion
 
         #region ViewModels
@@ -53,6 +54,7 @@ internal static class IocContainer
             .SingleInstance();
         builder.RegisterType<FolderBrowserViewModel>();
         builder.RegisterType<AdvancedSearchViewModel>();
+        builder.RegisterType<NewSongWindowViewModel>();
         builder
             .RegisterType<SettingsWindowViewModel>()
             .AsSelf()

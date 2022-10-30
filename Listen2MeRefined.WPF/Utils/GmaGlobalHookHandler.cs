@@ -84,6 +84,11 @@ internal class GmaGlobalHookHandler : IGlobalHook
     
     private void OnMouseMove(object? sender, MouseEventArgs e)
     {
-        
+        if (
+            e.X <= 0 || e.X >= Screen.PrimaryScreen.Bounds.Width - 5
+            || e.Y <= 0 || e.Y >= Screen.PrimaryScreen.Bounds.Height - 5)
+        {
+            WindowManager.ShowNewSongWindow(e.X, e.Y);
+        }
     }
 }
