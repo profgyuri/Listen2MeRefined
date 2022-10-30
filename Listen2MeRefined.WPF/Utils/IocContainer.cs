@@ -117,39 +117,6 @@ internal static class IocContainer
             .RegisterType<GmaGlobalHookHandler>()
             .As<IGlobalHook>()
             .SingleInstance();
-        /*builder
-            .Register<IKeyboardMouseEvents>(context =>
-            {
-                var hook = Hook.GlobalEvents();
-
-                hook.KeyDown += (sender, e) =>
-                {
-                    if (!_lowLevelKeys.Contains(e.KeyCode))
-                    {
-                        return;
-                    }
-                    
-                    // call the corresponding media method
-                    var mediaController = context.Resolve<IMediaController>();
-                    switch (e.KeyCode)
-                    {
-                        case Keys.MediaPlayPause:
-                            mediaController.PlayPause();
-                            break;
-                        case Keys.MediaNextTrack:
-                            mediaController.Next();
-                            break;
-                        case Keys.MediaPreviousTrack:
-                            mediaController.Previous();
-                            break;
-                        case Keys.MediaStop:
-                            mediaController.Stop();
-                            break;
-                    }
-                };
-
-                return hook;
-            });*/
 
         #region MediatR
         builder

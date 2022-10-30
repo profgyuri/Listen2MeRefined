@@ -61,7 +61,8 @@ internal static class WindowManager
     /// </summary>
     /// <param name="x">X parameter of mouse position.</param>
     /// <param name="y">Y parameter of mouse position.</param>
-    internal static void ShowNewSongWindow(int x, int y)
+    /// <returns>The instance of the New Song Window.</returns>
+    internal static NewSongWindow ShowNewSongWindow(int x, int y)
     {
         using var scope = IocContainer.GetContainer().BeginLifetimeScope();
         var window = scope.Resolve<NewSongWindow>();
@@ -85,5 +86,14 @@ internal static class WindowManager
         }
         
         window.Show();
+        return window;
+    }
+    
+    /// <summary>
+    /// Closes the new song window, when the mouse coordinates are no longer in a corner.
+    /// </summary>
+    internal static void CloseNewSongWindow(NewSongWindow window)
+    {
+        window.Close();
     }
 }
