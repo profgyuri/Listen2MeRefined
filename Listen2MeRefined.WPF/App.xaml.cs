@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using Dapper;
-using Listen2MeRefined.WPF.Views;
 
 namespace Listen2MeRefined.WPF;
 
@@ -14,11 +13,6 @@ public sealed partial class App : Application
         base.OnStartup(e);
 
         SqlMapper.AddTypeHandler(new TimeSpanTypeHandler());
-        ShowMainWindow();
-    }
-
-    private void ShowMainWindow()
-    {
-        WindowManager.ShowWindow<NewSongWindow>(false);
+        WindowManager.ShowWindow<MainWindow>(false);
     }
 }

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Media;
 using Autofac;
+using Gma.System.MouseKeyHook;
 using Listen2MeRefined.Core;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
@@ -26,15 +28,6 @@ internal static class IocContainer
     private static IContainer? _container;
 
     private const string SeqConnection = "http://localhost:5341";
-
-    private static readonly HashSet<ConsoleKey> _lowLevelKeys =
-        new()
-        {
-            ConsoleKey.MediaPlay,
-            ConsoleKey.MediaStop,
-            ConsoleKey.MediaPrevious,
-            ConsoleKey.MediaNext
-        };
 
     internal static IContainer GetContainer()
     {
@@ -119,8 +112,42 @@ internal static class IocContainer
             .SingleInstance();
 
         builder
-            .Register(_ => new KeyboardHook(_lowLevelKeys))
+            .RegisterType<GmaGlobalHookHandler>()
+            .As<IGlobalHook>()
             .SingleInstance();
+        /*builder
+            .Register<IKeyboardMouseEvents>(context =>
+            {
+                var hook = Hook.GlobalEvents();
+
+                hook.KeyDown += (sender, e) =>
+                {
+                    if (!_lowLevelKeys.Contains(e.KeyCode))
+                    {
+                        return;
+                    }
+                    
+                    // call the corresponding media method
+                    var mediaController = context.Resolve<IMediaController>();
+                    switch (e.KeyCode)
+                    {
+                        case Keys.MediaPlayPause:
+                            mediaController.PlayPause();
+                            break;
+                        case Keys.MediaNextTrack:
+                            mediaController.Next();
+                            break;
+                        case Keys.MediaPreviousTrack:
+                            mediaController.Previous();
+                            break;
+                        case Keys.MediaStop:
+                            mediaController.Stop();
+                            break;
+                    }
+                };
+
+                return hook;
+            });*/
 
         #region MediatR
         builder
