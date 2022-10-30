@@ -7,6 +7,8 @@ using System.Windows;
 
 internal static class WindowManager
 {
+    private const int TriggerNotificationWindowAreaSize = 10;
+    
     /// <summary>
     ///     Shows a window registered in the dependency framework.
     /// </summary>
@@ -67,22 +69,22 @@ internal static class WindowManager
         using var scope = IocContainer.GetContainer().BeginLifetimeScope();
         var window = scope.Resolve<NewSongWindow>();
 
-        if (x <= 5)
+        if (x <= TriggerNotificationWindowAreaSize)
         {
             window.Left = 0;
         }
-        else if (x >= SystemParameters.PrimaryScreenWidth - 5)
+        else if (x >= SystemParameters.PrimaryScreenWidth - TriggerNotificationWindowAreaSize)
         {
             window.Left = SystemParameters.PrimaryScreenWidth - window.Width;
         }
         
-        if (y <= 5)
+        if (y <= TriggerNotificationWindowAreaSize)
         {
             window.Top = 0;
         }
-        else if (y >= SystemParameters.PrimaryScreenHeight - 5)
+        else if (y >= SystemParameters.PrimaryScreenHeight - TriggerNotificationWindowAreaSize)
         {
-            window.Top = SystemParameters.PrimaryScreenHeight - window.Height;
+            window.Top = SystemParameters.WorkArea.Height - window.Height;
         }
         
         window.Show();

@@ -14,6 +14,8 @@ internal class GmaGlobalHookHandler : IGlobalHook
     private readonly IMediaController _mediaController;
     private readonly IKeyboardMouseEvents _globalHook = Hook.GlobalEvents();
     
+    private const int TriggerNotificationWindowAreaSize = 10;
+    
     private static readonly HashSet<Keys> _lowLevelKeys =
         new()
         {
@@ -87,8 +89,8 @@ internal class GmaGlobalHookHandler : IGlobalHook
     
     private void OnMouseMove(object? sender, MouseEventArgs e)
     {
-        var shouldShowNewWindow = (e.X <= 5 || e.X >= Screen.PrimaryScreen.Bounds.Width - 5)
-                                   && (e.Y <= 5 || e.Y >= Screen.PrimaryScreen.Bounds.Height - 5);
+        var shouldShowNewWindow = (e.X <= TriggerNotificationWindowAreaSize || e.X >= Screen.PrimaryScreen.Bounds.Width - TriggerNotificationWindowAreaSize)
+                                   && (e.Y <= TriggerNotificationWindowAreaSize || e.Y >= Screen.PrimaryScreen.Bounds.Height - TriggerNotificationWindowAreaSize);
 
         switch (shouldShowNewWindow)
         {

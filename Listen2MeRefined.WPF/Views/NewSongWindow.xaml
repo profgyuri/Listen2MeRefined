@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:NewSongWindowViewModel}"
         Style="{StaticResource BasicWindow}"
+        Topmost="True"
         Background="{StaticResource HoloBackground}"
         ResizeMode="NoResize"
         FontSize="18"
