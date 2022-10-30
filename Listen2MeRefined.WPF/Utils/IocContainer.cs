@@ -54,7 +54,10 @@ internal static class IocContainer
             .SingleInstance();
         builder.RegisterType<FolderBrowserViewModel>();
         builder.RegisterType<AdvancedSearchViewModel>();
-        builder.RegisterType<NewSongWindowViewModel>();
+        builder.RegisterType<NewSongWindowViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
         builder
             .RegisterType<SettingsWindowViewModel>()
             .AsSelf()

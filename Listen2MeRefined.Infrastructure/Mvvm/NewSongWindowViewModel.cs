@@ -1,19 +1,20 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
+using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
 public partial class NewSongWindowViewModel
+    : INotificationHandler<CurrentSongNotification>
 {
-    [ObservableProperty] private AudioModel _song;
+    [ObservableProperty] private AudioModel _song = new();
 
-    public NewSongWindowViewModel()
+    #region Implementation of INotificationHandler<in CurrentSongNotification>
+    /// <inheritdoc />
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        Song = new AudioModel
-        {
-            Artist = "W&W",
-            Title = "Bigfoot",
-            Genre = "House",
-            Bitrate = 320,
-            BPM = 128
-        };
+        Song = notification.Audio;
+        return Task.CompletedTask;
     }
+    #endregion
 }
