@@ -16,6 +16,7 @@ public partial class MainWindowViewModel :
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IGlobalHook _globalHook;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
@@ -35,18 +36,26 @@ public partial class MainWindowViewModel :
     }
 
     public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager<AppSettings> settingsManager)
+        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager<AppSettings> settingsManager,
+        IGlobalHook globalHook)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
         _settingsManager = settingsManager;
+        _globalHook = globalHook;
         _fontFamily = _settingsManager.Settings.FontFamily;
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(
             TimeSpan.FromMilliseconds(500), 
             () => OnPropertyChanged(nameof(CurrentTime)));
+        _globalHook.Register();
+    }
+    
+    ~MainWindowViewModel()
+    {
+        _globalHook.Unregister();
     }
 
     #region Commands

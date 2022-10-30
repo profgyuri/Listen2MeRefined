@@ -5,6 +5,7 @@ using Source.Extensions;
 using Source.KeyboardHook;
 using NAudio.Wave;
 using System.Collections.ObjectModel;
+using Gma.System.MouseKeyHook;
 
 namespace Listen2MeRefined.Infrastructure.Media;
 
@@ -49,15 +50,13 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         set => _waveOutEvent.Volume = value;
     }
 
-    public WindowsMusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask,
-        KeyboardHook keyboardHook, IRepository<AudioModel> audioRepository)
+    public WindowsMusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask, IRepository<AudioModel> audioRepository)
     {
         _logger = logger;
         _mediator = mediator;
         _audioRepository = audioRepository;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), CurrentTimeCheck);
-        keyboardHook.KeyboardPressed += KeyboardPressedEvent;
     }
 
     #region IMediaController
@@ -224,32 +223,6 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _playbackState = PlaybackState.Paused;
 
         _logger.Debug("Playback paused");
-    }
-    #endregion
-
-    #region Event handlers
-    private void KeyboardPressedEvent(object? sender, KeyboardHookEventArgs e)
-    {
-        if (e.KeyboardState == KeyboardState.KeyUp)
-        {
-            return;
-        }
-        
-        switch (e.KeyboardData.Key)
-        {
-            case ConsoleKey.MediaPlay:
-                PlayPause();
-                break;
-            case ConsoleKey.MediaStop:
-                Stop();
-                break;
-            case ConsoleKey.MediaNext:
-                Next();
-                break;
-            case ConsoleKey.MediaPrevious:
-                Previous();
-                break;
-        }
     }
     #endregion
 
