@@ -2,17 +2,26 @@
 
 using Microsoft.EntityFrameworkCore;
 
-public class DataContext : DbContext
+public sealed class DataContext : DbContext
 {
 #pragma warning disable CS8618
     public DbSet<AudioModel> Songs { get; set; }
     public DbSet<PlaylistModel> Playlists { get; set; }
+    public DbSet<AppSettings> Settings { get; set; }
+#pragma warning restore CS8618
 
     public DataContext()
     {
         Database.EnsureCreated();
     }
-#pragma warning restore CS8618
+
+    #region Overrides of DbContext
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AppSettings>().HasNoKey();
+    }
+    #endregion
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

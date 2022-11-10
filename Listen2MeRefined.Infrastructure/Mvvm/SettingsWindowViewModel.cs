@@ -50,7 +50,7 @@ public partial class SettingsWindowViewModel :
     private void Init()
     {
         var settings = _settingsManager.Settings;
-        Folders = new(settings.MusicFolders);
+        Folders = new(settings.MusicFolders.Select(x => x.FullPath));
         FontFamily = settings.FontFamily;
         SelectedFontFamily = settings.FontFamily;
     }
@@ -69,7 +69,7 @@ public partial class SettingsWindowViewModel :
 
         Folders.Add(notification.Path);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders);
+        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
 
         _logger.Information("Scanning folder for audio files: {Path}", notification.Path);
         var files = await _fileEnumerator.EnumerateFilesAsync(notification.Path);
@@ -86,7 +86,7 @@ public partial class SettingsWindowViewModel :
 
         Folders.Remove(SelectedFolder!);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders);
+        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
     }
 
     [RelayCommand]

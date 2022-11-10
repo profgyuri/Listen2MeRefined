@@ -139,7 +139,7 @@ internal static class IocContainer
             .As<IFolderBrowser>();
 
         builder
-            .RegisterType<FileSettingsManager<AppSettings>>()
+            .RegisterType<DatabaseSettingsManager<AppSettings>>()
             .As<ISettingsManager<AppSettings>>();
 
         builder
