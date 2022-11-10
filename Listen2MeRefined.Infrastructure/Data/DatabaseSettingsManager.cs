@@ -4,7 +4,7 @@ using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Data;
 
-public class DatabaseSettingsManager<T> : ISettingsManager<T>
+public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     where T: Settings, new()
 {
     private DataContext _dataContext;

@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Listen2MeRefined.WPF;
 
-internal class GmaGlobalHookHandler : IGlobalHook
+internal sealed class GmaGlobalHookHandler : IGlobalHook
 {
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
