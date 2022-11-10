@@ -7,7 +7,7 @@ namespace Listen2MeRefined.Infrastructure.Data;
 public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     where T: Settings, new()
 {
-    private DataContext _dataContext;
+    private readonly DataContext _dataContext;
     
     private T? _settings;
     

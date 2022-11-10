@@ -6,7 +6,7 @@ using Ardalis.GuardClauses;
 
 internal static class Extensions
 {
-    private static object _contextLock = new object();
+    private static readonly object _contextLock = new object();
     
     internal static void NotExistingFile(this IGuardClause clause, string path, string parameterName)
     {
