@@ -4,6 +4,11 @@ public class MusicFolderModel : Model
 {
     public string FullPath { get; set; }
 
+    public MusicFolderModel()
+    {
+        
+    }
+    
     public MusicFolderModel(string path)
     {
         FullPath = path;

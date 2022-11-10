@@ -15,14 +15,6 @@ public sealed class DataContext : DbContext
         Database.EnsureCreated();
     }
 
-    #region Overrides of DbContext
-    /// <inheritdoc />
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<AppSettings>().HasNoKey();
-    }
-    #endregion
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);

@@ -26,13 +26,13 @@ public class DatabaseSettingsManager<T> : ISettingsManager<T>
         
         settings?.Invoke(oldSettings!);
         
-        //_dataContext.Settings.Update((oldSettings as AppSettings)!);
+        _dataContext.Settings.Update((oldSettings as AppSettings)!);
+        _dataContext.SaveChanges();
     }
     #endregion
     
     private T LoadSettings()
     {
-        //return _dataContext.Settings.FirstOrDefault() as T ?? new T();
-        return new T();
+        return _dataContext.Settings.FirstOrDefault() as T ?? new T();
     }
 }
