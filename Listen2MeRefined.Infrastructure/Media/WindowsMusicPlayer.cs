@@ -2,10 +2,8 @@
 using MediatR;
 using Source;
 using Source.Extensions;
-using Source.KeyboardHook;
 using NAudio.Wave;
 using System.Collections.ObjectModel;
-using Gma.System.MouseKeyHook;
 
 namespace Listen2MeRefined.Infrastructure.Media;
 

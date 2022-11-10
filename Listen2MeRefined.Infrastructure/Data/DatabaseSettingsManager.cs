@@ -1,4 +1,3 @@
-using System.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Source.Storage;
 
@@ -17,7 +16,7 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     }
     #region Implementation of ISettingsManager<out T>
     /// <inheritdoc />
-    public T? Settings => _settings ??= LoadSettings();
+    public T Settings => _settings ??= LoadSettings();
 
     /// <inheritdoc />
     public void SaveSettings(Action<T>? settings = null)

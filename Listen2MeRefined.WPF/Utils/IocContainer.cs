@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
-using System.Windows.Forms;
 using System.Windows.Media;
 using Autofac;
-using Gma.System.MouseKeyHook;
 using Listen2MeRefined.Core;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
@@ -17,7 +13,6 @@ using MediatR;
 using Microsoft.Data.Sqlite;
 using Serilog;
 using Source;
-using Source.KeyboardHook;
 using Source.Storage;
 using IDataReader = Listen2MeRefined.Core.Interfaces.DataHandlers.IDataReader;
 
