@@ -16,6 +16,8 @@ public partial class SettingsWindowViewModel :
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IRepository<MusicFolderModel> _musicFolderRepository;
+    private readonly IRepository<PlaylistModel> _playlistRepository;
     private readonly IMediator _mediator;
 
     private TimedTask? _timedTask;
@@ -33,7 +35,7 @@ public partial class SettingsWindowViewModel :
     public SettingsWindowViewModel(ILogger logger, ISettingsManager<AppSettings> settingsManager,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator,
-        FontFamilies fontFamilies)
+        FontFamilies fontFamilies, IRepository<MusicFolderModel> musicFolderRepository, IRepository<PlaylistModel> playlistRepository)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -41,18 +43,15 @@ public partial class SettingsWindowViewModel :
         _fileEnumerator = fileEnumerator;
         _audioRepository = audioRepository;
         _mediator = mediator;
+        _musicFolderRepository = musicFolderRepository;
+        _playlistRepository = playlistRepository;
 
-        FontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
+        _fontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
 
-        Init();
-    }
-
-    private void Init()
-    {
         var settings = _settingsManager.Settings;
-        Folders = new(settings.MusicFolders.Select(x => x.FullPath));
-        FontFamily = settings.FontFamily;
-        SelectedFontFamily = settings.FontFamily;
+        _folders = new(settings.MusicFolders.Select(x => x.FullPath));
+        _fontFamily = settings.FontFamily;
+        _selectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
@@ -65,6 +64,13 @@ public partial class SettingsWindowViewModel :
     #region Notification Handlers
     public async Task Handle(FolderBrowserNotification notification, CancellationToken cancellationToken)
     {
+        var path = notification.Path;
+        
+        if (Folders.Contains(path))
+        {
+            return;
+        }
+        
         _logger.Debug("Adding path to music folders: {Path}", notification.Path);
 
         Folders.Add(notification.Path);
@@ -100,6 +106,8 @@ public partial class SettingsWindowViewModel :
             if (_secondsToCancelClear == 0)
             {
                 await _audioRepository.DeleteAllAsync();
+                await _musicFolderRepository.DeleteAllAsync();
+                await _playlistRepository.DeleteAllAsync();
 
                 await _timedTask?.StopAsync()!;
                 IsClearMetadataButtonVisible = true;

@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Data;
@@ -26,12 +27,15 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
         settings?.Invoke(oldSettings!);
         
         _dataContext.Settings.Update((oldSettings as AppSettings)!);
+        _dataContext.MusicFolders.UpdateRange((oldSettings as AppSettings)!.MusicFolders);
         _dataContext.SaveChanges();
     }
     #endregion
     
     private T LoadSettings()
     {
-        return _dataContext.Settings.FirstOrDefault() as T ?? new T();
+        return _dataContext.Settings
+            .Include(x => x.MusicFolders)
+            .FirstOrDefault() as T ?? new T();
     }
 }
