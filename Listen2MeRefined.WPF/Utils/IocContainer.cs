@@ -6,6 +6,7 @@ using Listen2MeRefined.Core;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.WPF.Views;
@@ -103,6 +104,14 @@ internal static class IocContainer
         builder
             .RegisterType<AudioRepository>()
             .As<IRepository<AudioModel>>();
+        
+        builder
+            .RegisterType<PlaylistRepository>()
+            .As<IRepository<PlaylistModel>>();
+        
+        builder
+            .RegisterType<MusicFolderRepository>()
+            .As<IRepository<MusicFolderModel>>();
         #endregion
 
         builder

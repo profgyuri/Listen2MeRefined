@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public sealed class AudioRepository : IRepository<AudioModel>
 {
