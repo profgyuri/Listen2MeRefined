@@ -1,6 +1,6 @@
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
-public class PlaylistRepository : RepositoryBase<PlaylistModel>
+public sealed class PlaylistRepository : RepositoryBase<PlaylistModel>
 {
     /// <inheritdoc />
     public PlaylistRepository(
