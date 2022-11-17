@@ -18,121 +18,125 @@ public sealed class MusicFolderRepository : RepositoryBase<MusicFolderModel>
     /// <inheritdoc />
     public override void Create(MusicFolderModel data)
     {
-        TODO_IMPLEMENT_ME();
+        _logger.Information("Saving folder to database: {Folder}", data);
+        _dataSaver.Save(data);
     }
 
     /// <inheritdoc />
     public override void Create(IEnumerable<MusicFolderModel> data)
     {
-        TODO_IMPLEMENT_ME();
+        _logger.Information("Saving multiple folders to database");
+        _dataSaver.Save(data);
     }
 
     /// <inheritdoc />
     public override async Task CreateAsync(MusicFolderModel data)
     {
-        return TODO_IMPLEMENT_ME;
+        _logger.Information("Saving folder to database: {Folder}", data);
+        await _dataSaver.SaveAsync(data);
     }
 
     /// <inheritdoc />
     public override async Task CreateAsync(IEnumerable<MusicFolderModel> data)
     {
-        return TODO_IMPLEMENT_ME;
+        _logger.Information("Saving multiple folders to database");
+        await _dataSaver.SaveAsync(data);
     }
 
     /// <inheritdoc />
     public override IEnumerable<MusicFolderModel> Read()
     {
-        return TODO_IMPLEMENT_ME;
+        return _dataReader.Read<MusicFolderModel>();
     }
 
     /// <inheritdoc />
     public override IEnumerable<MusicFolderModel> Read(string searchTerm)
     {
-        return TODO_IMPLEMENT_ME;
+        return _dataReader.Read<MusicFolderModel>(searchTerm);
     }
 
     /// <inheritdoc />
     public override IEnumerable<MusicFolderModel> Read(MusicFolderModel model)
     {
-        return TODO_IMPLEMENT_ME;
+        return _dataReader.Read(model, false);
     }
 
     /// <inheritdoc />
     public override async Task<IEnumerable<MusicFolderModel>> ReadAsync()
     {
-        return TODO_IMPLEMENT_ME;
+        return await _dataReader.ReadAsync<MusicFolderModel>();
     }
 
     /// <inheritdoc />
     public override async Task<IEnumerable<MusicFolderModel>> ReadAsync(string searchTerm)
     {
-        return TODO_IMPLEMENT_ME;
+        return await _dataReader.ReadAsync<MusicFolderModel>(searchTerm);
     }
 
     /// <inheritdoc />
     public override async Task<IEnumerable<MusicFolderModel>> ReadAsync(MusicFolderModel model)
     {
-        return TODO_IMPLEMENT_ME;
+        return await _dataReader.ReadAsync(model, false);
     }
 
     /// <inheritdoc />
     public override void Update(MusicFolderModel data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataUpdater.Update(data);
     }
 
     /// <inheritdoc />
     public override void Update(IEnumerable<MusicFolderModel> data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataUpdater.Update(data);
     }
 
     /// <inheritdoc />
     public override async Task UpdateAsync(MusicFolderModel data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataUpdater.UpdateAsync(data);
     }
 
     /// <inheritdoc />
     public override async Task UpdateAsync(IEnumerable<MusicFolderModel> data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataUpdater.UpdateAsync(data);
     }
 
     /// <inheritdoc />
     public override void Delete(MusicFolderModel data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataRemover.Remove(data);
     }
 
     /// <inheritdoc />
     public override void Delete(IEnumerable<MusicFolderModel> data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataRemover.Remove(data);
     }
 
     /// <inheritdoc />
     public override async Task DeleteAsync(MusicFolderModel data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataRemover.RemoveAsync(data);
     }
 
     /// <inheritdoc />
     public override async Task DeleteAsync(IEnumerable<MusicFolderModel> data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataRemover.RemoveAsync(data);
     }
 
     /// <inheritdoc />
     public override void DeleteAll()
     {
-        TODO_IMPLEMENT_ME();
+        _dataRemover.RemoveAll<MusicFolderModel>();
     }
 
     /// <inheritdoc />
     public override async Task DeleteAllAsync()
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataRemover.RemoveAllAsync<MusicFolderModel>();
     }
     #endregion
 }

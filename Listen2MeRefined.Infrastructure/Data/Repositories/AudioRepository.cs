@@ -31,8 +31,7 @@ public sealed class AudioRepository : IRepository<AudioModel>
 
     public void Create(IEnumerable<AudioModel> data)
     {
-        data.TryGetNonEnumeratedCount(out var count);
-        _logger.Information("Saving audio list to database: {Count}", count);
+        _logger.Information("Saving a list of audio to database");
         _dataSaver.Save(data);
     }
 
@@ -44,8 +43,7 @@ public sealed class AudioRepository : IRepository<AudioModel>
 
     public async Task CreateAsync(IEnumerable<AudioModel> data)
     {
-        data.TryGetNonEnumeratedCount(out var count);
-        _logger.Information("Saving audio list to database: {Count}", count);
+        _logger.Information("Saving a list of audio to database");
         await _dataSaver.SaveAsync(data);
     }
     #endregion

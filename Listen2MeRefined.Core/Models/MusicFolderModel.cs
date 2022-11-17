@@ -12,4 +12,12 @@ public sealed class MusicFolderModel : Model
     {
         FullPath = path;
     }
+
+    #region Overrides of Object
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return FullPath;
+    }
+    #endregion
 }

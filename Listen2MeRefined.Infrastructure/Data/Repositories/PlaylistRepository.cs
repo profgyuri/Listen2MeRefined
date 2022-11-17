@@ -18,121 +18,125 @@ public class PlaylistRepository : RepositoryBase<PlaylistModel>
     /// <inheritdoc />
     public override void Create(PlaylistModel data)
     {
-        TODO_IMPLEMENT_ME();
+        _logger.Information("Creating playlist '{Playlist}' in database", data.Name);
+        _dataSaver.Save(data);
     }
 
     /// <inheritdoc />
     public override void Create(IEnumerable<PlaylistModel> data)
     {
-        TODO_IMPLEMENT_ME();
+        _logger.Information("Creating multiple playlists in database");
+        _dataSaver.Save(data);
     }
 
     /// <inheritdoc />
     public override async Task CreateAsync(PlaylistModel data)
     {
-        return TODO_IMPLEMENT_ME;
+        _logger.Information("Creating playlist '{Playlist}' in database", data.Name);
+        await _dataSaver.SaveAsync(data);
     }
 
     /// <inheritdoc />
     public override async Task CreateAsync(IEnumerable<PlaylistModel> data)
     {
-        return TODO_IMPLEMENT_ME;
+        _logger.Information("Creating multiple playlists in database");
+        await _dataSaver.SaveAsync(data);
     }
 
     /// <inheritdoc />
     public override IEnumerable<PlaylistModel> Read()
     {
-        return TODO_IMPLEMENT_ME;
+        return _dataReader.Read<PlaylistModel>();
     }
 
     /// <inheritdoc />
     public override IEnumerable<PlaylistModel> Read(string searchTerm)
     {
-        return TODO_IMPLEMENT_ME;
+        return _dataReader.Read<PlaylistModel>(searchTerm);
     }
 
     /// <inheritdoc />
     public override IEnumerable<PlaylistModel> Read(PlaylistModel model)
     {
-        return TODO_IMPLEMENT_ME;
+        return _dataReader.Read(model, false);
     }
 
     /// <inheritdoc />
     public override async Task<IEnumerable<PlaylistModel>> ReadAsync()
     {
-        return TODO_IMPLEMENT_ME;
+        return await _dataReader.ReadAsync<PlaylistModel>();
     }
 
     /// <inheritdoc />
     public override async Task<IEnumerable<PlaylistModel>> ReadAsync(string searchTerm)
     {
-        return TODO_IMPLEMENT_ME;
+        return await _dataReader.ReadAsync<PlaylistModel>(searchTerm);
     }
 
     /// <inheritdoc />
     public override async Task<IEnumerable<PlaylistModel>> ReadAsync(PlaylistModel model)
     {
-        return TODO_IMPLEMENT_ME;
+        return await _dataReader.ReadAsync(model, false);
     }
 
     /// <inheritdoc />
     public override void Update(PlaylistModel data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataUpdater.Update(data);
     }
 
     /// <inheritdoc />
     public override void Update(IEnumerable<PlaylistModel> data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataUpdater.Update(data);
     }
 
     /// <inheritdoc />
     public override async Task UpdateAsync(PlaylistModel data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataUpdater.UpdateAsync(data);
     }
 
     /// <inheritdoc />
     public override async Task UpdateAsync(IEnumerable<PlaylistModel> data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataUpdater.UpdateAsync(data);
     }
 
     /// <inheritdoc />
     public override void Delete(PlaylistModel data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataRemover.Remove(data);
     }
 
     /// <inheritdoc />
     public override void Delete(IEnumerable<PlaylistModel> data)
     {
-        TODO_IMPLEMENT_ME();
+        _dataRemover.Remove(data);
     }
 
     /// <inheritdoc />
     public override async Task DeleteAsync(PlaylistModel data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataRemover.RemoveAsync(data);
     }
 
     /// <inheritdoc />
     public override async Task DeleteAsync(IEnumerable<PlaylistModel> data)
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataRemover.RemoveAsync(data);
     }
 
     /// <inheritdoc />
     public override void DeleteAll()
     {
-        TODO_IMPLEMENT_ME();
+        _dataRemover.RemoveAll<PlaylistModel>();
     }
 
     /// <inheritdoc />
     public override async Task DeleteAllAsync()
     {
-        return TODO_IMPLEMENT_ME;
+        await _dataRemover.RemoveAllAsync<PlaylistModel>();
     }
     #endregion
 }
