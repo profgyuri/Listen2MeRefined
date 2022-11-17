@@ -1,8 +1,9 @@
-﻿namespace Listen2MeRefined.WPF;
-using System.Windows;
+﻿using System.Windows;
+
+namespace Listen2MeRefined.WPF;
 
 /// <summary>
-/// Interaction logic for FolderBrowserWindow.xaml
+///     Interaction logic for FolderBrowserWindow.xaml
 /// </summary>
 public sealed partial class FolderBrowserWindow : Window
 {
@@ -13,7 +14,9 @@ public sealed partial class FolderBrowserWindow : Window
         FolderList.Focus();
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    private void CancelButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         Close();
     }

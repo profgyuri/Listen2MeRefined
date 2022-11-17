@@ -9,5 +9,4 @@ global using Serilog;
 global using System.Collections.Generic;
 global using System.Data;
 global using System.Threading.Tasks;
-
 global using IDataReader = Listen2MeRefined.Core.Interfaces.DataHandlers.IDataReader;

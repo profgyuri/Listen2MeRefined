@@ -1,6 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Dapper;
+﻿using Dapper.Contrib.Extensions;
 
-using global::Dapper.Contrib.Extensions;
+namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
 public class DapperSaver : IDataSaver
 {
@@ -11,22 +11,26 @@ public class DapperSaver : IDataSaver
         _connection = connection;
     }
 
-    public void Save<T>(T data) where T : Model
+    public void Save<T>(T data)
+        where T : Model
     {
         _connection.Insert(data);
     }
 
-    public void Save<T>(IEnumerable<T> list) where T : Model
+    public void Save<T>(IEnumerable<T> list)
+        where T : Model
     {
         _connection.Insert(list);
     }
 
-    public async Task SaveAsync<T>(T data) where T : Model
+    public async Task SaveAsync<T>(T data)
+        where T : Model
     {
         await _connection.InsertAsync(data);
     }
 
-    public async Task SaveAsync<T>(IEnumerable<T> list) where T : Model
+    public async Task SaveAsync<T>(IEnumerable<T> list)
+        where T : Model
     {
         await _connection.InsertAsync(list);
     }

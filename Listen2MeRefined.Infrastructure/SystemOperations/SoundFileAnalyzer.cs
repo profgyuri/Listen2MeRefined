@@ -1,12 +1,12 @@
-﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
+﻿using Ardalis.GuardClauses;
+using File = TagLib.File;
 
-using Ardalis.GuardClauses;
-using TagLib;
+namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
 public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
 {
     /// <summary>
-    ///     Gets an <see cref="AudioModel"/> after analyzing the file at <paramref name="path"/>.
+    ///     Gets an <see cref="AudioModel" /> after analyzing the file at <paramref name="path" />.
     /// </summary>
     /// <param name="path">Local path to the audio file.</param>
     public AudioModel Analyze(string path)
@@ -21,14 +21,14 @@ public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
             Title = file.Tag.Title,
             Artist = string.Join("; ", file.Tag.Performers!),
             Genre = string.Join("; ", file.Tag.Genres!),
-            BPM = (short)file.Tag.BeatsPerMinute,
-            Bitrate = (short)file.Properties.AudioBitrate,
+            BPM = (short) file.Tag.BeatsPerMinute,
+            Bitrate = (short) file.Properties.AudioBitrate,
             Length = file.Properties.Duration
         };
     }
 
     /// <summary>
-    ///     Gets a list of <see cref="AudioModel"/> objects after analyzing the files at <paramref name="paths"/>.
+    ///     Gets a list of <see cref="AudioModel" /> objects after analyzing the files at <paramref name="paths" />.
     /// </summary>
     /// <param name="paths">List of local paths leading to audio files.</param>
     public IEnumerable<AudioModel> Analyze(IEnumerable<string> paths)
@@ -46,7 +46,7 @@ public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
     }
 
     /// <summary>
-    ///     Gets an <see cref="AudioModel"/> after analyzing the file at <paramref name="path"/>.
+    ///     Gets an <see cref="AudioModel" /> after analyzing the file at <paramref name="path" />.
     /// </summary>
     /// <param name="path">Local path to the audio file.</param>
     public async Task<AudioModel> AnalyzeAsync(string path)
@@ -55,7 +55,7 @@ public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
     }
 
     /// <summary>
-    ///     Gets a list of <see cref="AudioModel"/> objects after analyzing the files at <paramref name="paths"/>.
+    ///     Gets a list of <see cref="AudioModel" /> objects after analyzing the files at <paramref name="paths" />.
     /// </summary>
     /// <param name="paths">List of local paths leading to audio files.</param>
     public async Task<IEnumerable<AudioModel>> AnalyzeAsync(IEnumerable<string> paths)

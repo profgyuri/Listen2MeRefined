@@ -1,6 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore;
+namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
 public sealed class DataContext : DbContext
 {

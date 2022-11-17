@@ -9,25 +9,29 @@ public sealed class EntityFrameworkUpdater : IDataUpdater
         _dataContext = dataContext;
     }
 
-    public void Update<T>(T data) where T : Model
+    public void Update<T>(T data)
+        where T : Model
     {
         _dataContext.Set<T>().Update(data);
         _dataContext.SaveChanges();
     }
 
-    public void Update<T>(IEnumerable<T> list) where T : Model
+    public void Update<T>(IEnumerable<T> list)
+        where T : Model
     {
         _dataContext.Set<T>().UpdateRange(list);
         _dataContext.SaveChanges();
     }
 
-    public async Task UpdateAsync<T>(T data) where T : Model
+    public async Task UpdateAsync<T>(T data)
+        where T : Model
     {
         _dataContext.Set<T>().Update(data);
         await _dataContext.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync<T>(IEnumerable<T> list) where T : Model
+    public async Task UpdateAsync<T>(IEnumerable<T> list)
+        where T : Model
     {
         _dataContext.Set<T>().UpdateRange(list);
         await _dataContext.SaveChangesAsync();

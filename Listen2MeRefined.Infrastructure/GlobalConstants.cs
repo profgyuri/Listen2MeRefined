@@ -2,6 +2,8 @@
 
 internal static class GlobalConstants
 {
+    public const string ParentPathItem = "..";
+
     public static string[] SupportedExtensions { get; } =
     {
         ".aa", ".aax", ".aac", ".aiff", ".ape", ".dsf",
@@ -9,6 +11,4 @@ internal static class GlobalConstants
         ".mpp", ".ogg", ".oga",
         ".wav", ".wma", ".wv", ".webm"
     };
-    
-    public const string ParentPathItem = "..";
 }

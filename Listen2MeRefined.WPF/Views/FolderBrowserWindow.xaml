@@ -5,40 +5,38 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
-        xmlns:local="clr-namespace:Listen2MeRefined.WPF"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:FolderBrowserViewModel}"
         Style="{StaticResource BasicWindow}"
-		Foreground="{StaticResource SecondaryBrush}"
         Title="FolderBrowserWindow"
         Height="250" Width="400">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome 
-			x:Name="WindowChrome"
-			CaptionHeight="32"/>
+        <WindowChrome
+            x:Name="WindowChrome"
+            CaptionHeight="32" />
     </WindowChrome.WindowChrome>
 
     <Border
         BorderThickness="2"
-		BorderBrush="{StaticResource ThirnaryBrush}"
-		Background="{StaticResource PrimaryBrush}"
-		CornerRadius="8">
+        BorderBrush="{StaticResource ThirnaryBrush}"
+        Background="{StaticResource PrimaryBrush}"
+        CornerRadius="8">
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <TextBlock
                 Text="Folder Browser"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                FontWeight="Bold"/>
+                FontWeight="Bold" />
 
             <ListView
                 x:Name="FolderList"
@@ -47,19 +45,19 @@
                 SelectedItem="{Binding SelectedFolder}"
                 Style="{StaticResource VirtualizedListView}">
                 <ListView.InputBindings>
-                    <KeyBinding Key="Return" Command="{Binding ChangeDirectoryCommand}"/>
+                    <KeyBinding Key="Return" Command="{Binding ChangeDirectoryCommand}" />
                 </ListView.InputBindings>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock
                             Text="{Binding}"
                             Foreground="{StaticResource SecondaryBrush}"
-                            TextWrapping="Wrap"/>
+                            TextWrapping="Wrap" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding ChangeDirectoryCommand}"/>
+                        <i:InvokeCommandAction Command="{Binding ChangeDirectoryCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ListView>
@@ -71,15 +69,15 @@
                 Foreground="{StaticResource SecondaryBrush}"
                 Grid.Row="2"
                 Margin="20 10 20 0"
-                Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <Grid
                 Grid.Row="3"
                 Margin="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="125"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="125"/>
+                    <ColumnDefinition Width="125" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="125" />
                 </Grid.ColumnDefinitions>
 
                 <Button
@@ -102,7 +100,7 @@
                     Content="_Cancel"
                     Style="{StaticResource InteractionButton}"
                     Width="100"
-                    Click="CancelButton_Click"/>
+                    Click="CancelButton_Click" />
             </Grid>
 
         </Grid>

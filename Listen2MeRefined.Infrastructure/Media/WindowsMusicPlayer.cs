@@ -1,9 +1,9 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using NAudio.Wave;
 using Source;
 using Source.Extensions;
-using NAudio.Wave;
-using System.Collections.ObjectModel;
 
 namespace Listen2MeRefined.Infrastructure.Media;
 
@@ -25,7 +25,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IRepository<AudioModel> _audioRepository;
-    
+
     private const int TimeCheckInterval = 500;
 
     public double CurrentTime
@@ -37,7 +37,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
             {
                 return;
             }
-            
+
             _fileReader.CurrentTime = TimeSpan.FromMilliseconds(value);
         }
     }
@@ -48,13 +48,23 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         set => _waveOutEvent.Volume = value;
     }
 
-    public WindowsMusicPlayer(ILogger logger, IMediator mediator, TimedTask timedTask, IRepository<AudioModel> audioRepository)
+    public WindowsMusicPlayer(
+        ILogger logger,
+        IMediator mediator,
+        TimedTask timedTask,
+        IRepository<AudioModel> audioRepository)
     {
         _logger = logger;
         _mediator = mediator;
         _audioRepository = audioRepository;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), CurrentTimeCheck);
+    }
+
+    /// <inheritdoc />
+    public void PassPlaylist(ref ObservableCollection<AudioModel> playlist)
+    {
+        _playlist = playlist;
     }
 
     #region IMediaController
@@ -103,7 +113,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _logger.Debug("Jumping to the previous song at index {Current} with the maximum possible index of {Maximum}...",
             _currentSongIndex, _playlist.Count - 1);
     }
-    
+
     public void JumpToIndex(int index)
     {
         _currentSongIndex = index;
@@ -115,13 +125,13 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _logger.Information("Shuffling playlist...");
 
         _playlist.Shuffle();
-        
+
         if (_currentSong is not null)
         {
-            (_playlist[0], _playlist[_currentSongIndex]) = 
+            (_playlist[0], _playlist[_currentSongIndex]) =
                 (_playlist[_currentSongIndex], _playlist[0]);
         }
-        
+
         _currentSongIndex = 0;
     }
     #endregion
@@ -143,7 +153,8 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         }
         catch (FileNotFoundException)
         {
-            _logger.Warning("File was not found at: {Path} - Trying to remove entry from database...", _currentSong.Path);
+            _logger.Warning("File was not found at: {Path} - Trying to remove entry from database...",
+                _currentSong.Path);
             _audioRepository.Delete(_currentSong);
         }
         catch (Exception ex)
@@ -151,7 +162,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
             _logger.Error(ex, "An unexpected error occured!");
             throw;
         }
-        
+
         _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
@@ -199,7 +210,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _previousTimeStamp = _fileReader.CurrentTime.TotalMilliseconds;
         _unpausedFor += TimeCheckInterval;
     }
-    
+
     private void StartPlayback()
     {
         _playbackState = PlaybackState.Playing;
@@ -223,10 +234,4 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _logger.Debug("Playback paused");
     }
     #endregion
-
-    /// <inheritdoc />
-    public void PassPlaylist(ref ObservableCollection<AudioModel> playlist)
-    {
-        _playlist = playlist;
-    }
 }

@@ -1,10 +1,12 @@
-﻿namespace Listen2MeRefined.WPF;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+
+namespace Listen2MeRefined.WPF;
+
 [TemplatePart(Name = "PART_AniVerticalScrollBar", Type = typeof(ScrollBar))]
 [TemplatePart(Name = "PART_AniHorizontalScrollBar", Type = typeof(ScrollBar))]
 public class SmoothScrollViewer : ScrollViewer
@@ -47,7 +49,7 @@ public class SmoothScrollViewer : ScrollViewer
     /// </summary>
     private double TargetVerticalOffset
     {
-        get => (double)GetValue(_targetVerticalOffsetProperty);
+        get => (double) GetValue(_targetVerticalOffsetProperty);
         set => SetValue(_targetVerticalOffsetProperty, value);
     }
 
@@ -56,21 +58,21 @@ public class SmoothScrollViewer : ScrollViewer
     /// </summary>
     private double TargetHorizontalOffset
     {
-        get => (double)GetValue(_targetHorizontalOffsetProperty);
+        get => (double) GetValue(_targetHorizontalOffsetProperty);
         set => SetValue(_targetHorizontalOffsetProperty, value);
     }
 
     /// <summary>
     ///     A property for changing the time it takes to scroll to a new position.
     /// </summary>
-    private TimeSpan ScrollingTime => (TimeSpan)GetValue(_scrollingTimeProperty);
+    private TimeSpan ScrollingTime => (TimeSpan) GetValue(_scrollingTimeProperty);
 
     /// <summary>
     ///     A property to allow users to describe a custom spline for the scrolling animation.
     /// </summary>
-    private KeySpline ScrollingSpline => (KeySpline)GetValue(_scrollingSplineProperty);
+    private KeySpline ScrollingSpline => (KeySpline) GetValue(_scrollingSplineProperty);
 
-    private bool CanKeyboardScroll => (bool)GetValue(_canKeyboardScrollProperty);
+    private bool CanKeyboardScroll => (bool) GetValue(_canKeyboardScrollProperty);
 
     static SmoothScrollViewer()
     {
@@ -100,9 +102,11 @@ public class SmoothScrollViewer : ScrollViewer
         PreviewKeyDown += AnimatedScrollViewer_PreviewKeyDown;
     }
 
-    private static void AnimatedScrollViewer_PreviewKeyDown(object sender, KeyEventArgs e)
+    private static void AnimatedScrollViewer_PreviewKeyDown(
+        object sender,
+        KeyEventArgs e)
     {
-        var thisScroller = (SmoothScrollViewer)sender;
+        var thisScroller = (SmoothScrollViewer) sender;
 
         if (!thisScroller.CanKeyboardScroll)
         {
@@ -165,7 +169,10 @@ public class SmoothScrollViewer : ScrollViewer
         e.Handled = isKeyHandled;
     }
 
-    private static double NormalizeScrollPos(ScrollViewer thisScroll, double scrollChange, Orientation o)
+    private static double NormalizeScrollPos(
+        ScrollViewer thisScroll,
+        double scrollChange,
+        Orientation o)
     {
         var returnValue = scrollChange;
 
@@ -187,11 +194,13 @@ public class SmoothScrollViewer : ScrollViewer
         return returnValue;
     }
 
-    private static void CustomPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    private static void CustomPreviewMouseWheel(
+        object sender,
+        MouseWheelEventArgs e)
     {
         double mouseWheelChange = e.Delta;
 
-        var thisScroller = (SmoothScrollViewer)sender;
+        var thisScroller = (SmoothScrollViewer) sender;
         var newVOffset = thisScroller.TargetVerticalOffset - mouseWheelChange / 3;
 
         if (newVOffset < 0)
@@ -210,7 +219,9 @@ public class SmoothScrollViewer : ScrollViewer
         e.Handled = true;
     }
 
-    private void VScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    private void VScrollBar_ValueChanged(
+        object sender,
+        RoutedPropertyChangedEventArgs<double> e)
     {
         var thisScroller = this;
         var oldTargetVOffset = e.OldValue;
@@ -234,7 +245,9 @@ public class SmoothScrollViewer : ScrollViewer
             };
     }
 
-    private void HScrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    private void HScrollBar_ValueChanged(
+        object sender,
+        RoutedPropertyChangedEventArgs<double> e)
     {
         var thisScroller = this;
 
@@ -259,40 +272,48 @@ public class SmoothScrollViewer : ScrollViewer
             };
     }
 
-    private static void OnTargetVerticalOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnTargetVerticalOffsetChanged(
+        DependencyObject d,
+        DependencyPropertyChangedEventArgs e)
     {
-        var thisScroller = (SmoothScrollViewer)d;
+        var thisScroller = (SmoothScrollViewer) d;
 
-        if (Math.Abs((double)e.NewValue - thisScroller._aniVerticalScrollBar.Value) > 0.0D)
+        if (Math.Abs((double) e.NewValue - thisScroller._aniVerticalScrollBar.Value) > 0.0D)
         {
-            thisScroller._aniVerticalScrollBar.Value = (double)e.NewValue;
+            thisScroller._aniVerticalScrollBar.Value = (double) e.NewValue;
         }
 
         AnimateScroller(thisScroller);
     }
 
-    private static void OnTargetHorizontalOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnTargetHorizontalOffsetChanged(
+        DependencyObject d,
+        DependencyPropertyChangedEventArgs e)
     {
-        var thisScroller = (SmoothScrollViewer)d;
+        var thisScroller = (SmoothScrollViewer) d;
 
-        if (Math.Abs((double)e.NewValue - thisScroller._aniHorizontalScrollBar.Value) > 0.0D)
+        if (Math.Abs((double) e.NewValue - thisScroller._aniHorizontalScrollBar.Value) > 0.0D)
         {
-            thisScroller._aniHorizontalScrollBar.Value = (double)e.NewValue;
+            thisScroller._aniHorizontalScrollBar.Value = (double) e.NewValue;
         }
 
         AnimateScroller(thisScroller);
     }
 
-    private static void OnHorizontalScrollOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnHorizontalScrollOffsetChanged(
+        DependencyObject d,
+        DependencyPropertyChangedEventArgs e)
     {
-        var thisSViewer = (SmoothScrollViewer)d;
-        thisSViewer.ScrollToHorizontalOffset((double)e.NewValue);
+        var thisSViewer = (SmoothScrollViewer) d;
+        thisSViewer.ScrollToHorizontalOffset((double) e.NewValue);
     }
 
-    private static void OnVerticalScrollOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnVerticalScrollOffsetChanged(
+        DependencyObject d,
+        DependencyPropertyChangedEventArgs e)
     {
-        var thisSViewer = (SmoothScrollViewer)d;
-        thisSViewer.ScrollToVerticalOffset((double)e.NewValue);
+        var thisSViewer = (SmoothScrollViewer) d;
+        thisSViewer.ScrollToVerticalOffset((double) e.NewValue);
     }
 
     private static void AnimateScroller(object objectToScroll)

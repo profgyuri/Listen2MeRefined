@@ -1,9 +1,9 @@
-﻿namespace Listen2MeRefined.WPF;
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+
+namespace Listen2MeRefined.WPF;
 
 /// <summary>
 ///     Fixes the issue with Windows of Style <see cref="WindowStyle.None" /> covering the taskbar. Do not use MaxWidth and
@@ -33,17 +33,23 @@ public class WindowResizer
     private static extern bool GetCursorPos(out Point lpPoint);
 
     [DllImport("user32.dll")]
-    private static extern bool GetMonitorInfo(IntPtr hMonitor, MonitorInfo lpmi);
+    private static extern bool GetMonitorInfo(
+        IntPtr hMonitor,
+        MonitorInfo lpmi);
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr MonitorFromPoint(Point pt, MonitorOptions dwFlags);
+    private static extern IntPtr MonitorFromPoint(
+        Point pt,
+        MonitorOptions dwFlags);
 
     /// <summary>
     ///     Initialize and hook into the windows message pump
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void Window_SourceInitialized(object? sender, EventArgs e)
+    private void Window_SourceInitialized(
+        object? sender,
+        EventArgs e)
     {
         // Get the handle of this window
         var handle = new WindowInteropHelper(_mWindow).Handle;
@@ -62,8 +68,12 @@ public class WindowResizer
     /// <param name="lParam"></param>
     /// <param name="handled"></param>
     /// <returns></returns>
-    private static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam,
-        IntPtr lParam, ref bool handled)
+    private static IntPtr WindowProc(
+        IntPtr hwnd,
+        int msg,
+        IntPtr wParam,
+        IntPtr lParam,
+        ref bool handled)
     {
         switch (msg)
         {
@@ -74,7 +84,7 @@ public class WindowResizer
                 break;
         }
 
-        return (IntPtr)0;
+        return (IntPtr) 0;
     }
 
     /// <summary>
@@ -95,7 +105,7 @@ public class WindowResizer
 
         var lCurrentScreen = MonitorFromPoint(lMousePosition, MonitorOptions.MonitorDefaulttonearest);
 
-        var lMmi = (MinMaxInfo)Marshal.PtrToStructure(lParam, typeof(MinMaxInfo))!;
+        var lMmi = (MinMaxInfo) Marshal.PtrToStructure(lParam, typeof(MinMaxInfo))!;
 
         if (lPrimaryScreen.Equals(lCurrentScreen))
         {
@@ -152,7 +162,9 @@ internal struct Point
     public int X;
     public int Y;
 
-    public Point(int x, int y)
+    public Point(
+        int x,
+        int y)
     {
         X = x;
         Y = y;

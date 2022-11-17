@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Listen2MeRefined.Tests.Infrastructure.SystemOperations;
 
 [TestFixture]
-public class FileEnumeratorTests 
+public class FileEnumeratorTests
 {
     [Test]
     public void EnumerateFiles_ReutrnsAList_WhenFolderIsGivenAsPath()
@@ -39,9 +39,11 @@ public class FileEnumeratorTests
     }
 
     [Test]
-    public void EnumerateFiles_ThrowsArguementException_WhenPathIsNotFolder(){
+    public void EnumerateFiles_ThrowsArguementException_WhenPathIsNotFolder()
+    {
         IFileEnumerator fileEnumerator = new FileEnumerator();
 
-        Assert.Throws<ArgumentException>(() => fileEnumerator.EnumerateFiles(@"e:\zene\bounce\Mike Candys - Like That.mp3"));
+        Assert.Throws<ArgumentException>(() =>
+            fileEnumerator.EnumerateFiles(@"e:\zene\bounce\Mike Candys - Like That.mp3"));
     }
 }

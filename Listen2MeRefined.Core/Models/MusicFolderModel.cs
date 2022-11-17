@@ -6,9 +6,8 @@ public sealed class MusicFolderModel : Model
 
     public MusicFolderModel()
     {
-        
     }
-    
+
     public MusicFolderModel(string path)
     {
         FullPath = path;

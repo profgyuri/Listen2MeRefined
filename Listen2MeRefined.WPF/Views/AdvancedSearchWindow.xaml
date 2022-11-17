@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
-        xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:AdvancedSearchViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -13,30 +12,30 @@
         Height="350" Width="300">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome 
-			x:Name="WindowChrome"
-			CaptionHeight="32"/>
+        <WindowChrome
+            x:Name="WindowChrome"
+            CaptionHeight="32" />
     </WindowChrome.WindowChrome>
 
     <Border
         BorderThickness="2"
-		BorderBrush="{StaticResource ThirnaryBrush}"
-		Background="{StaticResource PrimaryBrush}"
-		CornerRadius="8">
+        BorderBrush="{StaticResource ThirnaryBrush}"
+        Background="{StaticResource PrimaryBrush}"
+        CornerRadius="8">
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <TextBlock
                 Text="Advanced Search"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                FontWeight="Bold"/>
+                FontWeight="Bold" />
 
         </Grid>
-        
+
     </Border>
 </Window>

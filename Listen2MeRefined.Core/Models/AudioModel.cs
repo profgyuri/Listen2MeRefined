@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
 namespace Listen2MeRefined.Core.Models;
 
-using System.Text;
-
-[System.ComponentModel.DataAnnotations.Schema.Table("Songs")]
+[Table("Songs")]
 public sealed class AudioModel : Model
 {
     public string? Artist { get; set; }
@@ -32,7 +31,7 @@ public sealed class AudioModel : Model
     {
         // only true when the 2 paths are the same
         return obj is AudioModel audio &&
-            string.Equals(Path, audio.Path, StringComparison.OrdinalIgnoreCase);
+               string.Equals(Path, audio.Path, StringComparison.OrdinalIgnoreCase);
     }
 
     public override string ToString()

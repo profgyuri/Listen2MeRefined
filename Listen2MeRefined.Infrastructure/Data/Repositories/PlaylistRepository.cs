@@ -1,124 +1,136 @@
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
-public class PlaylistRepository : IRepository<PlaylistModel>
+public class PlaylistRepository : RepositoryBase<PlaylistModel>
 {
-    #region Implementation of IRepository<PlaylistModel>
     /// <inheritdoc />
-    public void Create(PlaylistModel data)
+    public PlaylistRepository(
+        IDataReader dataReader,
+        IDataSaver dataSaver,
+        IDataRemover dataRemover,
+        IDataUpdater dataUpdater,
+        ILogger logger)
+        : base(dataReader, dataSaver, dataRemover,
+            dataUpdater, logger)
+    {
+    }
+
+    #region Overrides of RepositoryBase<PlaylistModel>
+    /// <inheritdoc />
+    public override void Create(PlaylistModel data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public void Create(IEnumerable<PlaylistModel> data)
+    public override void Create(IEnumerable<PlaylistModel> data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task CreateAsync(PlaylistModel data)
+    public override async Task CreateAsync(PlaylistModel data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task CreateAsync(IEnumerable<PlaylistModel> data)
+    public override async Task CreateAsync(IEnumerable<PlaylistModel> data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public IEnumerable<PlaylistModel> Read()
+    public override IEnumerable<PlaylistModel> Read()
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public IEnumerable<PlaylistModel> Read(string searchTerm)
+    public override IEnumerable<PlaylistModel> Read(string searchTerm)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public IEnumerable<PlaylistModel> Read(PlaylistModel model)
+    public override IEnumerable<PlaylistModel> Read(PlaylistModel model)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<PlaylistModel>> ReadAsync()
+    public override async Task<IEnumerable<PlaylistModel>> ReadAsync()
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<PlaylistModel>> ReadAsync(string searchTerm)
+    public override async Task<IEnumerable<PlaylistModel>> ReadAsync(string searchTerm)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<PlaylistModel>> ReadAsync(PlaylistModel model)
+    public override async Task<IEnumerable<PlaylistModel>> ReadAsync(PlaylistModel model)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public void Update(PlaylistModel data)
+    public override void Update(PlaylistModel data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public void Update(IEnumerable<PlaylistModel> data)
+    public override void Update(IEnumerable<PlaylistModel> data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(PlaylistModel data)
+    public override async Task UpdateAsync(PlaylistModel data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(IEnumerable<PlaylistModel> data)
+    public override async Task UpdateAsync(IEnumerable<PlaylistModel> data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public void Delete(PlaylistModel data)
+    public override void Delete(PlaylistModel data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public void Delete(IEnumerable<PlaylistModel> data)
+    public override void Delete(IEnumerable<PlaylistModel> data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(PlaylistModel data)
+    public override async Task DeleteAsync(PlaylistModel data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(IEnumerable<PlaylistModel> data)
+    public override async Task DeleteAsync(IEnumerable<PlaylistModel> data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public void DeleteAll()
+    public override void DeleteAll()
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task DeleteAllAsync()
+    public override async Task DeleteAllAsync()
     {
         return TODO_IMPLEMENT_ME;
     }

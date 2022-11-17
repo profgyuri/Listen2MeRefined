@@ -8,8 +8,7 @@ using Source.Storage;
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
-public partial class SettingsWindowViewModel :
-    INotificationHandler<FolderBrowserNotification>
+public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
@@ -32,10 +31,16 @@ public partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
 
-    public SettingsWindowViewModel(ILogger logger, ISettingsManager<AppSettings> settingsManager,
+    public SettingsWindowViewModel(
+        ILogger logger,
+        ISettingsManager<AppSettings> settingsManager,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator,
-        FontFamilies fontFamilies, IRepository<MusicFolderModel> musicFolderRepository, IRepository<PlaylistModel> playlistRepository)
+        IFileEnumerator fileEnumerator,
+        IRepository<AudioModel> audioRepository,
+        IMediator mediator,
+        FontFamilies fontFamilies,
+        IRepository<MusicFolderModel> musicFolderRepository,
+        IRepository<PlaylistModel> playlistRepository)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -62,15 +67,17 @@ public partial class SettingsWindowViewModel :
     }
 
     #region Notification Handlers
-    public async Task Handle(FolderBrowserNotification notification, CancellationToken cancellationToken)
+    public async Task Handle(
+        FolderBrowserNotification notification,
+        CancellationToken cancellationToken)
     {
         var path = notification.Path;
-        
+
         if (Folders.Contains(path))
         {
             return;
         }
-        
+
         _logger.Debug("Adding path to music folders: {Path}", notification.Path);
 
         Folders.Add(notification.Path);

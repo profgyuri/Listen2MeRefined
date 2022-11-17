@@ -1,124 +1,136 @@
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
-public class MusicFolderRepository : IRepository<MusicFolderModel>
+public sealed class MusicFolderRepository : RepositoryBase<MusicFolderModel>
 {
-    #region Implementation of IRepository<MusicFolderModel>
     /// <inheritdoc />
-    public void Create(MusicFolderModel data)
+    public MusicFolderRepository(
+        IDataReader dataReader,
+        IDataSaver dataSaver,
+        IDataRemover dataRemover,
+        IDataUpdater dataUpdater,
+        ILogger logger)
+        : base(dataReader, dataSaver, dataRemover,
+            dataUpdater, logger)
+    {
+    }
+
+    #region Overrides of RepositoryBase<MusicFolderModel>
+    /// <inheritdoc />
+    public override void Create(MusicFolderModel data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public void Create(IEnumerable<MusicFolderModel> data)
+    public override void Create(IEnumerable<MusicFolderModel> data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task CreateAsync(MusicFolderModel data)
+    public override async Task CreateAsync(MusicFolderModel data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task CreateAsync(IEnumerable<MusicFolderModel> data)
+    public override async Task CreateAsync(IEnumerable<MusicFolderModel> data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public IEnumerable<MusicFolderModel> Read()
+    public override IEnumerable<MusicFolderModel> Read()
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public IEnumerable<MusicFolderModel> Read(string searchTerm)
+    public override IEnumerable<MusicFolderModel> Read(string searchTerm)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public IEnumerable<MusicFolderModel> Read(MusicFolderModel model)
+    public override IEnumerable<MusicFolderModel> Read(MusicFolderModel model)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<MusicFolderModel>> ReadAsync()
+    public override async Task<IEnumerable<MusicFolderModel>> ReadAsync()
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<MusicFolderModel>> ReadAsync(string searchTerm)
+    public override async Task<IEnumerable<MusicFolderModel>> ReadAsync(string searchTerm)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<MusicFolderModel>> ReadAsync(MusicFolderModel model)
+    public override async Task<IEnumerable<MusicFolderModel>> ReadAsync(MusicFolderModel model)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public void Update(MusicFolderModel data)
+    public override void Update(MusicFolderModel data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public void Update(IEnumerable<MusicFolderModel> data)
+    public override void Update(IEnumerable<MusicFolderModel> data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(MusicFolderModel data)
+    public override async Task UpdateAsync(MusicFolderModel data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(IEnumerable<MusicFolderModel> data)
+    public override async Task UpdateAsync(IEnumerable<MusicFolderModel> data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public void Delete(MusicFolderModel data)
+    public override void Delete(MusicFolderModel data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public void Delete(IEnumerable<MusicFolderModel> data)
+    public override void Delete(IEnumerable<MusicFolderModel> data)
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(MusicFolderModel data)
+    public override async Task DeleteAsync(MusicFolderModel data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(IEnumerable<MusicFolderModel> data)
+    public override async Task DeleteAsync(IEnumerable<MusicFolderModel> data)
     {
         return TODO_IMPLEMENT_ME;
     }
 
     /// <inheritdoc />
-    public void DeleteAll()
+    public override void DeleteAll()
     {
         TODO_IMPLEMENT_ME();
     }
 
     /// <inheritdoc />
-    public async Task DeleteAllAsync()
+    public override async Task DeleteAllAsync()
     {
         return TODO_IMPLEMENT_ME;
     }

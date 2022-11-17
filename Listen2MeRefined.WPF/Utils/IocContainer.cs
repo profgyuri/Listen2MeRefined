@@ -13,6 +13,7 @@ using Listen2MeRefined.WPF.Views;
 using MediatR;
 using Microsoft.Data.Sqlite;
 using Serilog;
+using Serilog.Core;
 using Source;
 using Source.Storage;
 using IDataReader = Listen2MeRefined.Core.Interfaces.DataHandlers.IDataReader;
@@ -104,11 +105,11 @@ internal static class IocContainer
         builder
             .RegisterType<AudioRepository>()
             .As<IRepository<AudioModel>>();
-        
+
         builder
             .RegisterType<PlaylistRepository>()
             .As<IRepository<PlaylistModel>>();
-        
+
         builder
             .RegisterType<MusicFolderRepository>()
             .As<IRepository<MusicFolderModel>>();
@@ -165,7 +166,7 @@ internal static class IocContainer
         return _container = builder.Build();
     }
 
-    private static Serilog.Core.Logger CreateLogger()
+    private static Logger CreateLogger()
     {
         var config = new LoggerConfiguration();
 
