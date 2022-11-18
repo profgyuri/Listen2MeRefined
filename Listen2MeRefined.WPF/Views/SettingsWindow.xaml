@@ -176,8 +176,8 @@
                         Grid.Column="1"
                         Style="{StaticResource InteractionButton}"
                         Content="Rescan Now"
+                        Command="{Binding ForceScanCommand}"
                         Width="120"
-                        IsEnabled="False"
                         Margin="0 10"
                         ToolTip="Scan all of your folders set up above." />
 

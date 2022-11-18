@@ -139,5 +139,13 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         _secondsToCancelClear = 5;
         CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
     }
+    
+    [RelayCommand]
+    private async Task ForceScanAsync()
+    {
+        _logger.Debug("Force scanning folders...");
+
+        await _folderScanner.ScanAllAsync();
+    }
     #endregion
 }
