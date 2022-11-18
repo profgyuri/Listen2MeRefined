@@ -23,7 +23,23 @@ public sealed class AudioModel : Model
             : string.Join(" - ", Artist, Title);
 
     public TimeSpan Length { get; set; }
-    public string? Path { get; set; }
+    public string? Path { get; init; }
+    
+    /// <summary>
+    /// Updates the properties of this instance with the properties of the given instance.
+    /// </summary>
+    /// <param name="from">The instance to copy the properties from.</param>
+    /// <returns></returns>
+    public AudioModel Update(AudioModel from)
+    {
+        Artist = from.Artist;
+        Title = from.Title;
+        Genre = from.Genre;
+        BPM = from.BPM;
+        Bitrate = from.Bitrate;
+        Length = from.Length;
+        return this;
+    }
 
     #region Overrides of Object
     /// <inheritdoc />
@@ -32,6 +48,12 @@ public sealed class AudioModel : Model
         // only true when the 2 paths are the same
         return obj is AudioModel audio &&
                string.Equals(Path, audio.Path, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        return Path?.GetHashCode() ?? -1;
     }
 
     public override string ToString()

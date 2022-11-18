@@ -75,9 +75,9 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
             return;
         }
 
-        _logger.Debug("Adding path to music folders: {Path}", notification.Path);
+        _logger.Debug("Adding path to music folders: {Path}", path);
 
-        Folders.Add(notification.Path);
+        Folders.Add(path);
 
         _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
 
