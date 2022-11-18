@@ -12,11 +12,10 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
-    private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
-    private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IRepository<MusicFolderModel> _musicFolderRepository;
     private readonly IRepository<PlaylistModel> _playlistRepository;
+    private readonly IFolderScanner _folderScanner;
     private readonly IMediator _mediator;
 
     private TimedTask? _timedTask;
@@ -34,22 +33,20 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     public SettingsWindowViewModel(
         ILogger logger,
         ISettingsManager<AppSettings> settingsManager,
-        IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IFileEnumerator fileEnumerator,
         IRepository<AudioModel> audioRepository,
         IMediator mediator,
         FontFamilies fontFamilies,
         IRepository<MusicFolderModel> musicFolderRepository,
-        IRepository<PlaylistModel> playlistRepository)
+        IRepository<PlaylistModel> playlistRepository,
+        IFolderScanner folderScanner)
     {
         _logger = logger;
         _settingsManager = settingsManager;
-        _audioFileAnalyzer = audioFileAnalyzer;
-        _fileEnumerator = fileEnumerator;
         _audioRepository = audioRepository;
         _mediator = mediator;
         _musicFolderRepository = musicFolderRepository;
         _playlistRepository = playlistRepository;
+        _folderScanner = folderScanner;
 
         _fontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
 
@@ -84,10 +81,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
         _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
 
-        _logger.Information("Scanning folder for audio files: {Path}", notification.Path);
-        var files = await _fileEnumerator.EnumerateFilesAsync(notification.Path);
-        var songs = await _audioFileAnalyzer.AnalyzeAsync(files);
-        await _audioRepository.CreateAsync(songs);
+        await _folderScanner.ScanAsync(path);
     }
     #endregion
 
