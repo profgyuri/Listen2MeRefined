@@ -115,18 +115,20 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
                 await _audioRepository.DeleteAllAsync();
                 await _musicFolderRepository.DeleteAllAsync();
                 await _playlistRepository.DeleteAllAsync();
+                
+                Folders = new();
 
                 await _timedTask?.StopAsync()!;
                 IsClearMetadataButtonVisible = true;
                 IsCancelClearMetadataButtonVisible = false;
                 _secondsToCancelClear = 5;
-                CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+                CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
                 _logger.Debug("Metadata cleared");
             }
 
             _secondsToCancelClear--;
-            CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+            CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
         });
         IsClearMetadataButtonVisible = false;
         IsCancelClearMetadataButtonVisible = true;
