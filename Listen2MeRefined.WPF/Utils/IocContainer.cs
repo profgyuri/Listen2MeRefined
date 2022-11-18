@@ -166,7 +166,8 @@ internal static class IocContainer
 
         builder
             .RegisterType<FolderScannerService>()
-            .As<IFolderScanner>();
+            .As<IFolderScanner>()
+            .SingleInstance();
 
         return _container = builder.Build();
     }

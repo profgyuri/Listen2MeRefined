@@ -1,3 +1,6 @@
+using Listen2MeRefined.Infrastructure.Data;
+using Source.Storage;
+
 namespace Listen2MeRefined.Infrastructure.Services;
 
 public sealed class FolderScannerService : IFolderScanner
@@ -5,17 +8,20 @@ public sealed class FolderScannerService : IFolderScanner
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly ILogger _logger;
 
     public FolderScannerService(
         IFileEnumerator fileEnumerator,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IRepository<AudioModel> audioRepository,
+        ISettingsManager<AppSettings> settingsManager,
         ILogger logger)
     {
         _fileEnumerator = fileEnumerator;
         _audioFileAnalyzer = audioFileAnalyzer;
         _audioRepository = audioRepository;
+        _settingsManager = settingsManager;
         _logger = logger;
     }
     
@@ -98,6 +104,24 @@ public sealed class FolderScannerService : IFolderScanner
         {
             await ScanAsync(path);
         }
+    }
+    
+    /// <inheritdoc />
+    public void ScanAll()
+    {
+        var paths =
+            _settingsManager.Settings.MusicFolders
+                .Select(x => x.FullPath);
+        Scan(paths);
+    }
+    
+    /// <inheritdoc />
+    public async Task ScanAllAsync()
+    {
+        var paths =
+            _settingsManager.Settings.MusicFolders
+                .Select(x => x.FullPath);
+        await ScanAsync(paths);
     }
     #endregion
 }
