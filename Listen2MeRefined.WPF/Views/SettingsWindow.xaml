@@ -77,12 +77,12 @@
                     <ListView
                         Grid.RowSpan="2"
                         Style="{StaticResource VirtualizedListView}"
-                        MaxHeight="128"
-                        MinHeight="42"
+                        Height="84"
                         Margin="0 0 10 0"
                         ItemsSource="{Binding Folders}"
                         SelectedItem="{Binding SelectedFolder}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock

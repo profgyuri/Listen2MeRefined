@@ -24,6 +24,21 @@ public sealed class AudioModel : Model
 
     public TimeSpan Length { get; set; }
     public string? Path { get; init; }
+    
+    /// <summary>
+    /// Updates the properties of this instance with the properties of the given instance.
+    /// </summary>
+    /// <param name="from">The instance to copy the properties from.</param>
+    /// <returns></returns>
+    public void Update(AudioModel from)
+    {
+        Artist = from.Artist;
+        Title = from.Title;
+        Genre = from.Genre;
+        BPM = from.BPM;
+        Bitrate = from.Bitrate;
+        Length = from.Length;
+    }
 
     #region Overrides of Object
     /// <inheritdoc />

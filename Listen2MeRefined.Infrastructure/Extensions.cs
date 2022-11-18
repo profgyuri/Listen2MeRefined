@@ -71,20 +71,4 @@ internal static class Extensions
             }
         }).ConfigureAwait(false);
     }
-    
-    /// <summary>
-    /// Updates the properties of this instance with the properties of the given instance.
-    /// </summary>
-    /// <param name="from">The instance to copy the properties from.</param>
-    /// <returns></returns>
-    public static AudioModel Update(this AudioModel old, AudioModel from)
-    {
-        old.Artist = from.Artist;
-        old.Title = from.Title;
-        old.Genre = from.Genre;
-        old.BPM = from.BPM;
-        old.Bitrate = from.Bitrate;
-        old.Length = from.Length;
-        return old;
-    }
 }
