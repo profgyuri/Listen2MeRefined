@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public sealed class AudioRepository : IRepository<AudioModel>
 {
@@ -8,7 +8,12 @@ public sealed class AudioRepository : IRepository<AudioModel>
     private readonly IDataUpdater _dataUpdater;
     private readonly ILogger _logger;
 
-    public AudioRepository(IDataReader dataReader, IDataSaver dataSaver, IDataRemover dataRemover, IDataUpdater dataUpdater, ILogger logger)
+    public AudioRepository(
+        IDataReader dataReader,
+        IDataSaver dataSaver,
+        IDataRemover dataRemover,
+        IDataUpdater dataUpdater,
+        ILogger logger)
     {
         _dataReader = dataReader;
         _dataSaver = dataSaver;
@@ -26,8 +31,7 @@ public sealed class AudioRepository : IRepository<AudioModel>
 
     public void Create(IEnumerable<AudioModel> data)
     {
-        data.TryGetNonEnumeratedCount(out var count);
-        _logger.Information("Saving audio list to database: {Count}", count);
+        _logger.Information("Saving a list of audio to database");
         _dataSaver.Save(data);
     }
 
@@ -39,8 +43,7 @@ public sealed class AudioRepository : IRepository<AudioModel>
 
     public async Task CreateAsync(IEnumerable<AudioModel> data)
     {
-        data.TryGetNonEnumeratedCount(out var count);
-        _logger.Information("Saving audio list to database: {Count}", count);
+        _logger.Information("Saving a list of audio to database");
         await _dataSaver.SaveAsync(data);
     }
     #endregion
@@ -65,12 +68,12 @@ public sealed class AudioRepository : IRepository<AudioModel>
     {
         await _dataRemover.RemoveAsync(data);
     }
-    
+
     public void DeleteAll()
     {
         _dataRemover.RemoveAll<AudioModel>();
     }
-    
+
     public async Task DeleteAllAsync()
     {
         await _dataRemover.RemoveAllAsync<AudioModel>();
@@ -82,27 +85,27 @@ public sealed class AudioRepository : IRepository<AudioModel>
     {
         return _dataReader.Read<AudioModel>();
     }
-    
+
     public IEnumerable<AudioModel> Read(string searchTerm)
     {
         return _dataReader.Read<AudioModel>(searchTerm);
     }
-    
+
     public IEnumerable<AudioModel> Read(AudioModel model)
     {
         return _dataReader.Read(model, false);
     }
-    
+
     public async Task<IEnumerable<AudioModel>> ReadAsync()
     {
         return await _dataReader.ReadAsync<AudioModel>();
     }
-    
+
     public async Task<IEnumerable<AudioModel>> ReadAsync(string searchTerm)
     {
         return await _dataReader.ReadAsync<AudioModel>(searchTerm);
     }
-    
+
     public async Task<IEnumerable<AudioModel>> ReadAsync(AudioModel model)
     {
         return await _dataReader.ReadAsync(model, false);

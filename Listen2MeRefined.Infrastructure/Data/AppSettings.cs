@@ -1,9 +1,12 @@
-﻿using Source.Storage;
+﻿using System.ComponentModel.DataAnnotations;
+using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Data;
 
 public sealed class AppSettings : Settings
 {
-    internal string FontFamily { get; set; } = "";
-    internal IEnumerable<string> MusicFolders { get; set; } = new List<string>();
+    [Key] public int Id { get; set; }
+
+    public string FontFamily { get; set; } = "";
+    public List<MusicFolderModel> MusicFolders { get; set; } = new();
 }

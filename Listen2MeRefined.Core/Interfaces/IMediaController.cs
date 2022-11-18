@@ -5,11 +5,15 @@
 /// </summary>
 public interface IMediaController
 {
+    double CurrentTime { get; set; }
+
+    float Volume { get; set; }
+
     /// <summary>
     ///     Play or pause the playback.
     /// </summary>
     void PlayPause();
-    
+
     /// <summary>
     ///     Stop the playback and jump to start.
     /// </summary>
@@ -24,7 +28,7 @@ public interface IMediaController
     ///     Jump to the previous media element.
     /// </summary>
     void Previous();
-    
+
     /// <summary>
     ///     Jump to the specified media element.
     /// </summary>
@@ -35,8 +39,4 @@ public interface IMediaController
     ///     Randomizes the order of the elements.
     /// </summary>
     void Shuffle();
-    
-    double CurrentTime { get; set; }
-    
-    float Volume { get; set; }
 }

@@ -1,10 +1,11 @@
-﻿namespace Listen2MeRefined.WPF;
-
-using Listen2MeRefined.WPF.Views;
+﻿using System;
 using System.Windows;
+using Listen2MeRefined.WPF.Views;
+
+namespace Listen2MeRefined.WPF;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+///     Interaction logic for MainWindow.xaml
 /// </summary>
 public sealed partial class MainWindow : Window
 {
@@ -15,31 +16,41 @@ public sealed partial class MainWindow : Window
         DataContext = viewModel;
     }
 
-    private void CloseWindow_Click(object sender, RoutedEventArgs e)
+    private void CloseWindow_Click(
+        object sender,
+        RoutedEventArgs e)
     {
-        this.Close();
-        System.Environment.Exit(0);
+        Close();
+        Environment.Exit(0);
     }
 
-    private void MaximizeWindow_Click(object sender, RoutedEventArgs e)
+    private void MaximizeWindow_Click(
+        object sender,
+        RoutedEventArgs e)
     {
-        WindowState = 
-            WindowState == WindowState.Maximized 
-            ? WindowState.Normal 
-            : WindowState.Maximized;
+        WindowState =
+            WindowState == WindowState.Maximized
+                ? WindowState.Normal
+                : WindowState.Maximized;
     }
 
-    private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
+    private void MinimizeWindow_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         WindowState = WindowState.Minimized;
     }
 
-    private void SettingsWindow_Click(object sender, RoutedEventArgs e)
+    private void SettingsWindow_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         WindowManager.ShowWindow<SettingsWindow>(Left + Width / 2, Top + Height / 2);
     }
 
-    private void AdvancedSearchWindow_Click(object sender, RoutedEventArgs e)
+    private void AdvancedSearchWindow_Click(
+        object sender,
+        RoutedEventArgs e)
     {
         WindowManager.ShowWindow<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
     }

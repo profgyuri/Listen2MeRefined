@@ -1,18 +1,18 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore;
+namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
-public class DataContext : DbContext
+public sealed class DataContext : DbContext
 {
-#pragma warning disable CS8618
     public DbSet<AudioModel> Songs { get; set; }
     public DbSet<PlaylistModel> Playlists { get; set; }
+    public DbSet<AppSettings> Settings { get; set; }
+    public DbSet<MusicFolderModel> MusicFolders { get; set; }
 
     public DataContext()
     {
         Database.EnsureCreated();
     }
-#pragma warning restore CS8618
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

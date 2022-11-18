@@ -8,14 +8,15 @@ using Source.Storage;
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
-public partial class SettingsWindowViewModel :
-    INotificationHandler<FolderBrowserNotification>
+public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IRepository<MusicFolderModel> _musicFolderRepository;
+    private readonly IRepository<PlaylistModel> _playlistRepository;
     private readonly IMediator _mediator;
 
     private TimedTask? _timedTask;
@@ -30,10 +31,16 @@ public partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
 
-    public SettingsWindowViewModel(ILogger logger, ISettingsManager<AppSettings> settingsManager,
+    public SettingsWindowViewModel(
+        ILogger logger,
+        ISettingsManager<AppSettings> settingsManager,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IFileEnumerator fileEnumerator, IRepository<AudioModel> audioRepository, IMediator mediator,
-        FontFamilies fontFamilies)
+        IFileEnumerator fileEnumerator,
+        IRepository<AudioModel> audioRepository,
+        IMediator mediator,
+        FontFamilies fontFamilies,
+        IRepository<MusicFolderModel> musicFolderRepository,
+        IRepository<PlaylistModel> playlistRepository)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -41,18 +48,15 @@ public partial class SettingsWindowViewModel :
         _fileEnumerator = fileEnumerator;
         _audioRepository = audioRepository;
         _mediator = mediator;
+        _musicFolderRepository = musicFolderRepository;
+        _playlistRepository = playlistRepository;
 
-        FontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
+        _fontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
 
-        Init();
-    }
-
-    private void Init()
-    {
         var settings = _settingsManager.Settings;
-        Folders = new(settings.MusicFolders);
-        FontFamily = settings.FontFamily;
-        SelectedFontFamily = settings.FontFamily;
+        _folders = new(settings.MusicFolders.Select(x => x.FullPath));
+        _fontFamily = settings.FontFamily;
+        _selectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
@@ -63,13 +67,22 @@ public partial class SettingsWindowViewModel :
     }
 
     #region Notification Handlers
-    public async Task Handle(FolderBrowserNotification notification, CancellationToken cancellationToken)
+    public async Task Handle(
+        FolderBrowserNotification notification,
+        CancellationToken cancellationToken)
     {
+        var path = notification.Path;
+
+        if (Folders.Contains(path))
+        {
+            return;
+        }
+
         _logger.Debug("Adding path to music folders: {Path}", notification.Path);
 
         Folders.Add(notification.Path);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders);
+        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
 
         _logger.Information("Scanning folder for audio files: {Path}", notification.Path);
         var files = await _fileEnumerator.EnumerateFilesAsync(notification.Path);
@@ -86,7 +99,7 @@ public partial class SettingsWindowViewModel :
 
         Folders.Remove(SelectedFolder!);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders);
+        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
     }
 
     [RelayCommand]
@@ -100,18 +113,22 @@ public partial class SettingsWindowViewModel :
             if (_secondsToCancelClear == 0)
             {
                 await _audioRepository.DeleteAllAsync();
+                await _musicFolderRepository.DeleteAllAsync();
+                await _playlistRepository.DeleteAllAsync();
+                
+                Folders = new();
 
                 await _timedTask?.StopAsync()!;
                 IsClearMetadataButtonVisible = true;
                 IsCancelClearMetadataButtonVisible = false;
                 _secondsToCancelClear = 5;
-                CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+                CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
                 _logger.Debug("Metadata cleared");
             }
 
             _secondsToCancelClear--;
-            CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+            CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
         });
         IsClearMetadataButtonVisible = false;
         IsCancelClearMetadataButtonVisible = true;

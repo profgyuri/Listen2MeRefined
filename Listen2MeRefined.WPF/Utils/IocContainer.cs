@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
-using System.Windows.Forms;
 using System.Windows.Media;
 using Autofac;
-using Gma.System.MouseKeyHook;
 using Listen2MeRefined.Core;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
 using Microsoft.Data.Sqlite;
 using Serilog;
+using Serilog.Core;
 using Source;
-using Source.KeyboardHook;
 using Source.Storage;
 using IDataReader = Listen2MeRefined.Core.Interfaces.DataHandlers.IDataReader;
 
@@ -108,6 +105,14 @@ internal static class IocContainer
         builder
             .RegisterType<AudioRepository>()
             .As<IRepository<AudioModel>>();
+
+        builder
+            .RegisterType<PlaylistRepository>()
+            .As<IRepository<PlaylistModel>>();
+
+        builder
+            .RegisterType<MusicFolderRepository>()
+            .As<IRepository<MusicFolderModel>>();
         #endregion
 
         builder
@@ -139,7 +144,7 @@ internal static class IocContainer
             .As<IFolderBrowser>();
 
         builder
-            .RegisterType<FileSettingsManager<AppSettings>>()
+            .RegisterType<DatabaseSettingsManager<AppSettings>>()
             .As<ISettingsManager<AppSettings>>();
 
         builder
@@ -161,7 +166,7 @@ internal static class IocContainer
         return _container = builder.Build();
     }
 
-    private static Serilog.Core.Logger CreateLogger()
+    private static Logger CreateLogger()
     {
         var config = new LoggerConfiguration();
 

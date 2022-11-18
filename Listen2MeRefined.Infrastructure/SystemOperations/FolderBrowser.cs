@@ -1,5 +1,4 @@
 ﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
-using System.Collections.Generic;
 
 public sealed class FolderBrowser : IFolderBrowser
 {

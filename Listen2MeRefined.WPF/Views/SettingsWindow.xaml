@@ -15,67 +15,67 @@
         Height="300" Width="450">
 
     <Window.Resources>
-        <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter"/>
-        <local:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter"/>
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter" />
+        <local:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter" />
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
 
     <WindowChrome.WindowChrome>
-        <WindowChrome 
-			x:Name="WindowChrome"
-			CaptionHeight="32"/>
+        <WindowChrome
+            x:Name="WindowChrome"
+            CaptionHeight="32" />
     </WindowChrome.WindowChrome>
 
     <Border
         BorderThickness="2"
-		BorderBrush="{StaticResource ThirnaryBrush}"
-		Background="{StaticResource PrimaryBrush}"
-		CornerRadius="8">
+        BorderBrush="{StaticResource ThirnaryBrush}"
+        Background="{StaticResource PrimaryBrush}"
+        CornerRadius="8">
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <TextBlock
                 Text="Settings"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                FontWeight="Bold"/>
+                FontWeight="Bold" />
 
             <Grid
                 Grid.Row="1"
                 Margin="10"
                 ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
-                    Text="Local folders: "/>
+                    Text="Local folders: " />
                 <Grid
                     Grid.Column="1"
                     Margin="0 0 0 15">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    
+
                     <ListView
-                        Grid.RowSpan ="2"
+                        Grid.RowSpan="2"
                         Style="{StaticResource VirtualizedListView}"
                         MaxHeight="128"
                         MinHeight="42"
@@ -92,7 +92,7 @@
                                     <TextBlock.ToolTip>
                                         <ToolTip
                                             Visibility="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTextBlockVisibilityConverter}}"
-                                            Content="{Binding}"/>
+                                            Content="{Binding}" />
                                     </TextBlock.ToolTip>
                                 </TextBlock>
                             </DataTemplate>
@@ -105,7 +105,7 @@
                         Grid.Column="1"
                         Content="{materialDesign:PackIcon Kind=FolderAddOutline}"
                         ToolTip="Browse"
-                        Margin="0 0 0 10"/>
+                        Margin="0 0 0 10" />
                     <Button
                         x:Name="RemoveFolder"
                         Style="{StaticResource InteractionButton}"
@@ -114,13 +114,13 @@
                         Grid.Column="1"
                         Grid.Row="1"
                         Content="{materialDesign:PackIcon Kind=FolderRemoveOutline}"
-                        ToolTip="Remove Selected"/>
+                        ToolTip="Remove Selected" />
                 </Grid>
 
                 <TextBlock
                     Grid.Row="1"
                     Text="Font settings:"
-                    VerticalAlignment="Center"/>
+                    VerticalAlignment="Center" />
                 <ComboBox
                     x:Name="FontFamily"
                     Grid.Row="1"
@@ -136,7 +136,7 @@
                         <DataTemplate>
                             <TextBlock
                                 Text="{Binding}"
-                                FontFamily="{Binding}"/>
+                                FontFamily="{Binding}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
@@ -145,13 +145,13 @@
                     Grid.Row="2"
                     Text="Metadata actions:"
                     Margin="0 10"
-                    VerticalAlignment="Center"/>
+                    VerticalAlignment="Center" />
                 <Grid
                     Grid.Row="2"
                     Grid.Column="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <Button
@@ -162,7 +162,7 @@
                         Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                         Width="120"
                         Margin="0 10"
-                        ToolTip="Clears all metadata stored in the local database file."/>
+                        ToolTip="Clears all metadata stored in the local database file." />
                     <Button
                         x:Name="CanclerClearMetadataButton"
                         Grid.Column="0"
@@ -171,7 +171,7 @@
                         Visibility="{Binding IsCancelClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                         Command="{Binding CancelClearMetadataCommand}"
                         Width="120"
-                        Margin="0 10"/>
+                        Margin="0 10" />
                     <Button
                         Grid.Column="1"
                         Style="{StaticResource InteractionButton}"
@@ -179,7 +179,7 @@
                         Width="120"
                         IsEnabled="False"
                         Margin="0 10"
-                        ToolTip="Scan all of your folders set up above."/>
+                        ToolTip="Scan all of your folders set up above." />
 
                 </Grid>
 
@@ -190,7 +190,7 @@
                     Style="{StaticResource InteractionButton}"
                     Content="Done"
                     Width="120"
-                    Click="CloseButton_Click"/>
+                    Click="CloseButton_Click" />
 
             </Grid>
 

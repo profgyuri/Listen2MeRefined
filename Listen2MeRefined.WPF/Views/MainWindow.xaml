@@ -6,108 +6,107 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
-        xmlns:local="clr-namespace:Listen2MeRefined.WPF"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"
         WindowStartupLocation="Manual"
-		Title="Listen2Me"
-		MinHeight="302" MinWidth="800"
+        Title="Listen2Me"
+        MinHeight="302" MinWidth="800"
         MaxHeight="702" MaxWidth="1030">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome 
-			x:Name="WindowChrome"
-			CaptionHeight="32"/>
+        <WindowChrome
+            x:Name="WindowChrome"
+            CaptionHeight="32" />
     </WindowChrome.WindowChrome>
 
     <Border
         BorderThickness="2"
-		BorderBrush="{StaticResource ThirnaryBrush}"
-		Background="{StaticResource PrimaryBrush}"
-		CornerRadius="8">
+        BorderBrush="{StaticResource ThirnaryBrush}"
+        Background="{StaticResource PrimaryBrush}"
+        CornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <!--Title bar -->
             <Grid
-				VerticalAlignment="Center">
+                VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
-                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
-                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
-                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}" />
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}" />
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}" />
+                    <ColumnDefinition Width="{Binding ElementName=MinimizeWindow, Path=Width}" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
-					Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
-					HorizontalAlignment="Center"
-					VerticalAlignment="Center"
-					Grid.ColumnSpan="4"
-                    FontWeight="Bold"/>
+                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Grid.ColumnSpan="4"
+                    FontWeight="Bold" />
 
                 <Button
                     x:Name="SettingsWindow"
                     Click="SettingsWindow_Click"
-					Grid.Column="1"
-					Style="{StaticResource TitleBarButton}"
-					Content="{materialDesign:PackIcon Kind=Gear,Size=15}"/>
+                    Grid.Column="1"
+                    Style="{StaticResource TitleBarButton}"
+                    Content="{materialDesign:PackIcon Kind=Gear,Size=15}" />
                 <Button
-					x:Name="MinimizeWindow"
+                    x:Name="MinimizeWindow"
                     Click="MinimizeWindow_Click"
-					Grid.Column="2"
-					Padding="0 0 0 5"
-					Style="{StaticResource TitleBarButton}"
-					Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
-					VerticalContentAlignment="Bottom"/>
+                    Grid.Column="2"
+                    Padding="0 0 0 5"
+                    Style="{StaticResource TitleBarButton}"
+                    Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
+                    VerticalContentAlignment="Bottom" />
                 <Button
                     x:Name="MaximizeWindow"
                     Click="MaximizeWindow_Click"
-					Grid.Column="3"
-					Style="{StaticResource TitleBarButton}"
-					Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}"/>
+                    Grid.Column="3"
+                    Style="{StaticResource TitleBarButton}"
+                    Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}" />
                 <Button
                     x:Name="CloseWindow"
                     Click="CloseWindow_Click"
-					Grid.Column="4"
-					Content="{materialDesign:PackIcon Kind=Close,Size=15}"
+                    Grid.Column="4"
+                    Content="{materialDesign:PackIcon Kind=Close,Size=15}"
                     Style="{StaticResource WindowCloseButton}"
-                    materialDesign:ButtonAssist.CornerRadius="0 8 0 0"/>
+                    materialDesign:ButtonAssist.CornerRadius="0 8 0 0" />
             </Grid>
-            
+
             <!--Content -->
             <Grid
                 Grid.Row="1"
                 Margin="10">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*" MinHeight="150"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" MinHeight="150" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Player controls -->
                 <Grid
                     Grid.ColumnSpan="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" MinWidth="280"/>
-                        <ColumnDefinition Width="Auto" MinWidth="100"/>
-                        <ColumnDefinition Width="Auto" MinWidth="100"/>
-                        <ColumnDefinition Width="Auto" MinWidth="100"/>
-                        <ColumnDefinition Width="Auto" MinWidth="100"/>
-                        <ColumnDefinition Width="Auto" MinWidth="100"/>
+                        <ColumnDefinition Width="*" MinWidth="280" />
+                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                        <ColumnDefinition Width="Auto" MinWidth="100" />
                     </Grid.ColumnDefinitions>
 
                     <Border
@@ -119,13 +118,13 @@
                         ToolTip="Currently Playing">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <TextBlock
@@ -133,20 +132,20 @@
                                 Margin="0 0 0 10"
                                 HorizontalAlignment="Center"
                                 FontWeight="Bold"
-                                Text="{Binding SelectedSong.Display, FallbackValue=Display Name}"/>
+                                Text="{Binding SelectedSong.Display, FallbackValue=Display Name}" />
                             <TextBlock
                                 Grid.Row="1"
-                                Text="{Binding SelectedSong.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}"/>
+                                Text="{Binding SelectedSong.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="1"
                                 Margin="10 0"
                                 HorizontalAlignment="Center"
-                                Text="{Binding SelectedSong.Genre, FallbackValue=Genre}"/>
+                                Text="{Binding SelectedSong.Genre, FallbackValue=Genre}" />
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="2"
-                                Text="{Binding SelectedSong.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}"/>
+                                Text="{Binding SelectedSong.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
 
                         </Grid>
                     </Border>
@@ -155,28 +154,28 @@
                         Grid.Column="1"
                         Command="{Binding PreviousCommand}"
                         Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
+                        Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}" />
                     <Button
                         Grid.Column="2"
                         Command="{Binding StopCommand}"
                         Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=Stop,Size=20}"/>
+                        Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
                     <Button
                         Grid.Column="3"
                         Command="{Binding PlayPauseCommand}"
                         Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}"/>
+                        Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
                     <Button
                         Grid.Column="4"
                         Command="{Binding NextCommand}"
                         Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}"/>
+                        Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
                     <Button
                         Grid.Column="5"
                         Command="{Binding ShuffleCommand}"
                         Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"/>
-                    <Slider 
+                        Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
+                    <Slider
                         Style="{DynamicResource NoHaloSlider}"
                         Foreground="{StaticResource ThirnaryBrush}"
                         materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
@@ -188,7 +187,7 @@
                         Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
                         Value="{Binding CurrentTime}"
                         Grid.ColumnSpan="5"
-                        MinWidth="470"/>
+                        MinWidth="470" />
 
                 </Grid>
 
@@ -200,7 +199,7 @@
                     dd:DragDrop.IsDropTarget="True"
                     ItemsSource="{Binding SearchResults}"
                     Style="{StaticResource SongsListView}"
-                    Grid.Row="1"/>
+                    Grid.Row="1" />
 
                 <!-- Playlist -->
                 <ListView
@@ -225,9 +224,9 @@
                     Grid.ColumnSpan="2"
                     Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <TextBox
@@ -235,7 +234,7 @@
                         materialDesign:HintAssist.Hint="Search For:"
                         materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource SecondaryBrush}">
                         <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}"/>
+                            <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
                         </TextBox.InputBindings>
                     </TextBox>
                     <Button
@@ -244,7 +243,7 @@
                         Command="{Binding QuickSearchCommand}"
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=Search,Size=20}"
-                        ToolTip="Quick Search"/>
+                        ToolTip="Quick Search" />
                     <Button
                         x:Name="AdvancedSearchWindow"
                         Grid.Column="2"
@@ -252,7 +251,7 @@
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=BookOpenOutline}"
                         ToolTip="Advanced Search"
-                        Click="AdvancedSearchWindow_Click"/>
+                        Click="AdvancedSearchWindow_Click" />
 
                 </Grid>
 

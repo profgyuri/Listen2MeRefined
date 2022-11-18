@@ -3,7 +3,7 @@
 public interface IFolderBrowser
 {
     /// <summary>
-    ///     Returns every subfolder in <paramref name="path"/>.
+    ///     Returns every subfolder in <paramref name="path" />.
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>

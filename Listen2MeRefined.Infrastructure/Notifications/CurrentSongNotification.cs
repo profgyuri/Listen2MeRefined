@@ -11,7 +11,7 @@ public sealed class CurrentSongNotification : INotification
     ///     The current song.
     /// </summary>
     public AudioModel Audio { get; }
-    
+
     /// <param name="audio">The current song. </param>
     public CurrentSongNotification(AudioModel audio)
     {

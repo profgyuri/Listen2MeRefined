@@ -1,6 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Dapper;
+﻿using Dapper.Contrib.Extensions;
 
-using global::Dapper.Contrib.Extensions;
+namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
 public class DapperUpdater : IDataUpdater
 {
@@ -11,22 +11,26 @@ public class DapperUpdater : IDataUpdater
         _connection = connection;
     }
 
-    public void Update<T>(T data) where T : Model
+    public void Update<T>(T data)
+        where T : Model
     {
         _connection.Update(data);
     }
 
-    public void Update<T>(IEnumerable<T> list) where T : Model
+    public void Update<T>(IEnumerable<T> list)
+        where T : Model
     {
         _connection.Update(list);
     }
 
-    public async Task UpdateAsync<T>(T data) where T : Model
+    public async Task UpdateAsync<T>(T data)
+        where T : Model
     {
         await _connection.UpdateAsync(data);
     }
 
-    public async Task UpdateAsync<T>(IEnumerable<T> list) where T : Model
+    public async Task UpdateAsync<T>(IEnumerable<T> list)
+        where T : Model
     {
         await _connection.UpdateAsync(list);
     }

@@ -8,9 +8,9 @@ using Source.Storage;
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
-public partial class MainWindowViewModel : 
-    INotificationHandler<CurrentSongNotification>,
-    INotificationHandler<FontFamilyChangedNotification>
+public partial class MainWindowViewModel
+    : INotificationHandler<CurrentSongNotification>,
+        INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
@@ -24,19 +24,24 @@ public partial class MainWindowViewModel :
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
-    
+
     public double CurrentTime
     {
         get => _mediaController.CurrentTime;
-        set  
+        set
         {
             _mediaController.CurrentTime = value;
             OnPropertyChanged();
         }
     }
 
-    public MainWindowViewModel(IMediaController mediaController, ILogger logger, IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository, TimedTask timedTask, ISettingsManager<AppSettings> settingsManager,
+    public MainWindowViewModel(
+        IMediaController mediaController,
+        ILogger logger,
+        IPlaylistReference playlistReference,
+        IRepository<AudioModel> audioRepository,
+        TimedTask timedTask,
+        ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook)
     {
         _mediaController = mediaController;
@@ -48,15 +53,37 @@ public partial class MainWindowViewModel :
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(
-            TimeSpan.FromMilliseconds(500), 
+            TimeSpan.FromMilliseconds(500),
             () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
     }
-    
+
     ~MainWindowViewModel()
     {
         _globalHook.Unregister();
     }
+
+    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
+    /// <inheritdoc />
+    Task INotificationHandler<FontFamilyChangedNotification>.Handle(
+        FontFamilyChangedNotification notification,
+        CancellationToken cancellationToken)
+    {
+        FontFamily = notification.FontFamily;
+        return Task.CompletedTask;
+    }
+    #endregion
+
+    #region Implementation of INotificationHandler<in CurrentSongNotification>
+    /// <inheritdoc />
+    Task INotificationHandler<CurrentSongNotification>.Handle(
+        CurrentSongNotification notification,
+        CancellationToken cancellationToken)
+    {
+        SelectedSong = notification.Audio;
+        return Task.CompletedTask;
+    }
+    #endregion
 
     #region Commands
     [RelayCommand]
@@ -79,7 +106,7 @@ public partial class MainWindowViewModel :
             _mediaController.JumpToIndex(_selectedIndex);
         }
     }
-    
+
     [RelayCommand]
     public void PlayPause()
     {
@@ -108,24 +135,6 @@ public partial class MainWindowViewModel :
     public void Shuffle()
     {
         _mediaController.Shuffle();
-    }
-    #endregion
-
-    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
-    /// <inheritdoc />
-    Task INotificationHandler<FontFamilyChangedNotification>.Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
-    {
-        FontFamily = notification.FontFamily;
-        return Task.CompletedTask;
-    }
-    #endregion
-    
-    #region Implementation of INotificationHandler<in CurrentSongNotification>
-    /// <inheritdoc />
-    Task INotificationHandler<CurrentSongNotification>.Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        SelectedSong = notification.Audio;
-        return Task.CompletedTask;
     }
     #endregion
 }
