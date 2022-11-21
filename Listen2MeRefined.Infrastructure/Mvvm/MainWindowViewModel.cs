@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Source;
 using Source.Storage;
 
@@ -42,13 +44,16 @@ public partial class MainWindowViewModel
         TimedTask timedTask,
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
-        IFolderScanner folderScanner)
+        IFolderScanner folderScanner,
+        DataContext dataContext)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
         _globalHook = globalHook;
         _fontFamily = settingsManager.Settings.FontFamily;
+        
+        dataContext.Database.Migrate();
 
         Task.Run(async () => await folderScanner.ScanAllAsync()).ConfigureAwait(false);
 
