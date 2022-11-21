@@ -11,7 +11,7 @@ public sealed class DataContext : DbContext
 
     public DataContext()
     {
-        Database.EnsureCreated();
+        Database.Migrate();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
