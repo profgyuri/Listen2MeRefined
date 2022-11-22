@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Listen2MeRefined.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221121195341_ScanOnStartupOption")]
-    partial class ScanOnStartupOption
+    [Migration("20221122020058_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

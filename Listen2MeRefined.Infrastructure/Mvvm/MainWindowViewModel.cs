@@ -51,11 +51,15 @@ public partial class MainWindowViewModel
         _logger = logger;
         _audioRepository = audioRepository;
         _globalHook = globalHook;
-        _fontFamily = settingsManager.Settings.FontFamily;
-        
+
         dataContext.Database.Migrate();
 
-        Task.Run(async () => await folderScanner.ScanAllAsync()).ConfigureAwait(false);
+        if (settingsManager.Settings.ScanOnStartup)
+        {
+            Task.Run(async () => await folderScanner.ScanAllAsync()).ConfigureAwait(false);
+        }
+
+        _fontFamily = settingsManager.Settings.FontFamily;
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(

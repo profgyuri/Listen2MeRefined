@@ -29,6 +29,16 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
+    
+    public bool ScanOnStartup
+    {
+        get => _settingsManager.Settings.ScanOnStartup;
+        set
+        {
+            _settingsManager.SaveSettings(s => s.ScanOnStartup = value);
+            OnPropertyChanged();
+        }
+    }
 
     public SettingsWindowViewModel(
         ILogger logger,
@@ -54,6 +64,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         _folders = new(settings.MusicFolders.Select(x => x.FullPath));
         _fontFamily = settings.FontFamily;
         _selectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
+        ScanOnStartup = settings.ScanOnStartup;
     }
 
     partial void OnSelectedFontFamilyChanged(string value)

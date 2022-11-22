@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Listen2MeRefined.Infrastructure.Migrations
 {
+    /// <inheritdoc />
     public partial class Initial : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -28,7 +30,8 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FontFamily = table.Column<string>(type: "TEXT", nullable: false)
+                    FontFamily = table.Column<string>(type: "TEXT", nullable: false),
+                    ScanOnStartup = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,6 +93,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                 column: "PlaylistModelId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
