@@ -9,11 +9,6 @@ public sealed class DataContext : DbContext
     public DbSet<AppSettings> Settings { get; set; }
     public DbSet<MusicFolderModel> MusicFolders { get; set; }
 
-    public DataContext()
-    {
-        Database.EnsureCreated();
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);

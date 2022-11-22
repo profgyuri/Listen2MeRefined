@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Source;
 using Source.Storage;
 
@@ -15,7 +17,6 @@ public partial class MainWindowViewModel
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
-    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IGlobalHook _globalHook;
 
     [ObservableProperty] private string _fontFamily;
@@ -42,14 +43,23 @@ public partial class MainWindowViewModel
         IRepository<AudioModel> audioRepository,
         TimedTask timedTask,
         ISettingsManager<AppSettings> settingsManager,
-        IGlobalHook globalHook)
+        IGlobalHook globalHook,
+        IFolderScanner folderScanner,
+        DataContext dataContext)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
-        _settingsManager = settingsManager;
         _globalHook = globalHook;
-        _fontFamily = _settingsManager.Settings.FontFamily;
+
+        dataContext.Database.Migrate();
+
+        if (settingsManager.Settings.ScanOnStartup)
+        {
+            Task.Run(async () => await folderScanner.ScanAllAsync()).ConfigureAwait(false);
+        }
+
+        _fontFamily = settingsManager.Settings.FontFamily;
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(

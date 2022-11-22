@@ -8,6 +8,7 @@ using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Media;
+using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.WPF.Views;
 using MediatR;
@@ -161,6 +162,11 @@ internal static class IocContainer
 
         builder
             .Register(_ => new FontFamilies(Fonts.SystemFontFamilies.Select(f => f.Source)))
+            .SingleInstance();
+
+        builder
+            .RegisterType<FolderScannerService>()
+            .As<IFolderScanner>()
             .SingleInstance();
 
         return _container = builder.Build();
