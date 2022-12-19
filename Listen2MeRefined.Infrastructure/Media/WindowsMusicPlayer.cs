@@ -156,6 +156,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
             _logger.Warning("File was not found at: {Path} - Trying to remove entry from database...",
                 _currentSong.Path);
             _audioRepository.Delete(_currentSong);
+            Next();
         }
         catch (Exception ex)
         {
@@ -194,21 +195,39 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 
     private void CurrentTimeCheck()
     {
-        if (_fileReader is null
-            || _playbackState is not PlaybackState.Playing)
+        if (ShouldSkipTimeCheck())
         {
             return;
         }
 
-        if (Math.Abs(_fileReader.CurrentTime.TotalMilliseconds - _previousTimeStamp) < 0.1
-            && _previousTimeStamp >= TimeCheckInterval
-            && _unpausedFor > TimeCheckInterval)
+        if (ShouldSkipToNext())
         {
             Next();
         }
 
-        _previousTimeStamp = _fileReader.CurrentTime.TotalMilliseconds;
+        _previousTimeStamp = _fileReader!.CurrentTime.TotalMilliseconds;
         _unpausedFor += TimeCheckInterval;
+    }
+
+    /// <summary>
+    /// Checks if any song is being played currently.
+    /// </summary>
+    /// <returns>True if a song is being played, false otherwise.</returns>
+    private bool ShouldSkipTimeCheck()
+    {
+        return _fileReader is null || _playbackState is not PlaybackState.Playing;
+    }
+
+    /// <summary>
+    /// Determines if the remainder of the current song should be skipped.
+    /// </summary>
+    /// <returns>True if the song reached it's end, false otherwise.</returns>
+    private bool ShouldSkipToNext()
+    {
+        return Math.Abs(_fileReader!.CurrentTime.TotalMilliseconds - _previousTimeStamp) < 0.1
+               && _previousTimeStamp >= TimeCheckInterval
+               && _unpausedFor > TimeCheckInterval
+               && _fileReader.CurrentTime.TotalMilliseconds > _fileReader.TotalTime.TotalMilliseconds - 1000;
     }
 
     private void StartPlayback()
