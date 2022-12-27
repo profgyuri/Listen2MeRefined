@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Autofac;
+using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Views;
 
 namespace Listen2MeRefined.WPF;
@@ -19,7 +20,7 @@ internal static class WindowManager
     internal static bool? ShowWindow<T>(bool isModal = true)
         where T : Window
     {
-        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
+        using var scope = AutofacContainer.Container.BeginLifetimeScope();
         var window = scope.Resolve<T>();
 
         if (isModal)
@@ -46,7 +47,7 @@ internal static class WindowManager
         bool isModal = true)
         where T : Window
     {
-        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
+        using var scope = AutofacContainer.Container.BeginLifetimeScope();
         var window = scope.Resolve<T>();
 
         window.Left = left - window.Width / 2;
@@ -72,7 +73,7 @@ internal static class WindowManager
         int x,
         int y)
     {
-        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
+        using var scope = AutofacContainer.Container.BeginLifetimeScope();
         var window = scope.Resolve<NewSongWindow>();
 
         if (x <= TriggerNotificationWindowAreaSize)
