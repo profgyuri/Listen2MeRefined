@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -23,7 +24,7 @@
 
     <Border
         BorderThickness="2"
-        BorderBrush="{StaticResource ThirnaryBrush}"
+        BorderBrush="{StaticResource ThertiaryBrush}"
         Background="{StaticResource PrimaryBrush}"
         CornerRadius="8">
         <Grid>
@@ -50,13 +51,13 @@
                     Grid.ColumnSpan="4"
                     FontWeight="Bold" />
 
-                <Button
+                <wpf:CustomButton
                     x:Name="SettingsWindow"
                     Click="SettingsWindow_Click"
                     Grid.Column="1"
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=Gear,Size=15}" />
-                <Button
+                <wpf:CustomButton
                     x:Name="MinimizeWindow"
                     Click="MinimizeWindow_Click"
                     Grid.Column="2"
@@ -64,13 +65,13 @@
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
                     VerticalContentAlignment="Bottom" />
-                <Button
+                <wpf:CustomButton
                     x:Name="MaximizeWindow"
                     Click="MaximizeWindow_Click"
                     Grid.Column="3"
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}" />
-                <Button
+                <wpf:CustomButton
                     x:Name="CloseWindow"
                     Click="CloseWindow_Click"
                     Grid.Column="4"
@@ -150,34 +151,34 @@
                         </Grid>
                     </Border>
 
-                    <Button
+                    <wpf:CustomButton
                         Grid.Column="1"
                         Command="{Binding PreviousCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}" />
-                    <Button
+                    <wpf:CustomButton
                         Grid.Column="2"
                         Command="{Binding StopCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
-                    <Button
+                    <wpf:CustomButton
                         Grid.Column="3"
                         Command="{Binding PlayPauseCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
-                    <Button
+                    <wpf:CustomButton
                         Grid.Column="4"
                         Command="{Binding NextCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
-                    <Button
+                    <wpf:CustomButton
                         Grid.Column="5"
                         Command="{Binding ShuffleCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
                     <Slider
                         Style="{DynamicResource NoHaloSlider}"
-                        Foreground="{StaticResource ThirnaryBrush}"
+                        Foreground="{StaticResource ThertiaryBrush}"
                         materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
                         Grid.Row="1"
                         Grid.Column="1"
@@ -237,14 +238,14 @@
                             <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
                         </TextBox.InputBindings>
                     </TextBox>
-                    <Button
+                    <wpf:CustomButton
                         Grid.Column="1"
                         Margin="20 0 0 0"
                         Command="{Binding QuickSearchCommand}"
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=Search,Size=20}"
                         ToolTip="Quick Search" />
-                    <Button
+                    <wpf:CustomButton
                         x:Name="AdvancedSearchWindow"
                         Grid.Column="2"
                         Margin="20 0 0 0"

@@ -8,8 +8,8 @@
     <Color x:Key="ThirnaryDarkColor">#505328</Color>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}" />
-    <SolidColorBrush x:Key="ThirnaryBrush" Color="{StaticResource ThirnaryColor}" />
-    <SolidColorBrush x:Key="ThirnaryMidBrush" Color="{StaticResource ThirnaryMidColor}" />
-    <SolidColorBrush x:Key="ThirnaryDarkBrush" Color="{StaticResource ThirnaryDarkColor}" />
+    <SolidColorBrush x:Key="ThertiaryBrush" Color="{StaticResource ThirnaryColor}" />
+    <SolidColorBrush x:Key="ThertiaryMidBrush" Color="{StaticResource ThirnaryMidColor}" />
+    <SolidColorBrush x:Key="ThertiaryDarkBrush" Color="{StaticResource ThirnaryDarkColor}" />
     <SolidColorBrush x:Key="HoloBackground" Color="{StaticResource PrimaryColor}" Opacity=".9" />
 </ResourceDictionary>

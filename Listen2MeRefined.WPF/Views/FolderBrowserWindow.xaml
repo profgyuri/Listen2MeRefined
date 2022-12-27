@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:FolderBrowserViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -20,7 +21,7 @@
 
     <Border
         BorderThickness="2"
-        BorderBrush="{StaticResource ThirnaryBrush}"
+        BorderBrush="{StaticResource ThertiaryBrush}"
         Background="{StaticResource PrimaryBrush}"
         CornerRadius="8">
 
@@ -80,7 +81,7 @@
                     <ColumnDefinition Width="125" />
                 </Grid.ColumnDefinitions>
 
-                <Button
+                <wpf:CustomButton
                     Content="Select"
                     Command="{Binding HandleSelectedPathCommand}"
                     Style="{StaticResource InteractionButton}"
@@ -93,8 +94,8 @@
                                 TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </Button>
-                <Button
+                </wpf:CustomButton>
+                <wpf:CustomButton
                     x:Name="CancelButton"
                     Grid.Column="2"
                     Content="_Cancel"

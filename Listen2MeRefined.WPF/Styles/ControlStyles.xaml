@@ -115,41 +115,62 @@
     </Style>
 
     <!--#region  Buttons-->
-    <Style TargetType="Button" x:Key="InteractionButton" BasedOn="{StaticResource {x:Type Button}}">
+    <Style TargetType="resources:CustomButton" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="resources:CustomButton">
+                    <Border 
+                        x:Name="border"
+                        CornerRadius="{TemplateBinding BorderRadius}" 
+                        Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}" 
+                        Padding="{TemplateBinding Padding}">
+                        <ContentPresenter 
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                            RecognizesAccessKey="True" 
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                            Content="{TemplateBinding Content}" 
+                            ContentTemplate="{TemplateBinding ContentTemplate}" 
+                            ContentStringFormat="{TemplateBinding ContentStringFormat}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{Binding MouseOverBackground, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{Binding PressedBackground, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="resources:CustomButton" x:Key="InteractionButton" BasedOn="{StaticResource {x:Type resources:CustomButton}}">
         <Setter Property="Height" Value="31" />
         <Setter Property="Width" Value="31" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{StaticResource ThirnaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThirnaryBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource ThertiaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ThertiaryBrush}" />
         <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource ThirnaryMidBrush}" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{StaticResource ThirnaryDarkBrush}" />
-            </Trigger>
-        </Style.Triggers>
+        <Setter Property="MouseOverBackground" Value="{StaticResource ThertiaryMidBrush}"/>
+        <Setter Property="PressedBackground" Value="{StaticResource ThertiaryDarkBrush}"/>
     </Style>
-    <Style TargetType="Button" x:Key="TitleBarButton" BasedOn="{StaticResource InteractionButton}">
+    <Style TargetType="resources:CustomButton" x:Key="TitleBarButton" BasedOn="{StaticResource InteractionButton}">
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Margin" Value="0 1 0 0" />
     </Style>
-    <Style TargetType="Button" x:Key="WindowCloseButton" BasedOn="{StaticResource TitleBarButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#970000" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#6f0000" />
-            </Trigger>
-        </Style.Triggers>
+    <Style TargetType="resources:CustomButton" x:Key="WindowCloseButton" BasedOn="{StaticResource TitleBarButton}">
+        <Setter Property="MouseOverBackground" Value="#970000"/>
+        <Setter Property="PressedBackground" Value="#6f0000"/>
+        <Setter Property="BorderRadius" Value="0 7 0 0"/>
     </Style>
-    <Style TargetType="Button" x:Key="PlayerButton" BasedOn="{StaticResource InteractionButton}">
+    <Style TargetType="resources:CustomButton" x:Key="PlayerButton" BasedOn="{StaticResource InteractionButton}">
         <Setter Property="Width" Value="40" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>

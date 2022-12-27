@@ -19,7 +19,7 @@
 
     <Border
         BorderThickness="2"
-        BorderBrush="{StaticResource ThirnaryBrush}"
+        BorderBrush="{StaticResource ThertiaryBrush}"
         Background="{StaticResource PrimaryBrush}"
         CornerRadius="8">
 

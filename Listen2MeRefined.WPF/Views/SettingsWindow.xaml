@@ -28,7 +28,7 @@
 
     <Border
         BorderThickness="2"
-        BorderBrush="{StaticResource ThirnaryBrush}"
+        BorderBrush="{StaticResource ThertiaryBrush}"
         Background="{StaticResource PrimaryBrush}"
         CornerRadius="8">
 
@@ -49,7 +49,7 @@
                 Grid.Row="1"
                 VerticalScrollBarVisibility="Visible">
                 <Grid
-                Margin="10">
+                    Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -63,10 +63,10 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock
-                    Text="Local folders: " />
+                        Text="Local folders: " />
                     <Grid
-                    Grid.Column="1"
-                    Margin="0 0 0 15">
+                        Grid.Column="1"
+                        Margin="0 0 0 15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -77,14 +77,14 @@
                         </Grid.ColumnDefinitions>
 
                         <ListView
-                        Grid.RowSpan="2"
-                        Style="{StaticResource VirtualizedListView}"
-                        Height="84"
-                        Margin="0 0 10 0"
-                        ItemsSource="{Binding Folders}"
-                        SelectedItem="{Binding SelectedFolder}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            Grid.RowSpan="2"
+                            Style="{StaticResource VirtualizedListView}"
+                            Height="84"
+                            Margin="0 0 10 0"
+                            ItemsSource="{Binding Folders}"
+                            SelectedItem="{Binding SelectedFolder}"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -100,88 +100,88 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <Button
-                        x:Name="OpenFolderBrowser"
-                        Style="{StaticResource InteractionButton}"
-                        Click="OpenFolderBrowser_Click"
-                        Grid.Column="1"
-                        Content="{materialDesign:PackIcon Kind=FolderAddOutline}"
-                        ToolTip="Browse"
-                        Margin="0 0 0 10" />
-                        <Button
-                        x:Name="RemoveFolder"
-                        Style="{StaticResource InteractionButton}"
-                        Command="{Binding RemoveFolderCommand}"
-                        IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
-                        Grid.Column="1"
-                        Grid.Row="1"
-                        Content="{materialDesign:PackIcon Kind=FolderRemoveOutline}"
-                        ToolTip="Remove Selected" />
+                        <local:CustomButton
+                            x:Name="OpenFolderBrowser"
+                            Style="{StaticResource InteractionButton}"
+                            Click="OpenFolderBrowser_Click"
+                            Grid.Column="1"
+                            Content="{materialDesign:PackIcon Kind=FolderAddOutline}"
+                            ToolTip="Browse"
+                            Margin="0 0 0 10" />
+                        <local:CustomButton
+                            x:Name="RemoveFolder"
+                            Style="{StaticResource InteractionButton}"
+                            Command="{Binding RemoveFolderCommand}"
+                            IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            Content="{materialDesign:PackIcon Kind=FolderRemoveOutline}"
+                            ToolTip="Remove Selected" />
                     </Grid>
 
                     <TextBlock
-                    Grid.Row="1"
-                    Text="Font settings:"
-                    VerticalAlignment="Center" />
+                        Grid.Row="1"
+                        Text="Font settings:"
+                        VerticalAlignment="Center" />
                     <ComboBox
-                    x:Name="FontFamily"
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Style="{StaticResource CustomComboBox}"
-                    materialDesign:HintAssist.Hint="FontFamily"
-                    materialDesign:HintAssist.FontFamily="{Binding SelectedFontFamily}"
-                    Foreground="{StaticResource SecondaryBrush}"
-                    BorderBrush="{StaticResource ThirnaryBrush}"
-                    SelectedItem="{Binding SelectedFontFamily}"
-                    ItemsSource="{Binding FontFamilies}">
+                        x:Name="FontFamily"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource CustomComboBox}"
+                        materialDesign:HintAssist.Hint="FontFamily"
+                        materialDesign:HintAssist.FontFamily="{Binding SelectedFontFamily}"
+                        Foreground="{StaticResource SecondaryBrush}"
+                        BorderBrush="{StaticResource ThertiaryBrush}"
+                        SelectedItem="{Binding SelectedFontFamily}"
+                        ItemsSource="{Binding FontFamilies}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock
-                                Text="{Binding}"
-                                FontFamily="{Binding}" />
+                                    Text="{Binding}"
+                                    FontFamily="{Binding}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
                     <TextBlock
-                    Grid.Row="2"
-                    Text="Metadata actions:"
-                    Margin="0 10"
-                    VerticalAlignment="Center" />
+                        Grid.Row="2"
+                        Text="Metadata actions:"
+                        Margin="0 10"
+                        VerticalAlignment="Center" />
                     <Grid
-                    Grid.Row="2"
-                    Grid.Column="1">
+                        Grid.Row="2"
+                        Grid.Column="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button
-                        x:Name="ClearMetadataButton"
-                        Style="{StaticResource InteractionButton}"
-                        Content="Clear Metadata"
-                        Command="{Binding ClearMetadataCommand}"
-                        Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                        Width="120"
-                        Margin="0 10"
-                        ToolTip="Clears all metadata stored in the local database file." />
-                        <Button
-                        x:Name="CanclerClearMetadataButton"
-                        Grid.Column="0"
-                        Style="{StaticResource InteractionButton}"
-                        Content="{Binding CancelClearMetadataButtonContent}"
-                        Visibility="{Binding IsCancelClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                        Command="{Binding CancelClearMetadataCommand}"
-                        Width="120"
-                        Margin="0 10" />
-                        <Button
-                        Grid.Column="1"
-                        Style="{StaticResource InteractionButton}"
-                        Content="Rescan Now"
-                        Command="{Binding ForceScanCommand}"
-                        Width="120"
-                        Margin="0 10"
-                        ToolTip="Scan all of your folders set up above." />
+                        <local:CustomButton
+                            x:Name="ClearMetadataButton"
+                            Style="{StaticResource InteractionButton}"
+                            Content="Clear Metadata"
+                            Command="{Binding ClearMetadataCommand}"
+                            Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Width="120"
+                            Margin="0 10"
+                            ToolTip="Clears all metadata stored in the local database file." />
+                        <local:CustomButton
+                            x:Name="CanclerClearMetadataButton"
+                            Grid.Column="0"
+                            Style="{StaticResource InteractionButton}"
+                            Content="{Binding CancelClearMetadataButtonContent}"
+                            Visibility="{Binding IsCancelClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                            Command="{Binding CancelClearMetadataCommand}"
+                            Width="120"
+                            Margin="0 10" />
+                        <local:CustomButton
+                            Grid.Column="1"
+                            Style="{StaticResource InteractionButton}"
+                            Content="Rescan Now"
+                            Command="{Binding ForceScanCommand}"
+                            Width="120"
+                            Margin="0 10"
+                            ToolTip="Scan all of your folders set up above." />
 
                     </Grid>
 
@@ -193,14 +193,14 @@
                     Grid.Row="3"
                     Grid.Column="1"
                     HorizontalAlignment="Left"
-                    Background="{StaticResource ThirnaryBrush}"
+                    Background="{StaticResource ThertiaryBrush}"
                     materialDesign:RippleAssist.IsDisabled="True"
                     IsChecked="{Binding ScanOnStartup}"/>
 
                 </Grid>
             </ScrollViewer>
 
-            <Button
+            <local:CustomButton
                 x:Name="CloseButton"
                 Grid.Row="2"
                 Margin="0 15"
