@@ -9,7 +9,7 @@ internal sealed class ViewsModule : Module
     {
         // Register all views via assembly scanning
         builder.RegisterAssemblyTypes(typeof(MainWindow).Assembly)
-            .Where(t => t.Namespace!.StartsWith("Listen2MeRefined.WPF.Views"))
+            .Where(t => t.Name.EndsWith("Window"))
             .AsSelf()
             .SingleInstance();
     }
