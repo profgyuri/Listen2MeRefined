@@ -1,5 +1,4 @@
 using Autofac;
-using Listen2MeRefined.WPF.Views;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 
