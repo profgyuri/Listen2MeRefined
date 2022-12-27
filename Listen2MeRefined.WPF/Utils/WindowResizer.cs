@@ -34,11 +34,11 @@ public class WindowResizer
 
     [DllImport("user32.dll")]
     private static extern bool GetMonitorInfo(
-        IntPtr hMonitor,
+        nint hMonitor,
         MonitorInfo lpmi);
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr MonitorFromPoint(
+    private static extern nint MonitorFromPoint(
         Point pt,
         MonitorOptions dwFlags);
 
@@ -68,11 +68,11 @@ public class WindowResizer
     /// <param name="lParam"></param>
     /// <param name="handled"></param>
     /// <returns></returns>
-    private static IntPtr WindowProc(
-        IntPtr hwnd,
+    private static nint WindowProc(
+        nint hwnd,
         int msg,
-        IntPtr wParam,
-        IntPtr lParam,
+        nint wParam,
+        nint lParam,
         ref bool handled)
     {
         switch (msg)
@@ -84,7 +84,7 @@ public class WindowResizer
                 break;
         }
 
-        return (IntPtr) 0;
+        return 0;
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class WindowResizer
     ///     Correctly accounting for the taskbar size and position
     /// </summary>
     /// <param name="lParam"></param>
-    private static void WmGetMinMaxInfo(IntPtr lParam)
+    private static void WmGetMinMaxInfo(nint lParam)
     {
         GetCursorPos(out var lMousePosition);
 

@@ -64,9 +64,9 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
         MouseEventArgs e)
     {
         var shouldShowNewWindow = (e.X <= TriggerNotificationWindowAreaSize ||
-                                   e.X >= Screen.PrimaryScreen.Bounds.Width - TriggerNotificationWindowAreaSize)
+                                   e.X >= Screen.PrimaryScreen!.Bounds.Width - TriggerNotificationWindowAreaSize)
                                   && (e.Y <= TriggerNotificationWindowAreaSize || e.Y >=
-                                      Screen.PrimaryScreen.Bounds.Height - TriggerNotificationWindowAreaSize);
+                                      Screen.PrimaryScreen!.Bounds.Height - TriggerNotificationWindowAreaSize);
 
         switch (shouldShowNewWindow)
         {
