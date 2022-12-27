@@ -2,11 +2,12 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net6.0-windows</TargetFramework>
+        <TargetFramework>net7.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <AssemblyName>Listen2Me</AssemblyName>
         <ApplicationIcon>Resources\Listen2Me.ico</ApplicationIcon>
+        <LangVersion>11</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
