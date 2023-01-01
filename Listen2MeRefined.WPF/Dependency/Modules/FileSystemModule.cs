@@ -1,4 +1,5 @@
 using Autofac;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 
@@ -22,7 +23,7 @@ internal sealed class FileSystemModule : Module
             .SingleInstance();
         
         builder
-            .RegisterType<SoundFileAnalyzer>()
-            .As<IFileAnalyzer<AudioModel>>();
+            .RegisterType<MetadataExtractor>()
+            .As<IMetadataExtractor<AudioModel>>();
     }
 }

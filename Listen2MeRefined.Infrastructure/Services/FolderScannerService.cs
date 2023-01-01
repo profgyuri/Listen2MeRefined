@@ -6,20 +6,20 @@ namespace Listen2MeRefined.Infrastructure.Services;
 public sealed class FolderScannerService : IFolderScanner
 {
     private readonly IFileEnumerator _fileEnumerator;
-    private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
+    private readonly IMetadataExtractor<AudioModel> _audioMetadataExtractor;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly ILogger _logger;
 
     public FolderScannerService(
         IFileEnumerator fileEnumerator,
-        IFileAnalyzer<AudioModel> audioFileAnalyzer,
+        IMetadataExtractor<AudioModel> audioMetadataExtractor,
         IRepository<AudioModel> audioRepository,
         ISettingsManager<AppSettings> settingsManager,
         ILogger logger)
     {
         _fileEnumerator = fileEnumerator;
-        _audioFileAnalyzer = audioFileAnalyzer;
+        _audioMetadataExtractor = audioMetadataExtractor;
         _audioRepository = audioRepository;
         _settingsManager = settingsManager;
         _logger = logger;
@@ -46,13 +46,13 @@ public sealed class FolderScannerService : IFolderScanner
             fromDb.RemoveAt(i);
             i--;
             
-            var updated = _audioFileAnalyzer.Analyze(current.Path!);
+            var updated = _audioMetadataExtractor.Extract(current.Path!);
             current.Update(updated);
             
             _audioRepository.UpdateAsync(current);
         }
         
-        var newSongs =  _audioFileAnalyzer.Analyze(files);
+        var newSongs =  _audioMetadataExtractor.Extract(files);
         _audioRepository.Create(newSongs);
         _audioRepository.Delete(fromDb);
     }
@@ -86,13 +86,13 @@ public sealed class FolderScannerService : IFolderScanner
             fromDb.RemoveAt(i);
             i--;
             
-            var updated = await _audioFileAnalyzer.AnalyzeAsync(current.Path!);
+            var updated = await _audioMetadataExtractor.ExtractAsync(current.Path!);
             current.Update(updated);
             
             await _audioRepository.UpdateAsync(current);
         }
         
-        var newSongs = await _audioFileAnalyzer.AnalyzeAsync(files);
+        var newSongs = await _audioMetadataExtractor.ExtractAsync(files);
         await _audioRepository.CreateAsync(newSongs);
         await _audioRepository.DeleteAsync(fromDb);
     }
