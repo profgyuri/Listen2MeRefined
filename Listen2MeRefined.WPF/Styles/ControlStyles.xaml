@@ -4,7 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf">
+    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
+    xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF">
 
     <Style TargetType="Window" x:Key="BasicWindow">
         <Setter Property="Background" Value="Transparent" />
@@ -179,7 +180,7 @@
             </AdornerDecorator>
         </Grid>
     </ControlTemplate>
-    <ControlTemplate x:Key="MaterialDesignSliderHorizontal" TargetType="{x:Type Slider}">
+    <ControlTemplate x:Key="MaterialDesignSliderHorizontal" TargetType="{x:Type resources:WaveSlider}">
         <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" UseLayoutRounding="True">
             <Grid SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
                 <Grid.RowDefinitions>
@@ -190,21 +191,29 @@
                 <TickBar x:Name="TopTick" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,0,0,2" Placement="Top" Visibility="Collapsed" />
                 <TickBar x:Name="BottomTick" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,2,0,0" Placement="Bottom" Visibility="Collapsed" />
 
-                <!-- This rectangle represents the remaining time -->
-                <Rectangle Fill="{TemplateBinding Foreground}" Height="4" Opacity="0.38" RadiusX="2" RadiusY="2" VerticalAlignment="Center" />
-                <!-- This border represents the elapsed time -->
-                <Border x:Name="activeTrack" Background="{TemplateBinding Foreground}" CornerRadius="3,0,0,3" HorizontalAlignment="Left" Height="6" VerticalAlignment="Center"
-                        Width="{Binding DecreaseRepeatButton.ActualWidth, ElementName=PART_Track}" />
-
-                <Canvas Height="6" VerticalAlignment="Center">
-                    <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Height="6" RadiusX="2" RadiusY="2" Visibility="Collapsed" />
+                <skia:SKElement
+                    x:Name="remaining" 
+                    Height="67" 
+                    Opacity=".38" 
+                    VerticalAlignment="Center"
+                    resources:SkiaElementHelper.Bitmap="{TemplateBinding WaveBitmap}"/>
+                <skia:SKElement
+                    x:Name="activeTrack" 
+                    Height="67"
+                    Width="{Binding DecreaseRepeatButton.ActualWidth, ElementName=PART_Track}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    resources:SkiaElementHelper.Bitmap="{TemplateBinding WaveBitmap}"/>
+                
+                <Canvas Height="67" VerticalAlignment="Center">
+                    <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Height="100" Visibility="Collapsed" />
                 </Canvas>
-                <Track x:Name="PART_Track" Height="20">
+                <Track x:Name="PART_Track" Height="67">
                     <Track.DecreaseRepeatButton>
-                        <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
+                        <RepeatButton Command="{x:Static resources:WaveSlider.DecreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
                     </Track.DecreaseRepeatButton>
                     <Track.IncreaseRepeatButton>
-                        <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
+                        <RepeatButton Command="{x:Static resources:WaveSlider.IncreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
                     </Track.IncreaseRepeatButton>
                     <Track.Thumb>
                         <Thumb Foreground="{TemplateBinding Foreground}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Template="{StaticResource MaterialDesignSliderThumb}" />
@@ -213,7 +222,7 @@
             </Grid>
         </Border>
     </ControlTemplate>
-    <Style x:Key="NoHaloSlider" TargetType="{x:Type Slider}">
+    <Style x:Key="NoHaloSlider" TargetType="{x:Type resources:WaveSlider}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Background" Value="{x:Null}" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -222,6 +231,9 @@
         <Setter Property="SnapsToDevicePixels" Value="False" />
         <Setter Property="UseLayoutRounding" Value="False" />
         <Setter Property="Template" Value="{StaticResource MaterialDesignSliderHorizontal}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="20 5 10 5" />
+        <Setter Property="wpf:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
                 <Setter Property="Template" Value="{StaticResource MaterialDesignSliderVertical}" />

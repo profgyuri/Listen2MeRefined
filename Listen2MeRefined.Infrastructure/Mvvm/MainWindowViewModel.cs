@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SkiaSharp;
 using Source;
 using Source.Storage;
 
@@ -25,6 +27,7 @@ public partial class MainWindowViewModel
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
+    [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
 
     public double CurrentTime
     {
@@ -91,6 +94,7 @@ public partial class MainWindowViewModel
         CancellationToken cancellationToken)
     {
         SelectedSong = notification.Audio;
+        WaveForm = new Drawing(100, 707).WaveForm(notification.Audio.Path);
         return Task.CompletedTask;
     }
     #endregion

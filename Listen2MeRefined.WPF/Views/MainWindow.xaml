@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -175,14 +176,12 @@
                         Command="{Binding ShuffleCommand}"
                         Style="{StaticResource PlayerButton}"
                         Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
-                    <Slider
+                    <wpf:WaveSlider
                         Style="{DynamicResource NoHaloSlider}"
                         Foreground="{StaticResource ThirnaryBrush}"
-                        materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging="True"
+                        WaveBitmap="{Binding WaveForm}"
                         Grid.Row="1"
                         Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Margin="20 5 10 5"
                         Minimum="0"
                         Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
                         Value="{Binding CurrentTime}"

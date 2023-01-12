@@ -12,6 +12,7 @@ public sealed class Canvas : IDisposable
     {
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
+        _canvas.Clear(new SKColor(50, 50, 64));
         _paint = new SKPaint{
             Color = SKColors.Orange,
             StrokeWidth = 1
