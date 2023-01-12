@@ -171,14 +171,11 @@
         </Setter>
     </Style>
     <ControlTemplate x:Key="MaterialDesignSliderThumb" TargetType="{x:Type Thumb}">
-        <Grid x:Name="thumbGrid" Height="20" Width="18">
+        <Grid x:Name="thumbGrid" Height="20" Width="0">
             <AdornerDecorator>
                 <AdornerDecorator.CacheMode>
                     <BitmapCache SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                 </AdornerDecorator.CacheMode>
-                <Ellipse x:Name="grip"
-                         Effect="{Binding (wpf:ShadowAssist.ShadowDepth), Converter={x:Static converters:ShadowConverter.Instance}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type RangeBase}}}"
-                         Fill="{TemplateBinding Foreground}" Margin="-1,0" />
             </AdornerDecorator>
         </Grid>
     </ControlTemplate>
@@ -192,9 +189,13 @@
                 </Grid.RowDefinitions>
                 <TickBar x:Name="TopTick" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,0,0,2" Placement="Top" Visibility="Collapsed" />
                 <TickBar x:Name="BottomTick" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,2,0,0" Placement="Bottom" Visibility="Collapsed" />
+
+                <!-- This rectangle represents the remaining time -->
                 <Rectangle Fill="{TemplateBinding Foreground}" Height="4" Opacity="0.38" RadiusX="2" RadiusY="2" VerticalAlignment="Center" />
+                <!-- This border represents the elapsed time -->
                 <Border x:Name="activeTrack" Background="{TemplateBinding Foreground}" CornerRadius="3,0,0,3" HorizontalAlignment="Left" Height="6" VerticalAlignment="Center"
                         Width="{Binding DecreaseRepeatButton.ActualWidth, ElementName=PART_Track}" />
+
                 <Canvas Height="6" VerticalAlignment="Center">
                     <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Height="6" RadiusX="2" RadiusY="2" Visibility="Collapsed" />
                 </Canvas>
@@ -211,74 +212,6 @@
                 </Track>
             </Grid>
         </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="TickPlacement" Value="TopLeft">
-                <Setter Property="Visibility" TargetName="TopTick" Value="Visible" />
-            </Trigger>
-            <Trigger Property="TickPlacement" Value="BottomRight">
-                <Setter Property="Visibility" TargetName="BottomTick" Value="Visible" />
-            </Trigger>
-            <Trigger Property="TickPlacement" Value="Both">
-                <Setter Property="Visibility" TargetName="TopTick" Value="Visible" />
-                <Setter Property="Visibility" TargetName="BottomTick" Value="Visible" />
-            </Trigger>
-            <Trigger Property="IsSelectionRangeEnabled" Value="true">
-                <Setter Property="Visibility" TargetName="PART_SelectionRange" Value="Visible" />
-            </Trigger>
-            <Trigger Property="IsDirectionReversed" Value="True">
-                <Setter Property="CornerRadius" TargetName="activeTrack" Value="0,3,3,0" />
-                <Setter Property="HorizontalAlignment" TargetName="activeTrack" Value="Right" />
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-    <ControlTemplate x:Key="MaterialDesignSliderVertical" TargetType="{x:Type Slider}">
-        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True" UseLayoutRounding="True">
-            <Grid SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition MinWidth="{TemplateBinding MinWidth}" Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TickBar x:Name="TopTick" Fill="{TemplateBinding Foreground}" Margin="0,0,2,0" Placement="Left" Visibility="Collapsed" Width="4" />
-                <TickBar x:Name="BottomTick" Fill="{TemplateBinding Foreground}" Margin="2,0,0,0" Placement="Right" Visibility="Collapsed" Width="4" />
-                <Rectangle Fill="{TemplateBinding Foreground}" HorizontalAlignment="Center" Opacity="0.38" RadiusX="2" RadiusY="2" Width="4" />
-                <Border x:Name="activeTrack" Background="{TemplateBinding Foreground}" CornerRadius="0,0,3,3" HorizontalAlignment="Center" Height="{Binding DecreaseRepeatButton.ActualHeight, ElementName=PART_Track}"
-                        VerticalAlignment="Bottom" Width="6" />
-                <Canvas HorizontalAlignment="Center" Width="6">
-                    <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" RadiusX="2" RadiusY="2" Visibility="Collapsed" Width="6" />
-                </Canvas>
-                <Track x:Name="PART_Track" Width="20">
-                    <Track.DecreaseRepeatButton>
-                        <RepeatButton Command="{x:Static Slider.DecreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
-                    </Track.DecreaseRepeatButton>
-                    <Track.IncreaseRepeatButton>
-                        <RepeatButton Command="{x:Static Slider.IncreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
-                    </Track.IncreaseRepeatButton>
-                    <Track.Thumb>
-                        <Thumb Foreground="{TemplateBinding Foreground}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Template="{StaticResource MaterialDesignSliderThumb}" />
-                    </Track.Thumb>
-                </Track>
-            </Grid>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="TickPlacement" Value="TopLeft">
-                <Setter Property="Visibility" TargetName="TopTick" Value="Visible" />
-            </Trigger>
-            <Trigger Property="TickPlacement" Value="BottomRight">
-                <Setter Property="Visibility" TargetName="BottomTick" Value="Visible" />
-            </Trigger>
-            <Trigger Property="TickPlacement" Value="Both">
-                <Setter Property="Visibility" TargetName="TopTick" Value="Visible" />
-                <Setter Property="Visibility" TargetName="BottomTick" Value="Visible" />
-            </Trigger>
-            <Trigger Property="IsSelectionRangeEnabled" Value="true">
-                <Setter Property="Visibility" TargetName="PART_SelectionRange" Value="Visible" />
-            </Trigger>
-            <Trigger Property="IsDirectionReversed" Value="True">
-                <Setter Property="CornerRadius" TargetName="activeTrack" Value="3,3,0,0" />
-                <Setter Property="VerticalAlignment" TargetName="activeTrack" Value="Top" />
-            </Trigger>
-        </ControlTemplate.Triggers>
     </ControlTemplate>
     <Style x:Key="NoHaloSlider" TargetType="{x:Type Slider}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
