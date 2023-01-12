@@ -41,8 +41,4 @@
         </Reference>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Media\SoundWave" />
-    </ItemGroup>
-
 </Project>
