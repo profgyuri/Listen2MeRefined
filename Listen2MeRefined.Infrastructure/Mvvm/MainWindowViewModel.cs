@@ -77,6 +77,7 @@ public partial class MainWindowViewModel
         
         WaveFormWidth = 470;
         WaveFormHeight = 70;
+        DrawPlaceholderLineAsync().ConfigureAwait(false);
     }
 
     ~MainWindowViewModel()
@@ -169,6 +170,7 @@ public partial class MainWindowViewModel
     
     private async Task DrawPlaceholderLineAsync()
     {
+        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
         WaveForm = await _waveFormDrawer.LineAsync();
     }
 }
