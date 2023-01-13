@@ -3,7 +3,7 @@ using NAudio.Wave;
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class PeakProvider
-    : IPeakProvider
+    : IPeakProvider<ISampleProvider>
 {
     private ISampleProvider _sampleProvider;
     private float[] _buffer;
@@ -56,7 +56,7 @@ public sealed class PeakProvider
     }
 
     /// <inheritdoc />
-    public void SetReader(IFileReader reader)
+    public void SetReader(IFileReader<ISampleProvider> reader)
     {
         _sampleProvider = reader.SampleProvider;
         _buffer = new float[reader.SamplesPerPeak];

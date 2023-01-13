@@ -20,7 +20,7 @@ public partial class MainWindowViewModel
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IGlobalHook _globalHook;
-    private readonly IWaveFormDrawer _waveFormDrawer;
+    private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
@@ -52,7 +52,7 @@ public partial class MainWindowViewModel
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
         DataContext dataContext,
-        IWaveFormDrawer waveFormDrawer)
+        IWaveFormDrawer<SKBitmap> waveFormDrawer)
     {
         _mediaController = mediaController;
         _logger = logger;

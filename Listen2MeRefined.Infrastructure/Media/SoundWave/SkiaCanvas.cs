@@ -2,14 +2,14 @@ using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
-public sealed class Canvas : IDisposable, ICanvas
+public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
 {
     private SKBitmap _bitmap;
     private SKCanvas _canvas;
     private readonly SKPaint _linePaint;
     private readonly SKColor _backgroundColor;
 
-    public Canvas()
+    public SkiaCanvas()
     {
         _linePaint = new SKPaint{
             Color = new SKColor(232, 255, 56),

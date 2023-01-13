@@ -1,21 +1,20 @@
-using SkiaSharp;
-
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
-public interface IWaveFormDrawer
+public interface IWaveFormDrawer<TBitmap> 
+    where TBitmap : class
 {
     /// <summary>
     /// Draws the sound wave.
     /// </summary>
     /// <param name="path">Path to the file.</param>
     /// <returns>Bitmap of the sound wave.</returns>
-    Task<SKBitmap> WaveFormAsync(string path);
+    Task<TBitmap> WaveFormAsync(string path);
 
     /// <summary>
     /// Draws a placeholder line for the sound wave.
     /// </summary>
     /// <returns></returns>
-    Task<SKBitmap> LineAsync();
+    Task<TBitmap> LineAsync();
 
     /// <summary>
     /// Sets the dimensions of the sound wave.
