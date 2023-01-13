@@ -71,7 +71,7 @@ public partial class MainWindowViewModel
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(
-            TimeSpan.FromMilliseconds(500),
+            TimeSpan.FromMilliseconds(100),
             () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
         
