@@ -17,7 +17,7 @@ public partial class MainWindowViewModel
         INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
-    private readonly IMediaController _mediaController;
+    private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IGlobalHook _globalHook;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
@@ -43,7 +43,7 @@ public partial class MainWindowViewModel
     }
 
     public MainWindowViewModel(
-        IMediaController mediaController,
+        IMediaController<SKBitmap> mediaController,
         ILogger logger,
         IPlaylistReference playlistReference,
         IRepository<AudioModel> audioRepository,
@@ -77,6 +77,7 @@ public partial class MainWindowViewModel
         
         WaveFormWidth = 470;
         WaveFormHeight = 70;
+        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
         DrawPlaceholderLineAsync().ConfigureAwait(false);
     }
 
@@ -102,8 +103,9 @@ public partial class MainWindowViewModel
         CurrentSongNotification notification,
         CancellationToken cancellationToken)
     {
+        await DrawPlaceholderLineAsync();
         SelectedSong = notification.Audio;
-        await RefreshSoundWave();
+        WaveForm = _mediaController.Bitmap;
     }
     #endregion
 
@@ -121,18 +123,18 @@ public partial class MainWindowViewModel
     }
 
     [RelayCommand]
-    private void JumpToSelecteSong()
+    private async Task JumpToSelecteSong()
     {
         if (_selectedIndex > -1)
         {
-            _mediaController.JumpToIndex(_selectedIndex);
+            await _mediaController.JumpToIndexAsync(_selectedIndex);
         }
     }
 
     [RelayCommand]
-    private void PlayPause()
+    private async Task PlayPause()
     {
-        _mediaController.PlayPause();
+        await _mediaController.PlayPauseAsync();
     }
 
     [RelayCommand]
@@ -144,15 +146,13 @@ public partial class MainWindowViewModel
     [RelayCommand]
     private async Task Next()
     {
-        await DrawPlaceholderLineAsync();
-        _mediaController.Next();
+        await _mediaController.NextAsync();
     }
 
     [RelayCommand]
     private async Task Previous()
     {
-        await DrawPlaceholderLineAsync();
-        _mediaController.Previous();
+        await _mediaController.PreviousAsync();
     }
 
     [RelayCommand]
@@ -161,16 +161,15 @@ public partial class MainWindowViewModel
         _mediaController.Shuffle();
     }
     #endregion
+    
+    private async Task DrawPlaceholderLineAsync()
+    {
+        WaveForm = await _waveFormDrawer.LineAsync();
+    }
 
     public async Task RefreshSoundWave()
     {
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
         WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong.Path);
-    }
-    
-    private async Task DrawPlaceholderLineAsync()
-    {
-        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        WaveForm = await _waveFormDrawer.LineAsync();
     }
 }

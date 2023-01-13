@@ -17,7 +17,8 @@ public class WaveFormModule : Module
         builder
             .RegisterType<WaveFormDrawer>()
             .As<IWaveFormDrawer<SKBitmap>>()
-            .AsImplementedInterfaces();
+            .AsImplementedInterfaces()
+            .SingleInstance();
         
         builder
             .RegisterType<PeakProvider>()

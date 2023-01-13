@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using NAudio.Wave;
+using SkiaSharp;
 using Source;
 using Source.Extensions;
 
@@ -10,7 +12,7 @@ namespace Listen2MeRefined.Infrastructure.Media;
 /// <summary>
 ///     Wrapper class for NAudio.
 /// </summary>
-public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
+public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistReference
 {
     private bool _startSongAutomatically;
     private int _currentSongIndex;
@@ -24,7 +26,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
-    private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     private const int TimeCheckInterval = 500;
 
@@ -48,17 +50,19 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         set => _waveOutEvent.Volume = value;
     }
 
+    public SKBitmap Bitmap { get; set; } = new(1, 1);
+
     public WindowsMusicPlayer(
         ILogger logger,
         IMediator mediator,
         TimedTask timedTask,
-        IRepository<AudioModel> audioRepository)
+        IWaveFormDrawer<SKBitmap> waveFormDrawer)
     {
         _logger = logger;
         _mediator = mediator;
-        _audioRepository = audioRepository;
+        _waveFormDrawer = waveFormDrawer;
 
-        timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), CurrentTimeCheck);
+        timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
     }
 
     /// <inheritdoc />
@@ -68,7 +72,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     }
 
     #region IMediaController
-    public void PlayPause()
+    public async Task PlayPauseAsync()
     {
         if (_playbackState == PlaybackState.Playing)
         {
@@ -76,7 +80,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
             return;
         }
 
-        StartPlayback();
+        await StartPlayback();
     }
 
     public void Stop()
@@ -94,30 +98,30 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         _startSongAutomatically = false;
     }
 
-    public void Next()
+    public async Task NextAsync()
     {
         _currentSongIndex = (_currentSongIndex + 1) % _playlist!.Count;
 
-        LoadCurrentSong();
+        await LoadCurrentSong();
 
         _logger.Debug("Jumping to the next song at index {Current} with the maximum possible index of {Maximum}...",
             _currentSongIndex, _playlist.Count - 1);
     }
 
-    public void Previous()
+    public async Task PreviousAsync()
     {
         _currentSongIndex = (_currentSongIndex - 1 + _playlist!.Count) % _playlist.Count;
 
-        LoadCurrentSong();
+        await LoadCurrentSong();
 
         _logger.Debug("Jumping to the previous song at index {Current} with the maximum possible index of {Maximum}...",
             _currentSongIndex, _playlist.Count - 1);
     }
 
-    public void JumpToIndex(int index)
+    public async Task JumpToIndexAsync(int index)
     {
         _currentSongIndex = index;
-        LoadCurrentSong();
+        await LoadCurrentSong();
     }
 
     public void Shuffle()
@@ -137,34 +141,20 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
     #endregion
 
     #region Helpers
-    private void LoadCurrentSong()
+    private async Task LoadCurrentSong()
     {
         _logger.Information("Loading audio: {Song}", _currentSong);
         _currentSong = _playlist[_currentSongIndex];
+        _fileReader = new AudioFileReader(_currentSong.Path);
 
-        try
+        if (_fileReader.WaveFormat.Encoding is WaveFormatEncoding.Extensible)
         {
-            _fileReader = new AudioFileReader(_currentSong.Path);
-        }
-        catch (NullReferenceException)
-        {
-            _logger.Error("{Song} was null", nameof(_currentSong));
-            Next();
-        }
-        catch (FileNotFoundException)
-        {
-            _logger.Warning("File was not found at: {Path} - Trying to remove entry from database...",
-                _currentSong.Path);
-            _audioRepository.Delete(_currentSong);
-            Next();
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "An unexpected error occured!");
-            throw;
+            //todo: find a way to convert to PCM
+            await NextAsync();
         }
 
-        _mediator.Publish(new CurrentSongNotification(_currentSong));
+        Bitmap = await _waveFormDrawer.WaveFormAsync(_currentSong.Path);
+        await _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
 
@@ -193,7 +183,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
         }
     }
 
-    private void CurrentTimeCheck()
+    private async Task CurrentTimeCheck()
     {
         if (ShouldSkipTimeCheck())
         {
@@ -202,7 +192,7 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
 
         if (ShouldSkipToNext())
         {
-            Next();
+            await NextAsync();
         }
 
         _previousTimeStamp = _fileReader!.CurrentTime.TotalMilliseconds;
@@ -230,14 +220,14 @@ public sealed class WindowsMusicPlayer : IMediaController, IPlaylistReference
                && _fileReader.CurrentTime.TotalMilliseconds > _fileReader.TotalTime.TotalMilliseconds - 1000;
     }
 
-    private void StartPlayback()
+    private async Task StartPlayback()
     {
         _playbackState = PlaybackState.Playing;
         _unpausedFor = 0;
 
         if (_currentSong is null && _playlist.Any())
         {
-            LoadCurrentSong();
+            await LoadCurrentSong();
         }
 
         _startSongAutomatically = true;
