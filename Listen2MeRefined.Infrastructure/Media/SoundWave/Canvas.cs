@@ -1,3 +1,4 @@
+using Listen2MeRefined.Infrastructure.SystemOperations;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
@@ -10,11 +11,12 @@ public sealed class Canvas : IDisposable
     
     public Canvas(int width, int height)
     {
+        var scale = Resolution.GetScaleFactor();
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         _canvas.Clear(new SKColor(50, 50, 64));
         _paint = new SKPaint{
-            Color = SKColors.Orange,
+            Color = new SKColor(232, 255, 56),
             StrokeWidth = 1
         };
     }

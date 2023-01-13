@@ -28,6 +28,8 @@ public partial class MainWindowViewModel
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
+    [ObservableProperty] private int _waveFormWidth;
+    [ObservableProperty] private int _waveFormHeight;
 
     public double CurrentTime
     {
@@ -69,6 +71,9 @@ public partial class MainWindowViewModel
             TimeSpan.FromMilliseconds(500),
             () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
+        
+        WaveFormWidth = 470;
+        WaveFormHeight = 70;
     }
 
     ~MainWindowViewModel()
@@ -94,7 +99,7 @@ public partial class MainWindowViewModel
         CancellationToken cancellationToken)
     {
         SelectedSong = notification.Audio;
-        WaveForm = new Drawing(100, 707).WaveForm(notification.Audio.Path);
+        WaveForm = new Drawing(WaveFormHeight, WaveFormWidth).WaveForm(notification.Audio.Path);
         return Task.CompletedTask;
     }
     #endregion

@@ -186,7 +186,8 @@
                         Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
                         Value="{Binding CurrentTime}"
                         Grid.ColumnSpan="5"
-                        MinWidth="470" />
+                        Width="{Binding WaveFormWidth}" 
+                        Height="{Binding WaveFormHeight}"/>
 
                 </Grid>
 

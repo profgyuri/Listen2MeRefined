@@ -1,3 +1,4 @@
+using Listen2MeRefined.Infrastructure.SystemOperations;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
@@ -15,8 +16,9 @@ public sealed class Drawing
     public Drawing(int height,
         int width)
     {
-        _height = height;
-        _width = width;
+        var scale = Resolution.GetScaleFactor();
+        _height = (int)(height * scale);
+        _width = (int)(width * scale);
     }
 
     /// <summary>
