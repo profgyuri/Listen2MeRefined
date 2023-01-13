@@ -8,6 +8,7 @@ using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Media;
+using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.WPF.Views;
@@ -168,6 +169,28 @@ internal static class IocContainer
             .RegisterType<FolderScannerService>()
             .As<IFolderScanner>()
             .SingleInstance();
+        
+        #region WaveForm
+        builder
+            .RegisterType<Canvas>()
+            .As<ICanvas>()
+            .AsImplementedInterfaces();
+        
+        builder
+            .RegisterType<WaveFormDrawer>()
+            .As<IWaveFormDrawer>()
+            .AsImplementedInterfaces();
+        
+        builder
+            .RegisterType<PeakProvider>()
+            .As<IPeakProvider>()
+            .AsImplementedInterfaces();
+        
+        builder
+            .RegisterType<FileReader>()
+            .As<IFileReader>()
+            .AsImplementedInterfaces();
+        #endregion
 
         return _container = builder.Build();
     }

@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SkiaSharp;
 using Source;
 using Source.Storage;
 
@@ -18,6 +20,7 @@ public partial class MainWindowViewModel
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IGlobalHook _globalHook;
+    private readonly IWaveFormDrawer _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
@@ -25,6 +28,9 @@ public partial class MainWindowViewModel
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
+    [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
+    [ObservableProperty] private int _waveFormWidth;
+    [ObservableProperty] private int _waveFormHeight;
 
     public double CurrentTime
     {
@@ -45,12 +51,14 @@ public partial class MainWindowViewModel
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
-        DataContext dataContext)
+        DataContext dataContext,
+        IWaveFormDrawer waveFormDrawer)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
         _globalHook = globalHook;
+        _waveFormDrawer = waveFormDrawer;
 
         dataContext.Database.Migrate();
 
@@ -63,9 +71,13 @@ public partial class MainWindowViewModel
 
         playlistReference.PassPlaylist(ref _playList);
         timedTask.Start(
-            TimeSpan.FromMilliseconds(500),
+            TimeSpan.FromMilliseconds(100),
             () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
+        
+        WaveFormWidth = 470;
+        WaveFormHeight = 70;
+        DrawPlaceholderLineAsync().ConfigureAwait(false);
     }
 
     ~MainWindowViewModel()
@@ -86,18 +98,18 @@ public partial class MainWindowViewModel
 
     #region Implementation of INotificationHandler<in CurrentSongNotification>
     /// <inheritdoc />
-    Task INotificationHandler<CurrentSongNotification>.Handle(
+    async Task INotificationHandler<CurrentSongNotification>.Handle(
         CurrentSongNotification notification,
         CancellationToken cancellationToken)
     {
         SelectedSong = notification.Audio;
-        return Task.CompletedTask;
+        await RefreshSoundWave();
     }
     #endregion
 
     #region Commands
     [RelayCommand]
-    public async Task QuickSearch()
+    private async Task QuickSearch()
     {
         _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
         _searchResults.Clear();
@@ -109,7 +121,7 @@ public partial class MainWindowViewModel
     }
 
     [RelayCommand]
-    public void JumpToSelecteSong()
+    private void JumpToSelecteSong()
     {
         if (_selectedIndex > -1)
         {
@@ -118,33 +130,47 @@ public partial class MainWindowViewModel
     }
 
     [RelayCommand]
-    public void PlayPause()
+    private void PlayPause()
     {
         _mediaController.PlayPause();
     }
 
     [RelayCommand]
-    public void Stop()
+    private void Stop()
     {
         _mediaController.Stop();
     }
 
     [RelayCommand]
-    public void Next()
+    private async Task Next()
     {
+        await DrawPlaceholderLineAsync();
         _mediaController.Next();
     }
 
     [RelayCommand]
-    public void Previous()
+    private async Task Previous()
     {
+        await DrawPlaceholderLineAsync();
         _mediaController.Previous();
     }
 
     [RelayCommand]
-    public void Shuffle()
+    private void Shuffle()
     {
         _mediaController.Shuffle();
     }
     #endregion
+
+    public async Task RefreshSoundWave()
+    {
+        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
+        WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong.Path);
+    }
+    
+    private async Task DrawPlaceholderLineAsync()
+    {
+        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
+        WaveForm = await _waveFormDrawer.LineAsync();
+    }
 }
