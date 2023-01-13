@@ -3,7 +3,7 @@ using NAudio.Wave;
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class FileReader
-    : IFileReader
+    : IFileReader<ISampleProvider>
 {
     private AudioFileReader _audioFileReader;
     

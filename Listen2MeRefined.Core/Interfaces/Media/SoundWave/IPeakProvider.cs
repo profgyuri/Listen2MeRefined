@@ -1,8 +1,6 @@
-using NAudio.Wave;
-
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
-public interface IPeakProvider
+public interface IPeakProvider<in TReader>
 {
     /// <summary>
     /// Gets the next peak value from the sample provider.
@@ -23,5 +21,5 @@ public interface IPeakProvider
     /// <param name="count">Number of peak values to get.</param>
     Task<float[]> GetAllPeaksAsync(int count);
 
-    void SetReader(IFileReader reader);
+    void SetReader(IFileReader<TReader> reader);
 }

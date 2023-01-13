@@ -1,24 +1,25 @@
 using Listen2MeRefined.Infrastructure.SystemOperations;
+using NAudio.Wave;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class WaveFormDrawer
-    : IWaveFormDrawer
+    : IWaveFormDrawer<SKBitmap>
 {
     private int _height;
     private int _width;
-    private readonly IFileReader _fileReader;
-    private readonly IPeakProvider _peakProvider;
-    private readonly ICanvas _canvas;
+    private readonly IFileReader<ISampleProvider> _fileReader;
+    private readonly IPeakProvider<ISampleProvider> _peakProvider;
+    private readonly ICanvas<SKPoint, SKBitmap> _canvas;
 
     /// <summary>
     /// Class used to draw the sound wave.
     /// </summary>
     public WaveFormDrawer(
-        IFileReader fileReader,
-        IPeakProvider peakProvider,
-        ICanvas canvas)
+        IFileReader<ISampleProvider> fileReader,
+        IPeakProvider<ISampleProvider> peakProvider,
+        ICanvas<SKPoint, SKBitmap> canvas)
     {
         _fileReader = fileReader;
         _peakProvider = peakProvider;
