@@ -20,6 +20,7 @@ public partial class MainWindowViewModel
     private readonly IMediaController _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IGlobalHook _globalHook;
+    private readonly IWaveFormDrawer _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string _searchTerm = "";
@@ -50,12 +51,14 @@ public partial class MainWindowViewModel
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
-        DataContext dataContext)
+        DataContext dataContext,
+        IWaveFormDrawer waveFormDrawer)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
         _globalHook = globalHook;
+        _waveFormDrawer = waveFormDrawer;
 
         dataContext.Database.Migrate();
 
@@ -99,7 +102,7 @@ public partial class MainWindowViewModel
         CancellationToken cancellationToken)
     {
         SelectedSong = notification.Audio;
-        WaveForm = new Drawing(WaveFormHeight, WaveFormWidth).WaveForm(notification.Audio.Path);
+        RefreshSoundWave();
         return Task.CompletedTask;
     }
     #endregion
@@ -157,8 +160,9 @@ public partial class MainWindowViewModel
     }
     #endregion
 
-    public void DpiChanged()
+    public void RefreshSoundWave()
     {
-        WaveForm = new Drawing(WaveFormHeight, WaveFormWidth).WaveForm(SelectedSong.Path);
+        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
+        WaveForm = _waveFormDrawer.WaveForm(SelectedSong.Path);
     }
 }

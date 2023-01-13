@@ -1,37 +1,42 @@
-using Listen2MeRefined.Infrastructure.SystemOperations;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
-public sealed class Canvas : IDisposable
+public sealed class Canvas : IDisposable, ICanvas
 {
-    private readonly SKBitmap _bitmap;
-    private readonly SKCanvas _canvas;
-    private readonly SKPaint _paint;
-    
-    public Canvas(int width, int height)
+    private SKBitmap _bitmap;
+    private SKCanvas _canvas;
+    private readonly SKPaint _linePaint;
+    private readonly SKColor _backgroundColor;
+
+    public Canvas()
     {
-        var scale = Resolution.GetScaleFactor();
-        _bitmap = new SKBitmap(width, height);
-        _canvas = new SKCanvas(_bitmap);
-        _canvas.Clear(new SKColor(50, 50, 64));
-        _paint = new SKPaint{
+        _linePaint = new SKPaint{
             Color = new SKColor(232, 255, 56),
             StrokeWidth = 1
         };
+        _backgroundColor = new SKColor(50, 50, 64);
     }
     
     public void DrawLine(SKPoint p1, SKPoint p2)
     {
-        _paint.IsAntialias = true;
-        _paint.Style = SKPaintStyle.Stroke;
-        _canvas.DrawLine(p1, p2, _paint);
+        _linePaint.IsAntialias = true;
+        _linePaint.Style = SKPaintStyle.Stroke;
+        _canvas.DrawLine(p1, p2, _linePaint);
     }
     
     public SKBitmap Finish()
     {
         _canvas.Flush();
         return _bitmap;
+    }
+
+    /// <inheritdoc />
+    public void Reset(int width, int height)
+    {
+        _bitmap = new SKBitmap(width, height);
+        _canvas = new SKCanvas(_bitmap);
+        _canvas.Clear(_backgroundColor);
     }
 
     public void Dispose()

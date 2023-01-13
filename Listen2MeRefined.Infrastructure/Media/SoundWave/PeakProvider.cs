@@ -3,20 +3,11 @@ using NAudio.Wave;
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class PeakProvider
+    : IPeakProvider
 {
-    private readonly ISampleProvider _sampleProvider;
-    private readonly float[] _buffer;
+    private ISampleProvider _sampleProvider;
+    private float[] _buffer;
     private const int BlockSize = 200;
-    
-    /// <summary>
-    /// Provides peak values for a given sample provider.
-    /// </summary>
-    /// <param name="stream">Object used for reading audio files.</param>
-    public PeakProvider(FileReader stream)
-    {
-        _sampleProvider = stream.SampleProvider;
-        _buffer = new float[stream.SamplesPerPeak];
-    }
     
     /// <summary>
     /// Gets the next peak value from the sample provider.
@@ -53,6 +44,14 @@ public sealed class PeakProvider
         {
             peaks[i] = GetNextPeak();
         }
+
         return peaks;
+    }
+
+    /// <inheritdoc />
+    public void SetReader(IFileReader reader)
+    {
+        _sampleProvider = reader.SampleProvider;
+        _buffer = new float[reader.SamplesPerPeak];
     }
 }
