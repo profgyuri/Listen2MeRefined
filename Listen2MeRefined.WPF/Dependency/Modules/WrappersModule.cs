@@ -1,5 +1,6 @@
 using Autofac;
 using Listen2MeRefined.Infrastructure.Media;
+using SkiaSharp;
 using Source;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
@@ -10,7 +11,7 @@ public class WrappersModule : Module
     {
         builder
             .RegisterType<WindowsMusicPlayer>()
-            .As<IMediaController>()
+            .As<IMediaController<SKBitmap>>()
             .As<IPlaylistReference>()
             .SingleInstance();
 

@@ -4,13 +4,14 @@ using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
 using Listen2MeRefined.WPF.Views;
 using Serilog;
+using SkiaSharp;
 
 namespace Listen2MeRefined.WPF;
 
 internal sealed class GmaGlobalHookHandler : IGlobalHook
 {
     private readonly ILogger _logger;
-    private readonly IMediaController _mediaController;
+    private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IKeyboardMouseEvents _globalHook = Hook.GlobalEvents();
     private readonly HashSet<NewSongWindow> _windows = new();
 
@@ -27,7 +28,7 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
 
     public GmaGlobalHookHandler(
         ILogger logger,
-        IMediaController mediaController)
+        IMediaController<SKBitmap> mediaController)
     {
         _logger = logger;
         _mediaController = mediaController;
@@ -45,13 +46,13 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
         switch (e.KeyCode)
         {
             case Keys.MediaPlayPause:
-                _mediaController.PlayPause();
+                _mediaController.PlayPauseAsync();
                 break;
             case Keys.MediaNextTrack:
-                _mediaController.Next();
+                _mediaController.NextAsync();
                 break;
             case Keys.MediaPreviousTrack:
-                _mediaController.Previous();
+                _mediaController.PreviousAsync();
                 break;
             case Keys.MediaStop:
                 _mediaController.Stop();
