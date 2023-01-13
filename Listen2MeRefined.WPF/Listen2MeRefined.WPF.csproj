@@ -7,6 +7,7 @@
         <UseWPF>true</UseWPF>
         <AssemblyName>Listen2Me</AssemblyName>
         <ApplicationIcon>Resources\Listen2Me.ico</ApplicationIcon>
+        <UseWindowsForms>True</UseWindowsForms>
     </PropertyGroup>
 
     <ItemGroup>

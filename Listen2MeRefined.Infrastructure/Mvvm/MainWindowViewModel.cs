@@ -156,4 +156,9 @@ public partial class MainWindowViewModel
         _mediaController.Shuffle();
     }
     #endregion
+
+    public void DpiChanged()
+    {
+        WaveForm = new Drawing(WaveFormHeight, WaveFormWidth).WaveForm(SelectedSong.Path);
+    }
 }

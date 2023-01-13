@@ -33,6 +33,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
+            <WindowsFormsHost
+                DpiChanged="WindowsFormsHost_DpiChanged"/>
+
             <!--Title bar -->
             <Grid
                 VerticalAlignment="Center">
