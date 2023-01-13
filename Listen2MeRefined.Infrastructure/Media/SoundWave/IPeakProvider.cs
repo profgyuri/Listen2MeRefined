@@ -17,5 +17,11 @@ public interface IPeakProvider
     /// <returns>Array of peak values between 0 and 1.</returns>
     float[] GetAllPeaks(int count);
     
+    /// <summary>
+    /// Gets the all peak values from the sample provider.
+    /// </summary>
+    /// <param name="count">Number of peak values to get.</param>
+    Task<float[]> GetAllPeaksAsync(int count);
+
     void SetReader(IFileReader reader);
 }

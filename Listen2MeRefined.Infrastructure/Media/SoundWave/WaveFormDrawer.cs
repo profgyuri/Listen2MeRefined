@@ -30,12 +30,12 @@ public sealed class WaveFormDrawer
     /// </summary>
     /// <param name="path">Path to the file.</param>
     /// <returns>Bitmap of the sound wave.</returns>
-    public SKBitmap WaveForm(string path)
+    public async Task<SKBitmap> WaveFormAsync(string path)
     {
         _fileReader.Open(path);
         _fileReader.SetSampleCount(_width);
         _peakProvider.SetReader(_fileReader);
-        var peaks = _peakProvider.GetAllPeaks(_width);
+        var peaks = await _peakProvider.GetAllPeaksAsync(_width);
 
         var midPoint = _height / 2;
         _canvas.Reset(_width, _height);
@@ -48,6 +48,18 @@ public sealed class WaveFormDrawer
             
             _canvas.DrawLine(point1, point2);
         }
+        
+        return _canvas.Finish();
+    }
+
+    /// <inheritdoc />
+    public async Task<SKBitmap> LineAsync()
+    {
+        await Task.Run(() => _canvas.Reset(_width, _height));
+        
+        var p1 = new SKPoint(0, (float) _height / 2);
+        var p2 = new SKPoint(_width, (float) _height / 2);
+        _canvas.DrawLine(p1, p2, 6);
         
         return _canvas.Finish();
     }

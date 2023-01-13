@@ -97,19 +97,18 @@ public partial class MainWindowViewModel
 
     #region Implementation of INotificationHandler<in CurrentSongNotification>
     /// <inheritdoc />
-    Task INotificationHandler<CurrentSongNotification>.Handle(
+    async Task INotificationHandler<CurrentSongNotification>.Handle(
         CurrentSongNotification notification,
         CancellationToken cancellationToken)
     {
         SelectedSong = notification.Audio;
-        RefreshSoundWave();
-        return Task.CompletedTask;
+        await RefreshSoundWave();
     }
     #endregion
 
     #region Commands
     [RelayCommand]
-    public async Task QuickSearch()
+    private async Task QuickSearch()
     {
         _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
         _searchResults.Clear();
@@ -121,7 +120,7 @@ public partial class MainWindowViewModel
     }
 
     [RelayCommand]
-    public void JumpToSelecteSong()
+    private void JumpToSelecteSong()
     {
         if (_selectedIndex > -1)
         {
@@ -130,39 +129,46 @@ public partial class MainWindowViewModel
     }
 
     [RelayCommand]
-    public void PlayPause()
+    private void PlayPause()
     {
         _mediaController.PlayPause();
     }
 
     [RelayCommand]
-    public void Stop()
+    private void Stop()
     {
         _mediaController.Stop();
     }
 
     [RelayCommand]
-    public void Next()
+    private async Task Next()
     {
+        await DrawPlaceholderLineAsync();
         _mediaController.Next();
     }
 
     [RelayCommand]
-    public void Previous()
+    private async Task Previous()
     {
+        await DrawPlaceholderLineAsync();
         _mediaController.Previous();
     }
 
     [RelayCommand]
-    public void Shuffle()
+    private void Shuffle()
     {
         _mediaController.Shuffle();
     }
     #endregion
 
-    public void RefreshSoundWave()
+    public async Task RefreshSoundWave()
     {
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        WaveForm = _waveFormDrawer.WaveForm(SelectedSong.Path);
+        WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong.Path);
+    }
+    
+    private async Task DrawPlaceholderLineAsync()
+    {
+        WaveForm = await _waveFormDrawer.LineAsync();
     }
 }

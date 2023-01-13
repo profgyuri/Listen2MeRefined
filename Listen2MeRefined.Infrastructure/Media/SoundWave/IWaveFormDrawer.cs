@@ -9,8 +9,14 @@ public interface IWaveFormDrawer
     /// </summary>
     /// <param name="path">Path to the file.</param>
     /// <returns>Bitmap of the sound wave.</returns>
-    SKBitmap WaveForm(string path);
-    
+    Task<SKBitmap> WaveFormAsync(string path);
+
+    /// <summary>
+    /// Draws a placeholder line for the sound wave.
+    /// </summary>
+    /// <returns></returns>
+    Task<SKBitmap> LineAsync();
+
     /// <summary>
     /// Sets the dimensions of the sound wave.
     /// </summary>

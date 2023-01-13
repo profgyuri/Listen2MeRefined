@@ -18,11 +18,23 @@ public sealed class Canvas : IDisposable, ICanvas
         _backgroundColor = new SKColor(50, 50, 64);
     }
     
-    public void DrawLine(SKPoint p1, SKPoint p2)
+    public void DrawLine(SKPoint p1, SKPoint p2, float? stroakWidth = null)
     {
         _linePaint.IsAntialias = true;
         _linePaint.Style = SKPaintStyle.Stroke;
-        _canvas.DrawLine(p1, p2, _linePaint);
+
+        if (stroakWidth is null)
+        {
+            _canvas.DrawLine(p1, p2, _linePaint);
+        }
+        else
+        {
+            var oldStrokeWidth = _linePaint.StrokeWidth;
+            _linePaint.StrokeWidth = stroakWidth.Value;
+            _canvas.DrawLine(p1, p2, _linePaint);
+            _linePaint.StrokeWidth = oldStrokeWidth;
+        }
+        
     }
     
     public SKBitmap Finish()

@@ -49,6 +49,13 @@ public sealed class PeakProvider
     }
 
     /// <inheritdoc />
+    public async Task<float[]> GetAllPeaksAsync(int count)
+    {
+        var peaks = await Task.Run(() => GetAllPeaks(count));
+        return peaks;
+    }
+
+    /// <inheritdoc />
     public void SetReader(IFileReader reader)
     {
         _sampleProvider = reader.SampleProvider;
