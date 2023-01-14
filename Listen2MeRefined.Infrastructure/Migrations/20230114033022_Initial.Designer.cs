@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Listen2MeRefined.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221122020058_Initial")]
+    [Migration("20230114033022_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -48,7 +48,6 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
