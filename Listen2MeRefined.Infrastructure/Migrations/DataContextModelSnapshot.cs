@@ -45,7 +45,6 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

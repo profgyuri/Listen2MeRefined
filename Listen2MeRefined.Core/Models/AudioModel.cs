@@ -8,7 +8,7 @@ public sealed class AudioModel : Model
 {
     public string? Artist { get; set; }
 
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     public string? Genre { get; set; }
 
@@ -19,7 +19,7 @@ public sealed class AudioModel : Model
     [NotMapped]
     public string Display =>
         string.IsNullOrEmpty(Artist)
-            ? $"{Path?.Split(System.IO.Path.PathSeparator)[^1] ?? ""}"
+            ? $"{new FileInfo(Path!).Name}"
             : string.Join(" - ", Artist, Title);
 
     public TimeSpan Length { get; set; }
