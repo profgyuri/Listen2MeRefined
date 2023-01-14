@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         d:DataContext="{d:DesignInstance vm:AdvancedSearchViewModel}"
         Style="{StaticResource BasicWindow}"
         ResizeMode="NoResize"
@@ -34,6 +35,12 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontWeight="Bold" />
+            <Button
+                Style="{StaticResource WindowCloseButton}"
+                HorizontalAlignment="Right"
+                Content="{materialDesign:PackIcon Kind=Close, Size=15}"
+                materialDesign:ButtonAssist.CornerRadius="0 8 0 0"
+                Click="Button_Click"/>
 
         </Grid>
 

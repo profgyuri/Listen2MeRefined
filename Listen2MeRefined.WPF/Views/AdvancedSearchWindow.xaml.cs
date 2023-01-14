@@ -13,4 +13,9 @@ public sealed partial class AdvancedSearchWindow : Window
 
         DataContext = viewModel;
     }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }
