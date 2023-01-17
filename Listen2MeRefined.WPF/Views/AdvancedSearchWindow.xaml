@@ -10,13 +10,20 @@
         Style="{StaticResource BasicWindow}"
         ResizeMode="NoResize"
         Title="AdvancedSearchWindow"
-        Height="350" Width="300">
+        Height="380" Width="400">
 
     <WindowChrome.WindowChrome>
         <WindowChrome
             x:Name="WindowChrome"
             CaptionHeight="32" />
     </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThirnaryBrush}" />
+        </Style>
+    </Window.Resources>
 
     <Border
         BorderThickness="2"
@@ -41,6 +48,83 @@
                 Content="{materialDesign:PackIcon Kind=Close, Size=15}"
                 materialDesign:ButtonAssist.CornerRadius="0 8 0 0"
                 Click="Button_Click"/>
+
+            <Grid
+                Margin="5"
+                Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox
+                    Grid.Column="2"
+                    Grid.ColumnSpan="3"
+                    Foreground="{DynamicResource ThirnaryBrush}"
+                    Background="{DynamicResource ThirnaryBrush}"
+                    Content="Match all"/>
+                <TextBlock
+                    Grid.ColumnSpan="2"
+                    Grid.Row="1"
+                    Text="New criteria:"/>
+                <ComboBox
+                    x:Name="TableColumnName"
+                    Grid.Row="2"
+                    Style="{StaticResource CustomComboBox}"
+                    Margin="0 5 5 5"/>
+                <ComboBox
+                    x:Name="Relation"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="5 0"
+                    Style="{StaticResource CustomComboBox}"/>
+                <TextBox
+                    x:Name="RangeLowerBound"
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    materialDesign:HintAssist.Hint="From"/>
+                <TextBox
+                    x:Name="RangeUpperBound"
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    materialDesign:HintAssist.Hint="To"/>
+                <TextBox
+                    x:Name="GeneralInput"
+                    Grid.Row="2"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"/>
+                <Button
+                    x:Name="AddCriteria"
+                    Grid.Row="2"
+                    Grid.Column="4"
+                    Style="{StaticResource InteractionButton}"
+                    Content="{materialDesign:PackIcon Kind=Plus,Size=20}"/>
+
+                <ListView
+                    x:Name="SearchCriterias"
+                    Grid.Row="3"
+                    Grid.ColumnSpan="5"
+                    Style="{StaticResource VirtualizedListView}"/>
+
+                <Button
+                    Grid.Row="4"
+                    Grid.ColumnSpan="5"
+                    Content="Search"
+                    Style="{StaticResource InteractionButton}"
+                    Width="200"
+                    Margin="5"/>
+
+            </Grid>
 
         </Grid>
 

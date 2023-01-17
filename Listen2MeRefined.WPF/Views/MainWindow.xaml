@@ -235,7 +235,7 @@
                     <TextBox
                         Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         materialDesign:HintAssist.Hint="Search For:"
-                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource SecondaryBrush}">
+                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThirnaryBrush}">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
                         </TextBox.InputBindings>
