@@ -57,7 +57,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*" x:Name="ListRow"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -71,6 +71,7 @@
                 <CheckBox
                     Grid.Column="2"
                     Grid.ColumnSpan="3"
+                    IsChecked="{Binding MatchAll}"
                     Foreground="{DynamicResource ThirnaryBrush}"
                     Background="{DynamicResource ThirnaryBrush}"
                     Content="Match all"/>
@@ -88,6 +89,7 @@
                 <ComboBox
                     x:Name="Relation"
                     ItemsSource="{Binding Relation}"
+                    SelectedItem="{Binding SelectedRelation}"
                     Grid.Row="2"
                     Grid.Column="1"
                     Margin="5 0"
@@ -109,17 +111,22 @@
 
                 <ListView
                     x:Name="SearchCriterias"
+                    Margin="5"
+                    ItemsSource="{Binding Criterias}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    Height="{Binding ElementName=ListRow, Path=Height}"
                     Grid.Row="3"
                     Grid.ColumnSpan="5"
                     Style="{StaticResource VirtualizedListView}"/>
 
                 <Button
+                    x:Name="Search"
                     Grid.Row="4"
                     Grid.ColumnSpan="5"
                     Content="Search"
                     Style="{StaticResource InteractionButton}"
                     Width="200"
-                    Margin="5"/>
+                    Margin="5" Click="Search_Click"/>
 
             </Grid>
 

@@ -14,7 +14,8 @@ namespace Listen2MeRefined.Infrastructure.Mvvm;
 [INotifyPropertyChanged]
 public partial class MainWindowViewModel
     : INotificationHandler<CurrentSongNotification>,
-        INotificationHandler<FontFamilyChangedNotification>
+        INotificationHandler<FontFamilyChangedNotification>,
+        INotificationHandler<AdvancedSearchNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController<SKBitmap> _mediaController;
@@ -106,6 +107,16 @@ public partial class MainWindowViewModel
         await DrawPlaceholderLineAsync();
         SelectedSong = notification.Audio;
         WaveForm = _mediaController.Bitmap;
+    }
+    #endregion
+    
+    #region Implementation of INotificationHandler<in AdvancedSearchNotification>
+    /// <inheritdoc />
+    public async Task Handle(
+        AdvancedSearchNotification notification,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 

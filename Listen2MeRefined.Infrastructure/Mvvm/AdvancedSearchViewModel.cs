@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text;
+using Dapper;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
@@ -13,17 +15,19 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly List<string> _numericRelations = new() { "Is", "Is not", "Bigger than", "Less than" };
-    private readonly List<string> _timeRelations = new() { "Is", "Is not", "Later than", "Earlier than" };
+    private readonly List<string> _timeRelations = new() { "Is", "Is not", "More than", "Less than" };
     private readonly List<string> _stringRelations = new() { "Is", "Is not", "Contains", "Does not contain" };
+    private readonly List<string> _queryStatements = new();
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private List<string> _columnName;
     private string _selectedColumnName;
     [ObservableProperty] private List<string> _relation;
-    [ObservableProperty] private string _selectedRelation;
+    [ObservableProperty] private string _selectedRelation = "";
     [ObservableProperty] private ObservableCollection<string> _criterias;
-    [ObservableProperty] private string _rangeSuffixText;
-    [ObservableProperty] private string _inputText;
+    [ObservableProperty] private string _rangeSuffixText = "";
+    [ObservableProperty] private string _inputText = "";
+    [ObservableProperty] private bool _matchAll;
 
     public string SelectedColumnName
     {
@@ -74,7 +78,44 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     [RelayCommand]
     private void AddCriteria()
     {
-        _criterias.Add("New Criteria");
+        _criterias.Add($"{SelectedColumnName} {SelectedRelation} {InputText}");
+
+        var queryBuilder = new StringBuilder(SelectedColumnName);
+        var criteriaBuilder = new StringBuilder(SelectedColumnName);
+        queryBuilder.Append(' ');
+        criteriaBuilder.Append(' ');
+        var relation = SelectedRelation switch
+        {
+            "Is" => "= ",
+            "Is not" => "<> ",
+            "Contains" => "LIKE ",
+            "Does not contain" => "NOT LIKE ",
+            "Bigger than" => "> ",
+            "Less than" => "< ",
+            "More than" => "> ",
+            _ => throw new IndexOutOfRangeException($"This relation is not handled: {SelectedRelation}")
+        };
+        queryBuilder.Append(relation);
+        criteriaBuilder.Append(SelectedRelation);
+        var input = SelectedRelation is "Contains" or "Does not Contain"
+            ? $"'%{InputText}%'"
+            : $"'{InputText}'";
+
+        queryBuilder.Append(input);
+        criteriaBuilder.Append(InputText);
+        
+        _queryStatements.Add(queryBuilder.ToString());
+        _criterias.Add(criteriaBuilder.ToString());
+        OnPropertyChanged(nameof(Criterias));
+        
+        InputText = "";
+    }
+
+    public void Search()
+    {
+        _mediator.Publish(new AdvancedSearchNotification(_queryStatements, _matchAll));
+        _queryStatements.Clear();
+        _criterias.Clear();
     }
     
     private static List<string> GetAudioModelProperties()
