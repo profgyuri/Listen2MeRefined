@@ -1,10 +1,13 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text;
+using Dapper;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using SkiaSharp;
 using Source;
 using Source.Storage;
@@ -21,6 +24,8 @@ public partial class MainWindowViewModel
     private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IGlobalHook _globalHook;
+    private readonly DataContext _dataContext;
+    private readonly IDbConnection _dbConnection;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
@@ -53,12 +58,15 @@ public partial class MainWindowViewModel
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
         DataContext dataContext,
+        IDbConnection dbConnection,
         IWaveFormDrawer<SKBitmap> waveFormDrawer)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
         _globalHook = globalHook;
+        _dataContext = dataContext;
+        _dbConnection = dbConnection;
         _waveFormDrawer = waveFormDrawer;
 
         dataContext.Database.Migrate();
@@ -116,7 +124,29 @@ public partial class MainWindowViewModel
         AdvancedSearchNotification notification,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var concatenation = notification.MatchAll ? "AND" : "OR";
+        var clauses = notification.Filters.Select(x => x.QueryString);
+        var parameterList = notification.Filters.Select(x => x.Parameters);
+        var parameters = new DynamicParameters();
+
+        foreach (var param in parameterList)
+        {
+            parameters.AddDynamicParams(param);
+        }
+
+        var builder = new StringBuilder();
+        builder.Append($"SELECT * FROM {_dataContext.Model.FindEntityType(typeof(AudioModel))!.GetTableName()!} WHERE ");
+        foreach (var clause in clauses)
+        {
+            builder.Append(clause);
+            builder.Append($" {concatenation} ");
+        }
+
+        builder.Remove(builder.Length - concatenation.Length - 1, concatenation.Length);
+        var query = builder.ToString();
+        var result = await _dbConnection.QueryAsync<AudioModel>(query, parameters);
+        _searchResults.Clear();
+        _searchResults.AddRange(result);
     }
     #endregion
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using Dapper;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
@@ -16,7 +17,7 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     private readonly List<string> _numericRelations = new() { "Is", "Is not", "Bigger than", "Less than" };
     private readonly List<string> _timeRelations = new() { "Is", "Is not", "More than", "Less than" };
     private readonly List<string> _stringRelations = new() { "Is", "Is not", "Contains", "Does not contain" };
-    private readonly List<string> _queryStatements = new();
+    private readonly List<ParameterizedQuery> _queryStatements = new();
 
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private List<string> _columnName;
@@ -96,14 +97,23 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
         };
         queryBuilder.Append(relation);
         criteriaBuilder.Append(SelectedRelation);
-        var input = SelectedRelation is "Contains" or "Does not Contain"
-            ? $"'%{InputText}%'"
-            : $"'{InputText}'";
+
+        var param = new DynamicParameters();
+        if (SelectedRelation is "Contains" or "Does not Contain")
+        {
+            param.Add($"param{_queryStatements.Count}", $"%{InputText}%");
+        }
+        else
+        {
+            param.Add($"param{_queryStatements.Count}", $"{InputText}");
+        }
+        
+        var input = $"@param{_queryStatements.Count}";
 
         queryBuilder.Append(input);
         criteriaBuilder.Append(InputText);
         
-        _queryStatements.Add(queryBuilder.ToString());
+        _queryStatements.Add(new ParameterizedQuery(queryBuilder.ToString(), param));
         _criterias.Add(criteriaBuilder.ToString());
         OnPropertyChanged(nameof(Criterias));
         
