@@ -27,46 +27,6 @@ public sealed class FolderScannerService : IFolderScanner
     
     #region Implementation of IFolderScanner
     /// <inheritdoc />
-    public void Scan(string path)
-    {
-        _logger.Information("Scanning folder for audio files: {Path}", path);
-        var files = _fileEnumerator.EnumerateFiles(path).ToHashSet();
-        var fromDb = _audioRepository.Read().ToList();
-
-        for (var i = 0; i < fromDb.Count; i++)
-        {
-            var current = fromDb[i];
-
-            if (!files.Contains(current.Path!))
-            {
-                continue;
-            }
-
-            files.Remove(current.Path!);
-            fromDb.RemoveAt(i);
-            i--;
-            
-            var updated = _audioFileAnalyzer.Analyze(current.Path!);
-            current.Update(updated);
-            
-            _audioRepository.UpdateAsync(current);
-        }
-        
-        var newSongs =  _audioFileAnalyzer.Analyze(files);
-        _audioRepository.Create(newSongs);
-        _audioRepository.Delete(fromDb);
-    }
-
-    /// <inheritdoc />
-    public void Scan(IEnumerable<string> paths)
-    {
-        foreach (var path in paths)
-        {
-            Scan(path);
-        }
-    }
-
-    /// <inheritdoc />
     public async Task ScanAsync(string path)
     {
         _logger.Information("Scanning folder for audio files: {Path}", path);
@@ -93,8 +53,8 @@ public sealed class FolderScannerService : IFolderScanner
         }
         
         var newSongs = await _audioFileAnalyzer.AnalyzeAsync(files);
-        await _audioRepository.CreateAsync(newSongs);
-        await _audioRepository.DeleteAsync(fromDb);
+        await _audioRepository.SaveAsync(newSongs);
+        await _audioRepository.RemoveAsync(fromDb);
     }
 
     /// <inheritdoc />
@@ -104,15 +64,6 @@ public sealed class FolderScannerService : IFolderScanner
         {
             await ScanAsync(path);
         }
-    }
-    
-    /// <inheritdoc />
-    public void ScanAll()
-    {
-        var paths =
-            _settingsManager.Settings.MusicFolders
-                .Select(x => x.FullPath);
-        Scan(paths);
     }
     
     /// <inheritdoc />

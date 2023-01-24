@@ -1,87 +1,94 @@
+using Dapper;
+using Dapper.Contrib.Extensions;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public abstract class RepositoryBase<T> : IRepository<T>
-    where T : class
+    where T: Model
 {
-    protected readonly IDataReader _dataReader;
-    protected readonly IDataSaver _dataSaver;
-    protected readonly IDataRemover _dataRemover;
-    protected readonly IDataUpdater _dataUpdater;
-    protected readonly ILogger _logger;
+    private readonly ILogger _logger;
+    private readonly DataContext _dataContext;
+    private readonly IDbConnection _dbConnection;
 
-    protected RepositoryBase(
-        IDataReader dataReader,
-        IDataSaver dataSaver,
-        IDataRemover dataRemover,
-        IDataUpdater dataUpdater,
-        ILogger logger)
+    private readonly string _tableName;
+
+    protected RepositoryBase(ILogger logger, DataContext dataContext, IDbConnection dbConnection)
     {
-        _dataReader = dataReader;
-        _dataSaver = dataSaver;
-        _dataRemover = dataRemover;
-        _dataUpdater = dataUpdater;
         _logger = logger;
+        _dataContext = dataContext;
+        _dbConnection = dbConnection;
+        
+        _tableName = _dataContext.Model.FindEntityType(typeof(T))!.GetTableName()!;
+    }
+    
+    #region Implementation of IDataSaver<in T>
+    /// <inheritdoc />
+    public async Task SaveAsync(T data)
+    {
+        _dataContext.AddIfDoesNotExist(data);
+        await _dataContext.SaveChangesAsync();
     }
 
-    #region Implementation of IRepository<T>
     /// <inheritdoc />
-    public abstract void Create(T data);
+    public async Task SaveAsync(IEnumerable<T> list)
+    {
+        await _dataContext.AddIfDoesNotExistAsync(list);
+        await _dataContext.SaveChangesAsync();
+    }
+    #endregion
+
+    #region Implementation of IDataReader<T>
+    /// <inheritdoc />
+    public async Task<IEnumerable<T>> ReadAsync()
+    {
+        var sql = $"SELECT * FROM {_tableName}";
+        return await _dbConnection.QueryAsync<T>(sql);
+    }
 
     /// <inheritdoc />
-    public abstract void Create(IEnumerable<T> data);
+    public async Task<IEnumerable<T>> ReadAsync(string searchTerm)
+    {
+        var query = RepositoryHelper.GetParameterizedQueryWithSearchTerm<AudioModel>(searchTerm, _tableName);
+        return await _dbConnection.QueryAsync<T>(query.QueryString, query.Parameters);
+    }
+    #endregion
+
+    #region Implementation of IDataUpdater<in T>
+    /// <inheritdoc />
+    public async Task UpdateAsync(T data)
+    {
+        await _dbConnection.UpdateAsync(data);
+    }
 
     /// <inheritdoc />
-    public abstract Task CreateAsync(T data);
+    public async Task UpdateAsync(IEnumerable<T> list)
+    {
+        await _dbConnection.UpdateAsync(list);
+    }
+    #endregion
+
+    #region Implementation of IDataRemover<T>
+    /// <inheritdoc />
+    public async Task RemoveAsync(T data)
+    {
+        _dataContext.Set<T>().Remove(data);
+        await _dataContext.SaveChangesAsync();
+    }
 
     /// <inheritdoc />
-    public abstract Task CreateAsync(IEnumerable<T> data);
+    public async Task RemoveAsync(IEnumerable<T> list)
+    {
+        _dataContext.Set<T>().RemoveRange(list);
+        await _dataContext.SaveChangesAsync();
+    }
 
     /// <inheritdoc />
-    public abstract IEnumerable<T> Read();
-
-    /// <inheritdoc />
-    public abstract IEnumerable<T> Read(string searchTerm);
-
-    /// <inheritdoc />
-    public abstract IEnumerable<T> Read(T model);
-
-    /// <inheritdoc />
-    public abstract Task<IEnumerable<T>> ReadAsync();
-
-    /// <inheritdoc />
-    public abstract Task<IEnumerable<T>> ReadAsync(string searchTerm);
-
-    /// <inheritdoc />
-    public abstract Task<IEnumerable<T>> ReadAsync(T model);
-
-    /// <inheritdoc />
-    public abstract void Update(T data);
-
-    /// <inheritdoc />
-    public abstract void Update(IEnumerable<T> data);
-
-    /// <inheritdoc />
-    public abstract Task UpdateAsync(T data);
-
-    /// <inheritdoc />
-    public abstract Task UpdateAsync(IEnumerable<T> data);
-
-    /// <inheritdoc />
-    public abstract void Delete(T data);
-
-    /// <inheritdoc />
-    public abstract void Delete(IEnumerable<T> data);
-
-    /// <inheritdoc />
-    public abstract Task DeleteAsync(T data);
-
-    /// <inheritdoc />
-    public abstract Task DeleteAsync(IEnumerable<T> data);
-
-    /// <inheritdoc />
-    public abstract void DeleteAll();
-
-    /// <inheritdoc />
-    public abstract Task DeleteAllAsync();
+    public async Task RemoveAllAsync()
+    {
+        var sql = $"DELETE FROM {_tableName}";
+        await _dbConnection.ExecuteAsync(sql);
+    }
     #endregion
 }

@@ -117,9 +117,9 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         {
             if (_secondsToCancelClear == 0)
             {
-                await _audioRepository.DeleteAllAsync();
-                await _musicFolderRepository.DeleteAllAsync();
-                await _playlistRepository.DeleteAllAsync();
+                await _audioRepository.RemoveAllAsync();
+                await _musicFolderRepository.RemoveAllAsync();
+                await _playlistRepository.RemoveAllAsync();
                 
                 Folders = new();
 
