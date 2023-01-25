@@ -51,13 +51,13 @@
                 Click="Button_Click"/>
 
             <Grid
-                Margin="5"
+                Margin="10 5"
                 Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*" x:Name="ListRow"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -67,58 +67,66 @@
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
-                <CheckBox
-                    Grid.Column="2"
-                    Grid.ColumnSpan="3"
-                    IsChecked="{Binding MatchAll}"
-                    Foreground="{DynamicResource ThirnaryBrush}"
-                    Background="{DynamicResource ThirnaryBrush}"
-                    Content="Match all"/>
+                
                 <TextBlock
                     Grid.ColumnSpan="2"
-                    Grid.Row="1"
                     Text="New criteria:"/>
                 <ComboBox
                     x:Name="TableColumnName"
                     ItemsSource="{Binding ColumnName}"
                     SelectedItem="{Binding SelectedColumnName}"
-                    Grid.Row="2"
+                    Grid.Row="1"
                     Style="{StaticResource CustomComboBox}"
                     Margin="0 5 5 5"/>
                 <ComboBox
                     x:Name="Relation"
                     ItemsSource="{Binding Relation}"
                     SelectedItem="{Binding SelectedRelation}"
-                    Grid.Row="2"
+                    Grid.Row="1"
                     Grid.Column="1"
                     Margin="5 0"
                     Style="{StaticResource CustomComboBox}"/>
                 <TextBox
                     x:Name="GeneralInput"
                     Text="{Binding InputText}"
-                    Grid.Row="2"
+                    Grid.Row="1"
                     Grid.Column="2"
                     Grid.ColumnSpan="2"
                     materialDesign:TextFieldAssist.SuffixText="{Binding RangeSuffixText}"/>
                 <Button
                     x:Name="AddCriteria"
-                    Grid.Row="2"
+                    Grid.Row="1"
                     Grid.Column="4"
                     Command="{Binding AddCriteriaCommand}"
                     Style="{StaticResource InteractionButton}"
                     Content="{materialDesign:PackIcon Kind=Plus,Size=20}"/>
 
-                <ListView
-                    x:Name="SearchCriterias"
-                    Margin="5"
-                    ItemsSource="{Binding Criterias}"
-                    ScrollViewer.VerticalScrollBarVisibility="Auto"
-                    Height="{Binding ElementName=ListRow, Path=Height}"
-                    Grid.Row="3"
+                <Border
+                    Grid.Row="2"
                     Grid.ColumnSpan="5"
-                    Style="{StaticResource VirtualizedListView}"/>
+                    CornerRadius="5"
+                    BorderBrush="#aaa"
+                    BorderThickness="1"
+                    Margin="0 5">
+                    <ListView
+                        x:Name="SearchCriterias"                        
+                        Margin="5"
+                        ItemsSource="{Binding Criterias}"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        Height="{Binding ElementName=ListRow, Path=Height}"
+                        Style="{StaticResource VirtualizedListView}"/>
+                </Border>
 
+                <CheckBox
+                    Grid.ColumnSpan="5"
+                    Grid.Row="3"
+                    IsChecked="{Binding MatchAll}"
+                    Foreground="{DynamicResource ThirnaryBrush}"
+                    Background="{DynamicResource ThirnaryBrush}"
+                    HorizontalAlignment="Center"
+                    Margin="0 5"
+                    Content="Match all"
+                    FontSize="20"/>
                 <Button
                     x:Name="Search"
                     Grid.Row="4"
