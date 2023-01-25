@@ -25,6 +25,7 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     [ObservableProperty] private List<string> _relation;
     [ObservableProperty] private string _selectedRelation = "";
     [ObservableProperty] private ObservableCollection<string> _criterias;
+    [ObservableProperty] private string _selectedCriteria;
     [ObservableProperty] private string _rangeSuffixText = "";
     [ObservableProperty] private string _inputText = "";
     [ObservableProperty] private bool _matchAll;
@@ -112,6 +113,15 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
         InputText = "";
     }
 
+    [RelayCommand]
+    private void DeleteItem()
+    {
+        if (!string.IsNullOrEmpty(SelectedCriteria) && _criterias.Contains(SelectedCriteria))
+        {
+            _criterias.Remove(SelectedCriteria);
+        }
+    }
+    
     public void Search()
     {
         _mediator.Publish(new AdvancedSearchNotification(_queryStatements, _matchAll));

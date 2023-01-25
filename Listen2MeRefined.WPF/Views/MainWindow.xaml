@@ -118,8 +118,7 @@
                         CornerRadius="8"
                         Padding="10"
                         BorderBrush="{StaticResource SecondaryBrush}"
-                        BorderThickness="2"
-                        ToolTip="Currently Playing">
+                        BorderThickness="2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />

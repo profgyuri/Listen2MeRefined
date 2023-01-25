@@ -42,8 +42,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <Grid
-                        MinWidth="320"
-                        ToolTip="{Binding Display}">
+                        MinWidth="320">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />

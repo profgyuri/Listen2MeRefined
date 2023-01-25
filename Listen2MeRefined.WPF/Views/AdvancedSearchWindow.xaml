@@ -112,9 +112,14 @@
                         x:Name="SearchCriterias"                        
                         Margin="5"
                         ItemsSource="{Binding Criterias}"
+                        SelectedItem="{Binding SelectedCriteria}"
                         ScrollViewer.VerticalScrollBarVisibility="Auto"
                         Height="{Binding ElementName=ListRow, Path=Height}"
-                        Style="{StaticResource VirtualizedListView}"/>
+                        Style="{StaticResource VirtualizedListView}">
+                        <ListView.InputBindings>
+                            <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}"/>
+                        </ListView.InputBindings>
+                    </ListView>
                 </Border>
 
                 <CheckBox
