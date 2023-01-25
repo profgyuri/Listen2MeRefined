@@ -23,6 +23,7 @@ public partial class MainWindowViewModel
     private readonly ILogger _logger;
     private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly IGlobalHook _globalHook;
     private readonly DataContext _dataContext;
     private readonly IDbConnection _dbConnection;
@@ -53,6 +54,7 @@ public partial class MainWindowViewModel
         ILogger logger,
         IPlaylistReference playlistReference,
         IRepository<AudioModel> audioRepository,
+        IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
         TimedTask timedTask,
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
@@ -64,6 +66,7 @@ public partial class MainWindowViewModel
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
+        _advancedAudioReader = advancedAudioReader;
         _globalHook = globalHook;
         _dataContext = dataContext;
         _dbConnection = dbConnection;
@@ -124,27 +127,8 @@ public partial class MainWindowViewModel
         AdvancedSearchNotification notification,
         CancellationToken cancellationToken)
     {
-        var concatenation = notification.MatchAll ? "AND" : "OR";
-        var clauses = notification.Filters.Select(x => x.QueryString);
-        var parameterList = notification.Filters.Select(x => x.Parameters);
-        var parameters = new DynamicParameters();
-
-        foreach (var param in parameterList)
-        {
-            parameters.AddDynamicParams(param);
-        }
-
-        var builder = new StringBuilder();
-        builder.Append($"SELECT * FROM {_dataContext.Model.FindEntityType(typeof(AudioModel))!.GetTableName()!} WHERE ");
-        foreach (var clause in clauses)
-        {
-            builder.Append(clause);
-            builder.Append($" {concatenation} ");
-        }
-
-        builder.Remove(builder.Length - concatenation.Length - 1, concatenation.Length);
-        var query = builder.ToString();
-        var result = await _dbConnection.QueryAsync<AudioModel>(query, parameters);
+        var result = 
+            await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll);
         _searchResults.Clear();
         _searchResults.AddRange(result);
     }

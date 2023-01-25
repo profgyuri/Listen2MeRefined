@@ -81,9 +81,7 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
         _criterias.Add($"{SelectedColumnName} {SelectedRelation} {InputText}");
 
         var queryBuilder = new StringBuilder(SelectedColumnName);
-        var criteriaBuilder = new StringBuilder(SelectedColumnName);
         queryBuilder.Append(' ');
-        criteriaBuilder.Append(' ');
         var relation = SelectedRelation switch
         {
             "Is" => "= ",
@@ -96,7 +94,6 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
             _ => throw new IndexOutOfRangeException($"This relation is not handled: {SelectedRelation}")
         };
         queryBuilder.Append(relation);
-        criteriaBuilder.Append(SelectedRelation);
 
         var param = new DynamicParameters();
         if (SelectedRelation is "Contains" or "Does not Contain")
@@ -107,15 +104,10 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
         {
             param.Add($"param{_queryStatements.Count}", $"{InputText}");
         }
-        
-        var input = $"@param{_queryStatements.Count}";
 
-        queryBuilder.Append(input);
-        criteriaBuilder.Append(InputText);
+        queryBuilder.Append($"@param{_queryStatements.Count}");
         
         _queryStatements.Add(new ParameterizedQuery(queryBuilder.ToString(), param));
-        _criterias.Add(criteriaBuilder.ToString());
-        OnPropertyChanged(nameof(Criterias));
         
         InputText = "";
     }

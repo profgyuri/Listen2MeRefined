@@ -32,7 +32,8 @@ public class DataAccessModule : Module
 
         builder
             .RegisterType<AudioRepository>()
-            .As<IRepository<AudioModel>>();
+            .As<IRepository<AudioModel>>()
+            .As<IAdvancedDataReader<ParameterizedQuery, AudioModel>>();
 
         builder
             .RegisterType<PlaylistRepository>()

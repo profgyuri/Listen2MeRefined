@@ -9,8 +9,8 @@ public abstract class RepositoryBase<T> : IRepository<T>
     where T: Model
 {
     private readonly ILogger _logger;
-    private readonly DataContext _dataContext;
-    private readonly IDbConnection _dbConnection;
+    protected readonly DataContext _dataContext;
+    protected readonly IDbConnection _dbConnection;
 
     private readonly string _tableName;
 
