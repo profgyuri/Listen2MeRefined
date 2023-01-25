@@ -132,9 +132,8 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
 
         if (_currentSong is not null)
         {
-            var current = _playlist[_currentSongIndex];
-            _playlist.Remove(current);
-            _playlist.Insert(0, current);
+            var index = _playlist.IndexOf(_currentSong);
+            (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
         }
 
         _currentSongIndex = 0;
