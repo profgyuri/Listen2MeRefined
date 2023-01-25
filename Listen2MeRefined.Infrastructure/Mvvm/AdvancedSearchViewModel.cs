@@ -136,6 +136,7 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
             return;
         }
         
+        _logger.Debug($"Starting advanced search with these filters:\n{Criterias}", string.Join('\n', _criterias));
         _mediator.Publish(new AdvancedSearchNotification(_queryStatements, _matchAll));
         _queryStatements.Clear();
         _criterias.Clear();
