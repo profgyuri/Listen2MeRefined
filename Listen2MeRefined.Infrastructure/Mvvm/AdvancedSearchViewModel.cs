@@ -79,6 +79,13 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     [RelayCommand]
     private void AddCriteria()
     {
+        if (string.IsNullOrEmpty(SelectedColumnName) ||
+            string.IsNullOrEmpty(SelectedRelation) ||
+            string.IsNullOrEmpty(InputText))
+        {
+            return;
+        }
+        
         _criterias.Add($"{SelectedColumnName} {SelectedRelation} {InputText}");
 
         var queryBuilder = new StringBuilder(SelectedColumnName);
@@ -124,6 +131,11 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     
     public void Search()
     {
+        if (_queryStatements.Count == 0)
+        {
+            return;
+        }
+        
         _mediator.Publish(new AdvancedSearchNotification(_queryStatements, _matchAll));
         _queryStatements.Clear();
         _criterias.Clear();
