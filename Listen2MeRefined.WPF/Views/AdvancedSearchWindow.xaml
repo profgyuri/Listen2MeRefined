@@ -92,6 +92,8 @@
                     Grid.Row="1"
                     Grid.Column="2"
                     Grid.ColumnSpan="2"
+                    BorderBrush="{StaticResource ThirnaryBrush}"
+                    Margin="5 0"
                     materialDesign:TextFieldAssist.SuffixText="{Binding RangeSuffixText}"/>
                 <Button
                     x:Name="AddCriteria"

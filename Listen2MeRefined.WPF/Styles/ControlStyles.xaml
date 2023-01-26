@@ -104,6 +104,8 @@
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThirnaryBrush}" />
         <Setter Property="Padding" Value="5" />
+        <Setter Property="BorderBrush" Value="{StaticResource ThirnaryBrush}" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource PrimaryBrush}" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
