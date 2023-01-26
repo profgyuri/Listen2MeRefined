@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Data;
+using NAudio.Wave;
 using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Services;
@@ -30,19 +31,21 @@ public sealed class FolderScannerService : IFolderScanner
     public async Task ScanAsync(string path)
     {
         _logger.Information("Scanning folder for audio files: {Path}", path);
-        var files = (await _fileEnumerator.EnumerateFilesAsync(path)).ToHashSet();
+        var files = await _fileEnumerator.EnumerateFilesAsync(path);
+        var filteredFiles =
+            files.Where(IsSupported).ToHashSet();
         var fromDb = (await _audioRepository.ReadAsync()).ToList();
 
         for (var i = 0; i < fromDb.Count; i++)
         {
             var current = fromDb[i];
 
-            if (!files.Contains(current.Path!))
+            if (!filteredFiles.Contains(current.Path!))
             {
                 continue;
             }
 
-            files.Remove(current.Path!);
+            filteredFiles.Remove(current.Path!);
             fromDb.RemoveAt(i);
             i--;
             
@@ -52,7 +55,7 @@ public sealed class FolderScannerService : IFolderScanner
             await _audioRepository.UpdateAsync(current);
         }
         
-        var newSongs = await _audioFileAnalyzer.AnalyzeAsync(files);
+        var newSongs = await _audioFileAnalyzer.AnalyzeAsync(filteredFiles);
         await _audioRepository.SaveAsync(newSongs);
         await _audioRepository.RemoveAsync(fromDb);
     }
@@ -75,4 +78,9 @@ public sealed class FolderScannerService : IFolderScanner
         await ScanAsync(paths);
     }
     #endregion
+
+    private static bool IsSupported(string path)
+    {
+        return !path.EndsWith(".wav") || new WaveFileReader(path).WaveFormat.Encoding is WaveFormatEncoding.Extensible;
+    }
 }
