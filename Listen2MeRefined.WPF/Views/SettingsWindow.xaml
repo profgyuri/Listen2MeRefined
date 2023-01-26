@@ -14,12 +14,6 @@
         Title="SettingsWindow"
         Height="300" Width="450">
 
-    <Window.Resources>
-        <local:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter" />
-        <local:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter" />
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-    </Window.Resources>
-
     <WindowChrome.WindowChrome>
         <WindowChrome
             x:Name="WindowChrome"

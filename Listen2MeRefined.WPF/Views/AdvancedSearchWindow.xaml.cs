@@ -13,4 +13,18 @@ public sealed partial class AdvancedSearchWindow : Window
 
         DataContext = viewModel;
     }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void Search_Click(object sender, RoutedEventArgs e)
+    {
+        var vm = DataContext as AdvancedSearchViewModel;
+
+        vm!.Search();
+
+        Close();
+    }
 }

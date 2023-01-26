@@ -118,8 +118,7 @@
                         CornerRadius="8"
                         Padding="10"
                         BorderBrush="{StaticResource SecondaryBrush}"
-                        BorderThickness="2"
-                        ToolTip="Currently Playing">
+                        BorderThickness="2">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -235,7 +234,7 @@
                     <TextBox
                         Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         materialDesign:HintAssist.Hint="Search For:"
-                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource SecondaryBrush}">
+                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThirnaryBrush}">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
                         </TextBox.InputBindings>

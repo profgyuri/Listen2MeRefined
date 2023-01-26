@@ -19,7 +19,7 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
     private double _previousTimeStamp;
     private double _unpausedFor;
     private AudioModel? _currentSong;
-    private AudioFileReader? _fileReader;
+    private WaveStream? _fileReader;
     private WaveOutEvent _waveOutEvent = new();
     private ObservableCollection<AudioModel> _playlist = new();
     private PlaybackState _playbackState = PlaybackState.Stopped;
@@ -132,8 +132,8 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
 
         if (_currentSong is not null)
         {
-            (_playlist[0], _playlist[_currentSongIndex]) =
-                (_playlist[_currentSongIndex], _playlist[0]);
+            var index = _playlist.IndexOf(_currentSong);
+            (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
         }
 
         _currentSongIndex = 0;
@@ -143,14 +143,18 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
     #region Helpers
     private async Task LoadCurrentSong()
     {
-        _logger.Information("Loading audio: {Song}", _currentSong);
         _currentSong = _playlist[_currentSongIndex];
-        _fileReader = new AudioFileReader(_currentSong.Path);
+        _logger.Information("Loading audio: {Song}", _currentSong);
+        _fileReader = _currentSong.Path.EndsWith(".wav") ? 
+            new WaveFileReader(_currentSong.Path) : 
+            new AudioFileReader(_currentSong.Path);
 
         if (_fileReader.WaveFormat.Encoding is WaveFormatEncoding.Extensible)
         {
-            //todo: find a way to convert to PCM
+            //just skip this, as I have no clue how to handle or convert this type
+            _logger.Debug("Unsupported (extensible) .wav file is being skipped: {Song}", _currentSong.Path);
             await NextAsync();
+            return;
         }
 
         Bitmap = await _waveFormDrawer.WaveFormAsync(_currentSong.Path);

@@ -1,136 +1,45 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+﻿using System.Text;
+using Dapper;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 
-public sealed class AudioRepository : IRepository<AudioModel>
+namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+
+public sealed class AudioRepository : 
+    RepositoryBase<AudioModel>,
+    IAdvancedDataReader<ParameterizedQuery, AudioModel>
 {
-    private readonly IDataReader _dataReader;
-    private readonly IDataSaver _dataSaver;
-    private readonly IDataRemover _dataRemover;
-    private readonly IDataUpdater _dataUpdater;
-    private readonly ILogger _logger;
+    public AudioRepository(DataContext dataContext, IDbConnection dbConnection, ILogger logger)
+        : base(logger, dataContext, dbConnection)
+    { }
 
-    public AudioRepository(
-        IDataReader dataReader,
-        IDataSaver dataSaver,
-        IDataRemover dataRemover,
-        IDataUpdater dataUpdater,
-        ILogger logger)
+    #region Implementation of IAdvancedDataReader<in ParameterizedQuery,AudioModel>
+    /// <inheritdoc />
+    public async Task<IEnumerable<AudioModel>> ReadAsync(IEnumerable<ParameterizedQuery> criterias, bool matchAll)
     {
-        _dataReader = dataReader;
-        _dataSaver = dataSaver;
-        _dataRemover = dataRemover;
-        _dataUpdater = dataUpdater;
-        _logger = logger;
-    }
+        var concatenation = matchAll ? "AND" : "OR";
+        var parameterizedQueries = criterias as ParameterizedQuery[] ?? criterias.ToArray();
+        var clauses = parameterizedQueries.Select(x => x.QueryString);
+        var parameterList = parameterizedQueries.Select(x => x.Parameters);
+        var parameters = new DynamicParameters();
 
-    #region IDataSaver
-    public void Create(AudioModel data)
-    {
-        _logger.Information("Saving audio to database: {Audio}", data.Display);
-        _dataSaver.Save(data);
-    }
+        foreach (var param in parameterList)
+        {
+            parameters.AddDynamicParams(param);
+        }
 
-    public void Create(IEnumerable<AudioModel> data)
-    {
-        _logger.Information("Saving a list of audio to database");
-        _dataSaver.Save(data);
-    }
+        var builder = new StringBuilder();
+        builder.Append($"SELECT * FROM {_dataContext.Model.FindEntityType(typeof(AudioModel))!.GetTableName()!} WHERE ");
+        foreach (var clause in clauses)
+        {
+            builder.Append(clause);
+            builder.Append(" COLLATE NOCASE");
+            builder.Append($" {concatenation} ");
+        }
 
-    public async Task CreateAsync(AudioModel data)
-    {
-        _logger.Information("Saving audio to database: {Audio}", data.Display);
-        await _dataSaver.SaveAsync(data);
-    }
-
-    public async Task CreateAsync(IEnumerable<AudioModel> data)
-    {
-        _logger.Information("Saving a list of audio to database");
-        await _dataSaver.SaveAsync(data);
-    }
-    #endregion
-
-    #region IDataRemover
-    public void Delete(AudioModel data)
-    {
-        _dataRemover.Remove(data);
-    }
-
-    public void Delete(IEnumerable<AudioModel> data)
-    {
-        _dataRemover.Remove(data);
-    }
-
-    public async Task DeleteAsync(AudioModel data)
-    {
-        await _dataRemover.RemoveAsync(data);
-    }
-
-    public async Task DeleteAsync(IEnumerable<AudioModel> data)
-    {
-        await _dataRemover.RemoveAsync(data);
-    }
-
-    public void DeleteAll()
-    {
-        _dataRemover.RemoveAll<AudioModel>();
-    }
-
-    public async Task DeleteAllAsync()
-    {
-        await _dataRemover.RemoveAllAsync<AudioModel>();
-    }
-    #endregion
-
-    #region IDataReader
-    public IEnumerable<AudioModel> Read()
-    {
-        return _dataReader.Read<AudioModel>();
-    }
-
-    public IEnumerable<AudioModel> Read(string searchTerm)
-    {
-        return _dataReader.Read<AudioModel>(searchTerm);
-    }
-
-    public IEnumerable<AudioModel> Read(AudioModel model)
-    {
-        return _dataReader.Read(model, false);
-    }
-
-    public async Task<IEnumerable<AudioModel>> ReadAsync()
-    {
-        return await _dataReader.ReadAsync<AudioModel>();
-    }
-
-    public async Task<IEnumerable<AudioModel>> ReadAsync(string searchTerm)
-    {
-        return await _dataReader.ReadAsync<AudioModel>(searchTerm);
-    }
-
-    public async Task<IEnumerable<AudioModel>> ReadAsync(AudioModel model)
-    {
-        return await _dataReader.ReadAsync(model, false);
-    }
-    #endregion
-
-    #region IDataUpdater
-    public void Update(AudioModel data)
-    {
-        _dataUpdater.Update(data);
-    }
-
-    public void Update(IEnumerable<AudioModel> data)
-    {
-        _dataUpdater.Update(data);
-    }
-
-    public async Task UpdateAsync(AudioModel data)
-    {
-        await _dataUpdater.UpdateAsync(data);
-    }
-
-    public async Task UpdateAsync(IEnumerable<AudioModel> data)
-    {
-        await _dataUpdater.UpdateAsync(data);
+        builder.Remove(builder.Length - concatenation.Length - 1, concatenation.Length);
+        var query = builder.ToString();
+        return await _dbConnection.QueryAsync<AudioModel>(query, parameters);
     }
     #endregion
 }

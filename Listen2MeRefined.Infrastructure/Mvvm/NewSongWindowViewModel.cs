@@ -8,7 +8,13 @@ public partial class NewSongWindowViewModel
     : INotificationHandler<CurrentSongNotification>,
         INotificationHandler<FontFamilyChangedNotification>
 {
-    [ObservableProperty] private AudioModel _song = new();
+    [ObservableProperty] private AudioModel _song = new()
+    {
+        Artist = "Artist",
+        Title = "Title",
+        Genre = "Genre",
+        Path = ""
+    };
     [ObservableProperty] private string _fontFamily = default!;
 
     #region Implementation of INotificationHandler<in CurrentSongNotification>

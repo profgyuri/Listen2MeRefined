@@ -42,8 +42,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <Grid
-                        MinWidth="320"
-                        ToolTip="{Binding Display}">
+                        MinWidth="320">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
@@ -103,6 +102,7 @@
     </Style>
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThirnaryBrush}" />
         <Setter Property="Padding" Value="5" />
         <Setter Property="ItemsPanel">
             <Setter.Value>

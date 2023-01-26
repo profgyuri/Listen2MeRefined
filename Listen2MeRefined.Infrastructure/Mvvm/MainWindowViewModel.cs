@@ -1,10 +1,13 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text;
+using Dapper;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using SkiaSharp;
 using Source;
 using Source.Storage;
@@ -14,12 +17,16 @@ namespace Listen2MeRefined.Infrastructure.Mvvm;
 [INotifyPropertyChanged]
 public partial class MainWindowViewModel
     : INotificationHandler<CurrentSongNotification>,
-        INotificationHandler<FontFamilyChangedNotification>
+        INotificationHandler<FontFamilyChangedNotification>,
+        INotificationHandler<AdvancedSearchNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly IGlobalHook _globalHook;
+    private readonly DataContext _dataContext;
+    private readonly IDbConnection _dbConnection;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
@@ -47,17 +54,22 @@ public partial class MainWindowViewModel
         ILogger logger,
         IPlaylistReference playlistReference,
         IRepository<AudioModel> audioRepository,
+        IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
         TimedTask timedTask,
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
         DataContext dataContext,
+        IDbConnection dbConnection,
         IWaveFormDrawer<SKBitmap> waveFormDrawer)
     {
         _mediaController = mediaController;
         _logger = logger;
         _audioRepository = audioRepository;
+        _advancedAudioReader = advancedAudioReader;
         _globalHook = globalHook;
+        _dataContext = dataContext;
+        _dbConnection = dbConnection;
         _waveFormDrawer = waveFormDrawer;
 
         dataContext.Database.Migrate();
@@ -106,6 +118,19 @@ public partial class MainWindowViewModel
         await DrawPlaceholderLineAsync();
         SelectedSong = notification.Audio;
         WaveForm = _mediaController.Bitmap;
+    }
+    #endregion
+    
+    #region Implementation of INotificationHandler<in AdvancedSearchNotification>
+    /// <inheritdoc />
+    public async Task Handle(
+        AdvancedSearchNotification notification,
+        CancellationToken cancellationToken)
+    {
+        var result = 
+            await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll);
+        _searchResults.Clear();
+        _searchResults.AddRange(result);
     }
     #endregion
 

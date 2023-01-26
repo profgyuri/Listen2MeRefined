@@ -5,17 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         d:DataContext="{d:DesignInstance vm:AdvancedSearchViewModel}"
+        xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         Style="{StaticResource BasicWindow}"
         ResizeMode="NoResize"
         Title="AdvancedSearchWindow"
-        Height="350" Width="300">
+        Height="400" Width="500">
 
     <WindowChrome.WindowChrome>
         <WindowChrome
             x:Name="WindowChrome"
             CaptionHeight="32" />
     </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThirnaryBrush}" />
+        </Style>
+    </Window.Resources>
 
     <Border
         BorderThickness="2"
@@ -34,6 +43,105 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 FontWeight="Bold" />
+            <Button
+                Style="{StaticResource WindowCloseButton}"
+                HorizontalAlignment="Right"
+                Content="{materialDesign:PackIcon Kind=Close, Size=15}"
+                materialDesign:ButtonAssist.CornerRadius="0 8 0 0"
+                Click="Button_Click"/>
+
+            <Grid
+                Margin="10 5"
+                Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" x:Name="ListRow"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock
+                    Grid.ColumnSpan="2"
+                    Text="New criteria:"/>
+                <ComboBox
+                    x:Name="TableColumnName"
+                    ItemsSource="{Binding ColumnName}"
+                    SelectedItem="{Binding SelectedColumnName}"
+                    Grid.Row="1"
+                    Style="{StaticResource CustomComboBox}"
+                    Margin="0 5 5 5"/>
+                <ComboBox
+                    x:Name="Relation"
+                    ItemsSource="{Binding Relation}"
+                    SelectedItem="{Binding SelectedRelation}"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="5 0"
+                    Style="{StaticResource CustomComboBox}"/>
+                <TextBox
+                    x:Name="GeneralInput"
+                    Text="{Binding InputText}"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Grid.ColumnSpan="2"
+                    materialDesign:TextFieldAssist.SuffixText="{Binding RangeSuffixText}"/>
+                <Button
+                    x:Name="AddCriteria"
+                    Grid.Row="1"
+                    Grid.Column="4"
+                    Command="{Binding AddCriteriaCommand}"
+                    Style="{StaticResource InteractionButton}"
+                    Content="{materialDesign:PackIcon Kind=Plus,Size=20}"/>
+
+                <Border
+                    Grid.Row="2"
+                    Grid.ColumnSpan="5"
+                    CornerRadius="5"
+                    BorderBrush="#aaa"
+                    BorderThickness="1"
+                    Margin="0 5">
+                    <ListView
+                        x:Name="SearchCriterias"                        
+                        Margin="5"
+                        ItemsSource="{Binding Criterias}"
+                        SelectedItem="{Binding SelectedCriteria}"
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        Height="{Binding ElementName=ListRow, Path=Height}"
+                        Style="{StaticResource VirtualizedListView}">
+                        <ListView.InputBindings>
+                            <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}"/>
+                        </ListView.InputBindings>
+                    </ListView>
+                </Border>
+
+                <CheckBox
+                    Grid.ColumnSpan="5"
+                    Grid.Row="3"
+                    IsChecked="{Binding MatchAll}"
+                    Foreground="{DynamicResource ThirnaryBrush}"
+                    Background="{DynamicResource ThirnaryBrush}"
+                    HorizontalAlignment="Center"
+                    Margin="0 5"
+                    Content="Match all"
+                    FontSize="20"/>
+                <Button
+                    x:Name="Search"
+                    Grid.Row="4"
+                    Grid.ColumnSpan="5"
+                    Content="Search"
+                    Style="{StaticResource InteractionButton}"
+                    Width="200"
+                    Margin="5" Click="Search_Click"/>
+
+            </Grid>
 
         </Grid>
 
