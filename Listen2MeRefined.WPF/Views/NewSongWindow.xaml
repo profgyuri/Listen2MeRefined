@@ -13,7 +13,12 @@
         FontSize="18"
         Title="NewSongWindow" Height="90" Width="450">
 
-    <Frame
-        x:Name="ContentPage"
-        NavigationUIVisibility="Hidden"/>
+    <Border
+        BorderBrush="{DynamicResource SecondaryBrush}"
+        BorderThickness="1"
+        CornerRadius="3">
+        <Frame
+            x:Name="ContentPage"
+            NavigationUIVisibility="Hidden"/>
+    </Border>
 </Window>

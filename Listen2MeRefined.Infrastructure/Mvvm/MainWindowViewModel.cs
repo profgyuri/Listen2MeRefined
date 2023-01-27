@@ -15,18 +15,16 @@ using Source.Storage;
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 [INotifyPropertyChanged]
-public partial class MainWindowViewModel
-    : INotificationHandler<CurrentSongNotification>,
-        INotificationHandler<FontFamilyChangedNotification>,
-        INotificationHandler<AdvancedSearchNotification>
+public partial class MainWindowViewModel : 
+    INotificationHandler<CurrentSongNotification>,
+    INotificationHandler<FontFamilyChangedNotification>,
+    INotificationHandler<AdvancedSearchNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly IGlobalHook _globalHook;
-    private readonly DataContext _dataContext;
-    private readonly IDbConnection _dbConnection;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
@@ -60,7 +58,6 @@ public partial class MainWindowViewModel
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
         DataContext dataContext,
-        IDbConnection dbConnection,
         IWaveFormDrawer<SKBitmap> waveFormDrawer)
     {
         _mediaController = mediaController;
@@ -68,8 +65,6 @@ public partial class MainWindowViewModel
         _audioRepository = audioRepository;
         _advancedAudioReader = advancedAudioReader;
         _globalHook = globalHook;
-        _dataContext = dataContext;
-        _dbConnection = dbConnection;
         _waveFormDrawer = waveFormDrawer;
 
         dataContext.Database.Migrate();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Listen2MeRefined.WPF.Views;
+using Listen2MeRefined.WPF.Views.Pages;
 
 namespace Listen2MeRefined.WPF;
 
@@ -9,11 +10,14 @@ namespace Listen2MeRefined.WPF;
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    public MainWindow(MainWindowViewModel viewModel)
+    public MainWindow(
+        MainWindowViewModel viewModel,
+        CurrentlyPlayingPage currentlyPlayingPage)
     {
         InitializeComponent();
 
         DataContext = viewModel;
+        CurrentlyPlayingFrame.Content = currentlyPlayingPage;
     }
 
     private void CloseWindow_Click(
