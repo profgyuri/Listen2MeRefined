@@ -13,7 +13,8 @@
         Style="{StaticResource BasicWindow}"
         WindowStartupLocation="Manual"
         Title="Listen2Me"
-        MinHeight="302" MinWidth="800"
+        MinHeight="502" MinWidth="800"
+        Height="702" Width="1030"
         MaxHeight="702" MaxWidth="1030">
 
     <WindowChrome.WindowChrome>
@@ -117,11 +118,12 @@
                         Grid.RowSpan="2"
                         CornerRadius="8"
                         Padding="10"
-                        BorderBrush="{StaticResource SecondaryBrush}"
+                        Margin="0 0 10 0"
+                        BorderBrush="#aaa"
                         BorderThickness="2">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -134,24 +136,35 @@
                                 Grid.ColumnSpan="3"
                                 Margin="0 0 0 10"
                                 HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
                                 FontWeight="Bold"
                                 Text="{Binding SelectedSong.Display, FallbackValue=Display Name}" />
                             <TextBlock
                                 Grid.Row="1"
+                                VerticalAlignment="Center"
                                 Text="{Binding SelectedSong.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="1"
                                 Margin="10 0"
                                 HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
                                 Text="{Binding SelectedSong.Genre, FallbackValue=Genre}" />
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="2"
+                                VerticalAlignment="Center"
                                 Text="{Binding SelectedSong.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
 
                         </Grid>
                     </Border>
+                    <TextBlock
+                        Text="Currently Playing"
+                        Background="{DynamicResource PrimaryBrush}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="30 -10 0 0"
+                        Padding="3 0"/>
 
                     <Button
                         Grid.Column="1"
@@ -194,31 +207,59 @@
                 </Grid>
 
                 <!-- Search results -->
-                <ListView
-                    x:Name="SearchResults"
-                    Margin="0 20 10 20"
-                    dd:DragDrop.IsDragSource="True"
-                    dd:DragDrop.IsDropTarget="True"
-                    ItemsSource="{Binding SearchResults}"
-                    Style="{StaticResource SongsListView}"
-                    Grid.Row="1" />
+                <Border
+                    Grid.Row="1"
+                    BorderThickness="1"
+                    BorderBrush="#aaa"
+                    CornerRadius="5"
+                    Margin="0 20 10 20">
+                    <ListView
+                        x:Name="SearchResults"
+                        Margin="0 20 10 20"
+                        dd:DragDrop.IsDragSource="True"
+                        dd:DragDrop.IsDropTarget="True"
+                        ItemsSource="{Binding SearchResults}"
+                        Style="{StaticResource SongsListView}"/>
+                </Border>
+                <TextBlock
+                    Grid.Row="1"
+                    Text="Search Results"
+                    Background="{DynamicResource PrimaryBrush}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="30 8 0 0"
+                    Padding="3 0"/>
 
                 <!-- Playlist -->
-                <ListView
+                <Border
                     Margin="10 20 0 20"
-                    dd:DragDrop.IsDragSource="True"
-                    dd:DragDrop.IsDropTarget="True"
-                    ItemsSource="{Binding PlayList}"
-                    Style="{StaticResource SongsListView}"
-                    SelectedIndex="{Binding SelectedIndex}"
                     Grid.Row="1"
-                    Grid.Column="1">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListView>
+                    Grid.Column="1"
+                    BorderThickness="1"
+                    BorderBrush="#aaa"
+                    CornerRadius="5">
+                    <ListView
+                        dd:DragDrop.IsDragSource="True"
+                        dd:DragDrop.IsDropTarget="True"
+                        ItemsSource="{Binding PlayList}"
+                        Style="{StaticResource SongsListView}"
+                        SelectedIndex="{Binding SelectedIndex}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListView>
+                </Border>
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="Playlist"
+                    Background="{DynamicResource PrimaryBrush}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Margin="30 8 0 0"
+                    Padding="3 0"/>
 
                 <!-- Searchbar -->
                 <Grid

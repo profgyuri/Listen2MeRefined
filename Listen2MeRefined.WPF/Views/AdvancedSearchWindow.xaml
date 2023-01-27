@@ -124,16 +124,24 @@
                     </ListView>
                 </Border>
 
-                <CheckBox
+                <StackPanel
                     Grid.ColumnSpan="5"
                     Grid.Row="3"
-                    IsChecked="{Binding MatchAll}"
-                    Foreground="{DynamicResource ThirnaryBrush}"
-                    Background="{DynamicResource ThirnaryBrush}"
                     HorizontalAlignment="Center"
-                    Margin="0 5"
-                    Content="Match all"
-                    FontSize="20"/>
+                    Orientation="Horizontal">
+                    <RadioButton
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        Foreground="{DynamicResource ThirnaryBrush}"
+                        BorderBrush="{DynamicResource ThirnaryBrush}"
+                        IsChecked="{Binding MatchAll}"
+                        Content="Match All" />
+                    <RadioButton
+                        Style="{StaticResource MaterialDesignTabRadioButton}"
+                        Foreground="{DynamicResource ThirnaryBrush}"
+                        BorderBrush="{DynamicResource ThirnaryBrush}"
+                        IsChecked="True"
+                        Content="Match Any" />
+                </StackPanel>
                 <Button
                     x:Name="Search"
                     Grid.Row="4"
