@@ -160,11 +160,8 @@
                     </Border>
                     <TextBlock
                         Text="Currently Playing"
-                        Background="{DynamicResource PrimaryBrush}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        Margin="30 -10 0 0"
-                        Padding="3 0"/>
+                        Style="{StaticResource ElementContainerText}"
+                        Margin="30 -10 0 0"/>
 
                     <Button
                         Grid.Column="1"
@@ -222,13 +219,9 @@
                         Style="{StaticResource SongsListView}"/>
                 </Border>
                 <TextBlock
+                    Style="{StaticResource ElementContainerText}"
                     Grid.Row="1"
-                    Text="Search Results"
-                    Background="{DynamicResource PrimaryBrush}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Margin="30 8 0 0"
-                    Padding="3 0"/>
+                    Text="Search Results"/>
 
                 <!-- Playlist -->
                 <Border
@@ -255,11 +248,7 @@
                     Grid.Row="1"
                     Grid.Column="1"
                     Text="Playlist"
-                    Background="{DynamicResource PrimaryBrush}"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Top"
-                    Margin="30 8 0 0"
-                    Padding="3 0"/>
+                    Style="{StaticResource ElementContainerText}"/>
 
                 <!-- Searchbar -->
                 <Grid

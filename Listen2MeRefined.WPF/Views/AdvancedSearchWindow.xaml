@@ -109,7 +109,7 @@
                     CornerRadius="5"
                     BorderBrush="#aaa"
                     BorderThickness="1"
-                    Margin="0 5">
+                    Margin="0 16 0 5">
                     <ListView
                         x:Name="SearchCriterias"                        
                         Margin="5"
@@ -123,6 +123,12 @@
                         </ListView.InputBindings>
                     </ListView>
                 </Border>
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.ColumnSpan="5"
+                    Style="{StaticResource ElementContainerText}"
+                    Margin="30 4 0 0"
+                    Text="Filters"/>
 
                 <StackPanel
                     Grid.ColumnSpan="5"
