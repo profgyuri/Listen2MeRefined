@@ -51,6 +51,7 @@
 
                 <TextBlock
                     Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
+                    FontSize="20"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Grid.ColumnSpan="4"
@@ -231,7 +232,7 @@
 
                     <TextBox
                         Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        materialDesign:HintAssist.Hint="Search For:"
+                        materialDesign:HintAssist.Hint="Quick Search"
                         BorderBrush="{StaticResource ThirnaryBrush}"
                         materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThirnaryBrush}">
                         <TextBox.InputBindings>

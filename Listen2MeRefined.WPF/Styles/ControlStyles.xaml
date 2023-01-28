@@ -124,6 +124,7 @@
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Padding" Value="3 0" />
         <Setter Property="Margin" Value="30 8 0 0" />
+        <Setter Property="FontSize" Value="18" />
     </Style>
     <!--#endregion-->
     

@@ -15,6 +15,7 @@
 
     <Border
         BorderBrush="{DynamicResource SecondaryBrush}"
+        Background="{StaticResource HoloBackground}"
         BorderThickness="1"
         CornerRadius="3">
         <Frame
