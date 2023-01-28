@@ -40,6 +40,11 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         }
     }
 
+    public bool DontScanOnStartup
+    {
+        get => !ScanOnStartup;
+    }
+
     public SettingsWindowViewModel(
         ILogger logger,
         ISettingsManager<AppSettings> settingsManager,

@@ -1,4 +1,5 @@
 using Autofac;
+using Listen2MeRefined.Infrastructure.Mvvm.Pages;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 
@@ -19,6 +20,12 @@ public class ViewModelsModule : Module
             .SingleInstance();
         builder
             .RegisterType<SettingsWindowViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        
+        builder
+            .RegisterType<CurrentlyPlayingPageViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();

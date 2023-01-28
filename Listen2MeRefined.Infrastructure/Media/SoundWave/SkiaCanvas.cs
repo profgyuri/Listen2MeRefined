@@ -12,10 +12,10 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
     public SkiaCanvas()
     {
         _linePaint = new SKPaint{
-            Color = new SKColor(232, 255, 56),
+            Color = new SKColor(255, 252, 64),
             StrokeWidth = 1
         };
-        _backgroundColor = new SKColor(50, 50, 64);
+        _backgroundColor = new SKColor(37, 37, 37);
     }
     
     public void DrawLine(SKPoint p1, SKPoint p2, float? stroakWidth = null)

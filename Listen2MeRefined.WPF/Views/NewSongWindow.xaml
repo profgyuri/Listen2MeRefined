@@ -4,49 +4,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
+        xmlns:page="clr-namespace:Listen2MeRefined.WPF.Views.Pages"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:NewSongWindowViewModel}"
         Style="{StaticResource BasicWindow}"
         Topmost="True"
-        Background="{StaticResource HoloBackground}"
         ResizeMode="NoResize"
         FontSize="18"
         Title="NewSongWindow" Height="90" Width="450">
 
-    <Grid
-        VerticalAlignment="Center"
-        Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
-        <TextBlock
-            Grid.ColumnSpan="3"
-            Margin="0 0 0 10"
-            HorizontalAlignment="Center"
-            FontWeight="Bold"
-            TextTrimming="CharacterEllipsis"
-            FontSize="22"
-            Text="{Binding Song.Display, FallbackValue=Display Name}" />
-        <TextBlock
-            Grid.Row="1"
-            Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
-        <TextBlock
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="10 0"
-            HorizontalAlignment="Center"
-            Text="{Binding Song.Genre, FallbackValue=Genre}" />
-        <TextBlock
-            Grid.Row="1"
-            Grid.Column="2"
-            Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
-
-    </Grid>
+    <Border
+        BorderBrush="{DynamicResource SecondaryBrush}"
+        Background="{StaticResource HoloBackground}"
+        BorderThickness="1"
+        CornerRadius="3">
+        <Frame
+            x:Name="ContentPage"
+            NavigationUIVisibility="Hidden"/>
+    </Border>
 </Window>

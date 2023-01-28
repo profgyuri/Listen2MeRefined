@@ -1,11 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!-- Palette based on: Crypto Prediction Market - Adobe Color -->
-    <Color x:Key="PrimaryColor">#323240</Color><!-- 60% -->
-    <Color x:Key="SecondaryColor">#52A7FF</Color><!-- 30% -->
-    <Color x:Key="ThirnaryColor">#E8FF38</Color><!-- 10% -->
-    <Color x:Key="ThirnaryMidColor">#687319</Color>
-    <Color x:Key="ThirnaryDarkColor">#505328</Color>
+    <Color x:Key="PrimaryColor">#252525</Color><!-- 60% -->
+    <Color x:Key="SecondaryColor">#0DA1FF</Color><!-- 30% -->
+    <Color x:Key="ThirnaryColor">#FFFC40</Color><!-- 10% -->
+    <Color x:Key="ThirnaryMidColor">#807E20</Color>
+    <Color x:Key="ThirnaryDarkColor">#403F10</Color>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}" />
     <SolidColorBrush x:Key="ThirnaryBrush" Color="{StaticResource ThirnaryColor}" />

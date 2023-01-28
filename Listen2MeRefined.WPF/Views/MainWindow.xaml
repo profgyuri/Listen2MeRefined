@@ -13,8 +13,10 @@
         Style="{StaticResource BasicWindow}"
         WindowStartupLocation="Manual"
         Title="Listen2Me"
-        MinHeight="302" MinWidth="800"
+        MinHeight="502" MinWidth="800"
+        Height="702" Width="1030"
         MaxHeight="702" MaxWidth="1030">
+
 
     <WindowChrome.WindowChrome>
         <WindowChrome
@@ -49,6 +51,7 @@
 
                 <TextBlock
                     Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
+                    FontSize="20"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Grid.ColumnSpan="4"
@@ -117,41 +120,17 @@
                         Grid.RowSpan="2"
                         CornerRadius="8"
                         Padding="10"
-                        BorderBrush="{StaticResource SecondaryBrush}"
-                        BorderThickness="2">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock
-                                Grid.ColumnSpan="3"
-                                Margin="0 0 0 10"
-                                HorizontalAlignment="Center"
-                                FontWeight="Bold"
-                                Text="{Binding SelectedSong.Display, FallbackValue=Display Name}" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Text="{Binding SelectedSong.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Margin="10 0"
-                                HorizontalAlignment="Center"
-                                Text="{Binding SelectedSong.Genre, FallbackValue=Genre}" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="2"
-                                Text="{Binding SelectedSong.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
-
-                        </Grid>
+                        Margin="0 0 10 0"
+                        BorderBrush="#aaa"
+                        BorderThickness="1">
+                        <Frame
+                            x:Name="CurrentlyPlayingFrame"
+                            NavigationUIVisibility="Hidden"/>
                     </Border>
+                    <TextBlock
+                        Text="Currently Playing"
+                        Style="{StaticResource ElementContainerText}"
+                        Margin="30 -10 0 0"/>
 
                     <Button
                         Grid.Column="1"
@@ -194,31 +173,51 @@
                 </Grid>
 
                 <!-- Search results -->
-                <ListView
-                    x:Name="SearchResults"
-                    Margin="0 20 10 20"
-                    dd:DragDrop.IsDragSource="True"
-                    dd:DragDrop.IsDropTarget="True"
-                    ItemsSource="{Binding SearchResults}"
-                    Style="{StaticResource SongsListView}"
-                    Grid.Row="1" />
+                <Border
+                    Grid.Row="1"
+                    BorderThickness="1"
+                    BorderBrush="#aaa"
+                    CornerRadius="5"
+                    Margin="0 20 10 20">
+                    <ListView
+                        x:Name="SearchResults"
+                        Margin="0 20 10 20"
+                        dd:DragDrop.IsDragSource="True"
+                        dd:DragDrop.IsDropTarget="True"
+                        ItemsSource="{Binding SearchResults}"
+                        Style="{StaticResource SongsListView}"/>
+                </Border>
+                <TextBlock
+                    Style="{StaticResource ElementContainerText}"
+                    Grid.Row="1"
+                    Text="Search Results"/>
 
                 <!-- Playlist -->
-                <ListView
+                <Border
                     Margin="10 20 0 20"
-                    dd:DragDrop.IsDragSource="True"
-                    dd:DragDrop.IsDropTarget="True"
-                    ItemsSource="{Binding PlayList}"
-                    Style="{StaticResource SongsListView}"
-                    SelectedIndex="{Binding SelectedIndex}"
                     Grid.Row="1"
-                    Grid.Column="1">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListView>
+                    Grid.Column="1"
+                    BorderThickness="1"
+                    BorderBrush="#aaa"
+                    CornerRadius="5">
+                    <ListView
+                        dd:DragDrop.IsDragSource="True"
+                        dd:DragDrop.IsDropTarget="True"
+                        ItemsSource="{Binding PlayList}"
+                        Style="{StaticResource SongsListView}"
+                        SelectedIndex="{Binding SelectedIndex}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListView>
+                </Border>
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="Playlist"
+                    Style="{StaticResource ElementContainerText}"/>
 
                 <!-- Searchbar -->
                 <Grid
@@ -233,7 +232,8 @@
 
                     <TextBox
                         Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        materialDesign:HintAssist.Hint="Search For:"
+                        materialDesign:HintAssist.Hint="Quick Search"
+                        BorderBrush="{StaticResource ThirnaryBrush}"
                         materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThirnaryBrush}">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
