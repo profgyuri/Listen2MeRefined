@@ -209,6 +209,7 @@
                         x:Name="AudioOutputComboBox"
                         Grid.Row="4"
                         Grid.Column="1"
+                        Margin="0 10"
                         Style="{StaticResource CustomComboBox}"
                         Foreground="{StaticResource SecondaryBrush}"
                         BorderBrush="{StaticResource ThirnaryBrush}"

@@ -262,14 +262,20 @@ public sealed class WindowsMusicPlayer :
         CancellationToken cancellationToken)
     {
         _outputDeviceIndex = notification.Device.Index;
-        var timeStamp = _fileReader?.CurrentTime;
+
+        if (_fileReader is null)
+        {
+            return;
+        }
+        
+        var timeStamp = _fileReader.CurrentTime;
 
         var isPlaying = _playbackState == PlaybackState.Playing;
         
         ReNewWaveOutEvent();
         Stop();
 
-        _fileReader!.CurrentTime = timeStamp ?? TimeSpan.Zero;
+        _fileReader.CurrentTime = timeStamp;
 
         if (isPlaying)
         {
