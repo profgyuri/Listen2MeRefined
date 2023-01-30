@@ -12,10 +12,14 @@ namespace Listen2MeRefined.Infrastructure.Media;
 /// <summary>
 ///     Wrapper class for NAudio.
 /// </summary>
-public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistReference
+public sealed class WindowsMusicPlayer : 
+    IMediaController<SKBitmap>, 
+    IPlaylistReference,
+    INotificationHandler<AudioOutputDeviceChangedNotification>
 {
     private bool _startSongAutomatically;
     private int _currentSongIndex;
+    private int _outputDeviceIndex = -1;
     private double _previousTimeStamp;
     private double _unpausedFor;
     private AudioModel? _currentSong;
@@ -178,7 +182,10 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
         try
         {
             _waveOutEvent.Dispose();
-            _waveOutEvent = new WaveOutEvent();
+            _waveOutEvent = new WaveOutEvent
+            {
+                DeviceNumber = _outputDeviceIndex
+            };
             _waveOutEvent.Init(_fileReader);
         }
         catch (Exception e)
@@ -245,6 +252,35 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
         _playbackState = PlaybackState.Paused;
 
         _logger.Debug("Playback paused");
+    }
+    #endregion
+
+    #region Implementation of INotificationHandler<in AudioOutputDeviceChangedNotification>
+    /// <inheritdoc />
+    public async Task Handle(
+        AudioOutputDeviceChangedNotification notification,
+        CancellationToken cancellationToken)
+    {
+        _outputDeviceIndex = notification.Device.Index;
+
+        if (_fileReader is null)
+        {
+            return;
+        }
+        
+        var timeStamp = _fileReader.CurrentTime;
+
+        var isPlaying = _playbackState == PlaybackState.Playing;
+        
+        ReNewWaveOutEvent();
+        Stop();
+
+        _fileReader.CurrentTime = timeStamp;
+
+        if (isPlaying)
+        {
+            await PlayPauseAsync();
+        }
     }
     #endregion
 }

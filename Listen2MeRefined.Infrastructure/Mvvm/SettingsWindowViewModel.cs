@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Source;
@@ -24,8 +25,10 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
     [ObservableProperty] private string _selectedFontFamily;
+    [ObservableProperty] private AudioOutputDevice _selectedAudioOutputDevice;
     [ObservableProperty] private ObservableCollection<string> _folders;
     [ObservableProperty] private ObservableCollection<string> _fontFamilies;
+    [ObservableProperty] private ObservableCollection<AudioOutputDevice> _audioOutputDevices = new();
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
@@ -70,6 +73,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         _fontFamily = settings.FontFamily;
         _selectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
         ScanOnStartup = settings.ScanOnStartup;
+        GetAudioOutputDevices().ConfigureAwait(false);
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
@@ -77,6 +81,12 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         OnPropertyChanged(nameof(SelectedFontFamily));
         _settingsManager.SaveSettings(s => s.FontFamily = value);
         _mediator.Publish(new FontFamilyChangedNotification(value));
+    }
+
+    partial void OnSelectedAudioOutputDeviceChanged(AudioOutputDevice value)
+    {
+        OnPropertyChanged(nameof(SelectedAudioOutputDevice));
+        _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
 
     #region Notification Handlers
@@ -164,4 +174,16 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         await _folderScanner.ScanAllAsync();
     }
     #endregion
+
+    private async Task GetAudioOutputDevices()
+    {
+        var devices = await AudioDevices.GetOutputDevices();
+        foreach (var device in devices)
+        {
+            AudioOutputDevices.Add(device);
+            OnPropertyChanged(nameof(AudioOutputDevices));
+        }
+        
+        SelectedAudioOutputDevice = AudioOutputDevices[0];
+    }
 }

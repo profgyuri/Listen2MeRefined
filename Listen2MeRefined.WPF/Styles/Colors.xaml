@@ -12,4 +12,5 @@
     <SolidColorBrush x:Key="ThirnaryMidBrush" Color="{StaticResource ThirnaryMidColor}" />
     <SolidColorBrush x:Key="ThirnaryDarkBrush" Color="{StaticResource ThirnaryDarkColor}" />
     <SolidColorBrush x:Key="HoloBackground" Color="{StaticResource PrimaryColor}" Opacity=".9" />
+    <SolidColorBrush x:Key="MaterialDesignPaper" Color="{StaticResource PrimaryColor}"/>
 </ResourceDictionary>
