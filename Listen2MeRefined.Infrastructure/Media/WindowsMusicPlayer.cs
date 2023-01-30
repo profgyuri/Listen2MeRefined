@@ -171,14 +171,17 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
         }
     }
 
-    private void ReNewWaveOutEvent()
+    private void ReNewWaveOutEvent(int outputDeviceNumber = -1)
     {
         _logger.Debug("Renewing waveout event...");
 
         try
         {
             _waveOutEvent.Dispose();
-            _waveOutEvent = new WaveOutEvent();
+            _waveOutEvent = new WaveOutEvent
+            {
+                DeviceNumber = outputDeviceNumber
+            };
             _waveOutEvent.Init(_fileReader);
         }
         catch (Exception e)

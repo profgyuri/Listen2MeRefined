@@ -24,8 +24,10 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     [ObservableProperty] private string _fontFamily;
     [ObservableProperty] private string? _selectedFolder;
     [ObservableProperty] private string _selectedFontFamily;
+    [ObservableProperty] private AudioOutputDevice _selectedAudioOutputDevice;
     [ObservableProperty] private ObservableCollection<string> _folders;
     [ObservableProperty] private ObservableCollection<string> _fontFamilies;
+    [ObservableProperty] private ObservableCollection<AudioOutputDevice> _audioOutputDevices;
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
@@ -77,6 +79,12 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         OnPropertyChanged(nameof(SelectedFontFamily));
         _settingsManager.SaveSettings(s => s.FontFamily = value);
         _mediator.Publish(new FontFamilyChangedNotification(value));
+    }
+
+    partial void OnSelectedAudioOutputDeviceChanged(AudioOutputDevice value)
+    {
+        OnPropertyChanged(nameof(SelectedAudioOutputDevice));
+        _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
 
     #region Notification Handlers

@@ -181,7 +181,7 @@
                     Margin="0 20 10 20">
                     <ListView
                         x:Name="SearchResults"
-                        Margin="0 20 10 20"
+                        Margin="0 20"
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding SearchResults}"
@@ -205,7 +205,8 @@
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding PlayList}"
                         Style="{StaticResource SongsListView}"
-                        SelectedIndex="{Binding SelectedIndex}">
+                        SelectedIndex="{Binding SelectedIndex}"
+                        Margin="0 20">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDoubleClick">
                                 <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />

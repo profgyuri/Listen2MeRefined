@@ -49,6 +49,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -182,8 +183,7 @@
                     <TextBlock
                         Grid.Row="3"
                         Text="Automatic scanning: "
-                        VerticalAlignment="Center"
-                        ToolTip="Your music files will be synchronised when you start the application."/>
+                        VerticalAlignment="Center"/>
                     <StackPanel
                         Grid.Row="3"
                         Grid.Column="1"
@@ -202,6 +202,27 @@
                             IsChecked="{Binding DontScanOnStartup, Mode=OneWay}"
                             Content="Manual Only" />
                     </StackPanel>
+
+                    <TextBlock
+                        Grid.Row="4"
+                        Text="Audio output: "
+                        VerticalAlignment="Center"/>
+                    <ComboBox
+                        x:Name="AudioOutputComboBox"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource CustomComboBox}"
+                        Foreground="{StaticResource SecondaryBrush}"
+                        BorderBrush="{StaticResource ThirnaryBrush}"
+                        SelectedItem="{Binding SelectedAudioOutputDevice}"
+                        ItemsSource="{Binding AudioOutputDevices}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
                 </Grid>
             </ScrollViewer>
