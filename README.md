@@ -7,6 +7,10 @@
  - Advanced search
  - Waveform as progress bar during playback
  - All available options are working
+   - Adding local folders for scanning
+   - Scan on startup or only manually
+   - Change fontstyle
+   - Change audio output device
 
 ### Known issues
 
