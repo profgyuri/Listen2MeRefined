@@ -12,10 +12,14 @@ namespace Listen2MeRefined.Infrastructure.Media;
 /// <summary>
 ///     Wrapper class for NAudio.
 /// </summary>
-public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistReference
+public sealed class WindowsMusicPlayer : 
+    IMediaController<SKBitmap>, 
+    IPlaylistReference,
+    INotificationHandler<AudioOutputDeviceChangedNotification>
 {
     private bool _startSongAutomatically;
     private int _currentSongIndex;
+    private int _outputDeviceIndex = -1;
     private double _previousTimeStamp;
     private double _unpausedFor;
     private AudioModel? _currentSong;
@@ -171,7 +175,7 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
         }
     }
 
-    private void ReNewWaveOutEvent(int outputDeviceNumber = -1)
+    private void ReNewWaveOutEvent()
     {
         _logger.Debug("Renewing waveout event...");
 
@@ -180,7 +184,7 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
             _waveOutEvent.Dispose();
             _waveOutEvent = new WaveOutEvent
             {
-                DeviceNumber = outputDeviceNumber
+                DeviceNumber = _outputDeviceIndex
             };
             _waveOutEvent.Init(_fileReader);
         }
@@ -248,6 +252,29 @@ public sealed class WindowsMusicPlayer : IMediaController<SKBitmap>, IPlaylistRe
         _playbackState = PlaybackState.Paused;
 
         _logger.Debug("Playback paused");
+    }
+    #endregion
+
+    #region Implementation of INotificationHandler<in AudioOutputDeviceChangedNotification>
+    /// <inheritdoc />
+    public async Task Handle(
+        AudioOutputDeviceChangedNotification notification,
+        CancellationToken cancellationToken)
+    {
+        _outputDeviceIndex = notification.Device.Index;
+        var timeStamp = _fileReader?.CurrentTime;
+
+        var isPlaying = _playbackState == PlaybackState.Playing;
+        
+        ReNewWaveOutEvent();
+        Stop();
+
+        _fileReader!.CurrentTime = timeStamp ?? TimeSpan.Zero;
+
+        if (isPlaying)
+        {
+            await PlayPauseAsync();
+        }
     }
     #endregion
 }

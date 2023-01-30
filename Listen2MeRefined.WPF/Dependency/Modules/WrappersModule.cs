@@ -11,8 +11,7 @@ public class WrappersModule : Module
     {
         builder
             .RegisterType<WindowsMusicPlayer>()
-            .As<IMediaController<SKBitmap>>()
-            .As<IPlaylistReference>()
+            .AsImplementedInterfaces()
             .SingleInstance();
 
         builder

@@ -123,8 +123,6 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         Style="{StaticResource CustomComboBox}"
-                        materialDesign:HintAssist.Hint="FontFamily"
-                        materialDesign:HintAssist.FontFamily="{Binding SelectedFontFamily}"
                         Foreground="{StaticResource SecondaryBrush}"
                         BorderBrush="{StaticResource ThirnaryBrush}"
                         SelectedItem="{Binding SelectedFontFamily}"
@@ -133,7 +131,7 @@
                             <DataTemplate>
                                 <TextBlock
                                     Text="{Binding}"
-                                    FontFamily="{Binding}" />
+                                    FontFamily="{Binding}"/>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
@@ -209,7 +207,7 @@
                         VerticalAlignment="Center"/>
                     <ComboBox
                         x:Name="AudioOutputComboBox"
-                        Grid.Row="1"
+                        Grid.Row="4"
                         Grid.Column="1"
                         Style="{StaticResource CustomComboBox}"
                         Foreground="{StaticResource SecondaryBrush}"
