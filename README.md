@@ -11,6 +11,7 @@
    - More understandable, easier replacing the searchlist items to the playlist
    - Individually choosable colors OR color themes
  - Adding context menu to list items (to "jump here", scan individually, etc.)
+ - Ability to clear playlist items
  - Status report for scanning
  - Performance improvements (starting the app should not freeze the computer at all (now it is 2-10 seconds))
 
