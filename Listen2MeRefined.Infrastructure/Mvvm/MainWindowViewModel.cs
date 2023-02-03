@@ -1,13 +1,10 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text;
-using Dapper;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
 using SkiaSharp;
 using Source;
 using Source.Storage;
@@ -21,10 +18,15 @@ public partial class MainWindowViewModel :
     INotificationHandler<AdvancedSearchNotification>
 {
     private readonly ILogger _logger;
+    private readonly IPlaylistReference _playlistReference;
     private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
+    private readonly TimedTask _timedTask;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IGlobalHook _globalHook;
+    private readonly IFolderScanner _folderScanner;
+    private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     [ObservableProperty] private string _fontFamily;
@@ -62,32 +64,46 @@ public partial class MainWindowViewModel :
     {
         _mediaController = mediaController;
         _logger = logger;
+        _playlistReference = playlistReference;
         _audioRepository = audioRepository;
         _advancedAudioReader = advancedAudioReader;
+        _timedTask = timedTask;
+        _settingsManager = settingsManager;
         _globalHook = globalHook;
+        _folderScanner = folderScanner;
+        _dataContext = dataContext;
         _waveFormDrawer = waveFormDrawer;
 
-        dataContext.Database.Migrate();
-
-        if (settingsManager.Settings.ScanOnStartup)
-        {
-            Task.Run(async () => await folderScanner.ScanAllAsync()).ConfigureAwait(false);
-        }
-
-        _fontFamily = settingsManager.Settings.FontFamily;
-
-        playlistReference.PassPlaylist(ref _playList);
-        timedTask.Start(
-            TimeSpan.FromMilliseconds(100),
-            () => OnPropertyChanged(nameof(CurrentTime)));
-        _globalHook.Register();
-        
-        WaveFormWidth = 470;
-        WaveFormHeight = 70;
-        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        DrawPlaceholderLineAsync().ConfigureAwait(false);
+        Initialize().ConfigureAwait(false);
     }
 
+    private async Task Initialize()
+    {
+        await Task.Run(async () => await _dataContext.Database.MigrateAsync());
+        await Task.Run(async () =>
+        {
+            FontFamily = _settingsManager.Settings.FontFamily;
+            WaveFormWidth = 470;
+            WaveFormHeight = 70;
+            _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
+            await DrawPlaceholderLineAsync();
+        });
+        
+        if (_settingsManager.Settings.ScanOnStartup)
+        {
+            await Task.Run(async () => await _folderScanner.ScanAllAsync()).ConfigureAwait(false);
+        }
+
+        _globalHook.Register();
+        await Task.Run(() =>
+        {
+            _playlistReference.PassPlaylist(ref _playList);
+            _timedTask.Start(
+                TimeSpan.FromMilliseconds(100),
+                () => OnPropertyChanged(nameof(CurrentTime)));
+        });
+    }
+    
     ~MainWindowViewModel()
     {
         _globalHook.Unregister();
