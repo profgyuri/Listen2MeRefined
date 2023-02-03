@@ -15,6 +15,9 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
     private readonly IKeyboardMouseEvents _globalHook = Hook.GlobalEvents();
     private readonly HashSet<NewSongWindow> _windows = new();
 
+    private readonly int _width = Screen.PrimaryScreen!.Bounds.Width;
+    private readonly int _height = Screen.PrimaryScreen.Bounds.Height;
+
     private const int TriggerNotificationWindowAreaSize = 10;
 
     private static readonly HashSet<Keys> _lowLevelKeys =
@@ -65,9 +68,9 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
         MouseEventArgs e)
     {
         var shouldShowNewWindow = (e.X <= TriggerNotificationWindowAreaSize ||
-                                   e.X >= Screen.PrimaryScreen.Bounds.Width - TriggerNotificationWindowAreaSize)
+                                   e.X >= _width - TriggerNotificationWindowAreaSize)
                                   && (e.Y <= TriggerNotificationWindowAreaSize || e.Y >=
-                                      Screen.PrimaryScreen.Bounds.Height - TriggerNotificationWindowAreaSize);
+                                      _height - TriggerNotificationWindowAreaSize);
 
         switch (shouldShowNewWindow)
         {

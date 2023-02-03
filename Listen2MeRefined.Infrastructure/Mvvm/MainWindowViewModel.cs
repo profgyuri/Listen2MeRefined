@@ -75,6 +75,8 @@ public partial class MainWindowViewModel :
         _waveFormDrawer = waveFormDrawer;
 
         Initialize().ConfigureAwait(false);
+        
+        _globalHook.Register();
     }
 
     private async Task Initialize()
@@ -94,7 +96,6 @@ public partial class MainWindowViewModel :
             await Task.Run(async () => await _folderScanner.ScanAllAsync()).ConfigureAwait(false);
         }
 
-        _globalHook.Register();
         await Task.Run(() =>
         {
             _playlistReference.PassPlaylist(ref _playList);
