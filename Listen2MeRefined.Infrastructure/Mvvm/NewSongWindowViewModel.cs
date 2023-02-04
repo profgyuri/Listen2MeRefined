@@ -1,7 +1,7 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-[INotifyPropertyChanged]
-public partial class NewSongWindowViewModel
+public sealed partial class NewSongWindowViewModel :
+    ObservableObject
 {
     
 }

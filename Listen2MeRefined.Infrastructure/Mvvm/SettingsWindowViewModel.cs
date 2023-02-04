@@ -8,8 +8,9 @@ using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-[INotifyPropertyChanged]
-public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowserNotification>
+public sealed partial class SettingsWindowViewModel : 
+    ObservableObject,
+    INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
@@ -105,7 +106,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
         Folders.Add(path);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
+        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
 
         await _folderScanner.ScanAsync(path);
     }
@@ -119,7 +120,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
         Folders.Remove(SelectedFolder!);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
+        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
     }
 
     [RelayCommand]

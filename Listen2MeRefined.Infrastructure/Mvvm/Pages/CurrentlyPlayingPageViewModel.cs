@@ -3,8 +3,8 @@ using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.Pages;
 
-[INotifyPropertyChanged]
-public partial class CurrentlyPlayingPageViewModel : 
+public sealed partial class CurrentlyPlayingPageViewModel : 
+    ObservableObject,
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>
 {
