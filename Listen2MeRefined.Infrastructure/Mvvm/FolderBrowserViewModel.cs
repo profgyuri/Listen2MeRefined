@@ -30,9 +30,18 @@ public sealed partial class FolderBrowserViewModel :
         _folderBrowser = folderBrowser;
         _mediator = mediator;
         _settingsManager = settingsManager;
-        _fontFamily = _settingsManager.Settings.FontFamily;
+        
+        Initialize().ConfigureAwait(false);
+    }
 
-        ChangeDirectory();
+    private async Task Initialize()
+    {
+        await Task.Run(() =>
+        {
+            FontFamily = _settingsManager.Settings.FontFamily;
+
+            ChangeDirectory();
+        });
     }
 
     [RelayCommand]

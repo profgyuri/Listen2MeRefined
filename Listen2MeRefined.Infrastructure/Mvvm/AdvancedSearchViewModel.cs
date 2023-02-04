@@ -69,12 +69,21 @@ public partial class AdvancedSearchViewModel :
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
-        _fontFamily = _settingsManager.Settings.FontFamily;
-        _criterias = new ();
-        _columnName = GetAudioModelProperties();
-        _relation = _stringRelations;
-        SelectedColumnName = _columnName.First();
-        SelectedRelation = _relation.First();
+        
+        Initialize().ConfigureAwait(false);
+    }
+
+    private async Task Initialize()
+    {
+        await Task.Run(() =>
+        {
+            FontFamily = _settingsManager.Settings.FontFamily;
+            Criterias = new();
+            ColumnName = GetAudioModelProperties();
+            Relation = _stringRelations;
+            SelectedColumnName = ColumnName.First();
+            SelectedRelation = Relation.First();
+        });
     }
 
     [RelayCommand]

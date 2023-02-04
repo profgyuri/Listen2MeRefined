@@ -19,6 +19,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IRepository<PlaylistModel> _playlistRepository;
     private readonly IFolderScanner _folderScanner;
     private readonly IMediator _mediator;
+    private readonly FontFamilies _installedFontFamilies;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -44,17 +45,14 @@ public sealed partial class SettingsWindowViewModel :
         }
     }
 
-    public bool DontScanOnStartup
-    {
-        get => !ScanOnStartup;
-    }
+    public bool DontScanOnStartup => !ScanOnStartup;
 
     public SettingsWindowViewModel(
         ILogger logger,
         ISettingsManager<AppSettings> settingsManager,
         IRepository<AudioModel> audioRepository,
         IMediator mediator,
-        FontFamilies fontFamilies,
+        FontFamilies installedFontFamilies,
         IRepository<MusicFolderModel> musicFolderRepository,
         IRepository<PlaylistModel> playlistRepository,
         IFolderScanner folderScanner)
@@ -63,18 +61,27 @@ public sealed partial class SettingsWindowViewModel :
         _settingsManager = settingsManager;
         _audioRepository = audioRepository;
         _mediator = mediator;
+        _installedFontFamilies = installedFontFamilies;
         _musicFolderRepository = musicFolderRepository;
         _playlistRepository = playlistRepository;
         _folderScanner = folderScanner;
 
-        _fontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
+        Initialize().ConfigureAwait(false);
+    }
 
-        var settings = _settingsManager.Settings;
-        _folders = new(settings.MusicFolders.Select(x => x.FullPath));
-        _fontFamily = settings.FontFamily;
-        _selectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
-        ScanOnStartup = settings.ScanOnStartup;
-        GetAudioOutputDevices().ConfigureAwait(false);
+    private async Task Initialize()
+    {
+        await Task.Run(async () =>
+        {
+            FontFamilies = new(_installedFontFamilies.FontFamilyNames);
+
+            var settings = _settingsManager.Settings;
+            Folders = new(settings.MusicFolders.Select(x => x.FullPath));
+            FontFamily = settings.FontFamily;
+            SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
+            ScanOnStartup = settings.ScanOnStartup;
+            await GetAudioOutputDevices();
+        });
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
