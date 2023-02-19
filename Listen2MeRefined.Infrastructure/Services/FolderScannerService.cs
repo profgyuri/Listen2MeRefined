@@ -35,6 +35,7 @@ public sealed class FolderScannerService : IFolderScanner
         var filteredFiles =
             files.Where(IsSupported).ToHashSet();
         var fromDb = (await _audioRepository.ReadAsync()).ToList();
+        var toUpdate = new HashSet<string>();
 
         for (var i = 0; i < fromDb.Count; i++)
         {
@@ -48,7 +49,7 @@ public sealed class FolderScannerService : IFolderScanner
             filteredFiles.Remove(current.Path!);
             fromDb.RemoveAt(i);
             i--;
-            
+
             var updated = await _audioFileAnalyzer.AnalyzeAsync(current.Path!);
             current.Update(updated);
             
