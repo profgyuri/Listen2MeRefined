@@ -8,8 +8,9 @@ using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-[INotifyPropertyChanged]
-public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyChangedNotification>
+public partial class AdvancedSearchViewModel : 
+    ObservableObject,
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
@@ -68,12 +69,21 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
-        _fontFamily = _settingsManager.Settings.FontFamily;
-        _criterias = new ();
-        _columnName = GetAudioModelProperties();
-        _relation = _stringRelations;
-        SelectedColumnName = _columnName.First();
-        SelectedRelation = _relation.First();
+        
+        Initialize().ConfigureAwait(false);
+    }
+
+    private async Task Initialize()
+    {
+        await Task.Run(() =>
+        {
+            FontFamily = _settingsManager.Settings.FontFamily;
+            Criterias = new();
+            ColumnName = GetAudioModelProperties();
+            Relation = _stringRelations;
+            SelectedColumnName = ColumnName.First();
+            SelectedRelation = Relation.First();
+        });
     }
 
     [RelayCommand]
@@ -86,7 +96,7 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
             return;
         }
         
-        _criterias.Add($"{SelectedColumnName} {SelectedRelation} {InputText}");
+        Criterias.Add($"{SelectedColumnName} {SelectedRelation} {InputText}");
 
         var queryBuilder = new StringBuilder(SelectedColumnName);
         queryBuilder.Append(' ');
@@ -123,9 +133,9 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
     [RelayCommand]
     private void DeleteItem()
     {
-        if (!string.IsNullOrEmpty(SelectedCriteria) && _criterias.Contains(SelectedCriteria))
+        if (!string.IsNullOrEmpty(SelectedCriteria) && Criterias.Contains(SelectedCriteria))
         {
-            _criterias.Remove(SelectedCriteria);
+            Criterias.Remove(SelectedCriteria);
         }
     }
     
@@ -136,10 +146,10 @@ public partial class AdvancedSearchViewModel : INotificationHandler<FontFamilyCh
             return;
         }
         
-        _logger.Debug($"Starting advanced search with these filters:\n{Criterias}", string.Join('\n', _criterias));
-        _mediator.Publish(new AdvancedSearchNotification(_queryStatements, _matchAll));
+        _logger.Debug($"Starting advanced search with these filters:\n{Criterias}", string.Join('\n', Criterias));
+        _mediator.Publish(new AdvancedSearchNotification(_queryStatements, MatchAll));
         _queryStatements.Clear();
-        _criterias.Clear();
+        Criterias.Clear();
     }
     
     private static List<string> GetAudioModelProperties()

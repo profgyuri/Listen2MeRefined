@@ -35,6 +35,7 @@ public sealed class FolderScannerService : IFolderScanner
         var filteredFiles =
             files.Where(IsSupported).ToHashSet();
         var fromDb = (await _audioRepository.ReadAsync()).ToList();
+        var toUpdate = new HashSet<AudioModel>();
 
         for (var i = 0; i < fromDb.Count; i++)
         {
@@ -48,16 +49,17 @@ public sealed class FolderScannerService : IFolderScanner
             filteredFiles.Remove(current.Path!);
             fromDb.RemoveAt(i);
             i--;
-            
+
             var updated = await _audioFileAnalyzer.AnalyzeAsync(current.Path!);
             current.Update(updated);
-            
-            await _audioRepository.UpdateAsync(current);
+
+            toUpdate.Add(current);
         }
         
         var newSongs = await _audioFileAnalyzer.AnalyzeAsync(filteredFiles);
-        await _audioRepository.SaveAsync(newSongs);
-        await _audioRepository.RemoveAsync(fromDb);
+        await Task.Run(() => _audioRepository.UpdateAsync(toUpdate));
+        await Task.Run(() => _audioRepository.SaveAsync(newSongs));
+        await Task.Run(() => _audioRepository.RemoveAsync(fromDb));
     }
 
     /// <inheritdoc />

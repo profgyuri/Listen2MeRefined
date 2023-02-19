@@ -60,15 +60,6 @@ public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
     /// <param name="paths">List of local paths leading to audio files.</param>
     public async Task<IEnumerable<AudioModel>> AnalyzeAsync(IEnumerable<string> paths)
     {
-        var result = new List<AudioModel>();
-
-        foreach (var path in paths)
-        {
-            var audio = await AnalyzeAsync(path);
-
-            result.Add(audio);
-        }
-
-        return result;
+        return await Task.Run(() => Analyze(paths));
     }
 }

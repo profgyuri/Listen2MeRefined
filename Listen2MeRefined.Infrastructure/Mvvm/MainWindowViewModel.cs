@@ -11,8 +11,8 @@ using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-[INotifyPropertyChanged]
-public partial class MainWindowViewModel : 
+public sealed partial class MainWindowViewModel : 
+    ObservableObject,
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>
@@ -75,6 +75,8 @@ public partial class MainWindowViewModel :
         _waveFormDrawer = waveFormDrawer;
 
         Initialize().ConfigureAwait(false);
+        
+        _globalHook.Register();
     }
 
     private async Task Initialize()
@@ -94,7 +96,6 @@ public partial class MainWindowViewModel :
             await Task.Run(async () => await _folderScanner.ScanAllAsync()).ConfigureAwait(false);
         }
 
-        _globalHook.Register();
         await Task.Run(() =>
         {
             _playlistReference.PassPlaylist(ref _playList);
@@ -140,8 +141,8 @@ public partial class MainWindowViewModel :
     {
         var result = 
             await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll);
-        _searchResults.Clear();
-        _searchResults.AddRange(result);
+        SearchResults.Clear();
+        SearchResults.AddRange(result);
     }
     #endregion
 
@@ -149,21 +150,21 @@ public partial class MainWindowViewModel :
     [RelayCommand]
     private async Task QuickSearch()
     {
-        _logger.Information("Searching for \'{SearchTerm}\'", _searchTerm);
-        _searchResults.Clear();
+        _logger.Information("Searching for \'{SearchTerm}\'", SearchTerm);
+        SearchResults.Clear();
         var results =
-            string.IsNullOrEmpty(_searchTerm)
+            string.IsNullOrEmpty(SearchTerm)
                 ? await _audioRepository.ReadAsync()
-                : await _audioRepository.ReadAsync(_searchTerm);
-        _searchResults.AddRange(results);
+                : await _audioRepository.ReadAsync(SearchTerm);
+        SearchResults.AddRange(results);
     }
 
     [RelayCommand]
     private async Task JumpToSelecteSong()
     {
-        if (_selectedIndex > -1)
+        if (SelectedIndex > -1)
         {
-            await _mediaController.JumpToIndexAsync(_selectedIndex);
+            await _mediaController.JumpToIndexAsync(SelectedIndex);
         }
     }
 
@@ -206,6 +207,6 @@ public partial class MainWindowViewModel :
     public async Task RefreshSoundWave()
     {
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong.Path);
+        WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong!.Path!);
     }
 }

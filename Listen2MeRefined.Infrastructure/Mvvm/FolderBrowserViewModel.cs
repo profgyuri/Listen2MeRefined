@@ -6,8 +6,9 @@ using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-[INotifyPropertyChanged]
-public partial class FolderBrowserViewModel : INotificationHandler<FontFamilyChangedNotification>
+public sealed partial class FolderBrowserViewModel : 
+    ObservableObject,
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
@@ -29,23 +30,32 @@ public partial class FolderBrowserViewModel : INotificationHandler<FontFamilyCha
         _folderBrowser = folderBrowser;
         _mediator = mediator;
         _settingsManager = settingsManager;
-        _fontFamily = _settingsManager.Settings.FontFamily;
+        
+        Initialize().ConfigureAwait(false);
+    }
 
-        ChangeDirectory();
+    private async Task Initialize()
+    {
+        await Task.Run(() =>
+        {
+            FontFamily = _settingsManager.Settings.FontFamily;
+
+            ChangeDirectory();
+        });
     }
 
     [RelayCommand]
     private void ChangeDirectory()
     {
-        FullPath = _selectedFolder switch
+        FullPath = SelectedFolder switch
         {
-            GlobalConstants.ParentPathItem => Path.GetDirectoryName(_fullPath) ?? "",
-            _ => Path.Combine(_fullPath, _selectedFolder)
+            GlobalConstants.ParentPathItem => Path.GetDirectoryName(FullPath) ?? "",
+            _ => Path.Combine(FullPath, SelectedFolder)
         };
 
-        _folders.Clear();
+        Folders.Clear();
 
-        if (string.IsNullOrEmpty(_fullPath))
+        if (string.IsNullOrEmpty(FullPath))
         {
             GetDriveNames();
         }
@@ -54,7 +64,7 @@ public partial class FolderBrowserViewModel : INotificationHandler<FontFamilyCha
             GetFolderNames();
         }
 
-        _selectedFolder = "";
+        SelectedFolder = "";
     }
 
     /// <summary>
@@ -65,21 +75,21 @@ public partial class FolderBrowserViewModel : INotificationHandler<FontFamilyCha
     private async Task HandleSelectedPath()
     {
         var hasSelectedChildPath =
-            !string.IsNullOrEmpty(_selectedFolder) && _selectedFolder != GlobalConstants.ParentPathItem;
+            !string.IsNullOrEmpty(SelectedFolder) && SelectedFolder != GlobalConstants.ParentPathItem;
         if (hasSelectedChildPath)
         {
-            FullPath = Path.Combine(_fullPath, _selectedFolder);
+            FullPath = Path.Combine(FullPath, SelectedFolder);
         }
 
-        var isFullPathInvalid = string.IsNullOrEmpty(_fullPath) || !new DirectoryInfo(_fullPath).Exists;
+        var isFullPathInvalid = string.IsNullOrEmpty(FullPath) || !new DirectoryInfo(FullPath).Exists;
         if (isFullPathInvalid)
         {
             return;
         }
 
-        _logger.Debug("Publishing {FullPath} from the folder browser dialog", _fullPath);
+        _logger.Debug("Publishing {FullPath} from the folder browser dialog", FullPath);
 
-        var notification = new FolderBrowserNotification(_fullPath);
+        var notification = new FolderBrowserNotification(FullPath);
         await _mediator.Publish(notification);
     }
 
@@ -87,17 +97,17 @@ public partial class FolderBrowserViewModel : INotificationHandler<FontFamilyCha
     {
         foreach (var drive in _folderBrowser.GetDrives())
         {
-            _folders.Add(drive);
+            Folders.Add(drive);
         }
     }
 
     private void GetFolderNames()
     {
-        _folders.Add(GlobalConstants.ParentPathItem);
+        Folders.Add(GlobalConstants.ParentPathItem);
 
-        foreach (var folder in _folderBrowser.GetSubFolders(_fullPath))
+        foreach (var folder in _folderBrowser.GetSubFolders(FullPath))
         {
-            _folders.Add(folder);
+            Folders.Add(folder);
         }
     }
 

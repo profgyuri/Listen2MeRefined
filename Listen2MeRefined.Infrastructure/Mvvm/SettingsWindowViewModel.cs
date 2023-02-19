@@ -8,8 +8,9 @@ using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-[INotifyPropertyChanged]
-public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowserNotification>
+public sealed partial class SettingsWindowViewModel : 
+    ObservableObject,
+    INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
@@ -18,6 +19,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
     private readonly IRepository<PlaylistModel> _playlistRepository;
     private readonly IFolderScanner _folderScanner;
     private readonly IMediator _mediator;
+    private readonly FontFamilies _installedFontFamilies;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -43,17 +45,14 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         }
     }
 
-    public bool DontScanOnStartup
-    {
-        get => !ScanOnStartup;
-    }
+    public bool DontScanOnStartup => !ScanOnStartup;
 
     public SettingsWindowViewModel(
         ILogger logger,
         ISettingsManager<AppSettings> settingsManager,
         IRepository<AudioModel> audioRepository,
         IMediator mediator,
-        FontFamilies fontFamilies,
+        FontFamilies installedFontFamilies,
         IRepository<MusicFolderModel> musicFolderRepository,
         IRepository<PlaylistModel> playlistRepository,
         IFolderScanner folderScanner)
@@ -62,18 +61,27 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
         _settingsManager = settingsManager;
         _audioRepository = audioRepository;
         _mediator = mediator;
+        _installedFontFamilies = installedFontFamilies;
         _musicFolderRepository = musicFolderRepository;
         _playlistRepository = playlistRepository;
         _folderScanner = folderScanner;
 
-        _fontFamilies = new ObservableCollection<string>(fontFamilies.FontFamilyNames);
+        Initialize().ConfigureAwait(false);
+    }
 
-        var settings = _settingsManager.Settings;
-        _folders = new(settings.MusicFolders.Select(x => x.FullPath));
-        _fontFamily = settings.FontFamily;
-        _selectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
-        ScanOnStartup = settings.ScanOnStartup;
-        GetAudioOutputDevices().ConfigureAwait(false);
+    private async Task Initialize()
+    {
+        await Task.Run(async () =>
+        {
+            FontFamilies = new(_installedFontFamilies.FontFamilyNames);
+
+            var settings = _settingsManager.Settings;
+            Folders = new(settings.MusicFolders.Select(x => x.FullPath));
+            FontFamily = settings.FontFamily;
+            SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
+            ScanOnStartup = settings.ScanOnStartup;
+            await GetAudioOutputDevices();
+        });
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
@@ -105,7 +113,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
         Folders.Add(path);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
+        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
 
         await _folderScanner.ScanAsync(path);
     }
@@ -119,7 +127,7 @@ public partial class SettingsWindowViewModel : INotificationHandler<FolderBrowse
 
         Folders.Remove(SelectedFolder!);
 
-        _settingsManager.SaveSettings(s => s.MusicFolders = _folders.Select(x => new MusicFolderModel(x)).ToList());
+        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
     }
 
     [RelayCommand]
