@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
         xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
@@ -211,6 +212,66 @@
                                 <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid
+                                    MinWidth="320">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Rectangle
+                                        Grid.RowSpan="2"
+                                        Fill="Transparent" />
+
+                                    <resources:HorizontalSeparator
+                                        Grid.Row="1"
+                                        VerticalAlignment="Bottom" />
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        x:Name="DisplayText"
+                                        Text="{Binding Display, FallbackValue=Track}"
+                                        FontSize="16"
+                                        TextTrimming="CharacterEllipsis"
+                                        HorizontalAlignment="Center"
+                                        FontWeight="Bold" />
+
+                                    <Grid
+                                        Grid.Row="1"
+                                        Grid.ColumnSpan="2"
+                                        Margin="0 0 0 5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="3*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock
+                                            Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            Text="{Binding Genre, FallbackValue=Genre}"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Center" />
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
                     </ListView>
                 </Border>
                 <TextBlock

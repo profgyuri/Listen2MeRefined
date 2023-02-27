@@ -38,67 +38,6 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        <Setter Property="ItemTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <Grid
-                        MinWidth="320">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Rectangle
-                            Grid.RowSpan="2"
-                            Fill="Transparent" />
-
-                        <resources:HorizontalSeparator
-                            Grid.Row="1"
-                            VerticalAlignment="Bottom" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Text="{Binding Display, FallbackValue=Track}"
-                            FontSize="16"
-                            TextTrimming="CharacterEllipsis"
-                            HorizontalAlignment="Center"
-                            FontWeight="Bold" />
-
-                        <Grid
-                            Grid.Row="1"
-                            Grid.ColumnSpan="2"
-                            Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="2*" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock
-                                Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                            <TextBlock
-                                Grid.Column="1"
-                                Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                            <TextBlock
-                                Grid.Column="2"
-                                Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                            <TextBlock
-                                Grid.Column="3"
-                                Text="{Binding Genre, FallbackValue=Genre}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                        </Grid>
-                    </Grid>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
