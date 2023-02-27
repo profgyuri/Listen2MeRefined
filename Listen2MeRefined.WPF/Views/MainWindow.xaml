@@ -237,6 +237,15 @@
                                         TextTrimming="CharacterEllipsis"
                                         HorizontalAlignment="Center"
                                         FontWeight="Bold" />
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        x:Name="InvisibleDisplayText"
+                                        Text="{Binding Display, FallbackValue=Track}"
+                                        FontSize="{Binding ElementName=DisplayText, Path=FontSize}"
+                                        TextTrimming="None"
+                                        HorizontalAlignment="{Binding ElementName=DisplayText, Path=HorizontalAlignment}"
+                                        FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
+                                        FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
 
                                     <Grid
                                         Grid.Row="1"
