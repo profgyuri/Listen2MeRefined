@@ -229,20 +229,22 @@
                                         Grid.Row="1"
                                         VerticalAlignment="Bottom" />
 
-                                    <TextBlock
+                                    <resources:StoryboardTextBlock
                                         Grid.Row="0"
                                         x:Name="DisplayText"
                                         Text="{Binding Display, FallbackValue=Track}"
+                                        Tag="{Binding ElementName=InvisibleDisplayText, Path=ActualWidth}"
                                         FontSize="16"
                                         TextTrimming="CharacterEllipsis"
                                         HorizontalAlignment="Center"
                                         FontWeight="Bold" />
-                                    <TextBlock
+                                    <resources:StoryboardTextBlock
                                         Grid.Row="0"
                                         x:Name="InvisibleDisplayText"
                                         Text="{Binding Display, FallbackValue=Track}"
                                         FontSize="{Binding ElementName=DisplayText, Path=FontSize}"
                                         TextTrimming="None"
+                                        Visibility="Hidden"
                                         HorizontalAlignment="{Binding ElementName=DisplayText, Path=HorizontalAlignment}"
                                         FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
                                         FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
