@@ -81,6 +81,7 @@ public sealed partial class MainWindowViewModel :
 
     private async Task Initialize()
     {
+        _playlistReference.PassPlaylist(ref _playList);
         await Task.Run(async () => await _dataContext.Database.MigrateAsync());
         await Task.Run(async () =>
         {
@@ -98,7 +99,6 @@ public sealed partial class MainWindowViewModel :
 
         await Task.Run(() =>
         {
-            _playlistReference.PassPlaylist(ref _playList);
             _timedTask.Start(
                 TimeSpan.FromMilliseconds(100),
                 () => OnPropertyChanged(nameof(CurrentTime)));
