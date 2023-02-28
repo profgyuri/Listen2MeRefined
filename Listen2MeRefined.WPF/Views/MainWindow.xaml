@@ -186,7 +186,14 @@
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding SearchResults}"
-                        Style="{StaticResource SongsListView}"/>
+                        Style="{StaticResource SongsListView}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Text="{Binding Display}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
                 </Border>
                 <TextBlock
                     Style="{StaticResource ElementContainerText}"
@@ -202,6 +209,7 @@
                     BorderBrush="#aaa"
                     CornerRadius="5">
                     <ListView
+                        Margin="0 20"
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding PlayList}"
@@ -232,6 +240,8 @@
                                     <resources:StoryboardTextBlock
                                         Grid.Row="0"
                                         x:Name="DisplayText"
+                                        MouseEnter="DisplayText_MouseEnter"
+                                        MouseLeave="DisplayText_MouseLeave"
                                         Text="{Binding Display, FallbackValue=Track}"
                                         Tag="{Binding ElementName=InvisibleDisplayText, Path=ActualWidth}"
                                         FontSize="16"
