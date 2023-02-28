@@ -122,16 +122,21 @@
                         CornerRadius="8"
                         Padding="10"
                         Margin="0 0 10 0"
-                        BorderBrush="#aaa"
+                        BorderBrush="#313131"
                         BorderThickness="1">
+                        <Border.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#232323"/>
+                                <GradientStop Color="{StaticResource PrimaryColor}" Offset=".12"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
                         <Frame
                             x:Name="CurrentlyPlayingFrame"
                             NavigationUIVisibility="Hidden"/>
                     </Border>
                     <TextBlock
                         Text="Currently Playing"
-                        Style="{StaticResource ElementContainerText}"
-                        Margin="30 -10 0 0"/>
+                        Style="{StaticResource ElementContainerText}"/>
 
                     <Button
                         Grid.Column="1"
@@ -177,12 +182,18 @@
                 <Border
                     Grid.Row="1"
                     BorderThickness="1"
-                    BorderBrush="#aaa"
+                    BorderBrush="#313131"
                     CornerRadius="5"
                     Margin="0 20 10 14">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#232323"/>
+                            <GradientStop Color="{StaticResource PrimaryColor}" Offset=".12"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
                     <ListView
                         x:Name="SearchResults"
-                        Margin="0 20"
+                        Margin="0 45 0 0"
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding SearchResults}"
@@ -198,7 +209,9 @@
                 <TextBlock
                     Style="{StaticResource ElementContainerText}"
                     Grid.Row="1"
-                    Text="Search Results"/>
+                    Text="Search Results"
+                    Margin="0 25"
+                    Background="Transparent"/>
 
                 <!-- Playlist -->
                 <Border
@@ -206,10 +219,16 @@
                     Grid.Row="1"
                     Grid.Column="1"
                     BorderThickness="1"
-                    BorderBrush="#aaa"
+                    BorderBrush="#313131"
                     CornerRadius="5">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                            <GradientStop Color="#232323"/>
+                            <GradientStop Color="{StaticResource PrimaryColor}" Offset=".12"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
                     <ListView
-                        Margin="0 20"
+                        Margin="0 45 0 0"
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding PlayList}"
@@ -299,7 +318,9 @@
                     Grid.Row="1"
                     Grid.Column="1"
                     Text="Playlist"
-                    Style="{StaticResource ElementContainerText}"/>
+                    Style="{StaticResource ElementContainerText}"
+                    Margin="0 25"
+                    Background="Transparent"/>
 
                 <!-- Searchbar -->
                 <Grid

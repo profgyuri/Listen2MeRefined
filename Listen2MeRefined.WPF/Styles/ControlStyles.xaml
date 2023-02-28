@@ -59,11 +59,11 @@
     <!--#region Element Container -->
     <Style TargetType="TextBlock" x:Key="ElementContainerText" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Padding" Value="3 0" />
-        <Setter Property="Margin" Value="30 8 0 0" />
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Margin" Value="0 2 0 0" />
+        <Setter Property="FontSize" Value="24" />
     </Style>
     <!--#endregion-->
     
