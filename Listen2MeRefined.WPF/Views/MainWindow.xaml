@@ -111,12 +111,9 @@
 
                     <Border
                         Grid.RowSpan="2"
-                        CornerRadius="8"
                         Padding="10"
                         Margin="0 0 10 0"
-                        Background="{StaticResource ContainerGradientBackgroundBrush}"
-                        BorderBrush="{StaticResource DarkBorderBrush}"
-                        BorderThickness="1">
+                        Style="{StaticResource ContainerBorder}">
                         <Frame
                             x:Name="CurrentlyPlayingFrame"
                             NavigationUIVisibility="Hidden"/>
@@ -127,10 +124,7 @@
 
                     <Border
                         Grid.Column="1"
-                        BorderThickness="1"
-                        Background="{StaticResource ContainerGradientBackgroundBrush}"
-                        BorderBrush="{StaticResource DarkBorderBrush}"
-                        CornerRadius="5">
+                        Style="{StaticResource ContainerBorder}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -186,10 +180,7 @@
                 <!-- Search results -->
                 <Border
                     Grid.Row="1"
-                    BorderThickness="1"
-                    Background="{StaticResource ContainerGradientBackgroundBrush}"
-                    BorderBrush="{StaticResource DarkBorderBrush}"
-                    CornerRadius="5"
+                    Style="{StaticResource ContainerBorder}"
                     Margin="0 20 10 14">
                     <ListView
                         x:Name="SearchResults"
@@ -218,10 +209,7 @@
                     Margin="10 20 0 14"
                     Grid.Row="1"
                     Grid.Column="1"
-                    BorderThickness="1"
-                    Background="{StaticResource ContainerGradientBackgroundBrush}"
-                    BorderBrush="{StaticResource DarkBorderBrush}"
-                    CornerRadius="5">
+                    Style="{StaticResource ContainerBorder}">
                     <ListView
                         Margin="0 45 0 0"
                         dd:DragDrop.IsDragSource="True"

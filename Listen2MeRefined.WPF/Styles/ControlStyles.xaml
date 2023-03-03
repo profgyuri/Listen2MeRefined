@@ -90,6 +90,13 @@
         </Setter>
     </Style>
 
+    <Style TargetType="Border" x:Key="ContainerBorder">
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
+        <Setter Property="Background" Value="{StaticResource ContainerGradientBackgroundBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    
     <!--#region Element Container -->
     <Style TargetType="TextBlock" x:Key="ElementContainerText" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
