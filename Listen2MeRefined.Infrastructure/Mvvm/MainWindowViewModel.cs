@@ -29,7 +29,7 @@ public sealed partial class MainWindowViewModel :
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
-    [ObservableProperty] private string _fontFamily;
+    [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
@@ -74,19 +74,26 @@ public sealed partial class MainWindowViewModel :
         _dataContext = dataContext;
         _waveFormDrawer = waveFormDrawer;
 
-        Initialize().ConfigureAwait(false);
-        
+        AsyncInit().ConfigureAwait(false);
+        Init();
+    }
+
+    private void Init()
+    {
+        _playlistReference.PassPlaylist(ref _playList);
+        _timedTask.Start(
+                TimeSpan.FromMilliseconds(100),
+                () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
     }
 
-    private async Task Initialize()
+    private async Task AsyncInit()
     {
-        _playlistReference.PassPlaylist(ref _playList);
         await Task.Run(async () => await _dataContext.Database.MigrateAsync());
         await Task.Run(async () =>
         {
             FontFamily = _settingsManager.Settings.FontFamily;
-            WaveFormWidth = 470;
+            WaveFormWidth = 480;
             WaveFormHeight = 70;
             _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
             await DrawPlaceholderLineAsync();
@@ -96,13 +103,6 @@ public sealed partial class MainWindowViewModel :
         {
             await Task.Run(async () => await _folderScanner.ScanAllAsync()).ConfigureAwait(false);
         }
-
-        await Task.Run(() =>
-        {
-            _timedTask.Start(
-                TimeSpan.FromMilliseconds(100),
-                () => OnPropertyChanged(nameof(CurrentTime)));
-        });
     }
     
     ~MainWindowViewModel()

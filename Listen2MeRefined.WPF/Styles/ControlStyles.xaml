@@ -184,7 +184,6 @@
         <Setter Property="UseLayoutRounding" Value="False" />
         <Setter Property="Template" Value="{StaticResource MaterialDesignSliderHorizontal}" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Margin" Value="20 5 10 5" />
         <Setter Property="wpf:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">

@@ -104,17 +104,9 @@
                 <!-- Player controls -->
                 <Grid
                     Grid.ColumnSpan="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" MinWidth="280" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <Border
@@ -138,43 +130,66 @@
                         Text="Currently Playing"
                         Style="{StaticResource ElementContainerText}"/>
 
-                    <Button
+                    <Border
                         Grid.Column="1"
-                        Command="{Binding PreviousCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}" />
-                    <Button
-                        Grid.Column="2"
-                        Command="{Binding StopCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
-                    <Button
-                        Grid.Column="3"
-                        Command="{Binding PlayPauseCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
-                    <Button
-                        Grid.Column="4"
-                        Command="{Binding NextCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
-                    <Button
-                        Grid.Column="5"
-                        Command="{Binding ShuffleCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
-                    <wpf:WaveSlider
-                        Style="{DynamicResource NoHaloSlider}"
-                        Foreground="{StaticResource ThirnaryBrush}"
-                        WaveBitmap="{Binding WaveForm}"
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Minimum="0"
-                        Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
-                        Value="{Binding CurrentTime}"
-                        Grid.ColumnSpan="5"
-                        Width="{Binding WaveFormWidth}" 
-                        Height="{Binding WaveFormHeight}"/>
+                        BorderThickness="1"
+                        BorderBrush="#313131"
+                        CornerRadius="5">
+                        <Border.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#232323"/>
+                                <GradientStop Color="{StaticResource PrimaryColor}" Offset=".12"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                Command="{Binding PreviousCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding StopCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
+                            <Button
+                                Grid.Column="2"
+                                Command="{Binding PlayPauseCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
+                            <Button
+                                Grid.Column="3"
+                                Command="{Binding NextCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
+                            <Button
+                                Grid.Column="4"
+                                Command="{Binding ShuffleCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
+                            <wpf:WaveSlider
+                                Style="{StaticResource NoHaloSlider}"
+                                Foreground="{StaticResource ThirnaryBrush}"
+                                WaveBitmap="{Binding WaveForm}"
+                                Grid.Row="1"
+                                Minimum="0"
+                                Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
+                                Value="{Binding CurrentTime}"
+                                Grid.ColumnSpan="5"
+                                Width="{Binding WaveFormWidth}" 
+                                Height="{Binding WaveFormHeight}"/>
+                        </Grid>
+                    </Border>
 
                 </Grid>
 
