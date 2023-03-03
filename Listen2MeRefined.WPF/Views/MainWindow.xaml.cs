@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using Listen2MeRefined.WPF.Views;
 using Listen2MeRefined.WPF.Views.Pages;
@@ -181,4 +182,12 @@ public sealed partial class MainWindow : Window
         storyboard.Begin();
     }
     #endregion
+
+    private void Playlist_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        if (sender is ListView listView && listView.SelectedItem != null)
+        {
+            listView.ScrollIntoView(listView.SelectedItem);
+        }
+    }
 }

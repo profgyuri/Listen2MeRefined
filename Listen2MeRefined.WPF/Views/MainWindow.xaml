@@ -261,13 +261,14 @@
                             Background="Transparent"/>
 
                         <ListView
+                            x:Name="Playlist"
                             Grid.Row="1"
-                            Margin="0 45 0 0"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
                             ItemsSource="{Binding PlayList}"
                             Style="{StaticResource CustomHighlightSongsListView}"
-                            SelectedIndex="{Binding SelectedIndex}">
+                            SelectedIndex="{Binding SelectedIndex}"
+                            SelectionChanged="Playlist_SelectionChanged">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDoubleClick">
                                     <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
