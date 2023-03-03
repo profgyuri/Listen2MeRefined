@@ -247,7 +247,7 @@
                         dd:DragDrop.IsDragSource="True"
                         dd:DragDrop.IsDropTarget="True"
                         ItemsSource="{Binding PlayList}"
-                        Style="{StaticResource SongsListView}"
+                        Style="{StaticResource CustomHighlightSongsListView}"
                         SelectedIndex="{Binding SelectedIndex}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDoubleClick">

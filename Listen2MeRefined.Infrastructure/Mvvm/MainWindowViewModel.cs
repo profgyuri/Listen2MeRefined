@@ -101,7 +101,7 @@ public sealed partial class MainWindowViewModel :
         
         if (_settingsManager.Settings.ScanOnStartup)
         {
-            await Task.Run(async () => await _folderScanner.ScanAllAsync()).ConfigureAwait(false);
+            await Task.Run(_folderScanner.ScanAllAsync);
         }
     }
     
