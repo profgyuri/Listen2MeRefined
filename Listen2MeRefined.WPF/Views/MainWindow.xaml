@@ -201,13 +201,42 @@
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
                             ItemsSource="{Binding SearchResults}"
-                            Style="{StaticResource SongsListView}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock
-                                    Text="{Binding Display}"/>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
+                            Style="{StaticResource SongsListView}"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                            <ListView.View>
+                                <GridView>
+                                    <GridView.ColumnHeaderContainerStyle>
+                                        <Style TargetType="GridViewColumnHeader">
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+                                            <Setter Property="Foreground" Value="{StaticResource ThirnaryBrush}" />
+                                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            <Setter Property="Width" Value="150" />
+                                        </Style>
+                                    </GridView.ColumnHeaderContainerStyle>
+                                    <GridViewColumn
+                                        Header="Artist"
+                                        DisplayMemberBinding="{Binding Artist}"/>
+                                    <GridViewColumn
+                                        Header="Title"
+                                        DisplayMemberBinding="{Binding Title}"/>
+                                    <GridViewColumn
+                                        Header="Genre"
+                                        DisplayMemberBinding="{Binding Genre}"/>
+                                    <GridViewColumn
+                                        Header="BPM"
+                                        DisplayMemberBinding="{Binding BPM}"/>
+                                    <GridViewColumn
+                                        Header="Bitrate"
+                                        DisplayMemberBinding="{Binding Bitrate}"/>
+                                    <GridViewColumn
+                                        Header="Path"
+                                        DisplayMemberBinding="{Binding Path}"/>
+                                </GridView>
+                            </ListView.View>
                         </ListView>
                     </Grid>
 
