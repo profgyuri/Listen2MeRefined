@@ -182,6 +182,7 @@
                     Grid.Row="1"
                     Style="{StaticResource ContainerBorder}"
                     Margin="0 20 10 14">
+                    <!-- todo: Switch this playlist to a gridlist like AIMP -->
                     <ListView
                         x:Name="SearchResults"
                         Margin="0 45 0 0"
