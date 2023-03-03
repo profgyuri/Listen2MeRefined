@@ -182,28 +182,36 @@
                     Grid.Row="1"
                     Style="{StaticResource ContainerBorder}"
                     Margin="0 20 10 14">
-                    <!-- todo: Switch this playlist to a gridlist like AIMP -->
-                    <ListView
-                        x:Name="SearchResults"
-                        Margin="0 45 0 0"
-                        dd:DragDrop.IsDragSource="True"
-                        dd:DragDrop.IsDropTarget="True"
-                        ItemsSource="{Binding SearchResults}"
-                        Style="{StaticResource SongsListView}">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Style="{StaticResource ElementContainerText}"
+                            Margin="0 6 0 20"
+                            Text="Search Results"
+                            Background="Transparent"/>
+
+                        <!-- todo: Switch this playlist to a gridlist like AIMP -->
+                        <ListView
+                            Grid.Row="1"
+                            x:Name="SearchResults"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            ItemsSource="{Binding SearchResults}"
+                            Style="{StaticResource SongsListView}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock
                                     Text="{Binding Display}"/>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+
                 </Border>
-                <TextBlock
-                    Style="{StaticResource ElementContainerText}"
-                    Grid.Row="1"
-                    Text="Search Results"
-                    Margin="0 25"
-                    Background="Transparent"/>
 
                 <!-- Playlist -->
                 <Border
@@ -211,36 +219,49 @@
                     Grid.Row="1"
                     Grid.Column="1"
                     Style="{StaticResource ContainerBorder}">
-                    <ListView
-                        Margin="0 45 0 0"
-                        dd:DragDrop.IsDragSource="True"
-                        dd:DragDrop.IsDropTarget="True"
-                        ItemsSource="{Binding PlayList}"
-                        Style="{StaticResource CustomHighlightSongsListView}"
-                        SelectedIndex="{Binding SelectedIndex}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDoubleClick">
-                                <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid
-                                    MinWidth="320">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                                    <Rectangle
+                        <TextBlock
+                            Text="Playlist"
+                            Style="{StaticResource ElementContainerText}"
+                            Margin="0 6 0 20"
+                            Background="Transparent"/>
+
+                        <ListView
+                            Grid.Row="1"
+                            Margin="0 45 0 0"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            ItemsSource="{Binding PlayList}"
+                            Style="{StaticResource CustomHighlightSongsListView}"
+                            SelectedIndex="{Binding SelectedIndex}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid
+                                    MinWidth="320">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <Rectangle
                                         Grid.RowSpan="2"
                                         Fill="Transparent" />
 
-                                    <resources:HorizontalSeparator
+                                        <resources:HorizontalSeparator
                                         Grid.Row="1"
                                         VerticalAlignment="Bottom" />
 
-                                    <resources:StoryboardTextBlock
+                                        <resources:StoryboardTextBlock
                                         Grid.Row="0"
                                         x:Name="DisplayText"
                                         MouseEnter="DisplayText_MouseEnter"
@@ -251,7 +272,7 @@
                                         TextTrimming="CharacterEllipsis"
                                         HorizontalAlignment="Center"
                                         FontWeight="Bold" />
-                                    <resources:StoryboardTextBlock
+                                        <resources:StoryboardTextBlock
                                         Grid.Row="0"
                                         x:Name="InvisibleDisplayText"
                                         Text="{Binding Display, FallbackValue=Track}"
@@ -262,50 +283,44 @@
                                         FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
                                         FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
 
-                                    <Grid
+                                        <Grid
                                         Grid.Row="1"
                                         Grid.ColumnSpan="2"
                                         Margin="0 0 0 5">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition Width="3*" />
-                                            <ColumnDefinition Width="2*" />
-                                        </Grid.ColumnDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="3*" />
+                                                <ColumnDefinition Width="2*" />
+                                            </Grid.ColumnDefinitions>
 
-                                        <TextBlock
+                                            <TextBlock
                                             Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
                                             TextTrimming="CharacterEllipsis"
                                             HorizontalAlignment="Center" />
-                                        <TextBlock
+                                            <TextBlock
                                             Grid.Column="1"
                                             Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
                                             TextTrimming="CharacterEllipsis"
                                             HorizontalAlignment="Center" />
-                                        <TextBlock
+                                            <TextBlock
                                             Grid.Column="2"
                                             Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
                                             TextTrimming="CharacterEllipsis"
                                             HorizontalAlignment="Center" />
-                                        <TextBlock
+                                            <TextBlock
                                             Grid.Column="3"
                                             Text="{Binding Genre, FallbackValue=Genre}"
                                             TextTrimming="CharacterEllipsis"
                                             HorizontalAlignment="Center" />
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
                 </Border>
-                <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Text="Playlist"
-                    Style="{StaticResource ElementContainerText}"
-                    Margin="0 25"
-                    Background="Transparent"/>
-
+                
                 <!-- Searchbar -->
                 <Grid
                     Grid.Row="2"
