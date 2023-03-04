@@ -185,7 +185,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition x:Name="ListRow" Height="*"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock
@@ -195,49 +195,47 @@
                             Background="Transparent"/>
 
                         <!-- todo: Switch this playlist to a gridlist like AIMP -->
-                        <ListView
+                        <DataGrid
                             Grid.Row="1"
                             x:Name="SearchResults"
+                            Height="{Binding ElementName=ListRow, Path=Height}"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
                             ItemsSource="{Binding SearchResults}"
-                            Style="{StaticResource SongsListView}"
-                            ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                            <ListView.View>
-                                <GridView>
-                                    <GridView.ColumnHeaderContainerStyle>
-                                        <Style TargetType="GridViewColumnHeader">
-                                            <Setter Property="Padding" Value="0" />
-                                            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
-                                            <Setter Property="Foreground" Value="{StaticResource ThirnaryBrush}" />
-                                            <Setter Property="BorderThickness" Value="0,0,0,1" />
-                                            <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
-                                            <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                                            <Setter Property="Width" Value="150" />
-                                        </Style>
-                                    </GridView.ColumnHeaderContainerStyle>
-                                    <GridViewColumn
-                                        Header="Artist"
-                                        DisplayMemberBinding="{Binding Artist}"/>
-                                    <GridViewColumn
-                                        Header="Title"
-                                        DisplayMemberBinding="{Binding Title}"/>
-                                    <GridViewColumn
-                                        Header="Genre"
-                                        DisplayMemberBinding="{Binding Genre}"/>
-                                    <GridViewColumn
-                                        Header="BPM"
-                                        DisplayMemberBinding="{Binding BPM}"/>
-                                    <GridViewColumn
-                                        Header="Bitrate"
-                                        DisplayMemberBinding="{Binding Bitrate}"/>
-                                    <GridViewColumn
-                                        Header="Path"
-                                        DisplayMemberBinding="{Binding Path}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
+                            Style="{StaticResource SearchResultGrid}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn 
+                                    Header="Artist" 
+                                    Binding="{Binding Artist}" 
+                                    Width="Auto"
+                                    MinWidth="80"/>
+                                <DataGridTextColumn 
+                                    Header="Title" 
+                                    Binding="{Binding Title}" 
+                                    Width="Auto"
+                                    MinWidth="80"/>
+                                <DataGridTextColumn 
+                                    Header="Genre" 
+                                    Binding="{Binding Genre}" 
+                                    Width="Auto"
+                                    MinWidth="80"/>
+                                <DataGridTextColumn 
+                                    Header="BPM" 
+                                    Binding="{Binding BPM}" 
+                                    Width="Auto" 
+                                    MinWidth="50"/>
+                                <DataGridTextColumn 
+                                    Header="Bitrate" 
+                                    Binding="{Binding Bitrate}" 
+                                    Width="Auto" 
+                                    MinWidth="50"/>
+                                <DataGridTextColumn 
+                                    Header="Path" 
+                                    Binding="{Binding Path}" 
+                                    Width="Auto" 
+                                    MinWidth="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Grid>
 
                 </Border>
@@ -284,39 +282,39 @@
                                         </Grid.RowDefinitions>
 
                                         <Rectangle
-                                        Grid.RowSpan="2"
-                                        Fill="Transparent" />
+                                            Grid.RowSpan="2"
+                                            Fill="Transparent" />
 
                                         <resources:HorizontalSeparator
-                                        Grid.Row="1"
-                                        VerticalAlignment="Bottom" />
+                                            Grid.Row="1"
+                                            VerticalAlignment="Bottom" />
 
                                         <resources:StoryboardTextBlock
-                                        Grid.Row="0"
-                                        x:Name="DisplayText"
-                                        MouseEnter="DisplayText_MouseEnter"
-                                        MouseLeave="DisplayText_MouseLeave"
-                                        Text="{Binding Display, FallbackValue=Track}"
-                                        Tag="{Binding ElementName=InvisibleDisplayText, Path=ActualWidth}"
-                                        FontSize="16"
-                                        TextTrimming="CharacterEllipsis"
-                                        HorizontalAlignment="Center"
-                                        FontWeight="Bold" />
+                                            Grid.Row="0"
+                                            x:Name="DisplayText"
+                                            MouseEnter="DisplayText_MouseEnter"
+                                            MouseLeave="DisplayText_MouseLeave"
+                                            Text="{Binding Display, FallbackValue=Track}"
+                                            Tag="{Binding ElementName=InvisibleDisplayText, Path=ActualWidth}"
+                                            FontSize="16"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="Bold" />
                                         <resources:StoryboardTextBlock
-                                        Grid.Row="0"
-                                        x:Name="InvisibleDisplayText"
-                                        Text="{Binding Display, FallbackValue=Track}"
-                                        FontSize="{Binding ElementName=DisplayText, Path=FontSize}"
-                                        TextTrimming="None"
-                                        Visibility="Hidden"
-                                        HorizontalAlignment="{Binding ElementName=DisplayText, Path=HorizontalAlignment}"
-                                        FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
-                                        FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
+                                            Grid.Row="0"
+                                            x:Name="InvisibleDisplayText"
+                                            Text="{Binding Display, FallbackValue=Track}"
+                                            FontSize="{Binding ElementName=DisplayText, Path=FontSize}"
+                                            TextTrimming="None"
+                                            Visibility="Hidden"
+                                            HorizontalAlignment="{Binding ElementName=DisplayText, Path=HorizontalAlignment}"
+                                            FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
+                                            FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
 
                                         <Grid
-                                        Grid.Row="1"
-                                        Grid.ColumnSpan="2"
-                                        Margin="0 0 0 5">
+                                            Grid.Row="1"
+                                            Grid.ColumnSpan="2"
+                                            Margin="0 0 0 5">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="2*" />
                                                 <ColumnDefinition Width="2*" />
@@ -325,24 +323,24 @@
                                             </Grid.ColumnDefinitions>
 
                                             <TextBlock
-                                            Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
-                                            TextTrimming="CharacterEllipsis"
-                                            HorizontalAlignment="Center" />
+                                                Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
                                             <TextBlock
-                                            Grid.Column="1"
-                                            Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
-                                            TextTrimming="CharacterEllipsis"
-                                            HorizontalAlignment="Center" />
+                                                Grid.Column="1"
+                                                Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
                                             <TextBlock
-                                            Grid.Column="2"
-                                            Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
-                                            TextTrimming="CharacterEllipsis"
-                                            HorizontalAlignment="Center" />
+                                                Grid.Column="2"
+                                                Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
                                             <TextBlock
-                                            Grid.Column="3"
-                                            Text="{Binding Genre, FallbackValue=Genre}"
-                                            TextTrimming="CharacterEllipsis"
-                                            HorizontalAlignment="Center" />
+                                                Grid.Column="3"
+                                                Text="{Binding Genre, FallbackValue=Genre}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
                                         </Grid>
                                     </Grid>
                                 </DataTemplate>
