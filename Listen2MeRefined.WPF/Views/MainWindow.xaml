@@ -198,11 +198,13 @@
                         <Button
                             Style="{StaticResource InteractionButton}"
                             Margin="10 0"
-                            Content="{materialDesign:PackIcon Kind=MinusBoxMultipleOutline}"/>
+                            Content="{materialDesign:PackIcon Kind=DeleteForeverOutline, Size=20}"
+                            ToolTip="Clear Results"/>
                         <Button
                             Grid.Column="1"
                             Style="{StaticResource InteractionButton}"
-                            Content="{materialDesign:PackIcon Kind=MinusBoxOutline}"/>
+                            Content="{materialDesign:PackIcon Kind=MinusBoxOutline, Size=20}"
+                            ToolTip="Remove Selected"/>
 
                         <TextBlock
                             Grid.Column="2"
@@ -213,11 +215,15 @@
 
                         <Button
                             Grid.Column="3"
-                            Style="{StaticResource InteractionButton}"/>
+                            Style="{StaticResource InteractionButton}"
+                            Content="{materialDesign:PackIcon Kind=ChevronRight, Size=20}"
+                            ToolTip="Add Selected to Playlist"/>
                         <Button
                             Grid.Column="4"
                             Style="{StaticResource InteractionButton}"
-                            Margin="10 0"/>
+                            Margin="10 0"
+                            Content="{materialDesign:PackIcon Kind=ChevronDoubleRight, Size=20}"
+                            ToolTip="Add All to Playlist"/>
 
                         <DataGrid
                             Grid.Row="1"
