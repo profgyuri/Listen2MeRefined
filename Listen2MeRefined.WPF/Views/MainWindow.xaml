@@ -183,20 +183,45 @@
                     Style="{StaticResource ContainerBorder}"
                     Margin="0 20 10 14">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition x:Name="ListRow" Height="*"/>
                         </Grid.RowDefinitions>
 
+                        <Button
+                            Style="{StaticResource InteractionButton}"
+                            Margin="10 0"
+                            Content="{materialDesign:PackIcon Kind=MinusBoxMultipleOutline}"/>
+                        <Button
+                            Grid.Column="1"
+                            Style="{StaticResource InteractionButton}"
+                            Content="{materialDesign:PackIcon Kind=MinusBoxOutline}"/>
+
                         <TextBlock
+                            Grid.Column="2"
                             Style="{StaticResource ElementContainerText}"
                             Margin="0 6 0 20"
                             Text="Search Results"
                             Background="Transparent"/>
 
-                        <!-- todo: Switch this playlist to a gridlist like AIMP -->
+                        <Button
+                            Grid.Column="3"
+                            Style="{StaticResource InteractionButton}"/>
+                        <Button
+                            Grid.Column="4"
+                            Style="{StaticResource InteractionButton}"
+                            Margin="10 0"/>
+
                         <DataGrid
                             Grid.Row="1"
+                            Grid.ColumnSpan="5"
                             x:Name="SearchResults"
                             Height="{Binding ElementName=ListRow, Path=Height}"
                             dd:DragDrop.IsDragSource="True"
