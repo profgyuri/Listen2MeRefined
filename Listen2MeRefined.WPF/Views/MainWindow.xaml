@@ -184,27 +184,16 @@
                     Margin="0 20 10 14">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition x:Name="ListRow" Height="*"/>
                         </Grid.RowDefinitions>
-
-                        <Button
-                            Style="{StaticResource InteractionButton}"
-                            Margin="10 0"
-                            Content="{materialDesign:PackIcon Kind=DeleteForeverOutline, Size=20}"
-                            ToolTip="Clear Results"/>
-                        <Button
-                            Grid.Column="1"
-                            Style="{StaticResource InteractionButton}"
-                            Content="{materialDesign:PackIcon Kind=MinusBoxOutline, Size=20}"
-                            ToolTip="Remove Selected"/>
 
                         <TextBlock
                             Grid.Column="2"
@@ -217,22 +206,25 @@
                             Grid.Column="3"
                             Style="{StaticResource InteractionButton}"
                             Content="{materialDesign:PackIcon Kind=ChevronRight, Size=20}"
+                            Command="{Binding SendSelectedToPlaylistCommand}"
                             ToolTip="Add Selected to Playlist"/>
                         <Button
                             Grid.Column="4"
                             Style="{StaticResource InteractionButton}"
                             Margin="10 0"
-                            Content="{materialDesign:PackIcon Kind=ChevronDoubleRight, Size=20}"
+                            Content="{materialDesign:PackIcon Kind=ChevronTripleRight, Size=20}"
+                            Command="{Binding SendAllToPlaylistCommand}"
                             ToolTip="Add All to Playlist"/>
 
                         <DataGrid
+                            x:Name="SearchResults"
                             Grid.Row="1"
                             Grid.ColumnSpan="5"
-                            x:Name="SearchResults"
                             Height="{Binding ElementName=ListRow, Path=Height}"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
                             ItemsSource="{Binding SearchResults}"
+                            SelectionChanged="SearchResults_SelectionChanged"
                             Style="{StaticResource SearchResultGrid}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn 

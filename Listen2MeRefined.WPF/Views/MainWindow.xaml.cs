@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
@@ -188,6 +189,21 @@ public sealed partial class MainWindow : Window
         if (sender is ListView listView && listView.SelectedItem != null)
         {
             listView.ScrollIntoView(listView.SelectedItem);
+        }
+    }
+
+    private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext;
+
+        foreach (var audio in e.AddedItems)
+        {
+            vm.AddSelectedAudio((AudioModel)audio);
+        }
+        
+        foreach (var audio in e.RemovedItems)
+        {
+            vm.RemoveSelectedAudio((AudioModel)audio);
         }
     }
 }

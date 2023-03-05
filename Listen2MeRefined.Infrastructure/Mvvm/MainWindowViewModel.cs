@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
 using Source;
+using Source.Extensions;
 using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
@@ -17,6 +18,7 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>
 {
+    private readonly Guid ID = Guid.NewGuid();
     private readonly ILogger _logger;
     private readonly IPlaylistReference _playlistReference;
     private readonly IMediaController<SKBitmap> _mediaController;
@@ -28,6 +30,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IFolderScanner _folderScanner;
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
+    private readonly HashSet<AudioModel> _selectedAudioModels = new();
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
@@ -197,8 +200,28 @@ public sealed partial class MainWindowViewModel :
     {
         _mediaController.Shuffle();
     }
+
+    [RelayCommand]
+    private void SendSelectedToPlaylist()
+    {
+        PlayList.AddRange(_selectedAudioModels);
+
+        while (_selectedAudioModels.Count > 0)
+        {
+            var toRemove = _selectedAudioModels.First();
+            SearchResults.Remove(toRemove);
+            _selectedAudioModels.Remove(toRemove);
+        }
+    }
+
+    [RelayCommand]
+    private void SendAllToPlaylist()
+    {
+        PlayList.AddRange(SearchResults);
+        SearchResults.Clear();
+    }
     #endregion
-    
+
     private async Task DrawPlaceholderLineAsync()
     {
         WaveForm = await _waveFormDrawer.LineAsync();
@@ -208,5 +231,15 @@ public sealed partial class MainWindowViewModel :
     {
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
         WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong!.Path!);
+    }
+
+    public void AddSelectedAudio(AudioModel song)
+    {
+        _selectedAudioModels.Add(song);
+    }
+
+    public void RemoveSelectedAudio(AudioModel song)
+    {
+        _selectedAudioModels?.Remove(song);
     }
 }
