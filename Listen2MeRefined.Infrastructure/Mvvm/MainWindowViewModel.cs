@@ -30,7 +30,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IFolderScanner _folderScanner;
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
-    private readonly HashSet<AudioModel> _selectedAudioModels = new();
+    private readonly HashSet<AudioModel> _selectedSearchResults = new();
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
@@ -204,13 +204,13 @@ public sealed partial class MainWindowViewModel :
     [RelayCommand]
     private void SendSelectedToPlaylist()
     {
-        PlayList.AddRange(_selectedAudioModels);
+        PlayList.AddRange(_selectedSearchResults);
 
-        while (_selectedAudioModels.Count > 0)
+        while (_selectedSearchResults.Count > 0)
         {
-            var toRemove = _selectedAudioModels.First();
+            var toRemove = _selectedSearchResults.First();
             SearchResults.Remove(toRemove);
-            _selectedAudioModels.Remove(toRemove);
+            _selectedSearchResults.Remove(toRemove);
         }
     }
 
@@ -235,11 +235,11 @@ public sealed partial class MainWindowViewModel :
 
     public void AddSelectedAudio(AudioModel song)
     {
-        _selectedAudioModels.Add(song);
+        _selectedSearchResults.Add(song);
     }
 
     public void RemoveSelectedAudio(AudioModel song)
     {
-        _selectedAudioModels?.Remove(song);
+        _selectedSearchResults?.Remove(song);
     }
 }

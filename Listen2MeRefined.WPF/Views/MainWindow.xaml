@@ -226,6 +226,10 @@
                             ItemsSource="{Binding SearchResults}"
                             SelectionChanged="SearchResults_SelectionChanged"
                             Style="{StaticResource SearchResultGrid}">
+                            <DataGrid.InputBindings>
+                                <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
+                                <KeyBinding Modifiers="Ctrl+Shift" Key="Right" Command="{Binding SendAllToPlaylistCommand}"/>
+                            </DataGrid.InputBindings>
                             <DataGrid.Columns>
                                 <DataGridTextColumn 
                                     Header="Artist" 
