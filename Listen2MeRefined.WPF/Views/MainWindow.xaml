@@ -317,6 +317,10 @@
                             Style="{StaticResource CustomHighlightSongsListView}"
                             SelectedIndex="{Binding SelectedIndex}"
                             SelectionChanged="Playlist_SelectionChanged">
+                            <ListView.InputBindings>
+                                <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
+                                <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
+                            </ListView.InputBindings>
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDoubleClick">
                                     <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
@@ -325,7 +329,7 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid
-                                    MinWidth="320">
+                                        MinWidth="320">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="*" />
