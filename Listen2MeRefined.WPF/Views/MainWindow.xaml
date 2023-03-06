@@ -316,6 +316,7 @@
                             ItemsSource="{Binding PlayList}"
                             Style="{StaticResource CustomHighlightSongsListView}"
                             SelectedIndex="{Binding SelectedIndex}"
+                            SelectedItem="{Binding SelectedSong}"
                             SelectionChanged="Playlist_SelectionChanged">
                             <ListView.InputBindings>
                                 <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
