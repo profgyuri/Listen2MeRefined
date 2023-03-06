@@ -190,6 +190,18 @@ public sealed partial class MainWindow : Window
         {
             listView.ScrollIntoView(listView.SelectedItem);
         }
+
+        var vm = (MainWindowViewModel)DataContext;
+
+        foreach (var audio in e.AddedItems)
+        {
+            vm.AddSelectedPlaylistItems((AudioModel)audio);
+        }
+
+        foreach (var audio in e.RemovedItems)
+        {
+            vm.RemoveSelectedPlaylistItems((AudioModel)audio);
+        }
     }
 
     private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -198,12 +210,12 @@ public sealed partial class MainWindow : Window
 
         foreach (var audio in e.AddedItems)
         {
-            vm.AddSelectedAudio((AudioModel)audio);
+            vm.AddSelectedSearchResult((AudioModel)audio);
         }
         
         foreach (var audio in e.RemovedItems)
         {
-            vm.RemoveSelectedAudio((AudioModel)audio);
+            vm.RemoveSelectedSearchResult((AudioModel)audio);
         }
     }
 }

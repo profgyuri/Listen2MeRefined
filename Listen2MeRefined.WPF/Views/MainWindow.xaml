@@ -274,19 +274,42 @@
                     Grid.Column="1"
                     Style="{StaticResource ContainerBorder}">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock
+                            Grid.Column="2"
                             Text="Playlist"
                             Style="{StaticResource ElementContainerText}"
                             Margin="0 6 0 20"
                             Background="Transparent"/>
 
+                        <Button
+                            Grid.Column="3"
+                            Style="{StaticResource InteractionButton}"
+                            Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=20}"
+                            Command="{Binding RemoveSelectedFromPlaylistCommand}"
+                            ToolTip="Remove Selected from Playlist"/>
+                        <Button
+                            Grid.Column="4"
+                            Style="{StaticResource InteractionButton}"
+                            Margin="10 0"
+                            Content="{materialDesign:PackIcon Kind=Plus, Size=20}"
+                            Command="{Binding ClearPlaylistCommand}"
+                            ToolTip="New Playlist"/>
+
                         <ListView
                             x:Name="Playlist"
+                            Grid.ColumnSpan="5"
                             Grid.Row="1"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"

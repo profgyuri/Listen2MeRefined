@@ -31,6 +31,7 @@ public sealed partial class MainWindowViewModel :
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
+    private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
@@ -219,6 +220,25 @@ public sealed partial class MainWindowViewModel :
     {
         PlayList.AddRange(SearchResults);
         SearchResults.Clear();
+        _selectedSearchResults.Clear();
+    }
+
+    [RelayCommand]
+    private void RemoveSelectedFromPlaylist()
+    {
+        while (_selectedPlaylistItems.Count > 0)
+        {
+            var toRemove = _selectedPlaylistItems.First();
+            PlayList.Remove(toRemove);
+            _selectedPlaylistItems.Remove(toRemove);
+        }
+    }
+
+    [RelayCommand]
+    private void ClearPlaylist()
+    {
+        PlayList.Clear();
+        _selectedPlaylistItems.Clear();
     }
     #endregion
 
@@ -233,13 +253,23 @@ public sealed partial class MainWindowViewModel :
         WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong!.Path!);
     }
 
-    public void AddSelectedAudio(AudioModel song)
+    public void AddSelectedSearchResult(AudioModel song)
     {
         _selectedSearchResults.Add(song);
     }
 
-    public void RemoveSelectedAudio(AudioModel song)
+    public void RemoveSelectedSearchResult(AudioModel song)
     {
         _selectedSearchResults?.Remove(song);
+    }
+
+    public void AddSelectedPlaylistItems(AudioModel song)
+    {
+        _selectedPlaylistItems.Add(song);
+    }
+
+    public void RemoveSelectedPlaylistItems(AudioModel song)
+    {
+        _selectedPlaylistItems.Remove(song);
     }
 }
