@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
 using Source;
+using Source.Extensions;
 using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
@@ -17,6 +18,7 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>
 {
+    private readonly Guid ID = Guid.NewGuid();
     private readonly ILogger _logger;
     private readonly IPlaylistReference _playlistReference;
     private readonly IMediaController<SKBitmap> _mediaController;
@@ -28,8 +30,10 @@ public sealed partial class MainWindowViewModel :
     private readonly IFolderScanner _folderScanner;
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
+    private readonly HashSet<AudioModel> _selectedSearchResults = new();
+    private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
 
-    [ObservableProperty] private string _fontFamily;
+    [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
@@ -74,18 +78,26 @@ public sealed partial class MainWindowViewModel :
         _dataContext = dataContext;
         _waveFormDrawer = waveFormDrawer;
 
-        Initialize().ConfigureAwait(false);
-        
+        AsyncInit().ConfigureAwait(false);
+        Init();
+    }
+
+    private void Init()
+    {
+        _playlistReference.PassPlaylist(ref _playList);
+        _timedTask.Start(
+                TimeSpan.FromMilliseconds(100),
+                () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
     }
 
-    private async Task Initialize()
+    private async Task AsyncInit()
     {
         await Task.Run(async () => await _dataContext.Database.MigrateAsync());
         await Task.Run(async () =>
         {
             FontFamily = _settingsManager.Settings.FontFamily;
-            WaveFormWidth = 470;
+            WaveFormWidth = 480;
             WaveFormHeight = 70;
             _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
             await DrawPlaceholderLineAsync();
@@ -93,16 +105,8 @@ public sealed partial class MainWindowViewModel :
         
         if (_settingsManager.Settings.ScanOnStartup)
         {
-            await Task.Run(async () => await _folderScanner.ScanAllAsync()).ConfigureAwait(false);
+            await Task.Run(_folderScanner.ScanAllAsync);
         }
-
-        await Task.Run(() =>
-        {
-            _playlistReference.PassPlaylist(ref _playList);
-            _timedTask.Start(
-                TimeSpan.FromMilliseconds(100),
-                () => OnPropertyChanged(nameof(CurrentTime)));
-        });
     }
     
     ~MainWindowViewModel()
@@ -197,8 +201,47 @@ public sealed partial class MainWindowViewModel :
     {
         _mediaController.Shuffle();
     }
+
+    [RelayCommand]
+    private void SendSelectedToPlaylist()
+    {
+        PlayList.AddRange(_selectedSearchResults);
+
+        while (_selectedSearchResults.Count > 0)
+        {
+            var toRemove = _selectedSearchResults.First();
+            SearchResults.Remove(toRemove);
+            _selectedSearchResults.Remove(toRemove);
+        }
+    }
+
+    [RelayCommand]
+    private void SendAllToPlaylist()
+    {
+        PlayList.AddRange(SearchResults);
+        SearchResults.Clear();
+        _selectedSearchResults.Clear();
+    }
+
+    [RelayCommand]
+    private void RemoveSelectedFromPlaylist()
+    {
+        while (_selectedPlaylistItems.Count > 0)
+        {
+            var toRemove = _selectedPlaylistItems.First();
+            PlayList.Remove(toRemove);
+            _selectedPlaylistItems.Remove(toRemove);
+        }
+    }
+
+    [RelayCommand]
+    private void ClearPlaylist()
+    {
+        PlayList.Clear();
+        _selectedPlaylistItems.Clear();
+    }
     #endregion
-    
+
     private async Task DrawPlaceholderLineAsync()
     {
         WaveForm = await _waveFormDrawer.LineAsync();
@@ -208,5 +251,25 @@ public sealed partial class MainWindowViewModel :
     {
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
         WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong!.Path!);
+    }
+
+    public void AddSelectedSearchResult(AudioModel song)
+    {
+        _selectedSearchResults.Add(song);
+    }
+
+    public void RemoveSelectedSearchResult(AudioModel song)
+    {
+        _selectedSearchResults?.Remove(song);
+    }
+
+    public void AddSelectedPlaylistItems(AudioModel song)
+    {
+        _selectedPlaylistItems.Add(song);
+    }
+
+    public void RemoveSelectedPlaylistItems(AudioModel song)
+    {
+        _selectedPlaylistItems.Remove(song);
     }
 }

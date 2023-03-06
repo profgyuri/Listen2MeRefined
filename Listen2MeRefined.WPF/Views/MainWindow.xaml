@@ -7,6 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
         xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
@@ -103,122 +104,306 @@
                 <!-- Player controls -->
                 <Grid
                     Grid.ColumnSpan="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" MinWidth="280" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
-                        <ColumnDefinition Width="Auto" MinWidth="100" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <Border
                         Grid.RowSpan="2"
-                        CornerRadius="8"
                         Padding="10"
                         Margin="0 0 10 0"
-                        BorderBrush="#aaa"
-                        BorderThickness="1">
+                        Style="{StaticResource ContainerBorder}">
                         <Frame
                             x:Name="CurrentlyPlayingFrame"
                             NavigationUIVisibility="Hidden"/>
                     </Border>
                     <TextBlock
                         Text="Currently Playing"
-                        Style="{StaticResource ElementContainerText}"
-                        Margin="30 -10 0 0"/>
+                        Style="{StaticResource ElementContainerText}"/>
 
-                    <Button
+                    <Border
                         Grid.Column="1"
-                        Command="{Binding PreviousCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}" />
-                    <Button
-                        Grid.Column="2"
-                        Command="{Binding StopCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
-                    <Button
-                        Grid.Column="3"
-                        Command="{Binding PlayPauseCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
-                    <Button
-                        Grid.Column="4"
-                        Command="{Binding NextCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
-                    <Button
-                        Grid.Column="5"
-                        Command="{Binding ShuffleCommand}"
-                        Style="{StaticResource PlayerButton}"
-                        Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
-                    <wpf:WaveSlider
-                        Style="{DynamicResource NoHaloSlider}"
-                        Foreground="{StaticResource ThirnaryBrush}"
-                        WaveBitmap="{Binding WaveForm}"
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Minimum="0"
-                        Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
-                        Value="{Binding CurrentTime}"
-                        Grid.ColumnSpan="5"
-                        Width="{Binding WaveFormWidth}" 
-                        Height="{Binding WaveFormHeight}"/>
+                        Style="{StaticResource ContainerBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                Command="{Binding PreviousCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding StopCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
+                            <Button
+                                Grid.Column="2"
+                                Command="{Binding PlayPauseCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
+                            <Button
+                                Grid.Column="3"
+                                Command="{Binding NextCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
+                            <Button
+                                Grid.Column="4"
+                                Command="{Binding ShuffleCommand}"
+                                Style="{StaticResource PlayerButton}"
+                                Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
+                            <wpf:WaveSlider
+                                Style="{StaticResource NoHaloSlider}"
+                                Foreground="{StaticResource ThirnaryBrush}"
+                                WaveBitmap="{Binding WaveForm}"
+                                Grid.Row="1"
+                                Minimum="0"
+                                Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
+                                Value="{Binding CurrentTime}"
+                                Grid.ColumnSpan="5"
+                                Width="{Binding WaveFormWidth}" 
+                                Height="{Binding WaveFormHeight}"/>
+                        </Grid>
+                    </Border>
 
                 </Grid>
 
                 <!-- Search results -->
                 <Border
                     Grid.Row="1"
-                    BorderThickness="1"
-                    BorderBrush="#aaa"
-                    CornerRadius="5"
+                    Style="{StaticResource ContainerBorder}"
                     Margin="0 20 10 14">
-                    <ListView
-                        x:Name="SearchResults"
-                        Margin="0 20"
-                        dd:DragDrop.IsDragSource="True"
-                        dd:DragDrop.IsDropTarget="True"
-                        ItemsSource="{Binding SearchResults}"
-                        Style="{StaticResource SongsListView}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition x:Name="ListRow" Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Column="2"
+                            Style="{StaticResource ElementContainerText}"
+                            Margin="0 6 0 20"
+                            Text="Search Results"
+                            Background="Transparent"/>
+
+                        <Button
+                            Grid.Column="3"
+                            Style="{StaticResource InteractionButton}"
+                            Content="{materialDesign:PackIcon Kind=ChevronRight, Size=20}"
+                            Command="{Binding SendSelectedToPlaylistCommand}"
+                            ToolTip="Add Selected to Playlist"/>
+                        <Button
+                            Grid.Column="4"
+                            Style="{StaticResource InteractionButton}"
+                            Margin="10 0"
+                            Content="{materialDesign:PackIcon Kind=ChevronTripleRight, Size=20}"
+                            Command="{Binding SendAllToPlaylistCommand}"
+                            ToolTip="Add All to Playlist"/>
+
+                        <DataGrid
+                            x:Name="SearchResults"
+                            Grid.Row="1"
+                            Grid.ColumnSpan="5"
+                            Height="{Binding ElementName=ListRow, Path=Height}"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            ItemsSource="{Binding SearchResults}"
+                            SelectionChanged="SearchResults_SelectionChanged"
+                            Style="{StaticResource SearchResultGrid}">
+                            <DataGrid.InputBindings>
+                                <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
+                                <KeyBinding Modifiers="Ctrl+Shift" Key="Right" Command="{Binding SendAllToPlaylistCommand}"/>
+                            </DataGrid.InputBindings>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn 
+                                    Header="Artist" 
+                                    Binding="{Binding Artist}" 
+                                    Width="Auto"
+                                    MinWidth="80"/>
+                                <DataGridTextColumn 
+                                    Header="Title" 
+                                    Binding="{Binding Title}" 
+                                    Width="Auto"
+                                    MinWidth="80"/>
+                                <DataGridTextColumn 
+                                    Header="Genre" 
+                                    Binding="{Binding Genre}" 
+                                    Width="Auto"
+                                    MinWidth="80"/>
+                                <DataGridTextColumn 
+                                    Header="BPM" 
+                                    Binding="{Binding BPM}" 
+                                    Width="Auto" 
+                                    MinWidth="50"/>
+                                <DataGridTextColumn 
+                                    Header="Bitrate" 
+                                    Binding="{Binding Bitrate}" 
+                                    Width="Auto" 
+                                    MinWidth="50"/>
+                                <DataGridTextColumn 
+                                    Header="Path" 
+                                    Binding="{Binding Path}" 
+                                    Width="Auto" 
+                                    MinWidth="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
                 </Border>
-                <TextBlock
-                    Style="{StaticResource ElementContainerText}"
-                    Grid.Row="1"
-                    Text="Search Results"/>
 
                 <!-- Playlist -->
                 <Border
                     Margin="10 20 0 14"
                     Grid.Row="1"
                     Grid.Column="1"
-                    BorderThickness="1"
-                    BorderBrush="#aaa"
-                    CornerRadius="5">
-                    <ListView
-                        dd:DragDrop.IsDragSource="True"
-                        dd:DragDrop.IsDropTarget="True"
-                        ItemsSource="{Binding PlayList}"
-                        Style="{StaticResource SongsListView}"
-                        SelectedIndex="{Binding SelectedIndex}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDoubleClick">
-                                <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </ListView>
-                </Border>
-                <TextBlock
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Text="Playlist"
-                    Style="{StaticResource ElementContainerText}"/>
+                    Style="{StaticResource ContainerBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="55"/>
+                            <ColumnDefinition Width="55"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
+                        <TextBlock
+                            Grid.Column="2"
+                            Text="Playlist"
+                            Style="{StaticResource ElementContainerText}"
+                            Margin="0 6 0 20"
+                            Background="Transparent"/>
+
+                        <Button
+                            Grid.Column="3"
+                            Style="{StaticResource InteractionButton}"
+                            Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=20}"
+                            Command="{Binding RemoveSelectedFromPlaylistCommand}"
+                            ToolTip="Remove Selected from Playlist"/>
+                        <Button
+                            Grid.Column="4"
+                            Style="{StaticResource InteractionButton}"
+                            Margin="10 0"
+                            Content="{materialDesign:PackIcon Kind=Plus, Size=20}"
+                            Command="{Binding ClearPlaylistCommand}"
+                            ToolTip="New Playlist"/>
+
+                        <ListView
+                            x:Name="Playlist"
+                            Grid.ColumnSpan="5"
+                            Grid.Row="1"
+                            dd:DragDrop.IsDragSource="True"
+                            dd:DragDrop.IsDropTarget="True"
+                            ItemsSource="{Binding PlayList}"
+                            Style="{StaticResource CustomHighlightSongsListView}"
+                            SelectedIndex="{Binding SelectedIndex}"
+                            SelectedItem="{Binding SelectedSong}"
+                            SelectionChanged="Playlist_SelectionChanged">
+                            <ListView.InputBindings>
+                                <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
+                                <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
+                            </ListView.InputBindings>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid
+                                        MinWidth="320">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <Rectangle
+                                            Grid.RowSpan="2"
+                                            Fill="Transparent" />
+
+                                        <resources:HorizontalSeparator
+                                            Grid.Row="1"
+                                            VerticalAlignment="Bottom" />
+
+                                        <resources:StoryboardTextBlock
+                                            Grid.Row="0"
+                                            x:Name="DisplayText"
+                                            MouseEnter="DisplayText_MouseEnter"
+                                            MouseLeave="DisplayText_MouseLeave"
+                                            Text="{Binding Display, FallbackValue=Track}"
+                                            Tag="{Binding ElementName=InvisibleDisplayText, Path=ActualWidth}"
+                                            FontSize="16"
+                                            TextTrimming="CharacterEllipsis"
+                                            HorizontalAlignment="Center"
+                                            FontWeight="Bold" />
+                                        <resources:StoryboardTextBlock
+                                            Grid.Row="0"
+                                            x:Name="InvisibleDisplayText"
+                                            Text="{Binding Display, FallbackValue=Track}"
+                                            FontSize="{Binding ElementName=DisplayText, Path=FontSize}"
+                                            TextTrimming="None"
+                                            Visibility="Hidden"
+                                            HorizontalAlignment="{Binding ElementName=DisplayText, Path=HorizontalAlignment}"
+                                            FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
+                                            FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
+
+                                        <Grid
+                                            Grid.Row="1"
+                                            Grid.ColumnSpan="2"
+                                            Margin="0 0 0 5">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="2*" />
+                                                <ColumnDefinition Width="3*" />
+                                                <ColumnDefinition Width="2*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock
+                                                Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
+                                            <TextBlock
+                                                Grid.Column="3"
+                                                Text="{Binding Genre, FallbackValue=Genre}"
+                                                TextTrimming="CharacterEllipsis"
+                                                HorizontalAlignment="Center" />
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+                
                 <!-- Searchbar -->
                 <Grid
                     Grid.Row="2"

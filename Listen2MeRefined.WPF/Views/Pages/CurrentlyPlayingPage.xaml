@@ -25,7 +25,7 @@
 
         <TextBlock
             Grid.ColumnSpan="3"
-            Margin="0 0 0 10"
+            Margin="0 20 0 10"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontWeight="Bold"
@@ -34,17 +34,19 @@
             Text="{Binding Song.Display, FallbackValue=Display Name}" />
         <TextBlock
             Grid.Row="1"
+            Margin="0 0 0 -10"
             Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
         <TextBlock
-             Grid.Row="1"
-             Grid.Column="1"
-             Margin="10 0"
-             HorizontalAlignment="Center"
-             Text="{Binding Song.Genre, FallbackValue=Genre}" />
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0 0 0 -10"
+            HorizontalAlignment="Center"
+            Text="{Binding Song.Genre, FallbackValue=Genre}" />
         <TextBlock
-             Grid.Row="1"
-             Grid.Column="2"
-             Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="0 0 0 -10"
+            Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
 
     </Grid>
 </Page>

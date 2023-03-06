@@ -233,10 +233,15 @@ public sealed class WindowsMusicPlayer :
 
     private async Task StartPlayback()
     {
+        if (!_playlist.Any())
+        {
+            return;
+        }
+
         _playbackState = PlaybackState.Playing;
         _unpausedFor = 0;
 
-        if (_currentSong is null && _playlist.Any())
+        if (_currentSong is null)
         {
             await LoadCurrentSong();
         }

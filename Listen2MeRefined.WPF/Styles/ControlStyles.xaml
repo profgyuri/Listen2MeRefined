@@ -38,65 +38,89 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        <Setter Property="ItemTemplate">
+    </Style>
+    <Style TargetType="ListView" x:Key="CustomHighlightSongsListView" BasedOn="{StaticResource SongsListView}">
+        <Setter Property="ItemContainerStyle">
             <Setter.Value>
-                <DataTemplate>
-                    <Grid
-                        MinWidth="320">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <Rectangle
-                            Grid.RowSpan="2"
-                            Fill="Transparent" />
-
-                        <resources:HorizontalSeparator
-                            Grid.Row="1"
-                            VerticalAlignment="Bottom" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Text="{Binding Display, FallbackValue=Track}"
-                            FontSize="16"
-                            TextTrimming="CharacterEllipsis"
-                            HorizontalAlignment="Center"
-                            FontWeight="Bold" />
-
-                        <Grid
-                            Grid.Row="1"
-                            Grid.ColumnSpan="2"
-                            Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="2*" />
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="2*" />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock
-                                Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                            <TextBlock
-                                Grid.Column="1"
-                                Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                            <TextBlock
-                                Grid.Column="2"
-                                Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                            <TextBlock
-                                Grid.Column="3"
-                                Text="{Binding Genre, FallbackValue=Genre}"
-                                TextTrimming="CharacterEllipsis"
-                                HorizontalAlignment="Center" />
-                        </Grid>
-                    </Grid>
-                </DataTemplate>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <Border 
+                                    x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="2">
+                                    <ContentPresenter />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource ThirnaryDarkBrush}"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                                        <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource ThirnaryMidBrush}"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                                        <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="DataGrid" x:Key="SearchResultGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="SelectionMode" Value="Extended" />
+        <Setter Property="SelectionUnit" Value="FullRow" />
+        <Setter Property="CanUserAddRows" Value="False" />
+        <Setter Property="CanUserResizeRows" Value="False" />
+        <Setter Property="CanUserReorderColumns" Value="True" />
+        <Setter Property="CanUserResizeColumns" Value="True" />
+        <Setter Property="CanUserDeleteRows" Value="True" />
+        <Setter Property="CanUserSortColumns" Value="True" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
+        <Setter Property="RowStyle">
+            <Setter.Value>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource ThirnaryDarkBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource ThirnaryMidBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="False"/>
+                                <Condition Property="IsSelected" Value="False"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="False"/>
+                                <Condition Property="IsSelected" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{StaticResource ThirnaryMidBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                        </MultiTrigger>
+                    </Style.Triggers>
+                </Style>
             </Setter.Value>
         </Setter>
     </Style>
@@ -117,14 +141,21 @@
         </Setter>
     </Style>
 
+    <Style TargetType="Border" x:Key="ContainerBorder">
+        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
+        <Setter Property="Background" Value="{StaticResource ContainerGradientBackgroundBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    
     <!--#region Element Container -->
     <Style TargetType="TextBlock" x:Key="ElementContainerText" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Padding" Value="3 0" />
-        <Setter Property="Margin" Value="30 8 0 0" />
-        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Margin" Value="0 2 0 0" />
+        <Setter Property="FontSize" Value="24" />
     </Style>
     <!--#endregion-->
     
@@ -245,7 +276,6 @@
         <Setter Property="UseLayoutRounding" Value="False" />
         <Setter Property="Template" Value="{StaticResource MaterialDesignSliderHorizontal}" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Margin" Value="20 5 10 5" />
         <Setter Property="wpf:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
@@ -257,4 +287,95 @@
         </Style.Triggers>
     </Style>
     <!--#endregion-->
+
+    <Style TargetType="{x:Type Thumb}" x:Key="ScrollBarThumbStyle">
+        <Setter Property="Background" Value="#555"/>
+        <Setter Property="IsHitTestVisible" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="5"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style 
+        TargetType="{x:Type ScrollBar}" 
+        BasedOn="{StaticResource {x:Type ScrollBar}}"
+        x:Key="{x:Type ScrollBar}">
+        <Setter Property="Background" Value="#333" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Border 
+                            Grid.Row="1"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="5"/>
+                        <Track 
+                            Grid.Row="1"
+                            IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource ScrollBarThumbStyle}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter Property="Width" Value="10" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ScrollBar}">
+                            <Grid x:Name="GridRoot" Background="{TemplateBinding Background}">
+
+                                <Track x:Name="PART_Track" IsDirectionReversed="True">
+                                    <Track.Thumb>
+                                        <Thumb x:Name="Thumb" Background="#555" />
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+
+            <!-- Horizontal ScrollBar -->
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Height" Value="10" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ScrollBar}">
+                            <Grid x:Name="GridRoot" Background="{TemplateBinding Background}">
+                                <Grid.ColumnDefinitions>
+                                </Grid.ColumnDefinitions>
+
+                                <Track x:Name="PART_Track">
+                                    <Track.Thumb>
+                                        <Thumb x:Name="Thumb" Background="#555" />
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Thumb" Property="Background" Value="Transparent"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
