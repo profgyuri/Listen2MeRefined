@@ -9,6 +9,7 @@ public sealed class WaveFormDrawer
 {
     private int _height;
     private int _width;
+    private readonly ILogger _logger;
     private readonly IFileReader<ISampleProvider> _fileReader;
     private readonly IPeakProvider<ISampleProvider> _peakProvider;
     private readonly ICanvas<SKPoint, SKBitmap> _canvas;
@@ -17,10 +18,12 @@ public sealed class WaveFormDrawer
     /// Class used to draw the sound wave.
     /// </summary>
     public WaveFormDrawer(
+        ILogger logger,
         IFileReader<ISampleProvider> fileReader,
         IPeakProvider<ISampleProvider> peakProvider,
         ICanvas<SKPoint, SKBitmap> canvas)
     {
+        _logger = logger;
         _fileReader = fileReader;
         _peakProvider = peakProvider;
         _canvas = canvas;
@@ -70,7 +73,16 @@ public sealed class WaveFormDrawer
         int width,
         int height)
     {
-        var scale = Resolution.GetScaleFactor();
+        var scale = 1f;
+        try
+        {
+            scale = Resolution.GetScaleFactor();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Could not get scaling factor for the monitor");
+        }
+
         _height = (int)(height * scale);
         _width = (int)(width * scale);
     }

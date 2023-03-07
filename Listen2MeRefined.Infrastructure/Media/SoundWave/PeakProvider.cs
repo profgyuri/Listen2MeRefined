@@ -24,6 +24,7 @@ public sealed class PeakProvider
             {
                 total += _buffer[i + y] * _buffer[i + y];
             }
+
             var rms = (float) Math.Sqrt(total/BlockSize);
 
             max = Math.Max(max, rms);

@@ -8,7 +8,7 @@ namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 public abstract class RepositoryBase<T> : IRepository<T>
     where T: Model
 {
-    private readonly ILogger _logger;
+    protected readonly ILogger _logger;
     protected readonly DataContext _dataContext;
     protected readonly IDbConnection _dbConnection;
 
