@@ -31,3 +31,4 @@
  - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
  - Scrollbar is still not visible
  - Shuffling can cause a crash when the currently loaded song is not in the playlist
+ - Crashing when the selected folder does not contain music files
