@@ -4,16 +4,14 @@
 
  - Implementing playlists
  - Drag 'n drop from outside the application
- - Reworking the UI to make it similar to Steam's UI
+ - Reworking the UI to make it similar to Steam's UI (~75% done)
  - UX/QOL improvements like:
    - Adding remaining and total time displays
-   - "Running text" where the title or artist name is too long
-   - More understandable, easier replacing the searchlist items to the playlist
+   - "Running text" where the title or artist name is too long (90% done but laggy experience)
    - Individually choosable colors OR color themes
  - Adding context menu to list items (to "jump here", scan individually, etc.)
- - Ability to clear playlist items
  - Status report for scanning
- - Performance improvements (starting the app should not freeze the computer at all (now it is 2-10 seconds))
+ - Performance improvements (registering global keyboard and mouse hooks is still a problem)
 
 ## Working features
 
