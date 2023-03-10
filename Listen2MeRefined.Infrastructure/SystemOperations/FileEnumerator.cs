@@ -1,7 +1,16 @@
 ﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
+using System.IO.Enumeration;
+
 public sealed class FileEnumerator : IFileEnumerator
 {
+    private readonly ILogger _logger;
+
+    public FileEnumerator(ILogger logger)
+    {
+        _logger = logger;
+    }
+
     private static void ThrowIfNotDirectory(string path)
     {
         if (!Directory.Exists(path))
@@ -10,10 +19,33 @@ public sealed class FileEnumerator : IFileEnumerator
         }
     }
 
-    private static IEnumerable<string> GetSupportedFiles(string path)
+    private IEnumerable<string> GetSupportedFiles(string path)
     {
-        return Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories)
-            .Where(file => GlobalConstants.SupportedExtensions.Contains(Path.GetExtension(file)));
+        var result = new List<string>();
+        try
+        {
+            var options = new EnumerationOptions
+            {
+                RecurseSubdirectories = false,
+                IgnoreInaccessible = true
+            };
+            var enumerator = new FileSystemEnumerable<string>(path, (ref FileSystemEntry entry) => entry.ToFullPath(), options);
+            {
+                foreach (var file in enumerator)
+                {
+                    if (GlobalConstants.SupportedExtensions.Contains(Path.GetExtension(file)))
+                    {
+                        result.Add(file);
+                    }
+                }
+            }
+        }
+        catch (UnauthorizedAccessException uae)
+        {
+            _logger.Error(uae.Message);
+        }
+
+        return result;
     }
 
     /// <inheritdoc />

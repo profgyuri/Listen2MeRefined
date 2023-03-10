@@ -152,6 +152,8 @@ public sealed partial class SettingsWindowViewModel :
                 _secondsToCancelClear = 5;
                 CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
+                _settingsManager.SaveSettings(x => x.MusicFolders = new());
+
                 _logger.Debug("Metadata cleared");
             }
 
@@ -171,7 +173,7 @@ public sealed partial class SettingsWindowViewModel :
         IsClearMetadataButtonVisible = true;
         IsCancelClearMetadataButtonVisible = false;
         _secondsToCancelClear = 5;
-        CancelClearMetadataButtonContent = $"Cancel({_secondsToCancelClear})";
+        CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
     }
     
     [RelayCommand]

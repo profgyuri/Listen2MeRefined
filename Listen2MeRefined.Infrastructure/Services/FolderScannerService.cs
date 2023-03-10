@@ -34,7 +34,10 @@ public sealed class FolderScannerService : IFolderScanner
         var files = await _fileEnumerator.EnumerateFilesAsync(path);
         var filteredFiles =
             files.Where(IsSupported).ToHashSet();
-        var fromDb = (await _audioRepository.ReadAsync()).ToList();
+        var fromDb = 
+            (await _audioRepository.ReadAsync())
+            .Where(x => x.Path.StartsWith(path))
+            .ToList();
         var toUpdate = new HashSet<AudioModel>();
 
         for (var i = 0; i < fromDb.Count; i++)

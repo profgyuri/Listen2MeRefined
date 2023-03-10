@@ -8,12 +8,14 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     where T : Settings, new()
 {
     private readonly DataContext _dataContext;
+    private readonly ILogger _logger;
 
     private T? _settings;
 
-    public DatabaseSettingsManager(DataContext dataContext)
+    public DatabaseSettingsManager(DataContext dataContext, ILogger logger)
     {
         _dataContext = dataContext;
+        _logger = logger;
     }
 
     private T LoadSettings()
@@ -36,7 +38,31 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
 
         _dataContext.Settings.Update((oldSettings as AppSettings)!);
         _dataContext.MusicFolders.UpdateRange((oldSettings as AppSettings)!.MusicFolders);
-        _dataContext.SaveChanges();
+        var saved = false;
+        while (!saved)
+        {
+            try
+            {
+                _dataContext.SaveChanges();
+                saved = true;
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.Entity is MusicFolderModel)
+                    {
+                        entry.OriginalValues.SetValues(entry.CurrentValues);
+                    }
+                    else
+                    {
+                        var message = "Don't know how to handle concurrency conflicts for " + entry.Metadata.Name;
+                        _logger.Fatal(message);
+                        throw new NotSupportedException(message);
+                    }
+                }
+            }
+        }
     }
     #endregion
 }
