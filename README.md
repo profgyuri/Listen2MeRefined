@@ -33,4 +33,4 @@
  - Crashes, when trying to start a song, that does not exist anymore under the known filename
  - Removing a music folder does not remove the songs it containes from the database
  - Scanning on startup does not seem to be working
- - Elapsed an total times ar bound to the current song, and this can cause false behaviour when selection changes
+ - Removing the currently playing song from the playlist is not refreshing the index, resulting in skipping 1 song
