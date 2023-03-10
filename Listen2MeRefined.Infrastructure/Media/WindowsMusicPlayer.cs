@@ -104,6 +104,13 @@ public sealed class WindowsMusicPlayer :
 
     public async Task NextAsync()
     {
+        if (!_playlist.Any())
+        {
+            _logger.Debug("Playback is stopped, because the playlist is empty!");
+            Stop();
+            return;
+        }
+
         _currentSongIndex = (_currentSongIndex + 1) % _playlist!.Count;
 
         await LoadCurrentSong();
@@ -150,6 +157,15 @@ public sealed class WindowsMusicPlayer :
     {
         _currentSong = _playlist[_currentSongIndex];
         _logger.Information("Loading audio: {Song}", _currentSong);
+
+        if (!File.Exists(_currentSong.Path))
+        {
+            _logger.Information("Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
+            _playlist.Remove(_currentSong);
+            await NextAsync();
+            return;
+        }
+
         _fileReader = _currentSong.Path.EndsWith(".wav") ? 
             new WaveFileReader(_currentSong.Path) : 
             new AudioFileReader(_currentSong.Path);
