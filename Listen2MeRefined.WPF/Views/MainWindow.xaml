@@ -14,9 +14,8 @@
         Style="{StaticResource BasicWindow}"
         WindowStartupLocation="Manual"
         Title="Listen2Me"
-        MinHeight="502" MinWidth="800"
-        Height="702" Width="1030"
-        MaxHeight="702" MaxWidth="1030">
+        MinHeight="502" MinWidth="1030"
+        Height="702" Width="1030">
 
 
     <WindowChrome.WindowChrome>
