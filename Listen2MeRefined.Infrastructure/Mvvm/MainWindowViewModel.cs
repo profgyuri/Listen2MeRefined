@@ -207,6 +207,12 @@ public sealed partial class MainWindowViewModel :
     [RelayCommand]
     private void SendSelectedToPlaylist()
     {
+        if (!_selectedSearchResults.Any())
+        {
+            SendAllToPlaylist();
+            return;
+        }
+
         PlayList.AddRange(_selectedSearchResults);
 
         while (_selectedSearchResults.Count > 0)
@@ -217,7 +223,6 @@ public sealed partial class MainWindowViewModel :
         }
     }
 
-    [RelayCommand]
     private void SendAllToPlaylist()
     {
         PlayList.AddRange(SearchResults);
@@ -228,6 +233,12 @@ public sealed partial class MainWindowViewModel :
     [RelayCommand]
     private void RemoveSelectedFromPlaylist()
     {
+        if (_selectedSearchResults.Count == 0)
+        {
+            ClearPlaylist();
+            return;
+        }
+
         while (_selectedPlaylistItems.Count > 0)
         {
             var toRemove = _selectedPlaylistItems.First();
@@ -236,7 +247,6 @@ public sealed partial class MainWindowViewModel :
         }
     }
 
-    [RelayCommand]
     private void ClearPlaylist()
     {
         PlayList.Clear();

@@ -184,9 +184,7 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="55"/>
-                            <ColumnDefinition Width="55"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="55"/>
                             <ColumnDefinition Width="55"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
@@ -195,23 +193,19 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock
-                            Grid.Column="2"
+                            Grid.Column="1"
                             Style="{StaticResource ElementContainerText}"
+                            VerticalAlignment="Center"
                             Margin="0 6 0 20"
                             Text="Search Results"
                             Background="Transparent"/>
 
                         <Button
-                            Grid.Column="3"
-                            Style="{StaticResource InteractionButton}"
-                            Content="{materialDesign:PackIcon Kind=ChevronRight, Size=20}"
-                            Command="{Binding SendSelectedToPlaylistCommand}"
-                            ToolTip="Add Selected to Playlist"/>
-                        <Button
-                            Grid.Column="4"
+                            Grid.Column="2"
                             Style="{StaticResource InteractionButton}"
                             Margin="10 0"
-                            Content="{materialDesign:PackIcon Kind=ChevronTripleRight, Size=20}"
+                            BorderThickness="0"
+                            Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}"
                             Command="{Binding SendAllToPlaylistCommand}"
                             ToolTip="Add All to Playlist"/>
 
@@ -276,9 +270,7 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="55"/>
-                            <ColumnDefinition Width="55"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="55"/>
                             <ColumnDefinition Width="55"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
@@ -287,25 +279,19 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock
-                            Grid.Column="2"
+                            Grid.Column="1"
                             Text="Playlist"
                             Style="{StaticResource ElementContainerText}"
                             Margin="0 6 0 20"
                             Background="Transparent"/>
 
                         <Button
-                            Grid.Column="3"
+                            Grid.Column="2"
                             Style="{StaticResource InteractionButton}"
-                            Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=20}"
+                            Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=32}"
                             Command="{Binding RemoveSelectedFromPlaylistCommand}"
-                            ToolTip="Remove Selected from Playlist"/>
-                        <Button
-                            Grid.Column="4"
-                            Style="{StaticResource InteractionButton}"
-                            Margin="10 0"
-                            Content="{materialDesign:PackIcon Kind=Plus, Size=20}"
-                            Command="{Binding ClearPlaylistCommand}"
-                            ToolTip="New Playlist"/>
+                            BorderThickness="0"
+                            ToolTip="Remove Selected / All from Playlist"/>
 
                         <ListView
                             x:Name="Playlist"
