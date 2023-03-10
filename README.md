@@ -30,5 +30,5 @@
  - Multiple display setup is currently not supported in any form.
  - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
  - Removing a music folder does not remove the songs it containes from the database
- - Scanning on startup does not seem to be working
+ - Scanning on startup does not seem to be working (or atleast the deletion does not happen where it would be applicable)
  - Removing the currently playing song from the playlist is not refreshing the index, resulting in skipping 1 song
