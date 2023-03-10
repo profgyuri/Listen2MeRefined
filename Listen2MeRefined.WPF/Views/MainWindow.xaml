@@ -167,7 +167,7 @@
                                 WaveBitmap="{Binding WaveForm}"
                                 Grid.Row="1"
                                 Minimum="0"
-                                Maximum="{Binding SelectedSong.Length.TotalMilliseconds}"
+                                Maximum="{Binding TotalTime}"
                                 Value="{Binding CurrentTime}"
                                 Grid.ColumnSpan="5"
                                 Width="{Binding WaveFormWidth}" 

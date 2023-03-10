@@ -42,6 +42,7 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
     [ObservableProperty] private int _waveFormWidth;
     [ObservableProperty] private int _waveFormHeight;
+    [ObservableProperty] private double _totalTime;
 
     public double CurrentTime
     {
@@ -134,6 +135,7 @@ public sealed partial class MainWindowViewModel :
         await DrawPlaceholderLineAsync();
         SelectedSong = notification.Audio;
         WaveForm = _mediaController.Bitmap;
+        TotalTime = SelectedSong.Length.TotalMilliseconds;
     }
     #endregion
     
