@@ -80,8 +80,9 @@ public sealed partial class SettingsWindowViewModel :
             FontFamily = settings.FontFamily;
             SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
             ScanOnStartup = settings.ScanOnStartup;
-            await GetAudioOutputDevices();
         });
+
+        await GetAudioOutputDevices();
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
@@ -187,11 +188,10 @@ public sealed partial class SettingsWindowViewModel :
 
     private async Task GetAudioOutputDevices()
     {
-        var devices = await AudioDevices.GetOutputDevices();
+        var devices = await Task.Run(AudioDevices.GetOutputDevices);
         foreach (var device in devices)
         {
             AudioOutputDevices.Add(device);
-            OnPropertyChanged(nameof(AudioOutputDevices));
         }
         
         SelectedAudioOutputDevice = AudioOutputDevices[0];
