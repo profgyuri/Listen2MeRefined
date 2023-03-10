@@ -29,8 +29,6 @@
 
  - Multiple display setup is currently not supported in any form.
  - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
- - Shuffling can cause a crash when the currently loaded song is not in the playlist
- - Crashes, when trying to start a song, that does not exist anymore under the known filename
  - Removing a music folder does not remove the songs it containes from the database
  - Scanning on startup does not seem to be working
  - Removing the currently playing song from the playlist is not refreshing the index, resulting in skipping 1 song
