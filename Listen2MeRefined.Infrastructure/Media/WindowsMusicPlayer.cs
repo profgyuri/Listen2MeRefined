@@ -134,9 +134,10 @@ public sealed class WindowsMusicPlayer :
 
         _playlist.Shuffle();
 
-        if (_currentSong is not null)
+        var index = _playlist.IndexOf(_currentSong);
+
+        if (index > -1)
         {
-            var index = _playlist.IndexOf(_currentSong);
             (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
         }
 
