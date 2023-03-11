@@ -36,6 +36,8 @@ There is also an option for advanced searching, right next to the magnifying gla
 
 Here you can set up as many filters as you want. You also have the option to include, exclude, a specific filter, or make the exact. After you set up your filters, you can choose, if you want any of them to match within a song's metadata, or to match every single filter you set up on every song that should be returned to the search results. For this to work properly, it is recommended to set up the artists, title, genre, bpm, etc. in every files metadata, because if the values are empty, then there is simply nothing to search for. 
 
+Now that you have your songs in the search results list, you can simply drag and drop them to the playlist, hit ctrl + right arrow key, or use the button next to the 'Search Results' text. If you have nothing selected, then every item from the search results will be replaced to the playlist, otherwise only the selected songs will be added.
+
 ## What's still needed for the release version?
 
  - Implementing playlists
