@@ -80,12 +80,12 @@ public sealed class WindowsMusicPlayer :
     {
         if (_playbackState == PlaybackState.Playing)
         {
-            _logger.Debug("Pausing playback");
+            _logger.Verbose("Pausing playback");
             PausePlayback();
             return;
         }
 
-        _logger.Debug("Starting playback");
+        _logger.Verbose("Starting playback");
         await StartPlayback();
     }
 
@@ -94,7 +94,7 @@ public sealed class WindowsMusicPlayer :
         _waveOutEvent.Stop();
         _playbackState = PlaybackState.Stopped;
 
-        _logger.Debug("Playback stopped by user");
+        _logger.Verbose("Playback stopped by user");
 
         if (_fileReader is not null)
         {
@@ -108,7 +108,7 @@ public sealed class WindowsMusicPlayer :
     {
         if (!_playlist.Any())
         {
-            _logger.Debug("Playback is stopped, because the playlist is empty!");
+            _logger.Verbose("Playback is stopped, because the playlist is empty!");
             Stop();
             return;
         }
@@ -165,13 +165,13 @@ public sealed class WindowsMusicPlayer :
 
         if (!File.Exists(_currentSong.Path))
         {
-            _logger.Information("Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
+            _logger.Debug("Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
             _playlist.Remove(_currentSong);
             await NextAsync();
             return;
         }
 
-        _logger.Debug("Determining the type of audio file reader");
+        _logger.Verbose("Determining the type of audio file reader");
         _fileReader = _currentSong.Path.EndsWith(".wav") ? 
             new WaveFileReader(_currentSong.Path) : 
             new AudioFileReader(_currentSong.Path);
@@ -184,10 +184,10 @@ public sealed class WindowsMusicPlayer :
             return;
         }
 
-        _logger.Debug("Drawing waveform for {Song}", _currentSong.Display);
+        _logger.Verbose("Drawing waveform for {Song}", _currentSong.Display);
         Bitmap = await _waveFormDrawer.WaveFormAsync(_currentSong.Path);
 
-        _logger.Debug("Publishing notification for the current song has changed");
+        _logger.Verbose("Publishing notification for the current song has changed");
         await _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
@@ -203,7 +203,7 @@ public sealed class WindowsMusicPlayer :
 
     private void ReNewWaveOutEvent()
     {
-        _logger.Debug("Renewing waveout event...");
+        _logger.Information("Renewing waveout event...");
 
         try
         {
@@ -293,6 +293,7 @@ public sealed class WindowsMusicPlayer :
         AudioOutputDeviceChangedNotification notification,
         CancellationToken cancellationToken)
     {
+        _logger.Information("Changing audio output device to {DeviceName}", notification.Device.Name);
         _outputDeviceIndex = notification.Device.Index;
 
         if (_fileReader is null)
