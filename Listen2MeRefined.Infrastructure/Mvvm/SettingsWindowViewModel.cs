@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
@@ -134,16 +135,18 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private void ClearMetadata()
     {
-        _logger.Debug("Clearing metadata...");
+        _logger.Information("Clearing metadata...");
 
         _timedTask = new();
         _timedTask.Start(TimeSpan.FromSeconds(1), async () =>
         {
             if (_secondsToCancelClear == 0)
             {
+                _logger.Verbose("Removing entries from database");
                 await _audioRepository.RemoveAllAsync();
                 await _musicFolderRepository.RemoveAllAsync();
                 await _playlistRepository.RemoveAllAsync();
+                _logger.Debug("Database was successfully cleared");
                 
                 Folders = new();
 
@@ -168,7 +171,7 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task CancelClearMetadataAsync()
     {
-        _logger.Debug("Clearing metadata canceled");
+        _logger.Information("Clearing metadata canceled");
 
         await _timedTask?.StopAsync()!;
         IsClearMetadataButtonVisible = true;
@@ -180,7 +183,7 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task ForceScanAsync()
     {
-        _logger.Debug("Force scanning folders...");
+        _logger.Information("Force scanning folders...");
 
         await _folderScanner.ScanAllAsync();
     }
@@ -188,7 +191,24 @@ public sealed partial class SettingsWindowViewModel :
 
     private async Task GetAudioOutputDevices()
     {
-        var devices = await Task.Run(AudioDevices.GetOutputDevices);
+        var devices = await Task.Run(() =>
+        {
+            var result = new List<AudioOutputDevice>();
+            try
+            {
+                result = AudioDevices.GetOutputDevices().ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Could not enumerate output devices. " + ex.Message);
+                if (ex.StackTrace is not null)
+                {
+                    _logger.Verbose(ex.StackTrace);
+                }
+            }
+
+            return result;
+        });
         foreach (var device in devices)
         {
             AudioOutputDevices.Add(device);
