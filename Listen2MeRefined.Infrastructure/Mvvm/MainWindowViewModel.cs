@@ -210,10 +210,12 @@ public sealed partial class MainWindowViewModel :
     {
         if (!_selectedSearchResults.Any())
         {
+            _logger.Verbose("Sending all {Count} search results to the playlist", _selectedSearchResults.Count);
             SendAllToPlaylist();
             return;
         }
 
+        _logger.Verbose("Sending {Count} selected search results to the playlist", _selectedSearchResults.Count);
         PlayList.AddRange(_selectedSearchResults);
 
         while (_selectedSearchResults.Count > 0)
@@ -236,10 +238,12 @@ public sealed partial class MainWindowViewModel :
     {
         if (_selectedSearchResults.Count == 0)
         {
+            _logger.Verbose($"Removing all item from playlist");
             ClearPlaylist();
             return;
         }
 
+        _logger.Verbose($"Removing selected items from playlist");
         while (_selectedPlaylistItems.Count > 0)
         {
             var toRemove = _selectedPlaylistItems.First();
