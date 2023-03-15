@@ -135,20 +135,23 @@ public sealed class WindowsMusicPlayer :
         await LoadCurrentSong();
     }
 
-    public void Shuffle()
+    public async Task Shuffle()
     {
         _logger.Information("Shuffling playlist...");
 
         _playlist.Shuffle();
 
         var index = _playlist.IndexOf(_currentSong);
+        _currentSongIndex = 0;
 
         if (index > -1)
         {
             (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
         }
-
-        _currentSongIndex = 0;
+        else
+        {
+            await LoadCurrentSong();
+        }
     }
     #endregion
 

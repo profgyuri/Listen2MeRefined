@@ -71,7 +71,7 @@ public sealed partial class SettingsWindowViewModel :
 
     private async Task Initialize()
     {
-        await Task.Run(async () =>
+        await Task.Run(() =>
         {
             FontFamilies = new(_installedFontFamilies.FontFamilyNames);
 

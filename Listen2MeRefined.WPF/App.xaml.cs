@@ -28,7 +28,7 @@ public sealed partial class App : Application
         using var scope = IocContainer.GetContainer().BeginLifetimeScope();
 
         Exception ex = e.ExceptionObject as Exception;
-        string errorMessage = "Unahandled exception: " + ex?.Message + "\n" + ex?.StackTrace ?? "Unknown error occurred.";
+        string errorMessage = ex is not null ? "Unahandled exception: " + ex.Message + "\n" + ex.StackTrace : "Unknown error occurred.";
 
         var logger = scope.Resolve<ILogger>();
         logger.Fatal(errorMessage);

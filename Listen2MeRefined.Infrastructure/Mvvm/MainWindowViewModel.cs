@@ -199,9 +199,10 @@ public sealed partial class MainWindowViewModel :
     }
 
     [RelayCommand]
-    private void Shuffle()
+    private async Task Shuffle()
     {
-        _mediaController.Shuffle();
+        await _mediaController.Shuffle();
+        SelectedIndex = 0;
     }
 
     [RelayCommand]

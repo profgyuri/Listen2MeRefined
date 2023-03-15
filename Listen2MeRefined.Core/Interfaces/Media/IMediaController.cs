@@ -41,5 +41,5 @@ public interface IMediaController<TBitmap>
     /// <summary>
     ///     Randomizes the order of the elements.
     /// </summary>
-    void Shuffle();
+    Task Shuffle();
 }
