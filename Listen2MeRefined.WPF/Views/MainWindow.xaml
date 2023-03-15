@@ -206,7 +206,7 @@
                             Margin="10 0"
                             BorderThickness="0"
                             Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}"
-                            Command="{Binding SendAllToPlaylistCommand}"
+                            Command="{Binding SendSelectedToPlaylistCommand}"
                             ToolTip="Add Selected / All to Playlist"/>
 
                         <DataGrid
