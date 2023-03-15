@@ -27,7 +27,7 @@ public class LoggerModule : Module
                 rollingInterval: RollingInterval.Day,
                 fileSizeLimitBytes: 1024 * 1024 * 10));
         config
-            .MinimumLevel.Debug();
+            .MinimumLevel.Verbose();
 
         return config.CreateLogger();
     }
