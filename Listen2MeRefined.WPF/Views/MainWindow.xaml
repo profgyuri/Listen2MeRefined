@@ -207,7 +207,7 @@
                             BorderThickness="0"
                             Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}"
                             Command="{Binding SendAllToPlaylistCommand}"
-                            ToolTip="Add All to Playlist"/>
+                            ToolTip="Add Selected / All to Playlist"/>
 
                         <DataGrid
                             x:Name="SearchResults"
