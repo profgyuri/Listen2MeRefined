@@ -80,10 +80,12 @@ public sealed class WindowsMusicPlayer :
     {
         if (_playbackState == PlaybackState.Playing)
         {
+            _logger.Debug("Pausing playback");
             PausePlayback();
             return;
         }
 
+        _logger.Debug("Starting playback");
         await StartPlayback();
     }
 
@@ -169,6 +171,7 @@ public sealed class WindowsMusicPlayer :
             return;
         }
 
+        _logger.Debug("Determining the type of audio file reader");
         _fileReader = _currentSong.Path.EndsWith(".wav") ? 
             new WaveFileReader(_currentSong.Path) : 
             new AudioFileReader(_currentSong.Path);
@@ -181,7 +184,10 @@ public sealed class WindowsMusicPlayer :
             return;
         }
 
+        _logger.Debug("Drawing waveform for {Song}", _currentSong.Display);
         Bitmap = await _waveFormDrawer.WaveFormAsync(_currentSong.Path);
+
+        _logger.Debug("Publishing notification for the current song has changed");
         await _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
@@ -268,6 +274,7 @@ public sealed class WindowsMusicPlayer :
 
         _startSongAutomatically = true;
         _waveOutEvent.Play();
+        _logger.Debug("Playback started");
     }
 
     private void PausePlayback()
