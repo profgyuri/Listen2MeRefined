@@ -144,6 +144,11 @@ public sealed class WindowsMusicPlayer :
 
     public async Task Shuffle()
     {
+        if (!_playlist.Any())
+        {
+            return;
+        }
+
         _logger.Information("Shuffling playlist...");
 
         _playlist.Shuffle();
