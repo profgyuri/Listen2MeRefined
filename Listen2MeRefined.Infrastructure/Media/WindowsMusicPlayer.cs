@@ -123,6 +123,11 @@ public sealed class WindowsMusicPlayer :
 
     public async Task PreviousAsync()
     {
+        if (!_playlist.Any())
+        {
+            return;
+        }
+
         _currentSongIndex = (_currentSongIndex - 1 + _playlist!.Count) % _playlist.Count;
 
         await LoadCurrentSong();
