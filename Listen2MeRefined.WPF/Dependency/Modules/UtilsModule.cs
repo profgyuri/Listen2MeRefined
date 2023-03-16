@@ -1,4 +1,6 @@
 using Autofac;
+using Listen2MeRefined.Core.Interfaces;
+using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data;
 using Source.Storage;
 
@@ -11,5 +13,9 @@ public class UtilsModule : Module
         builder
             .RegisterType<DatabaseSettingsManager<AppSettings>>()
             .As<ISettingsManager<AppSettings>>();
+
+        builder
+            .RegisterType<VersionChecker>()
+            .As<IVersionChecker>();
     }
 }

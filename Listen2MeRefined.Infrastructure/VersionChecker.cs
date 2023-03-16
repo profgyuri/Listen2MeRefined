@@ -12,7 +12,7 @@ public class VersionChecker : IVersionChecker
     public async Task<Version> GetLatestVersionAsync()
     {
         using var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "MyApp");
+        client.DefaultRequestHeaders.Add("User-Agent", "listen2me");
 
         var json = await client.GetStringAsync(apiUrl);
         var releases = JsonConvert.DeserializeObject<List<Release>>(json)!;
