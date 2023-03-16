@@ -63,6 +63,16 @@
                     Grid.Column="1"
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=Gear,Size=15}" />
+                <TextBlock
+                    x:Name="SettingsNotifierButton"
+                    IsHitTestVisible="False"
+                    Grid.Column="1"
+                    Foreground="Red"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    FontWeight="Black"
+                    Padding="0 1 2 0"
+                    Text="!"/>
                 <Button
                     x:Name="MinimizeWindow"
                     Click="MinimizeWindow_Click"
