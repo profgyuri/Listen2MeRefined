@@ -32,5 +32,9 @@ public sealed partial class App : Application
 
         var logger = scope.Resolve<ILogger>();
         logger.Fatal(errorMessage);
+
+        MessageBox.Show("The application has crashed! If you wish to help to resolve the issue, please, send the latest " +
+            "log.txt file (in the same folder as listen2me.exe) to 'listen2mebugs@gmail.com'!", 
+            "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }
