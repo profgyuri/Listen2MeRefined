@@ -13,4 +13,9 @@ public interface IVersionChecker
     /// Check if the current version is the latest.
     /// </summary>
     Task<bool> IsLatestAsync();
+
+    /// <summary>
+    /// Open the GitHub release page in the default browser.
+    /// </summary>
+    void OpenUpdateLink();
 }

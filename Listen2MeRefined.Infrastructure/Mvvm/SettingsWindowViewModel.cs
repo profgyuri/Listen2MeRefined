@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Media;
@@ -21,6 +22,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IFolderScanner _folderScanner;
     private readonly IMediator _mediator;
     private readonly FontFamilies _installedFontFamilies;
+    private readonly IVersionChecker _versionChecker;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -35,6 +37,8 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
+    [ObservableProperty] private string _updateAvailableText;
+    [ObservableProperty] private bool _isUpdateButtonVisible;
     
     public bool ScanOnStartup
     {
@@ -56,7 +60,8 @@ public sealed partial class SettingsWindowViewModel :
         FontFamilies installedFontFamilies,
         IRepository<MusicFolderModel> musicFolderRepository,
         IRepository<PlaylistModel> playlistRepository,
-        IFolderScanner folderScanner)
+        IFolderScanner folderScanner,
+        IVersionChecker versionChecker)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -66,13 +71,14 @@ public sealed partial class SettingsWindowViewModel :
         _musicFolderRepository = musicFolderRepository;
         _playlistRepository = playlistRepository;
         _folderScanner = folderScanner;
+        _versionChecker = versionChecker;
 
         Initialize().ConfigureAwait(false);
     }
 
     private async Task Initialize()
     {
-        await Task.Run(() =>
+        await Task.Run(async () =>
         {
             FontFamilies = new(_installedFontFamilies.FontFamilyNames);
 
@@ -81,6 +87,16 @@ public sealed partial class SettingsWindowViewModel :
             FontFamily = settings.FontFamily;
             SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
             ScanOnStartup = settings.ScanOnStartup;
+            if (await _versionChecker.IsLatestAsync())
+            {
+                UpdateAvailableText = "You are using the latest version!";
+                IsUpdateButtonVisible = false;
+            }
+            else
+            {
+                UpdateAvailableText = "Newer version is available!";
+                IsUpdateButtonVisible = true;
+            }
         });
 
         await GetAudioOutputDevices();
@@ -186,6 +202,12 @@ public sealed partial class SettingsWindowViewModel :
         _logger.Information("Force scanning folders...");
 
         await _folderScanner.ScanAllAsync();
+    }
+
+    [RelayCommand]
+    private async Task OpenBrowserForUpdate()
+    {
+        _versionChecker.OpenUpdateLink();
     }
     #endregion
 

@@ -48,7 +48,7 @@ public partial class Version : IComparable<Version>
     /// are not breaking.</param>
     /// <param name="patch">The patch version number. This number is used to indicate bug fixes.</param>
     /// <returns></returns>
-    public static Version CreateFromVersionNumbers(int major, int minor, int patch)
+    public static Version FromVersionNumbers(int major, int minor, int patch)
     {
         return new Version(major, minor, patch);
     }
@@ -59,7 +59,7 @@ public partial class Version : IComparable<Version>
     /// <param name="version">The string that represents the version. It can start with or without 'v'.</param>
     /// <returns>A new instance of <see cref="Version"/>. If the string is invalid for versioning, a version with all
     /// values set to 0 will be returned. </returns>
-    public static Version CreateFromString(string version)
+    public static Version FromString(string version)
     {
         if (!string.IsNullOrEmpty(version))
         {
