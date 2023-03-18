@@ -1,12 +1,12 @@
 ﻿namespace Listen2MeRefined.Infrastructure;
 
 using Newtonsoft.Json;
-using System.Configuration;
 using System.Threading.Tasks;
 using Version = Listen2MeRefined.Core.Models.Version;
 
 public class VersionChecker : IVersionChecker
 {
+    private readonly string versionNumber = "0.6.0";
     private const string apiUrl = "https://api.github.com/repos/profgyuri/Listen2MeRefined/releases";
 
     public async Task<Version> GetLatestVersionAsync()
@@ -25,7 +25,6 @@ public class VersionChecker : IVersionChecker
     public async Task<bool> IsLatestAsync()
     {
         var latestVersion = await GetLatestVersionAsync();
-        var versionNumber = ConfigurationManager.AppSettings["VersionNumber"] ?? "";
         var currentVersion = Version.CreateFromString(versionNumber);
 
         return latestVersion <= currentVersion;

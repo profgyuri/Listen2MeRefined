@@ -61,6 +61,13 @@ public partial class Version : IComparable<Version>
     /// values set to 0 will be returned. </returns>
     public static Version CreateFromString(string version)
     {
+        if (!string.IsNullOrEmpty(version))
+        {
+            version = version
+                .Replace("-beta", "")
+                .Replace("-alpha", "");
+        }
+
         if (!VersionRegex().IsMatch(version))
         {
             return new Version(0, 0, 0);

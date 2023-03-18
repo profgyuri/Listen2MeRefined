@@ -17,7 +17,6 @@
         MinHeight="502" MinWidth="1030"
         Height="702" Width="1030">
 
-
     <WindowChrome.WindowChrome>
         <WindowChrome
             x:Name="WindowChrome"
@@ -64,10 +63,11 @@
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=Gear,Size=15}" />
                 <TextBlock
-                    x:Name="SettingsNotifierButton"
+                    x:Name="UpdateNotification"
                     IsHitTestVisible="False"
                     Grid.Column="1"
                     Foreground="Red"
+                    Visibility="{Binding IsUpdateExclamationMarkVisible, Converter={StaticResource BoolToVisibilityConverter}}"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     FontWeight="Black"
