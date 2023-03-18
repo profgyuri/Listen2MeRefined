@@ -30,6 +30,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IFolderScanner _folderScanner;
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
+    private readonly IVersionChecker _versionChecker;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
 
@@ -43,6 +44,7 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private int _waveFormWidth;
     [ObservableProperty] private int _waveFormHeight;
     [ObservableProperty] private double _totalTime;
+    [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
 
     public double CurrentTime
     {
@@ -65,7 +67,8 @@ public sealed partial class MainWindowViewModel :
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
         DataContext dataContext,
-        IWaveFormDrawer<SKBitmap> waveFormDrawer)
+        IWaveFormDrawer<SKBitmap> waveFormDrawer,
+        IVersionChecker versionChecker)
     {
         _mediaController = mediaController;
         _logger = logger;
@@ -78,6 +81,7 @@ public sealed partial class MainWindowViewModel :
         _folderScanner = folderScanner;
         _dataContext = dataContext;
         _waveFormDrawer = waveFormDrawer;
+        _versionChecker = versionChecker;
 
         AsyncInit().ConfigureAwait(false);
         Init();
@@ -100,6 +104,7 @@ public sealed partial class MainWindowViewModel :
             FontFamily = _settingsManager.Settings.FontFamily;
             WaveFormWidth = 480;
             WaveFormHeight = 70;
+            IsUpdateExclamationMarkVisible = !await _versionChecker.IsLatestAsync();
             _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
             await DrawPlaceholderLineAsync();
         });

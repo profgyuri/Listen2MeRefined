@@ -56,6 +56,7 @@ public sealed partial class MainWindow : Window
         object sender,
         RoutedEventArgs e)
     {
+        UpdateNotification.Visibility = Visibility.Collapsed;
         WindowManager.ShowWindow<SettingsWindow>(Left + Width / 2, Top + Height / 2);
     }
 

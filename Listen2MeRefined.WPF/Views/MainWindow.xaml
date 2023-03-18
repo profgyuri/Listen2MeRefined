@@ -17,7 +17,6 @@
         MinHeight="502" MinWidth="1030"
         Height="702" Width="1030">
 
-
     <WindowChrome.WindowChrome>
         <WindowChrome
             x:Name="WindowChrome"
@@ -63,6 +62,17 @@
                     Grid.Column="1"
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=Gear,Size=15}" />
+                <TextBlock
+                    x:Name="UpdateNotification"
+                    IsHitTestVisible="False"
+                    Grid.Column="1"
+                    Foreground="Red"
+                    Visibility="{Binding IsUpdateExclamationMarkVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    FontWeight="Black"
+                    Padding="0 1 2 0"
+                    Text="!"/>
                 <Button
                     x:Name="MinimizeWindow"
                     Click="MinimizeWindow_Click"
@@ -222,7 +232,6 @@
                             Style="{StaticResource SearchResultGrid}">
                             <DataGrid.InputBindings>
                                 <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
-                                <KeyBinding Modifiers="Ctrl+Shift" Key="Right" Command="{Binding SendAllToPlaylistCommand}"/>
                             </DataGrid.InputBindings>
                             <DataGrid.Columns>
                                 <DataGridTextColumn 
