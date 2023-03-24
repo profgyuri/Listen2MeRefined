@@ -70,5 +70,4 @@ Now that you have your songs in the search results list, you can simply drag and
  - Removing a music folder does not remove the songs it containes from the database
  - Scanning on startup does not seem to be working (or atleast the deletion does not happen where it would be applicable)
  - Removing the currently playing song from the playlist is not refreshing the index, resulting in skipping 1 song
- - Match all in advanced search window has no effect
  - If you click on the play button before the first song has loaded, the app will crash
