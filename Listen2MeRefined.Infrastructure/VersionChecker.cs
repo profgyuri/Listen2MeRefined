@@ -18,6 +18,11 @@ public class VersionChecker : IVersionChecker
             return _latest.Version;
         }
 
+        if (await IsInternetAccessible() is false)
+        {
+            return versionNumber;
+        }
+
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Add("User-Agent", "listen2me");
 
@@ -30,6 +35,11 @@ public class VersionChecker : IVersionChecker
 
     public async Task<bool> IsLatestAsync()
     {
+        if (await IsInternetAccessible() is false)
+        {
+            return true;
+        }
+
         var latestVersion = await GetLatestVersionAsync();
 
         return latestVersion <= versionNumber;
@@ -39,6 +49,20 @@ public class VersionChecker : IVersionChecker
     {
         var url = _latest?.Assets[0].Browser_Download_Url ?? "https://github.com/profgyuri/Listen2MeRefined/releases";
         Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+    }
+
+    private async Task<bool> IsInternetAccessible()
+    {
+        try
+        {
+            using var client = new HttpClient();
+            using var stream = await client.GetAsync("https://www.google.com");
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
 
