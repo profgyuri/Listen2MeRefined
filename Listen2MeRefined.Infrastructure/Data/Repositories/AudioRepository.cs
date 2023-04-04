@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
-using Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
