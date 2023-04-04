@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Core.Interfaces;
+namespace Listen2MeRefined.WPF.Utils;
 
 public interface IGlobalHook
 {

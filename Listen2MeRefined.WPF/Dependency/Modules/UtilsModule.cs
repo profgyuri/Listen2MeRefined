@@ -1,5 +1,4 @@
 using Autofac;
-using Listen2MeRefined.Core.Interfaces;
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data;
 using Source.Storage;
