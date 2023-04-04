@@ -28,7 +28,7 @@ internal static class RepositoryHelper
             whereParams.Add($"{property}", $"%{searchTerm}%");
         }
 
-        whereClause.Remove(whereClause.Length - 4, 4);
+        whereClause.Length -= 4;
 
         var sql = $"SELECT * FROM {tableName} WHERE {whereClause}";
         return new ParameterizedQuery(sql, whereParams);
@@ -76,7 +76,7 @@ internal static class RepositoryHelper
             }
         }
 
-        whereClause.Remove(whereClause.Length - 4, 4);
+        whereClause.Length -= 4;
 
         var sql = $"SELECT * FROM {tableName} WHERE {whereClause}";
         return new ParameterizedQuery(sql, whereParams);

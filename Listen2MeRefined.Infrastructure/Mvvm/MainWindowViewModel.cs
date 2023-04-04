@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;

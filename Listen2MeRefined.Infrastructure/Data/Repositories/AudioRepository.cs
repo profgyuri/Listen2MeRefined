@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
@@ -37,7 +38,7 @@ public sealed class AudioRepository :
             builder.Append($" {concatenation} ");
         }
 
-        builder.Remove(builder.Length - concatenation.Length - 1, concatenation.Length);
+        builder.Length -= concatenation.Length + 1;
         var query = builder.ToString();
         return await _dbConnection.QueryAsync<AudioModel>(query, parameters);
     }
