@@ -1,6 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
