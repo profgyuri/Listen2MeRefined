@@ -1,14 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
-using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
 using Source;
+using Source.Extensions;
 using Source.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;

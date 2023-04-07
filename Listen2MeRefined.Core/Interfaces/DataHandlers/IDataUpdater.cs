@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
+﻿using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
 
 public interface IDataUpdater<in T>
     where T : Model

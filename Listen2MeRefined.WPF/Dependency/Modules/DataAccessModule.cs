@@ -4,7 +4,6 @@ using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
-using Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
 using Microsoft.Data.Sqlite;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;

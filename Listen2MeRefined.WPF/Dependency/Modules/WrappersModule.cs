@@ -1,6 +1,5 @@
 using Autofac;
 using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.WPF.Utils;
 using SkiaSharp;
 using Source;
 

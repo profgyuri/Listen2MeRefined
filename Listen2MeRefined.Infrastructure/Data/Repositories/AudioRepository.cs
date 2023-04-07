@@ -37,7 +37,7 @@ public sealed class AudioRepository :
             builder.Append($" {concatenation} ");
         }
 
-        builder.Length -= concatenation.Length + 1;
+        builder.Remove(builder.Length - concatenation.Length - 1, concatenation.Length);
         var query = builder.ToString();
         return await _dbConnection.QueryAsync<AudioModel>(query, parameters);
     }

@@ -1,15 +1,15 @@
-﻿namespace Listen2MeRefined.Infrastructure.Media;
+﻿namespace Listen2MeRefined.Core.Interfaces;
 
 /// <summary>
 ///     Contract for controlling any media element.
 /// </summary>
-public interface IMediaController<TBitmap>
+public interface IMediaController<TBitmap> 
     where TBitmap : class
 {
     double CurrentTime { get; set; }
 
     float Volume { get; set; }
-
+    
     TBitmap Bitmap { get; set; }
 
     /// <summary>
