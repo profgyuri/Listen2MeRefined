@@ -65,7 +65,15 @@ public abstract class RepositoryBase<T> : IRepository<T>
     /// <inheritdoc />
     public async Task UpdateAsync(IEnumerable<T> list)
     {
-        await _dbConnection.UpdateAsync(list);
+        try
+        {
+            await _dbConnection.UpdateAsync(list);
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e.Message);
+        }
+        await _dataContext.SaveChangesAsync();
     }
     #endregion
 

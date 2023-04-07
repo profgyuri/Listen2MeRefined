@@ -32,10 +32,10 @@ public sealed class FolderScannerService : IFolderScanner
     {
         _logger.Information("Scanning folder for audio files: {Path}", path);
         var files = await _fileEnumerator.EnumerateFilesAsync(path);
-        var filteredFiles =
-            files.Where(IsSupported).ToHashSet();
-        var fromDb = 
-            (await _audioRepository.ReadAsync())
+        var newSupportedFiles = files
+            .Where(IsSupported)
+            .ToHashSet();
+        var fromDb = (await _audioRepository.ReadAsync())
             .Where(x => x.Path.StartsWith(path))
             .ToList();
         var toUpdate = new HashSet<AudioModel>();
@@ -44,12 +44,12 @@ public sealed class FolderScannerService : IFolderScanner
         {
             var current = fromDb[i];
 
-            if (!filteredFiles.Contains(current.Path!))
+            if (!newSupportedFiles.Contains(current.Path!))
             {
                 continue;
             }
 
-            filteredFiles.Remove(current.Path!);
+            newSupportedFiles.Remove(current.Path!);
             fromDb.RemoveAt(i);
             i--;
 
@@ -59,10 +59,10 @@ public sealed class FolderScannerService : IFolderScanner
             toUpdate.Add(current);
         }
         
-        var newSongs = await _audioFileAnalyzer.AnalyzeAsync(filteredFiles);
-        await Task.Run(() => _audioRepository.UpdateAsync(toUpdate));
-        await Task.Run(() => _audioRepository.SaveAsync(newSongs));
-        await Task.Run(() => _audioRepository.RemoveAsync(fromDb));
+        var newSongs = await _audioFileAnalyzer.AnalyzeAsync(newSupportedFiles);
+        await _audioRepository.UpdateAsync(toUpdate);
+        await _audioRepository.SaveAsync(newSongs);
+        await _audioRepository.RemoveAsync(fromDb);
     }
 
     /// <inheritdoc />
@@ -86,6 +86,6 @@ public sealed class FolderScannerService : IFolderScanner
 
     private static bool IsSupported(string path)
     {
-        return !path.EndsWith(".wav") || new WaveFileReader(path).WaveFormat.Encoding is WaveFormatEncoding.Extensible;
+        return !path.EndsWith(".wav") || new WaveFileReader(path).WaveFormat.Encoding is not WaveFormatEncoding.Extensible;
     }
 }
