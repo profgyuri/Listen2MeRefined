@@ -73,6 +73,7 @@ public abstract class RepositoryBase<T> : IRepository<T>
         {
             _logger.Error(e.Message);
         }
+
         await _dataContext.SaveChangesAsync();
     }
     #endregion

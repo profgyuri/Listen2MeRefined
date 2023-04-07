@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Dapper.Contrib.Extensions;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using TableAttribute = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
 
 namespace Listen2MeRefined.Core.Models;
 
@@ -16,7 +18,7 @@ public sealed class AudioModel : Model
 
     public short Bitrate { get; set; }
 
-    [NotMapped]
+    [NotMapped, Computed]
     public string Display =>
         string.IsNullOrEmpty(Artist)
             ? $"{new FileInfo(Path!).Name}"
