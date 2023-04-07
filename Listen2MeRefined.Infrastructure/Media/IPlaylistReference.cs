@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using Listen2MeRefined.Core.Models;
 
-namespace Listen2MeRefined.Core.Interfaces;
+namespace Listen2MeRefined.Infrastructure.Media;
 
 public interface IPlaylistReference
 {

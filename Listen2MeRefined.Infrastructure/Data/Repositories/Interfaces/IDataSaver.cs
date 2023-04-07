@@ -1,6 +1,4 @@
-﻿using Listen2MeRefined.Core.Models;
-
-namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
 
 public interface IDataSaver<in T>
     where T: Model

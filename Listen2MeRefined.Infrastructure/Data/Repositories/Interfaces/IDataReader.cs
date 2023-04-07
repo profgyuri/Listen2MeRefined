@@ -1,9 +1,7 @@
-﻿using Listen2MeRefined.Core.Models;
-
-namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories.Interfaces;
 
 public interface IDataReader<T>
-    where T: Model
+    where T : Model
 {
     /// <summary>
     ///     Returns every entry for the matching <typeparamref name="T" /> type from the database asynchronously.

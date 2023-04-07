@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.WPF.Views;
 using Serilog;
 using SkiaSharp;
 
-namespace Listen2MeRefined.WPF;
+namespace Listen2MeRefined.WPF.Utils;
 
 internal sealed class GmaGlobalHookHandler : IGlobalHook
 {
@@ -75,11 +76,11 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
         switch (shouldShowNewWindow)
         {
             case true when _windows.Count == 0:
-            {
-                var window = WindowManager.ShowNewSongWindow(e.X, e.Y);
-                _windows.Add(window);
-                return;
-            }
+                {
+                    var window = WindowManager.ShowNewSongWindow(e.X, e.Y);
+                    _windows.Add(window);
+                    return;
+                }
             case true:
                 return;
         }
