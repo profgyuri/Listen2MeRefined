@@ -78,6 +78,11 @@ public sealed class WindowsMusicPlayer :
     #region IMediaController
     public async Task PlayPauseAsync()
     {
+        if (_currentSong is null)
+        {
+            return;
+        }
+
         if (_playbackState == PlaybackState.Playing)
         {
             _logger.Verbose("Pausing playback");
