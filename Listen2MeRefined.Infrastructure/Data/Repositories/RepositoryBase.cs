@@ -12,7 +12,7 @@ public abstract class RepositoryBase<T> : IRepository<T>
     protected readonly DataContext _dataContext;
     protected readonly IDbConnection _dbConnection;
 
-    private readonly string _tableName;
+    protected readonly string _tableName;
 
     protected RepositoryBase(ILogger logger, DataContext dataContext, IDbConnection dbConnection)
     {

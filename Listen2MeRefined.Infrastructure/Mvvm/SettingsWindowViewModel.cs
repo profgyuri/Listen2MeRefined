@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Listen2MeRefined.Core.Interfaces.DataHandlers;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Media;
@@ -23,6 +24,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IMediator _mediator;
     private readonly FontFamilies _installedFontFamilies;
     private readonly IVersionChecker _versionChecker;
+    private readonly IFromFolderRemover _fromFolderRemover;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -61,7 +63,8 @@ public sealed partial class SettingsWindowViewModel :
         IRepository<MusicFolderModel> musicFolderRepository,
         IRepository<PlaylistModel> playlistRepository,
         IFolderScanner folderScanner,
-        IVersionChecker versionChecker)
+        IVersionChecker versionChecker,
+        IFromFolderRemover fromFolderRemover)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -72,6 +75,7 @@ public sealed partial class SettingsWindowViewModel :
         _playlistRepository = playlistRepository;
         _folderScanner = folderScanner;
         _versionChecker = versionChecker;
+        _fromFolderRemover = fromFolderRemover;
 
         Initialize().ConfigureAwait(false);
     }
@@ -139,11 +143,12 @@ public sealed partial class SettingsWindowViewModel :
 
     #region Commands
     [RelayCommand]
-    private void RemoveFolder()
+    private async Task RemoveFolder()
     {
         _logger.Debug("Removing folder: {Folder}", SelectedFolder);
 
         Folders.Remove(SelectedFolder!);
+        await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder!);
 
         _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
     }

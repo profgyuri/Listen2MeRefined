@@ -7,7 +7,8 @@ namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public sealed class AudioRepository : 
     RepositoryBase<AudioModel>,
-    IAdvancedDataReader<ParameterizedQuery, AudioModel>
+    IAdvancedDataReader<ParameterizedQuery, AudioModel>,
+    IFromFolderRemover
 {
     public AudioRepository(DataContext dataContext, IDbConnection dbConnection, ILogger logger)
         : base(logger, dataContext, dbConnection)
@@ -42,4 +43,10 @@ public sealed class AudioRepository :
         return await _dbConnection.QueryAsync<AudioModel>(query, parameters);
     }
     #endregion
+
+    public async Task RemoveFromFolderAsync(string folderPath)
+    {
+        var sql = $"DELETE FROM {_tableName} WHERE Path LIKE @PathPrefix";
+        await _dbConnection.ExecuteAsync(sql, new { PathPrefix = $"{folderPath}%" });
+    }
 }
