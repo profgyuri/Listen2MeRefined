@@ -7,7 +7,7 @@ using Version = Listen2MeRefined.Core.Models.Version;
 
 public class VersionChecker : IVersionChecker
 {
-    private readonly Version versionNumber = Version.FromVersionNumbers(0, 6, 1);
+    private readonly Version versionNumber = Version.FromVersionNumbers(0, 6, 2);
     private const string apiUrl = "https://api.github.com/repos/profgyuri/Listen2MeRefined/releases";
     private Release? _latest;
 
