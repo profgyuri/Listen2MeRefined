@@ -67,5 +67,4 @@ Now that you have your songs in the search results list, you can simply drag and
 
  - Multiple display setup is currently not supported in any form.
  - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
- - Removing a music folder does not remove the songs it containes from the database
  - Removing the currently playing song from the playlist is not refreshing the index, resulting in skipping 1 song
