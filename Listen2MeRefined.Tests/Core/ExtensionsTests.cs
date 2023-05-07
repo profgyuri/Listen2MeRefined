@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using Source.Extensions;
+﻿using Listen2MeRefined.Core.Source.Extensions;
+using NUnit.Framework;
 
 namespace Listen2MeRefined.Tests.Core;
 

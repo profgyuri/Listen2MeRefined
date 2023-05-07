@@ -1,7 +1,6 @@
 using Autofac;
+using Listen2MeRefined.Core.Source;
 using Listen2MeRefined.Infrastructure.Media;
-using SkiaSharp;
-using Source;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 
