@@ -1,8 +1,7 @@
 using Autofac;
-using Listen2MeRefined.Core.Interfaces;
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data;
-using Source.Storage;
+using Listen2MeRefined.Infrastructure.Storage;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 
