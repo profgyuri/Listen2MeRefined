@@ -186,89 +186,128 @@
 
                 </Grid>
 
-                <!-- Search results -->
-                <Border
+                <TabControl
                     Grid.Row="1"
-                    Style="{StaticResource ContainerBorder}"
+                    materialDesign:ColorZoneAssist.Foreground="{StaticResource ThirnaryBrush}"
+                    materialDesign:ColorZoneAssist.Mode="Custom"
                     Margin="0 20 10 14">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="55"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="55"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition x:Name="ListRow" Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock
-                            Grid.Column="1"
-                            Style="{StaticResource ElementContainerText}"
-                            VerticalAlignment="Center"
-                            Margin="0 6 0 20"
-                            Text="Search Results"
-                            Background="Transparent"/>
-
-                        <Button
-                            Grid.Column="2"
-                            Style="{StaticResource InteractionButton}"
-                            Margin="10 0"
-                            BorderThickness="0"
-                            Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}"
-                            Command="{Binding SendSelectedToPlaylistCommand}"
-                            ToolTip="Add Selected / All to Playlist"/>
-
-                        <DataGrid
-                            x:Name="SearchResults"
+                    <TabItem
+                        Header="Search Results">
+                        <Border
                             Grid.Row="1"
-                            Grid.ColumnSpan="5"
-                            Height="{Binding ElementName=ListRow, Path=Height}"
-                            Foreground="{StaticResource SecondaryBrush}"
-                            dd:DragDrop.IsDragSource="True"
-                            dd:DragDrop.IsDropTarget="True"
-                            ItemsSource="{Binding SearchResults}"
-                            SelectionChanged="SearchResults_SelectionChanged"
-                            Style="{StaticResource SearchResultGrid}">
-                            <DataGrid.InputBindings>
-                                <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
-                            </DataGrid.InputBindings>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn 
-                                    Header="Artist" 
-                                    Binding="{Binding Artist}" 
-                                    Width="Auto"
-                                    MinWidth="80"/>
-                                <DataGridTextColumn 
-                                    Header="Title" 
-                                    Binding="{Binding Title}" 
-                                    Width="Auto"
-                                    MinWidth="80"/>
-                                <DataGridTextColumn 
-                                    Header="Genre" 
-                                    Binding="{Binding Genre}" 
-                                    Width="Auto"
-                                    MinWidth="80"/>
-                                <DataGridTextColumn 
-                                    Header="BPM" 
-                                    Binding="{Binding BPM}" 
-                                    Width="Auto" 
-                                    MinWidth="50"/>
-                                <DataGridTextColumn 
-                                    Header="Bitrate" 
-                                    Binding="{Binding Bitrate}" 
-                                    Width="Auto" 
-                                    MinWidth="50"/>
-                                <DataGridTextColumn 
-                                    Header="Path" 
-                                    Binding="{Binding Path}" 
-                                    Width="Auto" 
-                                    MinWidth="100"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
+                            Margin="0 10 0 0"
+                            Style="{StaticResource ContainerBorder}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="55"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="55"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition x:Name="ListRow" Height="*"/>
+                                </Grid.RowDefinitions>
 
-                </Border>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Style="{StaticResource ElementContainerText}"
+                                    VerticalAlignment="Center"
+                                    Margin="0 6 0 20"
+                                    Text="Search Results"
+                                    Background="Transparent"/>
+
+                                <Button
+                                    Grid.Column="2"
+                                    Style="{StaticResource InteractionButton}"
+                                    Margin="10 0"
+                                    BorderThickness="0"
+                                    Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}"
+                                    Command="{Binding SendSelectedToPlaylistCommand}"
+                                    ToolTip="Add Selected / All to Playlist"/>
+
+                                <DataGrid
+                                    x:Name="SearchResults"
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="5"
+                                    Height="{Binding ElementName=ListRow, Path=Height}"
+                                    Foreground="{StaticResource SecondaryBrush}"
+                                    dd:DragDrop.IsDragSource="True"
+                                    dd:DragDrop.IsDropTarget="True"
+                                    ItemsSource="{Binding SearchResults}"
+                                    SelectionChanged="SearchResults_SelectionChanged"
+                                    Style="{StaticResource SearchResultGrid}">
+                                    <DataGrid.InputBindings>
+                                        <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
+                                    </DataGrid.InputBindings>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn 
+                                            Header="Artist" 
+                                            Binding="{Binding Artist}" 
+                                            Width="Auto"
+                                            MinWidth="80"/>
+                                        <DataGridTextColumn 
+                                            Header="Title" 
+                                            Binding="{Binding Title}" 
+                                            Width="Auto"
+                                            MinWidth="80"/>
+                                        <DataGridTextColumn 
+                                            Header="Genre" 
+                                            Binding="{Binding Genre}" 
+                                            Width="Auto"
+                                            MinWidth="80"/>
+                                        <DataGridTextColumn 
+                                            Header="BPM" 
+                                            Binding="{Binding BPM}" 
+                                            Width="Auto" 
+                                            MinWidth="50"/>
+                                        <DataGridTextColumn 
+                                            Header="Bitrate" 
+                                            Binding="{Binding Bitrate}" 
+                                            Width="Auto" 
+                                            MinWidth="50"/>
+                                        <DataGridTextColumn 
+                                            Header="Path" 
+                                            Binding="{Binding Path}" 
+                                            Width="Auto" 
+                                            MinWidth="100"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+
+                        </Border>
+                    </TabItem>
+                    <TabItem
+                        Header="Song Menu">
+                        <Grid
+                            Margin="0 10 0 0">
+                            <Grid.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+                                    <Setter Property="Margin" Value="0 10"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button
+                                Grid.ColumnSpan="2"
+                                Width="380"
+                                Content="Play This Song"/>
+                            <Button
+                                Grid.ColumnSpan="2"
+                                Grid.Row="1"
+                                Width="380"
+                                Content="Play This Song"/>
+
+                        </Grid>
+                    </TabItem>
+                </TabControl>
 
                 <!-- Playlist -->
                 <Border
