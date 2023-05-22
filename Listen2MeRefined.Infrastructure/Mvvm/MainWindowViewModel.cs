@@ -163,6 +163,7 @@ public sealed partial class MainWindowViewModel :
     private async Task QuickSearch()
     {
         _logger.Information("Searching for \'{SearchTerm}\'", SearchTerm);
+        SwitchToSearchResultsTab();
         SearchResults.Clear();
         var results =
             string.IsNullOrEmpty(SearchTerm)

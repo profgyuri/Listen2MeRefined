@@ -65,6 +65,8 @@ public sealed partial class MainWindow : Window
         RoutedEventArgs e)
     {
         WindowManager.ShowWindow<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
+        var vm = (MainWindowViewModel)DataContext;
+        vm.SwitchToSearchResultsTab();
     }
 
     private void WindowsFormsHost_DpiChanged(object sender, DpiChangedEventArgs e)
