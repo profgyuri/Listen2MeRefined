@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
 using Listen2MeRefined.WPF.Views;
 using Listen2MeRefined.WPF.Views.Pages;
@@ -216,6 +217,24 @@ public sealed partial class MainWindow : Window
         foreach (var audio in e.RemovedItems)
         {
             vm.RemoveSelectedSearchResult((AudioModel)audio);
+        }
+    }
+
+    private void Playlist_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            var vm = (MainWindowViewModel)DataContext;
+            vm.JumpToSelecteSong().ConfigureAwait(false);
+        }
+    }
+
+    private void Playlist_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Right)
+        {
+            var vm = (MainWindowViewModel)DataContext;
+            vm.SwitchToSongMenuTab();
         }
     }
 }

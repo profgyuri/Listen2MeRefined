@@ -192,7 +192,8 @@
                     materialDesign:ColorZoneAssist.Mode="Custom"
                     Margin="0 20 10 14">
                     <TabItem
-                        Header="Search Results">
+                        Header="Search Results"
+                        IsSelected="{Binding IsSearchResultsTabVisible}">
                         <Border
                             Grid.Row="1"
                             Margin="0 10 0 0"
@@ -277,7 +278,8 @@
                         </Border>
                     </TabItem>
                     <TabItem
-                        Header="Song Menu">
+                        Header="Song Menu"
+                        IsSelected="{Binding IsSongMenuTabVisible}">
                         <Grid
                             Margin="0 10 0 0">
                             <Grid.Resources>
@@ -357,6 +359,8 @@
                             x:Name="Playlist"
                             Grid.ColumnSpan="5"
                             Grid.Row="1"
+                            MouseDoubleClick="Playlist_MouseDoubleClick"
+                            MouseUp="Playlist_MouseUp"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
                             ItemsSource="{Binding PlayList}"
@@ -368,11 +372,6 @@
                                 <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
                                 <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
                             </ListView.InputBindings>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseDoubleClick">
-                                    <i:InvokeCommandAction Command="{Binding JumpToSelecteSongCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid

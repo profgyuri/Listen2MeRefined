@@ -44,6 +44,8 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private int _waveFormHeight;
     [ObservableProperty] private double _totalTime;
     [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
+    [ObservableProperty] private bool _isSearchResultsTabVisible = true;
+    [ObservableProperty] private bool _isSongMenuTabVisible;
 
     public double CurrentTime
     {
@@ -170,7 +172,7 @@ public sealed partial class MainWindowViewModel :
     }
 
     [RelayCommand]
-    private async Task JumpToSelecteSong()
+    public async Task JumpToSelecteSong()
     {
         if (SelectedIndex > -1)
         {
@@ -260,6 +262,20 @@ public sealed partial class MainWindowViewModel :
     {
         PlayList.Clear();
         _selectedPlaylistItems.Clear();
+    }
+
+    [RelayCommand]
+    public void SwitchToSearchResultsTab()
+    {
+        IsSearchResultsTabVisible = true;
+        IsSongMenuTabVisible = false;
+    }
+
+    [RelayCommand]
+    public void SwitchToSongMenuTab()
+    {
+        IsSearchResultsTabVisible = false;
+        IsSongMenuTabVisible = true;
     }
     #endregion
 
