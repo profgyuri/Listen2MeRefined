@@ -313,6 +313,7 @@
 
                             <Button
                                 Grid.ColumnSpan="2"
+                                Command="{Binding JumpToSelecteSongCommand}"
                                 Width="380"
                                 Content="Play This Song"/>
                             <Button
@@ -355,6 +356,7 @@
                             <Button
                                 Grid.ColumnSpan="2"
                                 Grid.Row="5"
+                                Command="{Binding RemoveSelectedFromPlaylistCommand}"
                                 Width="380"
                                 Content="Remove From Playlist"/>
                             <Button
