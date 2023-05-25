@@ -32,23 +32,33 @@
         </Grid.ColumnDefinitions>
         <Button
             Grid.Column="0"
-            Click="OnRatingButtonClick" 
+            Click="OnRatingButtonClick"
+            MouseEnter="Button_MouseEnter"
+            MouseLeave="Button_MouseLeave"
             Tag="1"/>
         <Button 
             Grid.Column="1"
             Click="OnRatingButtonClick" 
+            MouseEnter="Button_MouseEnter"
+            MouseLeave="Button_MouseLeave"
             Tag="2"/>
         <Button 
             Grid.Column="2"
             Click="OnRatingButtonClick" 
+            MouseEnter="Button_MouseEnter"
+            MouseLeave="Button_MouseLeave"
             Tag="3"/>
         <Button 
             Grid.Column="3"
             Click="OnRatingButtonClick" 
+            MouseEnter="Button_MouseEnter"
+            MouseLeave="Button_MouseLeave"
             Tag="4"/>
         <Button 
             Grid.Column="4"
             Click="OnRatingButtonClick" 
+            MouseEnter="Button_MouseEnter"
+            MouseLeave="Button_MouseLeave"
             Tag="5"/>
     </Grid>
 </UserControl>
