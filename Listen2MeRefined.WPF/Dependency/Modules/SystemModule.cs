@@ -2,6 +2,7 @@ using System.Linq;
 using System.Windows.Media;
 using Autofac;
 using Listen2MeRefined.Core;
+using Listen2MeRefined.Core.Interfaces.System;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 
@@ -30,6 +31,11 @@ public class SystemModule : Module
         builder
             .RegisterType<FolderScannerService>()
             .As<IFolderScanner>()
+            .SingleInstance();
+
+        builder
+            .RegisterType<FileScannerService>()
+            .As<IFileScanner>()
             .SingleInstance();
     }
 }

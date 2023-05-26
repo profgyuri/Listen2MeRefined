@@ -302,8 +302,6 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
@@ -349,22 +347,18 @@
                                     Grid.Row="1"
                                     Grid.ColumnSpan="2"
                                     Width="380"
+                                    Command="{Binding ScanSelectedSongCommand}"
                                     Content="Scan This Song"/>
                             </Grid>
                             <Separator
                                 Grid.Row="4"/>
-                            
+
                             <Button
                                 Grid.ColumnSpan="2"
                                 Grid.Row="5"
                                 Command="{Binding RemoveSelectedFromPlaylistCommand}"
                                 Width="380"
                                 Content="Remove From Playlist"/>
-                            <Button
-                                Grid.ColumnSpan="2"
-                                Grid.Row="6"
-                                Width="380"
-                                Content="Delete From Computer"/>
 
                         </Grid>
                     </TabItem>

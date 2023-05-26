@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Core.Interfaces.System;
 using Listen2MeRefined.Core.Source;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
@@ -30,6 +31,7 @@ public sealed partial class MainWindowViewModel :
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IVersionChecker _versionChecker;
+    private readonly IFileScanner _fileScanner;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
 
@@ -71,7 +73,8 @@ public sealed partial class MainWindowViewModel :
         IFolderScanner folderScanner,
         DataContext dataContext,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
-        IVersionChecker versionChecker)
+        IVersionChecker versionChecker,
+        IFileScanner fileScanner)
     {
         _mediaController = mediaController;
         _logger = logger;
@@ -85,6 +88,7 @@ public sealed partial class MainWindowViewModel :
         _dataContext = dataContext;
         _waveFormDrawer = waveFormDrawer;
         _versionChecker = versionChecker;
+        _fileScanner = fileScanner;
 
         AsyncInit().ConfigureAwait(false);
         Init();
@@ -286,6 +290,21 @@ public sealed partial class MainWindowViewModel :
         }
 
         PlayList.Move(selectedSongIndex, newIndex);
+    }
+
+    [RelayCommand]
+    private async Task ScanSelectedSong()
+    {
+        if (SelectedSong is null)
+        {
+            return;
+        }
+
+        _logger.Verbose($"Scanning {SelectedSong.Title}");
+        var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
+        var index = PlayList.IndexOf(SelectedSong);
+        PlayList[index] = scanned;
+        SelectedSong = scanned;
     }
 
     [RelayCommand]
