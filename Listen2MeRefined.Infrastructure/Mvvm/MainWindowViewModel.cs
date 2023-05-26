@@ -57,6 +57,8 @@ public sealed partial class MainWindowViewModel :
         }
     }
 
+    private int _currentSongIndex = -1;
+
     public MainWindowViewModel(
         IMediaController<SKBitmap> mediaController,
         ILogger logger,
@@ -142,6 +144,7 @@ public sealed partial class MainWindowViewModel :
         SelectedSong = notification.Audio;
         WaveForm = _mediaController.Bitmap;
         TotalTime = SelectedSong.Length.TotalMilliseconds;
+        _currentSongIndex = PlayList.IndexOf(SelectedSong);
     }
     #endregion
     
@@ -263,6 +266,26 @@ public sealed partial class MainWindowViewModel :
     {
         PlayList.Clear();
         _selectedPlaylistItems.Clear();
+    }
+
+    [RelayCommand]
+    private void SetSelectedSongAsNext()
+    {
+        if (SelectedSong is null || PlayList.Count <= 1)
+        {
+            return;
+        }
+
+        _logger.Verbose($"Setting {SelectedSong.Title} as next song");
+        var selectedSongIndex = PlayList.IndexOf(SelectedSong);
+        var newIndex = _currentSongIndex + 1;
+
+        if (newIndex >= PlayList.Count)
+        {
+            newIndex = 0;
+        }
+
+        PlayList.Move(selectedSongIndex, newIndex);
     }
 
     [RelayCommand]
