@@ -326,6 +326,13 @@
                             <Grid
                                 Grid.Row="3"
                                 Grid.ColumnSpan="2">
+                                <Grid.Resources>
+                                    <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                                        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+                                        <Setter Property="Margin" Value="55 5 0 5" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </Grid.Resources>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
                                     <ColumnDefinition Width="5*"/>
@@ -333,23 +340,72 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Label
                                     Grid.Column="0"
-                                    Margin="55 0 0 0"
+                                    Grid.Row="5"
                                     Content="Rating:"/>
                                 <local:RatingBar
                                     Grid.Column="1"
+                                    Grid.Row="5"
                                     Width="100"
                                     HorizontalAlignment="Left"/>
-                                <Button
+                                <Label
+                                    Grid.Column="0"
+                                    Content="Artist:"/>
+                                <TextBox
+                                    Grid.Column="1"
+                                    Margin="20,5"
+                                    Text=""/>
+                                <Label
+                                    Grid.Column="0"
                                     Grid.Row="1"
+                                    Content="Title:"/>
+                                <TextBox
+                                    Grid.Column="1"
+                                    Grid.Row="1"
+                                    Margin="20,5"
+                                    Text=""/>
+                                <Label
+                                    Grid.Column="0"
+                                    Grid.Row="2"
+                                    Content="Genre:"/>
+                                <TextBox
+                                    Grid.Column="1"
+                                    Grid.Row="2"
+                                    Margin="20,5"
+                                    Text=""/>
+                                <Label
+                                    Grid.Column="0"
+                                    Grid.Row="3"
+                                    Content="Bitrate:"/>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Grid.Row="3"
+                                    Margin="5,0"
+                                    Text="{Binding Bitrate}"/>
+                                <Label
+                                    Grid.Column="0"
+                                    Grid.Row="4"
+                                    Content="BPM:"/>
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Grid.Row="4"
+                                    Margin="5,0"
+                                    Text="{Binding BPM}"/>
+                                <Button
+                                    Grid.Row="6"
                                     Grid.ColumnSpan="2"
                                     Width="380"
                                     Command="{Binding ScanSelectedSongCommand}"
                                     Content="Scan This Song"/>
                             </Grid>
+
                             <Separator
                                 Grid.Row="4"/>
 
