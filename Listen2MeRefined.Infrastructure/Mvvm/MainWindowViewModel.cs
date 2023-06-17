@@ -18,7 +18,6 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>
 {
-    private readonly Guid ID = Guid.NewGuid();
     private readonly ILogger _logger;
     private readonly IPlaylistReference _playlistReference;
     private readonly IMediaController<SKBitmap> _mediaController;
