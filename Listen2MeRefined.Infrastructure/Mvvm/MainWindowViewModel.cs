@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Core.Interfaces.System;
 using Listen2MeRefined.Core.Source;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
@@ -17,7 +18,6 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>
 {
-    private readonly Guid ID = Guid.NewGuid();
     private readonly ILogger _logger;
     private readonly IPlaylistReference _playlistReference;
     private readonly IMediaController<SKBitmap> _mediaController;
@@ -30,6 +30,7 @@ public sealed partial class MainWindowViewModel :
     private readonly DataContext _dataContext;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IVersionChecker _versionChecker;
+    private readonly IFileScanner _fileScanner;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
 
@@ -44,6 +45,8 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private int _waveFormHeight;
     [ObservableProperty] private double _totalTime;
     [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
+    [ObservableProperty] private bool _isSearchResultsTabVisible = true;
+    [ObservableProperty] private bool _isSongMenuTabVisible;
 
     public double CurrentTime
     {
@@ -54,6 +57,8 @@ public sealed partial class MainWindowViewModel :
             OnPropertyChanged();
         }
     }
+
+    private int _currentSongIndex = -1;
 
     public MainWindowViewModel(
         IMediaController<SKBitmap> mediaController,
@@ -67,7 +72,8 @@ public sealed partial class MainWindowViewModel :
         IFolderScanner folderScanner,
         DataContext dataContext,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
-        IVersionChecker versionChecker)
+        IVersionChecker versionChecker,
+        IFileScanner fileScanner)
     {
         _mediaController = mediaController;
         _logger = logger;
@@ -81,6 +87,7 @@ public sealed partial class MainWindowViewModel :
         _dataContext = dataContext;
         _waveFormDrawer = waveFormDrawer;
         _versionChecker = versionChecker;
+        _fileScanner = fileScanner;
 
         AsyncInit().ConfigureAwait(false);
         Init();
@@ -140,6 +147,7 @@ public sealed partial class MainWindowViewModel :
         SelectedSong = notification.Audio;
         WaveForm = _mediaController.Bitmap;
         TotalTime = SelectedSong.Length.TotalMilliseconds;
+        _currentSongIndex = PlayList.IndexOf(SelectedSong);
     }
     #endregion
     
@@ -161,6 +169,7 @@ public sealed partial class MainWindowViewModel :
     private async Task QuickSearch()
     {
         _logger.Information("Searching for \'{SearchTerm}\'", SearchTerm);
+        SwitchToSearchResultsTab();
         SearchResults.Clear();
         var results =
             string.IsNullOrEmpty(SearchTerm)
@@ -170,7 +179,7 @@ public sealed partial class MainWindowViewModel :
     }
 
     [RelayCommand]
-    private async Task JumpToSelecteSong()
+    public async Task JumpToSelecteSong()
     {
         if (SelectedIndex > -1)
         {
@@ -260,6 +269,55 @@ public sealed partial class MainWindowViewModel :
     {
         PlayList.Clear();
         _selectedPlaylistItems.Clear();
+    }
+
+    [RelayCommand]
+    private void SetSelectedSongAsNext()
+    {
+        if (SelectedSong is null || PlayList.Count <= 1)
+        {
+            return;
+        }
+
+        _logger.Verbose($"Setting {SelectedSong.Title} as next song");
+        var selectedSongIndex = PlayList.IndexOf(SelectedSong);
+        var newIndex = _currentSongIndex + 1;
+
+        if (newIndex >= PlayList.Count)
+        {
+            newIndex = 0;
+        }
+
+        PlayList.Move(selectedSongIndex, newIndex);
+    }
+
+    [RelayCommand]
+    private async Task ScanSelectedSong()
+    {
+        if (SelectedSong is null)
+        {
+            return;
+        }
+
+        _logger.Verbose($"Scanning {SelectedSong.Title}");
+        var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
+        var index = PlayList.IndexOf(SelectedSong);
+        PlayList[index] = scanned;
+        SelectedSong = scanned;
+    }
+
+    [RelayCommand]
+    public void SwitchToSearchResultsTab()
+    {
+        IsSearchResultsTabVisible = true;
+        IsSongMenuTabVisible = false;
+    }
+
+    [RelayCommand]
+    public void SwitchToSongMenuTab()
+    {
+        IsSearchResultsTabVisible = false;
+        IsSongMenuTabVisible = true;
     }
     #endregion
 

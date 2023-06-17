@@ -6,6 +6,7 @@
     <Color x:Key="SecondaryColor">#0DA1FF</Color><!-- 30% -->
     <Color x:Key="ThirnaryColor">#FFFC40</Color><!-- 10% -->
     <Color x:Key="DarkBorderColor">#313131</Color>
+    <Color x:Key="ThirnaryLightColor">#b8ba38</Color>
     <Color x:Key="ThirnaryLightMidColor">#908E30</Color>
     <Color x:Key="ThirnaryMidColor">#DC403E14</Color>
     <Color x:Key="ThirnaryDarkColor">#AA302F10</Color>
@@ -14,6 +15,7 @@
     <SolidColorBrush x:Key="DarkBorderBrush" Color="{StaticResource DarkBorderColor}" />
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}" />
     <SolidColorBrush x:Key="ThirnaryBrush" Color="{StaticResource ThirnaryColor}" />
+    <SolidColorBrush x:Key="ThirnaryLightBrush" Color="{StaticResource ThirnaryLightColor}" />
     <SolidColorBrush x:Key="ThirnaryLightMidBrush" Color="{StaticResource ThirnaryLightMidColor}" />
     <SolidColorBrush x:Key="ThirnaryMidBrush" Color="{StaticResource ThirnaryMidColor}" />
     <SolidColorBrush x:Key="ThirnaryDarkBrush" Color="{StaticResource ThirnaryDarkColor}" />
