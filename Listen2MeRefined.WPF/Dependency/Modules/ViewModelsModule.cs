@@ -23,7 +23,13 @@ public class ViewModelsModule : Module
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
-        
+
+        builder
+            .RegisterType<SearchbarViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+
         builder
             .RegisterType<CurrentlyPlayingPageViewModel>()
             .AsSelf()

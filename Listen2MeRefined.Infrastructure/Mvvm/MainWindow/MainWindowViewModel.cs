@@ -8,6 +8,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NAudio.Utils;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
@@ -16,12 +17,12 @@ public sealed partial class MainWindowViewModel :
     ObservableObject,
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
-    INotificationHandler<AdvancedSearchNotification>
+    INotificationHandler<AdvancedSearchNotification>,
+    INotificationHandler<QuickSearchResultsNotification>
 {
     private readonly ILogger _logger;
     private readonly IPlaylistReference _playlistReference;
     private readonly IMediaController<SKBitmap> _mediaController;
-    private readonly IRepository<AudioModel> _audioRepository;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly TimedTask _timedTask;
     private readonly ISettingsManager<AppSettings> _settingsManager;
@@ -33,6 +34,8 @@ public sealed partial class MainWindowViewModel :
     private readonly IFileScanner _fileScanner;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
+
+    [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
@@ -73,12 +76,12 @@ public sealed partial class MainWindowViewModel :
         DataContext dataContext,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IVersionChecker versionChecker,
-        IFileScanner fileScanner)
+        IFileScanner fileScanner,
+        SearchbarViewModel searchbarViewModel)
     {
         _mediaController = mediaController;
         _logger = logger;
         _playlistReference = playlistReference;
-        _audioRepository = audioRepository;
         _advancedAudioReader = advancedAudioReader;
         _timedTask = timedTask;
         _settingsManager = settingsManager;
@@ -88,6 +91,8 @@ public sealed partial class MainWindowViewModel :
         _waveFormDrawer = waveFormDrawer;
         _versionChecker = versionChecker;
         _fileScanner = fileScanner;
+
+        _searchbarViewModel = searchbarViewModel;
 
         AsyncInit().ConfigureAwait(false);
         Init();
@@ -164,20 +169,15 @@ public sealed partial class MainWindowViewModel :
     }
     #endregion
 
-    #region Commands
-    [RelayCommand]
-    private async Task QuickSearch()
+    public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("Searching for \'{SearchTerm}\'", SearchTerm);
         SwitchToSearchResultsTab();
         SearchResults.Clear();
-        var results =
-            string.IsNullOrEmpty(SearchTerm)
-                ? await _audioRepository.ReadAsync()
-                : await _audioRepository.ReadAsync(SearchTerm);
-        SearchResults.AddRange(results);
+        SearchResults.AddRange(notification.Results);
+        await Task.CompletedTask;
     }
 
+    #region Commands
     [RelayCommand]
     public async Task JumpToSelecteSong()
     {

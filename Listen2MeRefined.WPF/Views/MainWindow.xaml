@@ -556,6 +556,7 @@
                 
                 <!-- Searchbar -->
                 <Grid
+                    DataContext="{Binding SearchbarViewModel}"
                     Grid.Row="2"
                     Grid.ColumnSpan="2"
                     Margin="0 10 0 0">
