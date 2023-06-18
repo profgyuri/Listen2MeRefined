@@ -26,17 +26,17 @@ public sealed partial class SettingsWindowViewModel :
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
 
-    [ObservableProperty] private string _fontFamily;
-    [ObservableProperty] private string? _selectedFolder;
-    [ObservableProperty] private string _selectedFontFamily;
-    [ObservableProperty] private AudioOutputDevice _selectedAudioOutputDevice;
-    [ObservableProperty] private ObservableCollection<string> _folders;
-    [ObservableProperty] private ObservableCollection<string> _fontFamilies;
+    [ObservableProperty] private string _fontFamily = "";
+    [ObservableProperty] private string? _selectedFolder = "";
+    [ObservableProperty] private string _selectedFontFamily = "";
+    [ObservableProperty] private AudioOutputDevice? _selectedAudioOutputDevice;
+    [ObservableProperty] private ObservableCollection<string> _folders = new();
+    [ObservableProperty] private ObservableCollection<string> _fontFamilies = new();
     [ObservableProperty] private ObservableCollection<AudioOutputDevice> _audioOutputDevices = new();
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
-    [ObservableProperty] private string _updateAvailableText;
+    [ObservableProperty] private string _updateAvailableText = "";
     [ObservableProperty] private bool _isUpdateButtonVisible;
     
     public bool ScanOnStartup
@@ -110,8 +110,13 @@ public sealed partial class SettingsWindowViewModel :
         _mediator.Publish(new FontFamilyChangedNotification(value));
     }
 
-    partial void OnSelectedAudioOutputDeviceChanged(AudioOutputDevice value)
+    partial void OnSelectedAudioOutputDeviceChanged(AudioOutputDevice? value)
     {
+        if (value is null)
+        {
+            return;
+        }
+
         OnPropertyChanged(nameof(SelectedAudioOutputDevice));
         _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
@@ -209,7 +214,7 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task OpenBrowserForUpdate()
     {
-        _versionChecker.OpenUpdateLink();
+        await Task.Run(_versionChecker.OpenUpdateLink);
     }
     #endregion
 

@@ -66,13 +66,7 @@ public sealed partial class MainWindow : Window
     {
         WindowManager.ShowWindow<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
         var vm = (MainWindowViewModel)DataContext;
-        vm.SwitchToSearchResultsTab();
-    }
-
-    private void WindowsFormsHost_DpiChanged(object sender, DpiChangedEventArgs e)
-    {
-        var vm = (MainWindowViewModel)DataContext;
-        vm.RefreshSoundWave().ConfigureAwait(false);
+        vm.ListsViewModel.SwitchToSearchResultsTab();
     }
 
     #region Flowing text animation
@@ -198,12 +192,12 @@ public sealed partial class MainWindow : Window
 
         foreach (var audio in e.AddedItems)
         {
-            vm.AddSelectedPlaylistItems((AudioModel)audio);
+            vm.ListsViewModel.AddSelectedPlaylistItems((AudioModel)audio);
         }
 
         foreach (var audio in e.RemovedItems)
         {
-            vm.RemoveSelectedPlaylistItems((AudioModel)audio);
+            vm.ListsViewModel.RemoveSelectedPlaylistItems((AudioModel)audio);
         }
     }
 
@@ -213,12 +207,12 @@ public sealed partial class MainWindow : Window
 
         foreach (var audio in e.AddedItems)
         {
-            vm.AddSelectedSearchResult((AudioModel)audio);
+            vm.ListsViewModel.AddSelectedSearchResult((AudioModel)audio);
         }
         
         foreach (var audio in e.RemovedItems)
         {
-            vm.RemoveSelectedSearchResult((AudioModel)audio);
+            vm.ListsViewModel.RemoveSelectedSearchResult((AudioModel)audio);
         }
     }
 
@@ -227,7 +221,7 @@ public sealed partial class MainWindow : Window
         if (e.ChangedButton == MouseButton.Left)
         {
             var vm = (MainWindowViewModel)DataContext;
-            vm.JumpToSelecteSong().ConfigureAwait(false);
+            vm.ListsViewModel.JumpToSelecteSong().ConfigureAwait(false);
         }
     }
 
@@ -236,7 +230,7 @@ public sealed partial class MainWindow : Window
         if (e.ChangedButton == MouseButton.Right)
         {
             var vm = (MainWindowViewModel)DataContext;
-            vm.SwitchToSongMenuTab();
+            vm.ListsViewModel.SwitchToSongMenuTab();
         }
     }
 }

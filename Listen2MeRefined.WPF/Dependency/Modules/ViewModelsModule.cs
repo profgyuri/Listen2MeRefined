@@ -23,7 +23,28 @@ public class ViewModelsModule : Module
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
-        
+
+        builder
+            .RegisterType<SearchbarViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<PlayerControlsViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<ListsViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<StartupManager>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+
         builder
             .RegisterType<CurrentlyPlayingPageViewModel>()
             .AsSelf()
