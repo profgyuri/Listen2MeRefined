@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Core.Interfaces;
 using Listen2MeRefined.Core.Interfaces.System;
 using Listen2MeRefined.Core.Source;
 using Listen2MeRefined.Infrastructure.Data;
@@ -22,20 +23,19 @@ public sealed partial class MainWindowViewModel :
 {
     private readonly ILogger _logger;
     private readonly IPlaylistReference _playlistReference;
-    private readonly IMediaController<SKBitmap> _mediaController;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
-    private readonly TimedTask _timedTask;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IGlobalHook _globalHook;
     private readonly IFolderScanner _folderScanner;
     private readonly DataContext _dataContext;
-    private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IVersionChecker _versionChecker;
     private readonly IFileScanner _fileScanner;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
+    private readonly IMediaController<SKBitmap> _mediaController;
 
     [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
+    [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _searchTerm = "";
@@ -43,56 +43,39 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
-    [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
-    [ObservableProperty] private int _waveFormWidth;
-    [ObservableProperty] private int _waveFormHeight;
-    [ObservableProperty] private double _totalTime;
     [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
     [ObservableProperty] private bool _isSearchResultsTabVisible = true;
     [ObservableProperty] private bool _isSongMenuTabVisible;
 
-    public double CurrentTime
-    {
-        get => _mediaController.CurrentTime;
-        set
-        {
-            _mediaController.CurrentTime = value;
-            OnPropertyChanged();
-        }
-    }
-
     private int _currentSongIndex = -1;
 
     public MainWindowViewModel(
-        IMediaController<SKBitmap> mediaController,
         ILogger logger,
         IPlaylistReference playlistReference,
-        IRepository<AudioModel> audioRepository,
         IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
-        TimedTask timedTask,
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
         DataContext dataContext,
-        IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IVersionChecker versionChecker,
         IFileScanner fileScanner,
-        SearchbarViewModel searchbarViewModel)
+        SearchbarViewModel searchbarViewModel,
+        PlayerControlsViewModel playerControlsViewModel,
+        IMediaController<SKBitmap> mediaController)
     {
-        _mediaController = mediaController;
         _logger = logger;
         _playlistReference = playlistReference;
         _advancedAudioReader = advancedAudioReader;
-        _timedTask = timedTask;
         _settingsManager = settingsManager;
         _globalHook = globalHook;
         _folderScanner = folderScanner;
         _dataContext = dataContext;
-        _waveFormDrawer = waveFormDrawer;
         _versionChecker = versionChecker;
         _fileScanner = fileScanner;
+        _mediaController = mediaController;
 
         _searchbarViewModel = searchbarViewModel;
+        _playerControlsViewModel = playerControlsViewModel;
 
         AsyncInit().ConfigureAwait(false);
         Init();
@@ -101,9 +84,6 @@ public sealed partial class MainWindowViewModel :
     private void Init()
     {
         _playlistReference.PassPlaylist(ref _playList);
-        _timedTask.Start(
-                TimeSpan.FromMilliseconds(100),
-                () => OnPropertyChanged(nameof(CurrentTime)));
         _globalHook.Register();
     }
 
@@ -113,11 +93,7 @@ public sealed partial class MainWindowViewModel :
         await Task.Run(async () =>
         {
             FontFamily = _settingsManager.Settings.FontFamily;
-            WaveFormWidth = 480;
-            WaveFormHeight = 70;
             IsUpdateExclamationMarkVisible = !await _versionChecker.IsLatestAsync();
-            _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-            await DrawPlaceholderLineAsync();
         });
         
         if (_settingsManager.Settings.ScanOnStartup)
@@ -148,10 +124,7 @@ public sealed partial class MainWindowViewModel :
         CurrentSongNotification notification,
         CancellationToken cancellationToken)
     {
-        await DrawPlaceholderLineAsync();
         SelectedSong = notification.Audio;
-        WaveForm = _mediaController.Bitmap;
-        TotalTime = SelectedSong.Length.TotalMilliseconds;
         _currentSongIndex = PlayList.IndexOf(SelectedSong);
     }
     #endregion
@@ -185,37 +158,6 @@ public sealed partial class MainWindowViewModel :
         {
             await _mediaController.JumpToIndexAsync(SelectedIndex);
         }
-    }
-
-    [RelayCommand]
-    private async Task PlayPause()
-    {
-        await _mediaController.PlayPauseAsync();
-    }
-
-    [RelayCommand]
-    private void Stop()
-    {
-        _mediaController.Stop();
-    }
-
-    [RelayCommand]
-    private async Task Next()
-    {
-        await _mediaController.NextAsync();
-    }
-
-    [RelayCommand]
-    private async Task Previous()
-    {
-        await _mediaController.PreviousAsync();
-    }
-
-    [RelayCommand]
-    private async Task Shuffle()
-    {
-        await _mediaController.Shuffle();
-        SelectedIndex = 0;
     }
 
     [RelayCommand]
@@ -320,17 +262,6 @@ public sealed partial class MainWindowViewModel :
         IsSongMenuTabVisible = true;
     }
     #endregion
-
-    private async Task DrawPlaceholderLineAsync()
-    {
-        WaveForm = await _waveFormDrawer.LineAsync();
-    }
-
-    public async Task RefreshSoundWave()
-    {
-        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        WaveForm = await _waveFormDrawer.WaveFormAsync(SelectedSong!.Path!);
-    }
 
     public void AddSelectedSearchResult(AudioModel song)
     {

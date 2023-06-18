@@ -35,9 +35,6 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <WindowsFormsHost
-                DpiChanged="WindowsFormsHost_DpiChanged"/>
-
             <!--Title bar -->
             <Grid
                 VerticalAlignment="Center">
@@ -133,6 +130,7 @@
                         VerticalAlignment="Top"/>
 
                     <Border
+                        DataContext="{Binding PlayerControlsViewModel}"
                         Grid.Column="1"
                         Style="{StaticResource ContainerBorder}">
                         <Grid>

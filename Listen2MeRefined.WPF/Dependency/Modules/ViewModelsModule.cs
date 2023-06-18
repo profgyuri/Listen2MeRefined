@@ -29,6 +29,11 @@ public class ViewModelsModule : Module
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
+        builder
+            .RegisterType<PlayerControlsViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
 
         builder
             .RegisterType<CurrentlyPlayingPageViewModel>()

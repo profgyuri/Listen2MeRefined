@@ -69,12 +69,6 @@ public sealed partial class MainWindow : Window
         vm.SwitchToSearchResultsTab();
     }
 
-    private void WindowsFormsHost_DpiChanged(object sender, DpiChangedEventArgs e)
-    {
-        var vm = (MainWindowViewModel)DataContext;
-        vm.RefreshSoundWave().ConfigureAwait(false);
-    }
-
     #region Flowing text animation
     private void DisplayText_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
