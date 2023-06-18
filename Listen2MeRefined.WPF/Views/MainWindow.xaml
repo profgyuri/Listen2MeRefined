@@ -186,6 +186,7 @@
                 </Grid>
 
                 <TabControl
+                    DataContext="{Binding ListsViewModel}"
                     Grid.Row="1"
                     materialDesign:ColorZoneAssist.Foreground="{StaticResource ThirnaryBrush}"
                     materialDesign:ColorZoneAssist.Mode="Custom"
@@ -428,6 +429,7 @@
 
                 <!-- Playlist -->
                 <Border
+                    DataContext="{Binding ListsViewModel}"
                     Margin="10 20 0 14"
                     Grid.Row="1"
                     Grid.Column="1"
