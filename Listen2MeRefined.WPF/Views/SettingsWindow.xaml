@@ -120,7 +120,7 @@
                         Text="Font settings:"
                         VerticalAlignment="Center" />
                     <ComboBox
-                        x:Name="FontFamily"
+                        x:Name="FontFamilyComboBox"
                         Grid.Row="1"
                         Grid.Column="1"
                         Style="{StaticResource CustomComboBox}"

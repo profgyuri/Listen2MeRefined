@@ -4,8 +4,6 @@ namespace Listen2MeRefined.Infrastructure.Data.Dapper;
 
 public sealed class DbConnection : IDisposable
 {
-    private IDbConnection _connection;
-
     public IDbConnection Connection { get; set; }
 
     public DbConnection()

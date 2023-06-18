@@ -39,6 +39,11 @@ public class ViewModelsModule : Module
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();
+        builder
+            .RegisterType<StartupManager>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
 
         builder
             .RegisterType<CurrentlyPlayingPageViewModel>()
