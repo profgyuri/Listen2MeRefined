@@ -480,7 +480,8 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid
-                                        MinWidth="320">
+                                        MinWidth="320"
+                                        ClipToBounds="True">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="*" />
@@ -495,26 +496,16 @@
                                             VerticalAlignment="Bottom" />
 
                                         <resources:StoryboardTextBlock
-                                            Grid.Row="0"
                                             x:Name="DisplayText"
                                             MouseEnter="DisplayText_MouseEnter"
                                             MouseLeave="DisplayText_MouseLeave"
                                             Text="{Binding Display, FallbackValue=Track}"
-                                            Tag="{Binding ElementName=InvisibleDisplayText, Path=ActualWidth}"
+                                            Margin="0 0 0 10"
                                             FontSize="16"
-                                            TextTrimming="CharacterEllipsis"
-                                            HorizontalAlignment="Center"
-                                            FontWeight="Bold" />
-                                        <resources:StoryboardTextBlock
-                                            Grid.Row="0"
-                                            x:Name="InvisibleDisplayText"
-                                            Text="{Binding Display, FallbackValue=Track}"
-                                            FontSize="{Binding ElementName=DisplayText, Path=FontSize}"
                                             TextTrimming="None"
-                                            Visibility="Hidden"
-                                            HorizontalAlignment="{Binding ElementName=DisplayText, Path=HorizontalAlignment}"
-                                            FontWeight="{Binding ElementName=DisplayText, Path=FontWeight}"
-                                            FontStyle="{Binding ElementName=DisplayText, Path=FontStyle}"/>
+                                            HorizontalAlignment="Left"
+                                            FontWeight="Bold" 
+                                            ClipToBounds="True"/>
 
                                         <Grid
                                             Grid.Row="1"
@@ -530,7 +521,8 @@
                                             <TextBlock
                                                 Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}"
                                                 TextTrimming="CharacterEllipsis"
-                                                HorizontalAlignment="Center" />
+                                                Margin="0"
+                                                HorizontalAlignment="Left" />
                                             <TextBlock
                                                 Grid.Column="1"
                                                 Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}"
@@ -544,8 +536,9 @@
                                             <TextBlock
                                                 Grid.Column="3"
                                                 Text="{Binding Genre, FallbackValue=Genre}"
+                                                Margin="0 0 10 0"
                                                 TextTrimming="CharacterEllipsis"
-                                                HorizontalAlignment="Center" />
+                                                HorizontalAlignment="Left" />
                                         </Grid>
                                     </Grid>
                                 </DataTemplate>

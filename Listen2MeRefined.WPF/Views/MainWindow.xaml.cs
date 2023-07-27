@@ -73,6 +73,7 @@ public sealed partial class MainWindow : Window
     private void DisplayText_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
     {
         var flowingTextBlock = (sender as StoryboardTextBlock)!;
+        var container = flowingTextBlock.Parent as FrameworkElement;
 
         //if the storyboard is already playing, just return
         if (_storyboards.ContainsKey(flowingTextBlock.StoryboardName))
@@ -80,12 +81,10 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        //we retrieve the full width of the text which is bound to the tag property
-        var fullWidth = (double)flowingTextBlock.Tag;
-        double swipeAmount = fullWidth - flowingTextBlock.ActualWidth;
+        double swipeAmount = flowingTextBlock.ActualWidth - container.ActualWidth + 0;
 
         //getting a smooth amount of swipe duration for longer texts
-        var swipeSeconds = swipeAmount / 100 * 2d;
+        var swipeSeconds = swipeAmount / 100 * 3.5d;
 
         //setting a minimum animation duration, so short texts dont just "jump" around
         swipeSeconds = swipeSeconds >= 3 ? swipeSeconds : 3;
@@ -102,20 +101,20 @@ public sealed partial class MainWindow : Window
         };
         thicknessAnimation.KeyFrames.Add(
             new SplineThicknessKeyFrame(
-                new Thickness(0, 0, 0, 0),
+                new Thickness(0, 0, 0, 10),
                 KeyTime.FromTimeSpan(TimeSpan.FromSeconds(.5))));
 
         if (swipeAmount > 0)
         {
             thicknessAnimation.KeyFrames.Add(
                 new SplineThicknessKeyFrame(
-                    new Thickness(-swipeAmount, 0, 0, 0),
+                    new Thickness(-swipeAmount, 0, 0, 10),
                     KeyTime.FromTimeSpan(TimeSpan.FromSeconds(swipeSeconds)),
                     _easeOutKeySpline));
 
             thicknessAnimation.KeyFrames.Add(
                 new SplineThicknessKeyFrame(
-                    new Thickness(-swipeAmount, 0, 0, 0),
+                    new Thickness(-swipeAmount, 0, 0, 10),
                     KeyTime.FromTimeSpan(TimeSpan.FromSeconds(swipeSeconds + .5)),
                     _easeOutKeySpline));
         }
@@ -156,13 +155,13 @@ public sealed partial class MainWindow : Window
         {
             thicknessAnimation.KeyFrames.Add(
                 new SplineThicknessKeyFrame(
-                    new Thickness(swipeAmount, 0, 0, 0),
+                    new Thickness(swipeAmount, 0, 0, 10),
                     KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0)),
                     _easeOutKeySpline));
 
             thicknessAnimation.KeyFrames.Add(
                new SplineThicknessKeyFrame(
-                   new Thickness(0, 0, 0, 0),
+                   new Thickness(0, 0, 0, 10),
                    KeyTime.FromTimeSpan(TimeSpan.FromSeconds(swipeSeconds)),
                    _easeOutKeySpline));
         }

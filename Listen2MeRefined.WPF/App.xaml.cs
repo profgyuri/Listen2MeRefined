@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 using Autofac;
 using Dapper;
 using Listen2MeRefined.WPF.Dependency;
@@ -18,6 +20,8 @@ public sealed partial class App : Application
 
         SqlMapper.AddTypeHandler(new TimeSpanTypeHandler());
         WindowManager.ShowWindow<MainWindow>(false);
+
+        RenderOptions.ProcessRenderMode = RenderMode.Default;
 
         // Subscribe to the UnhandledException event
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
