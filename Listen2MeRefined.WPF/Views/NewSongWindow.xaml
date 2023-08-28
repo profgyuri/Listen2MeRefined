@@ -11,7 +11,7 @@
         Topmost="{Binding IsTopmost}"
         ResizeMode="NoResize"
         FontSize="18"
-        Title="NewSongWindow" Height="90" Width="450">
+        Title="NewSongWindow" Height="100" Width="460">
 
     <Border
         BorderBrush="{DynamicResource SecondaryBrush}"
@@ -20,6 +20,7 @@
         CornerRadius="3">
         <Frame
             x:Name="ContentPage"
-            NavigationUIVisibility="Hidden"/>
+            NavigationUIVisibility="Hidden"
+            Margin="5 -25 5 10"/>
     </Border>
 </Window>

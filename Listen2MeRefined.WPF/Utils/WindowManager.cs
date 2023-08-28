@@ -103,6 +103,6 @@ internal static class WindowManager
     /// </summary>
     internal static void CloseNewSongWindow(NewSongWindow window)
     {
-        window.Close();
+        window.Hide();
     }
 }

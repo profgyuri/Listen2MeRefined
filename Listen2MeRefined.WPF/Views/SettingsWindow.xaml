@@ -12,7 +12,7 @@
         FontFamily="{Binding SelectedFontFamily}"
         ResizeMode="NoResize"
         Title="SettingsWindow"
-        Height="300" Width="450">
+        Height="300" Width="480">
 
     <WindowChrome.WindowChrome>
         <WindowChrome

@@ -93,7 +93,7 @@ public sealed partial class SettingsWindowViewModel :
             {
                 "Default",
                 "Always on top",
-                "Off"
+                //todo: "Off"
             };
             SelectedNewSongWindowPosition = settings.NewSongWindowPosition;
             if (await _versionChecker.IsLatestAsync())
