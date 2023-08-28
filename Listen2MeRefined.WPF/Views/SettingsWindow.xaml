@@ -224,6 +224,21 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
+                    <TextBlock
+                        Grid.Row="5"
+                        Text="Notification window:"
+                        VerticalAlignment="Center"/>
+                    <ComboBox
+                        x:Name="NotificationWindowComboBox"
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        Margin="0 10"
+                        Style="{StaticResource CustomComboBox}"
+                        Foreground="{StaticResource SecondaryBrush}"
+                        BorderBrush="{StaticResource ThirnaryBrush}"
+                        SelectedItem="{Binding SelectedNewSongWindowPosition}"
+                        ItemsSource="{Binding NewSongWindowPositions}"/>
+
                     <StackPanel
                         Grid.Row="1000"
                         Grid.ColumnSpan="2"

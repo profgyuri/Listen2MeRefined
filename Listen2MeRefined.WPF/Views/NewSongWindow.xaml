@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:NewSongWindowViewModel}"
         Style="{StaticResource BasicWindow}"
-        Topmost="True"
+        Topmost="{Binding IsTopmost}"
         ResizeMode="NoResize"
         FontSize="18"
         Title="NewSongWindow" Height="90" Width="450">

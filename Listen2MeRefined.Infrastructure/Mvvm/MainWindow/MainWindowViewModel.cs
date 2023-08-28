@@ -7,8 +7,6 @@ public sealed partial class MainWindowViewModel :
     ObservableObject,
     INotificationHandler<FontFamilyChangedNotification>
 {
-    private readonly IVersionChecker _versionChecker;
-
     [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
     [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
     [ObservableProperty] private ListsViewModel _listsViewModel;
@@ -21,16 +19,17 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager)
+        StartupManager startupManager,
+        IGlobalHook globalHook)
     {
-        _versionChecker = versionChecker;
-
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
         _listsViewModel = listsViewModel;
 
-        Task.Run(async () => IsUpdateExclamationMarkVisible = !await _versionChecker.IsLatestAsync());
+        Task.Run(async () => IsUpdateExclamationMarkVisible = !await versionChecker.IsLatestAsync());
         Task.Run(startupManager.StartAsync);
+
+        globalHook.Register();
     }
 
     #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
