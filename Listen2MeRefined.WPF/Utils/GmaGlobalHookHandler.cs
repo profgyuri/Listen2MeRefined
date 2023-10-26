@@ -1,14 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
+using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.WPF.Views;
+using MediatR;
 using Serilog;
 using SkiaSharp;
 
 namespace Listen2MeRefined.WPF;
 
-internal sealed class GmaGlobalHookHandler : IGlobalHook
+internal sealed class GmaGlobalHookHandler :
+    IGlobalHook
 {
     private readonly ILogger _logger;
     private readonly IMediaController<SKBitmap> _mediaController;
@@ -67,10 +73,11 @@ internal sealed class GmaGlobalHookHandler : IGlobalHook
         object? sender,
         MouseEventArgs e)
     {
-        var shouldShowNewWindow = (e.X <= TriggerNotificationWindowAreaSize ||
-                                   e.X >= _width - TriggerNotificationWindowAreaSize)
-                                  && (e.Y <= TriggerNotificationWindowAreaSize || e.Y >=
-                                      _height - TriggerNotificationWindowAreaSize);
+        var shouldShowNewWindow = 
+            (e.X <= TriggerNotificationWindowAreaSize ||
+            e.X >= _width - TriggerNotificationWindowAreaSize) && 
+            (e.Y <= TriggerNotificationWindowAreaSize || e.Y >=
+            _height - TriggerNotificationWindowAreaSize);
 
         switch (shouldShowNewWindow)
         {

@@ -29,9 +29,11 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string? _selectedFolder = "";
     [ObservableProperty] private string _selectedFontFamily = "";
+    [ObservableProperty] private string _selectedNewSongWindowPosition = "";
     [ObservableProperty] private AudioOutputDevice? _selectedAudioOutputDevice;
     [ObservableProperty] private ObservableCollection<string> _folders = new();
     [ObservableProperty] private ObservableCollection<string> _fontFamilies = new();
+    [ObservableProperty] private ObservableCollection<string> _newSongWindowPositions = new();
     [ObservableProperty] private ObservableCollection<AudioOutputDevice> _audioOutputDevices = new();
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
@@ -87,7 +89,13 @@ public sealed partial class SettingsWindowViewModel :
             Folders = new(settings.MusicFolders.Select(x => x.FullPath));
             FontFamily = settings.FontFamily;
             SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
-            ScanOnStartup = settings.ScanOnStartup;
+            NewSongWindowPositions = new()
+            {
+                "Default",
+                "Always on top",
+                //todo: "Off"
+            };
+            SelectedNewSongWindowPosition = settings.NewSongWindowPosition;
             if (await _versionChecker.IsLatestAsync())
             {
                 UpdateAvailableText = "You are using the latest version!";
@@ -119,6 +127,18 @@ public sealed partial class SettingsWindowViewModel :
 
         OnPropertyChanged(nameof(SelectedAudioOutputDevice));
         _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
+    }
+
+    partial void OnSelectedNewSongWindowPositionChanged(string value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        OnPropertyChanged(nameof(SelectedNewSongWindowPosition));
+        _settingsManager.SaveSettings(x => x.NewSongWindowPosition = value);
+        _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
     }
 
     #region Notification Handlers
