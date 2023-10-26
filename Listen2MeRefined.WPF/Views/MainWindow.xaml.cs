@@ -31,8 +31,7 @@ public sealed partial class MainWindow : Window
         object sender,
         RoutedEventArgs e)
     {
-        Close();
-        Environment.Exit(0);
+        Application.Current.Shutdown();
     }
 
     private void MaximizeWindow_Click(
