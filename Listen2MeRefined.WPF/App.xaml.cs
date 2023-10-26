@@ -19,9 +19,11 @@ public sealed partial class App : Application
         base.OnStartup(e);
 
         SqlMapper.AddTypeHandler(new TimeSpanTypeHandler());
-        WindowManager.ShowWindow<MainWindow>(false);
-
         RenderOptions.ProcessRenderMode = RenderMode.Default;
+
+        // Set ShutdownMode to OnMainWindowClose
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
+        WindowManager.ShowWindow<MainWindow>(false);
 
         // Subscribe to the UnhandledException event
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
