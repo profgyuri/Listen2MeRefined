@@ -13,7 +13,7 @@ namespace Listen2MeRefined.Infrastructure.Media;
 ///     Wrapper class for NAudio.
 /// </summary>
 public sealed class WindowsMusicPlayer : 
-    IMediaController<SKBitmap>, 
+    IMediaController, 
     IPlaylistReference,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
@@ -53,8 +53,6 @@ public sealed class WindowsMusicPlayer :
         get => _waveOutEvent.Volume;
         set => _waveOutEvent.Volume = value;
     }
-
-    public SKBitmap Bitmap { get; set; } = new(1, 1);
 
     public WindowsMusicPlayer(
         ILogger logger,
@@ -198,9 +196,6 @@ public sealed class WindowsMusicPlayer :
             await NextAsync();
             return;
         }
-
-        _logger.Verbose("Drawing waveform for {Song}", _currentSong.Display);
-        Bitmap = await _waveFormDrawer.WaveFormAsync(_currentSong.Path);
 
         _logger.Verbose("Publishing notification for the current song has changed");
         await _mediator.Publish(new CurrentSongNotification(_currentSong));

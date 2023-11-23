@@ -20,7 +20,7 @@ public partial class ListsViewModel :
     private readonly ILogger _logger;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly IFileScanner _fileScanner;
-    private readonly IMediaController<SKBitmap> _mediaController;
+    private readonly IMediaController _mediaController;
 
     private int _currentSongIndex = -1;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
@@ -39,7 +39,7 @@ public partial class ListsViewModel :
         IPlaylistReference playlistReference,
         IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
         IFileScanner fileScanner,
-        IMediaController<SKBitmap> mediaController)
+        IMediaController mediaController)
     {
         _logger = logger;
 

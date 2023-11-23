@@ -17,7 +17,7 @@ internal sealed class GmaGlobalHookHandler :
     IGlobalHook
 {
     private readonly ILogger _logger;
-    private readonly IMediaController<SKBitmap> _mediaController;
+    private readonly IMediaController _mediaController;
     private readonly IKeyboardMouseEvents _globalHook = Hook.GlobalEvents();
     private readonly HashSet<NewSongWindow> _windows = new();
 
@@ -37,7 +37,7 @@ internal sealed class GmaGlobalHookHandler :
 
     public GmaGlobalHookHandler(
         ILogger logger,
-        IMediaController<SKBitmap> mediaController)
+        IMediaController mediaController)
     {
         _logger = logger;
         _mediaController = mediaController;

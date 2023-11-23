@@ -3,14 +3,11 @@
 /// <summary>
 ///     Contract for controlling any media element.
 /// </summary>
-public interface IMediaController<TBitmap> 
-    where TBitmap : class
+public interface IMediaController
 {
     double CurrentTime { get; set; }
 
     float Volume { get; set; }
-    
-    TBitmap Bitmap { get; set; }
 
     /// <summary>
     ///     Play or pause the playback.
