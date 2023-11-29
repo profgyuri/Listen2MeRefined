@@ -1,6 +1,4 @@
-﻿namespace Listen2MeRefined.Core.Interfaces;
-
-using Version = Listen2MeRefined.Core.Models.Version;
+﻿namespace Listen2MeRefined.Infrastructure.Versioning;
 
 public interface IVersionChecker
 {

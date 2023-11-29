@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Core.Models;
+﻿namespace Listen2MeRefined.Infrastructure.Versioning;
 
 using System.Text.RegularExpressions;
 

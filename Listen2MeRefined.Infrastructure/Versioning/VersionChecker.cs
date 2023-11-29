@@ -1,9 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure;
+﻿namespace Listen2MeRefined.Infrastructure.Versioning;
 
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Version = Listen2MeRefined.Core.Models.Version;
 
 public class VersionChecker : IVersionChecker
 {

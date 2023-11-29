@@ -8,3 +8,4 @@ global using Serilog;
 global using System.Collections.Generic;
 global using System.Data;
 global using System.Threading.Tasks;
+global using Listen2MeRefined.Infrastructure.Versioning;
