@@ -1,6 +1,5 @@
-using MediatR;
-
 namespace Listen2MeRefined.Infrastructure.Notifications;
+using MediatR;
 
 public class AudioOutputDeviceChangedNotification : INotification
 {

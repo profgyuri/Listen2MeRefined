@@ -1,8 +1,8 @@
-﻿using Listen2MeRefined.Infrastructure.Mvvm.Pages;
-using System.Windows.Controls;
-
-namespace Listen2MeRefined.WPF.Views.Pages
+﻿namespace Listen2MeRefined.WPF.Views.Pages
 {
+    using Listen2MeRefined.Infrastructure.Mvvm.Pages;
+    using System.Windows.Controls;
+
     /// <summary>
     /// Interaction logic for CurrentlyPlayingPage.xaml
     /// </summary>

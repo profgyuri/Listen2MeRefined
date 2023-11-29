@@ -1,11 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿namespace Listen2MeRefined.Infrastructure.Media;
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using NAudio.Wave;
 using SkiaSharp;
-
-namespace Listen2MeRefined.Infrastructure.Media;
 
 /// <summary>
 ///     Wrapper class for NAudio.

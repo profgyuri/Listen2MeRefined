@@ -1,11 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+using System.Collections.ObjectModel;
 using System.Text;
 using Dapper;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public partial class AdvancedSearchViewModel : 
     ObservableObject,

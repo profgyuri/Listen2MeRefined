@@ -1,7 +1,6 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm.Pages;
+using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm.Pages;
 
 public sealed partial class CurrentlyPlayingPageViewModel : 
     ObservableObject,

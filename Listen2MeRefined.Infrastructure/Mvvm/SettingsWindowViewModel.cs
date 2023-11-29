@@ -1,11 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class SettingsWindowViewModel : 
     ObservableObject,

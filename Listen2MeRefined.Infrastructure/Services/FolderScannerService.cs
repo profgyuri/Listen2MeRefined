@@ -1,8 +1,7 @@
+namespace Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
-
-namespace Listen2MeRefined.Infrastructure.Services;
 
 public sealed class FolderScannerService : IFolderScanner
 {

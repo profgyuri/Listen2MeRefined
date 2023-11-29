@@ -1,9 +1,8 @@
-﻿using System;
+﻿namespace Listen2MeRefined.WPF;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-
-namespace Listen2MeRefined.WPF;
 
 /// <summary>
 ///     Value converter made for settings window to determine

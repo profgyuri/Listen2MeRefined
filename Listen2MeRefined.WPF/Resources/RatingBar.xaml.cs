@@ -1,8 +1,7 @@
-﻿using System.Windows;
+﻿namespace Listen2MeRefined.WPF.Resources;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
-namespace Listen2MeRefined.WPF.Resources;
 
 /// <summary>
 /// Interaction logic for RatingBar.xaml

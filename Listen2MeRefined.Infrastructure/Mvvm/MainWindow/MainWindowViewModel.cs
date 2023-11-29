@@ -1,7 +1,6 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class MainWindowViewModel : 
     ObservableObject,

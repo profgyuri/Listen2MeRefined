@@ -1,6 +1,5 @@
-﻿using System.Windows;
-
-namespace Listen2MeRefined.WPF.Views;
+﻿namespace Listen2MeRefined.WPF.Views;
+using System.Windows;
 
 /// <summary>
 ///     Interaction logic for AdvancedSearchWindow.xaml

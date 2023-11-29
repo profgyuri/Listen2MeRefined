@@ -1,8 +1,7 @@
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Media;
-
-namespace Listen2MeRefined.WPF.Dependency.Modules;
 
 public class WrappersModule : Module
 {

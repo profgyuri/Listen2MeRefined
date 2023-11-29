@@ -1,6 +1,5 @@
-using SkiaSharp;
-
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
+using SkiaSharp;
 
 public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
 {

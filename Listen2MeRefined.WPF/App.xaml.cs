@@ -1,4 +1,5 @@
-﻿using System;
+﻿namespace Listen2MeRefined.WPF;
+using System;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -6,8 +7,6 @@ using Autofac;
 using Dapper;
 using Listen2MeRefined.WPF.Dependency;
 using Serilog;
-
-namespace Listen2MeRefined.WPF;
 
 /// <summary>
 ///     Interaction logic for App.xaml

@@ -1,4 +1,5 @@
-﻿using System;
+﻿namespace Listen2MeRefined.WPF;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,8 +8,6 @@ using System.Windows.Media.Animation;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.WPF.Views;
 using Listen2MeRefined.WPF.Views.Pages;
-
-namespace Listen2MeRefined.WPF;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml

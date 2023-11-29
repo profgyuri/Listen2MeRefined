@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json;
-
-namespace Listen2MeRefined.Infrastructure.Storage;
+﻿namespace Listen2MeRefined.Infrastructure.Storage;
+using Newtonsoft.Json;
 
 /// <summary>
 ///     Responsible to save the specified settings to a file in .json format.

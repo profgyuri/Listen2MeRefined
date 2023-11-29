@@ -1,13 +1,11 @@
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Linq;
 using System.Windows.Media;
 using Autofac;
-using Listen2MeRefined.Core;
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.SystemOperations;
-
-namespace Listen2MeRefined.WPF.Dependency.Modules;
 
 public class SystemModule : Module
 {

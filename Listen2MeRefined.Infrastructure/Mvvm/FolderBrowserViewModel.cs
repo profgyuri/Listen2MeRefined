@@ -1,10 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class FolderBrowserViewModel : 
     ObservableObject,

@@ -1,7 +1,6 @@
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Mvvm.Pages;
-
-namespace Listen2MeRefined.WPF.Dependency.Modules;
 
 public class ViewModelsModule : Module
 {

@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
+﻿namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
 
 public sealed class KeyboardHook : IDisposable
 {

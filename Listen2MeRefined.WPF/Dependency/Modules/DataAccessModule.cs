@@ -1,3 +1,4 @@
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Data;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
@@ -6,8 +7,6 @@ using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Microsoft.Data.Sqlite;
-
-namespace Listen2MeRefined.WPF.Dependency.Modules;
 
 public class DataAccessModule : Module
 {

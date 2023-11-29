@@ -1,6 +1,5 @@
-using Listen2MeRefined.Infrastructure.Data.EntityFramework;
-
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 
 public sealed class PlaylistRepository : RepositoryBase<PlaylistModel>
 {

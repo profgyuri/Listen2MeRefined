@@ -1,7 +1,6 @@
+namespace Listen2MeRefined.Infrastructure.Media;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-
-namespace Listen2MeRefined.Infrastructure.Media;
 
 internal static class AudioDevices
 {

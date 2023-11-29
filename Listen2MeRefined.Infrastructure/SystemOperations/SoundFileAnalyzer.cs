@@ -1,7 +1,6 @@
-﻿using Ardalis.GuardClauses;
+﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
+using Ardalis.GuardClauses;
 using File = TagLib.File;
-
-namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
 public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
 {

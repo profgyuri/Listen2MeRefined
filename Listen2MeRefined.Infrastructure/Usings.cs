@@ -2,7 +2,6 @@
 global using Listen2MeRefined.Infrastructure.Data;
 global using Listen2MeRefined.Infrastructure.Data.Repositories;
 global using Listen2MeRefined.Infrastructure.Data.Models;
-global using Listen2MeRefined.Core;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
 global using Serilog;

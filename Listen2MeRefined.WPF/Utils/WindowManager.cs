@@ -1,9 +1,8 @@
-﻿using System.Windows;
+﻿namespace Listen2MeRefined.WPF;
+using System.Windows;
 using Autofac;
 using Listen2MeRefined.WPF.Views;
 using Listen2MeRefined.WPF.Dependency;
-
-namespace Listen2MeRefined.WPF;
 
 internal static class WindowManager
 {

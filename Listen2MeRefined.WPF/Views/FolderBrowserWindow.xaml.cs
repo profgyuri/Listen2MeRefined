@@ -1,6 +1,5 @@
-﻿using System.Windows;
-
-namespace Listen2MeRefined.WPF;
+﻿namespace Listen2MeRefined.WPF;
+using System.Windows;
 
 /// <summary>
 ///     Interaction logic for FolderBrowserWindow.xaml

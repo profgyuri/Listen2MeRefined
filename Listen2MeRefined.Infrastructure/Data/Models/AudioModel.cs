@@ -1,9 +1,8 @@
-﻿using Dapper.Contrib.Extensions;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Models;
+using global::Dapper.Contrib.Extensions;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using TableAttribute = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
-
-namespace Listen2MeRefined.Infrastructure.Data.Models;
 
 [Table("Songs")]
 public sealed class AudioModel : Model

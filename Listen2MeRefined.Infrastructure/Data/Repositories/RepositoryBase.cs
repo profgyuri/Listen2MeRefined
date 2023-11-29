@@ -1,9 +1,8 @@
-using Dapper;
-using Dapper.Contrib.Extensions;
+namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+using global::Dapper;
+using global::Dapper.Contrib.Extensions;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
-
-namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public abstract class RepositoryBase<T> : IRepository<T>
     where T: Model

@@ -1,8 +1,7 @@
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Serilog;
 using Serilog.Core;
-
-namespace Listen2MeRefined.WPF.Dependency.Modules;
 
 public class LoggerModule : Module
 {

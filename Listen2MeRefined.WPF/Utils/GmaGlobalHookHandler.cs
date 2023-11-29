@@ -1,3 +1,4 @@
+namespace Listen2MeRefined.WPF;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -6,8 +7,6 @@ using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.WPF.Views;
 using Serilog;
-
-namespace Listen2MeRefined.WPF;
 
 internal sealed class GmaGlobalHookHandler :
     IGlobalHook

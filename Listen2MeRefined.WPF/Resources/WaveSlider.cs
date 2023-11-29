@@ -1,8 +1,7 @@
+namespace Listen2MeRefined.WPF;
 using System.Windows;
 using System.Windows.Controls;
 using SkiaSharp;
-
-namespace Listen2MeRefined.WPF;
 
 public class WaveSlider : Slider
 {
