@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Listen2MeRefined.Core.Source.KeyboardHook;
+namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
 
 public sealed class KeyboardHookEventArgs : HandledEventArgs
 {

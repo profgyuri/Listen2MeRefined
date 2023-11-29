@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Core.Source.KeyboardHook;
+﻿namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
 
 public record struct KeycodeInterpreter(
     int VirtualCode,

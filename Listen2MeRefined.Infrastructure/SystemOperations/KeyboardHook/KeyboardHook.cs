@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Listen2MeRefined.Core.Source.KeyboardHook;
+namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
 
 public sealed class KeyboardHook : IDisposable
 {
