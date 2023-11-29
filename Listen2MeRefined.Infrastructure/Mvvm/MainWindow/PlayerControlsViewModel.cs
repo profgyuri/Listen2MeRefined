@@ -1,6 +1,5 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-using Listen2MeRefined.Core.Source;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;

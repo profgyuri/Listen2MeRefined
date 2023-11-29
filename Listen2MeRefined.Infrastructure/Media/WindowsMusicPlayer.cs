@@ -1,6 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Listen2MeRefined.Core.Source;
-using Listen2MeRefined.Core.Source.Extensions;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;

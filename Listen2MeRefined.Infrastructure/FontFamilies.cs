@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Core;
+﻿namespace Listen2MeRefined.Infrastructure;
 
 public sealed class FontFamilies
 {

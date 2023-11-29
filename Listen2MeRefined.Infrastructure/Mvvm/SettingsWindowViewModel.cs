@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using Listen2MeRefined.Core.Source;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
