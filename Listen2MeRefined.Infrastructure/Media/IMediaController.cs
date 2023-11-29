@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Core.Interfaces;
+﻿namespace Listen2MeRefined.Infrastructure.Media;
 
 /// <summary>
 ///     Contract for controlling any media element.

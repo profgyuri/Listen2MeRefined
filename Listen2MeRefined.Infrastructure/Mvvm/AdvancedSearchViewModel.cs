@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
 using Dapper;
-using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;

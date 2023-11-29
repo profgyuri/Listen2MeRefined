@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Core.Interfaces;
+namespace Listen2MeRefined.Infrastructure.Services;
 
 /// <summary>
 /// Used to analyze the media files and save the metadata to the database.

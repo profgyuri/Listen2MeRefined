@@ -1,7 +1,4 @@
-﻿namespace Listen2MeRefined.Core.Interfaces.System;
-
-using Listen2MeRefined.Core.Models;
-
+﻿namespace Listen2MeRefined.Infrastructure.Services;
 public interface IFileScanner
 {
     /// <summary>

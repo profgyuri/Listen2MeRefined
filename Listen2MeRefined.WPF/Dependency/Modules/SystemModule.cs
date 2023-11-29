@@ -2,7 +2,7 @@ using System.Linq;
 using System.Windows.Media;
 using Autofac;
 using Listen2MeRefined.Core;
-using Listen2MeRefined.Core.Interfaces.System;
+using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 

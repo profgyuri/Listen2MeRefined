@@ -1,14 +1,14 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-using Listen2MeRefined.Core.Interfaces.System;
-using Listen2MeRefined.Core.Interfaces;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using SkiaSharp;
+using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Media;
 
 public partial class ListsViewModel :
     ObservableObject,

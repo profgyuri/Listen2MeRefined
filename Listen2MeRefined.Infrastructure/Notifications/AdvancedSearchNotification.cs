@@ -1,4 +1,3 @@
-using Listen2MeRefined.Infrastructure.Data;
 using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Notifications;

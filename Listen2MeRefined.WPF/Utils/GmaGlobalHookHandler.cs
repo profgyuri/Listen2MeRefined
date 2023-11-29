@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gma.System.MouseKeyHook;
-using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.WPF.Views;
-using MediatR;
 using Serilog;
-using SkiaSharp;
 
 namespace Listen2MeRefined.WPF;
 

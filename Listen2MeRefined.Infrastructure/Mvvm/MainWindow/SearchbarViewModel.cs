@@ -1,5 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
+using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 

@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Core.Models;
+namespace Listen2MeRefined.Infrastructure.Data.Models;
 
 public sealed class MusicFolderModel : Model
 {

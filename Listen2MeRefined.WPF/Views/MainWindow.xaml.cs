@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.WPF.Views;
 using Listen2MeRefined.WPF.Views.Pages;
 

@@ -1,6 +1,4 @@
-﻿using Listen2MeRefined.Core.Models;
-
-namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 /// <summary>
 ///     Interface to provide CRUD operations.

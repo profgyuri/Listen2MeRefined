@@ -3,6 +3,7 @@ using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Microsoft.Data.Sqlite;
 

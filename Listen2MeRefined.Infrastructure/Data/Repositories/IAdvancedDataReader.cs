@@ -1,6 +1,4 @@
-using Listen2MeRefined.Core.Models;
-
-namespace Listen2MeRefined.Core.Interfaces.DataHandlers;
+namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public interface IAdvancedDataReader<in T1, T2>
     where T2: Model

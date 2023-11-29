@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using TableAttribute = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
 
-namespace Listen2MeRefined.Core.Models;
+namespace Listen2MeRefined.Infrastructure.Data.Models;
 
 [Table("Songs")]
 public sealed class AudioModel : Model
@@ -31,7 +31,7 @@ public sealed class AudioModel : Model
 
     public TimeSpan Length { get; set; }
     public string? Path { get; init; }
-    
+
     /// <summary>
     /// Updates the properties of this instance with the properties of the given instance.
     /// </summary>

@@ -3,10 +3,10 @@
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Storage;
-using Listen2MeRefined.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Services;
 
 public class StartupManager : IDisposable
 {
