@@ -14,7 +14,7 @@ internal sealed class GmaGlobalHookHandler :
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly IKeyboardMouseEvents _globalHook = Hook.GlobalEvents();
-    private readonly HashSet<NewSongWindow> _windows = new();
+    private  NewSongWindow? _window;
 
     private readonly int _width = Screen.PrimaryScreen!.Bounds.Width;
     private readonly int _height = Screen.PrimaryScreen.Bounds.Height;
@@ -74,22 +74,13 @@ internal sealed class GmaGlobalHookHandler :
             (e.Y <= TriggerNotificationWindowAreaSize || e.Y >=
             _height - TriggerNotificationWindowAreaSize);
 
-        switch (shouldShowNewWindow)
+        if (shouldShowNewWindow)
         {
-            case true when _windows.Count == 0:
-            {
-                var window = WindowManager.ShowNewSongWindow(e.X, e.Y);
-                _windows.Add(window);
-                return;
-            }
-            case true:
-                return;
+            _window = WindowManager.ShowNewSongWindow(e.X, e.Y);
         }
-
-        foreach (var window in _windows)
+        else if (_window is not null)
         {
-            WindowManager.CloseNewSongWindow(window);
-            _windows.Remove(window);
+            WindowManager.CloseNewSongWindow(_window);
         }
     }
 
@@ -97,16 +88,8 @@ internal sealed class GmaGlobalHookHandler :
     /// <inheritdoc />
     public void Register()
     {
-        try
-        {
-            _globalHook.KeyDown += OnKeyDown;
-            _globalHook.MouseMove += OnMouseMove;
-        }
-        catch (Exception e)
-        {
-            _logger.Error(e, "Error registering global hook");
-            Unregister();
-        }
+        _globalHook.KeyDown += OnKeyDown;
+        _globalHook.MouseMove += OnMouseMove;
     }
 
     /// <inheritdoc />
