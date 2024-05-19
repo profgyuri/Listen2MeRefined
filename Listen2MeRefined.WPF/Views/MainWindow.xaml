@@ -14,7 +14,7 @@
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"
         WindowStartupLocation="Manual"
-        Title="Listen2Me"
+        Title="{Binding Song.Display}"
         MinHeight="502" MinWidth="1030"
         Height="702" Width="1030">
 
@@ -47,7 +47,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
-                    Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}},Path=Title,FallbackValue=Listen2Me}"
+                    Text="Listen2Me"
                     FontSize="20"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
@@ -120,14 +120,55 @@
                         Padding="10"
                         Margin="0 0 10 0"
                         Style="{StaticResource ContainerBorder}">
-                        <Frame
-                            x:Name="CurrentlyPlayingFrame"
-                            NavigationUIVisibility="Hidden"/>
+                        <Grid
+                            VerticalAlignment="Center"
+                            Margin="5 0 10 5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontWeight="Bold"
+                                TextTrimming="CharacterEllipsis"
+                                FontSize="26"
+                                Text="{Binding Song.Title, FallbackValue=Title}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0 5"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontWeight="SemiBold"
+                                FontStyle="Italic"
+                                TextTrimming="CharacterEllipsis"
+                                FontSize="20"
+                                Text="{Binding Song.Artist, FallbackValue=Artist}" />
+
+                            <UniformGrid
+                                Grid.Row="2"
+                                Columns="3"
+                                Margin="0 0 0 5">
+                                <TextBlock
+                                    FontSize="14"
+                                    Margin="0 0 0 -10"
+                                    Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
+                                <TextBlock
+                                    FontSize="14"
+                                    Margin="0 0 0 -10"
+                                    HorizontalAlignment="Center"
+                                    Text="{Binding Song.Genre, FallbackValue=Genre}" />
+                                <TextBlock
+                                    Margin="0 0 0 -10"
+                                    HorizontalAlignment="Right"
+                                    FontSize="14"
+                                    Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
+                            </UniformGrid>
+
+                        </Grid>
                     </Border>
-                    <TextBlock
-                        Text="Currently Playing"
-                        Style="{StaticResource ElementContainerText}"
-                        VerticalAlignment="Top"/>
 
                     <Border
                         DataContext="{Binding PlayerControlsViewModel}"

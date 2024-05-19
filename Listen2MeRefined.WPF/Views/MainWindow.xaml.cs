@@ -8,7 +8,6 @@ using System.Windows.Media.Animation;
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.WPF.Views;
-using Listen2MeRefined.WPF.Views.Pages;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
@@ -21,13 +20,11 @@ public sealed partial class MainWindow : Window
 
     public MainWindow(
         MainWindowViewModel viewModel,
-        CurrentlyPlayingPage currentlyPlayingPage,
         IGlobalHook globalHook)
     {
         InitializeComponent();
 
         DataContext = viewModel;
-        CurrentlyPlayingFrame.Content = currentlyPlayingPage;
         _globalHook = globalHook;
     }
 

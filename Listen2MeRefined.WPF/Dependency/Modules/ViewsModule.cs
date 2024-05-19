@@ -1,7 +1,6 @@
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.WPF.Views;
-using Listen2MeRefined.WPF.Views.Pages;
 
 public class ViewsModule : Module
 {
@@ -12,6 +11,5 @@ public class ViewsModule : Module
         builder.RegisterType<AdvancedSearchWindow>().InstancePerLifetimeScope();
         builder.RegisterType<SettingsWindow>().InstancePerLifetimeScope();
         builder.RegisterType<NewSongWindow>().SingleInstance();
-        builder.RegisterType<CurrentlyPlayingPage>().InstancePerDependency();
     }
 }
