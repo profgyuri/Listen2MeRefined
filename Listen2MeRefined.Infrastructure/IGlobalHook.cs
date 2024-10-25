@@ -5,7 +5,7 @@ public interface IGlobalHook
     /// <summary>
     ///     Sets up the keys used by the application.
     /// </summary>
-    public void Register();
+    public Task RegisterAsync();
 
     /// <summary>
     ///     Cleans up the used resources.

@@ -27,7 +27,6 @@ public sealed class WindowsMusicPlayer :
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
-    private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     private const int TimeCheckInterval = 500;
 
@@ -54,12 +53,10 @@ public sealed class WindowsMusicPlayer :
     public WindowsMusicPlayer(
         ILogger logger,
         IMediator mediator,
-        TimedTask timedTask,
-        IWaveFormDrawer<SKBitmap> waveFormDrawer)
+        TimedTask timedTask)
     {
         _logger = logger;
         _mediator = mediator;
-        _waveFormDrawer = waveFormDrawer;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
     }

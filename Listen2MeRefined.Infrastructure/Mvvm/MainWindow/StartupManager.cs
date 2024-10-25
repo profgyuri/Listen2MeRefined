@@ -33,13 +33,20 @@ public class StartupManager : IDisposable
 
     public async Task StartAsync()
     {
-        await Task.Run(async () => await _dataContext.Database.MigrateAsync());
-        await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily));
-
-        if (_settingsManager.Settings.ScanOnStartup)
+        // Initialize hooks last and don't block startup
+        await Task.Run(async () =>
         {
-            await Task.Run(async () => await _folderScanner.ScanAllAsync());
-        }
+            await _dataContext.Database.MigrateAsync();
+            await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily));
+
+            if (_settingsManager.Settings.ScanOnStartup)
+            {
+                await _folderScanner.ScanAllAsync();
+            }
+        });
+    
+        // Initialize hooks after everything else is ready
+        await _globalHook.RegisterAsync();
     }
 
     protected virtual void Dispose(bool disposing)

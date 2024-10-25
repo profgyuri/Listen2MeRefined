@@ -42,16 +42,23 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
         return _bitmap;
     }
 
-    /// <inheritdoc />
     public void Reset(int width, int height)
     {
+        var oldCanvas = _canvas;
+        var oldBitmap = _bitmap;
+    
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         _canvas.Clear(_backgroundColor);
+
+        // Dispose old objects after new ones are created successfully
+        oldCanvas?.Dispose();
+        oldBitmap?.Dispose();
     }
 
     public void Dispose()
     {
-        _canvas.Dispose();
+        _canvas?.Dispose();
+        _bitmap?.Dispose();
     }
 }

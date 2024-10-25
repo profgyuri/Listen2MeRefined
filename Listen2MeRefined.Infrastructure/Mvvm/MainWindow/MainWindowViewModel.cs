@@ -26,8 +26,7 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager,
-        IGlobalHook globalHook)
+        StartupManager startupManager)
     {
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
@@ -35,8 +34,6 @@ public sealed partial class MainWindowViewModel :
 
         Task.Run(async () => IsUpdateExclamationMarkVisible = !await versionChecker.IsLatestAsync());
         Task.Run(startupManager.StartAsync);
-
-        globalHook.Register();
     }
 
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
