@@ -26,7 +26,7 @@
 
     <Border
         BorderThickness="2"
-        BorderBrush="{StaticResource ThirnaryBrush}"
+        BorderBrush="{StaticResource TertiaryBrush}"
         Background="{StaticResource PrimaryBrush}"
         CornerRadius="8">
         <Grid>
@@ -212,7 +212,7 @@
                                 Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
                             <wpf:WaveSlider
                                 Style="{StaticResource NoHaloSlider}"
-                                Foreground="{StaticResource ThirnaryBrush}"
+                                Foreground="{StaticResource TertiaryBrush}"
                                 WaveBitmap="{Binding WaveForm}"
                                 Grid.Row="1"
                                 Minimum="0"
@@ -229,7 +229,7 @@
                 <TabControl
                     DataContext="{Binding ListsViewModel}"
                     Grid.Row="1"
-                    materialDesign:ColorZoneAssist.Foreground="{StaticResource ThirnaryBrush}"
+                    materialDesign:ColorZoneAssist.Foreground="{StaticResource TertiaryBrush}"
                     materialDesign:ColorZoneAssist.Mode="Custom"
                     Margin="0 20 10 14">
                     <TabItem
@@ -603,8 +603,8 @@
                     <TextBox
                         Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         materialDesign:HintAssist.Hint="Quick Search"
-                        BorderBrush="{StaticResource ThirnaryBrush}"
-                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThirnaryBrush}">
+                        BorderBrush="{StaticResource TertiaryBrush}"
+                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource TertiaryBrush}">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
                         </TextBox.InputBindings>

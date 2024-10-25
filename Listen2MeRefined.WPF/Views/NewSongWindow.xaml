@@ -13,7 +13,7 @@
         Title="NewSongWindow" Height="100" Width="460">
 
     <Border
-        BorderBrush="{DynamicResource ThirnaryBrush}"
+        BorderBrush="{DynamicResource TertiaryBrush}"
         Background="{StaticResource HoloBackground}"
         BorderThickness="1"
         CornerRadius="3">
