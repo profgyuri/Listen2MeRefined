@@ -15,7 +15,7 @@ using System.Windows.Forms;
 internal sealed class SharpHookHandler
     : Listen2MeRefined.Infrastructure.IGlobalHook
 {
-    private readonly SharpHook.IGlobalHook hook;
+    private readonly SharpHook.IGlobalHook _hook;
     private readonly ILogger _logger;
     private readonly IMediaController _mediaController;
     private readonly System.Threading.Timer _mouseDebounceTimer;
@@ -38,7 +38,7 @@ internal sealed class SharpHookHandler
 
     public SharpHookHandler(ILogger logger, IMediaController mediaController)
     {
-        hook = new TaskPoolGlobalHook();
+        _hook = new TaskPoolGlobalHook();
         _logger = logger;
         _mediaController = mediaController;
         
@@ -49,11 +49,11 @@ internal sealed class SharpHookHandler
     {
         try 
         {
-            hook.KeyPressed += OnKeyDown;
-            hook.MouseMoved += OnMouseMove;
+            _hook.KeyPressed += OnKeyDown;
+            _hook.MouseMoved += OnMouseMove;
             
             // Run hook on background thread
-            await Task.Run(() => hook.Run());
+            await Task.Run(() => _hook.Run());
         }
         catch (Exception ex)
         {
@@ -133,8 +133,8 @@ internal sealed class SharpHookHandler
 
     public void Unregister()
     {
-        hook.KeyPressed -= OnKeyDown;
-        hook.MouseMoved -= OnMouseMove;
-        hook.Dispose();
+        _hook.KeyPressed -= OnKeyDown;
+        _hook.MouseMoved -= OnMouseMove;
+        _hook.Dispose();
     }
 }
