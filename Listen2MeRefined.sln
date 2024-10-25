@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Notes.md = Notes.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Listen2MeRefined.Tests", "Listen2MeRefined.Tests\Listen2MeRefined.Tests.csproj", "{F67C2D8F-3EAC-4B5F-AEA7-00774B9AA48E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{92A56D1F-DF77-4148-93BC-B1DA30B0FFB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92A56D1F-DF77-4148-93BC-B1DA30B0FFB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92A56D1F-DF77-4148-93BC-B1DA30B0FFB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F67C2D8F-3EAC-4B5F-AEA7-00774B9AA48E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F67C2D8F-3EAC-4B5F-AEA7-00774B9AA48E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F67C2D8F-3EAC-4B5F-AEA7-00774B9AA48E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F67C2D8F-3EAC-4B5F-AEA7-00774B9AA48E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
