@@ -1,7 +1,6 @@
-﻿using Listen2MeRefined.Core.Interfaces.System;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+﻿namespace Listen2MeRefined.Infrastructure.Services;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.SystemOperations;
 
 public class FileScannerService : IFileScanner
 {

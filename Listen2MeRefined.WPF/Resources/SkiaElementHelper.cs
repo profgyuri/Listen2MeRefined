@@ -1,9 +1,8 @@
+namespace Listen2MeRefined.WPF;
 using System.Windows;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 using SkiaSharp.Views.WPF;
-
-namespace Listen2MeRefined.WPF;
 
 internal static class SkiaElementHelper
 {

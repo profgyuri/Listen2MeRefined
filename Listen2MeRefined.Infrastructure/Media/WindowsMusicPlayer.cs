@@ -1,19 +1,16 @@
-﻿using System.Collections.ObjectModel;
-using Listen2MeRefined.Core.Source;
-using Listen2MeRefined.Core.Source.Extensions;
+﻿namespace Listen2MeRefined.Infrastructure.Media;
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using NAudio.Wave;
 using SkiaSharp;
 
-namespace Listen2MeRefined.Infrastructure.Media;
-
 /// <summary>
 ///     Wrapper class for NAudio.
 /// </summary>
 public sealed class WindowsMusicPlayer : 
-    IMediaController<SKBitmap>, 
+    IMediaController, 
     IPlaylistReference,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
@@ -30,7 +27,6 @@ public sealed class WindowsMusicPlayer :
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
-    private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
 
     private const int TimeCheckInterval = 500;
 
@@ -54,17 +50,13 @@ public sealed class WindowsMusicPlayer :
         set => _waveOutEvent.Volume = value;
     }
 
-    public SKBitmap Bitmap { get; set; } = new(1, 1);
-
     public WindowsMusicPlayer(
         ILogger logger,
         IMediator mediator,
-        TimedTask timedTask,
-        IWaveFormDrawer<SKBitmap> waveFormDrawer)
+        TimedTask timedTask)
     {
         _logger = logger;
         _mediator = mediator;
-        _waveFormDrawer = waveFormDrawer;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
     }
@@ -198,9 +190,6 @@ public sealed class WindowsMusicPlayer :
             await NextAsync();
             return;
         }
-
-        _logger.Verbose("Drawing waveform for {Song}", _currentSong.Display);
-        Bitmap = await _waveFormDrawer.WaveFormAsync(_currentSong.Path);
 
         _logger.Verbose("Publishing notification for the current song has changed");
         await _mediator.Publish(new CurrentSongNotification(_currentSong));

@@ -1,8 +1,7 @@
-﻿using Autofac;
+﻿namespace Listen2MeRefined.WPF.Dependency;
+using Autofac;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using MediatR.Extensions.Autofac.DependencyInjection.Builder;
-
-namespace Listen2MeRefined.WPF.Dependency;
 
 internal static class IocContainer
 {

@@ -1,13 +1,13 @@
-﻿using System;
+﻿namespace Listen2MeRefined.WPF;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using Listen2MeRefined.Infrastructure;
+using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.WPF.Views;
-using Listen2MeRefined.WPF.Views.Pages;
-
-namespace Listen2MeRefined.WPF;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
@@ -16,21 +16,23 @@ public sealed partial class MainWindow : Window
 {
     private readonly KeySpline _easeOutKeySpline = new(0.5, 0, 0.5, 1);
     private readonly Dictionary<string, Storyboard> _storyboards = new();
+    private readonly IGlobalHook _globalHook;
 
     public MainWindow(
         MainWindowViewModel viewModel,
-        CurrentlyPlayingPage currentlyPlayingPage)
+        IGlobalHook globalHook)
     {
         InitializeComponent();
 
         DataContext = viewModel;
-        CurrentlyPlayingFrame.Content = currentlyPlayingPage;
+        _globalHook = globalHook;
     }
 
     private void CloseWindow_Click(
         object sender,
         RoutedEventArgs e)
     {
+        _globalHook.Unregister();
         Application.Current.Shutdown();
     }
 

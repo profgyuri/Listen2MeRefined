@@ -1,7 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-using Listen2MeRefined.Core.Interfaces;
-using Listen2MeRefined.Core.Source;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
@@ -13,7 +12,7 @@ public partial class PlayerControlsViewModel :
 {
     private readonly ILogger _logger;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
-    private readonly IMediaController<SKBitmap> _mediaController;
+    private readonly IMediaController _mediaController;
     private readonly TimedTask _timedTask;
 
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
@@ -34,7 +33,7 @@ public partial class PlayerControlsViewModel :
     public PlayerControlsViewModel(
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
-        IMediaController<SKBitmap> mediaController,
+        IMediaController mediaController,
         TimedTask timedTask)
     {
         _logger = logger;
@@ -67,7 +66,7 @@ public partial class PlayerControlsViewModel :
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         await DrawPlaceholderLineAsync();
-        WaveForm = _mediaController.Bitmap;
+        WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
         TotalTime = notification.Audio.Length.TotalMilliseconds;
     }
 

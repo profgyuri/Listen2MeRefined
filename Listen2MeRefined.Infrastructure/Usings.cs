@@ -1,10 +1,11 @@
-﻿global using Listen2MeRefined.Core.Interfaces;
-global using Listen2MeRefined.Core.Models;
-global using Listen2MeRefined.Core.Interfaces.DataHandlers;
-global using Listen2MeRefined.Core;
+﻿global using Listen2MeRefined.Core.Models;
+global using Listen2MeRefined.Infrastructure.Data;
+global using Listen2MeRefined.Infrastructure.Data.Repositories;
+global using Listen2MeRefined.Infrastructure.Data.Models;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
 global using Serilog;
 global using System.Collections.Generic;
 global using System.Data;
 global using System.Threading.Tasks;
+global using Listen2MeRefined.Infrastructure.Versioning;

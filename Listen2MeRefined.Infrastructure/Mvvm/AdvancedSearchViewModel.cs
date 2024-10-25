@@ -1,12 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+using System.Collections.ObjectModel;
 using System.Text;
 using Dapper;
-using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public partial class AdvancedSearchViewModel : 
     ObservableObject,
@@ -73,7 +71,7 @@ public partial class AdvancedSearchViewModel :
         Initialize().ConfigureAwait(false);
     }
 
-    private async Task Initialize()
+    public async Task Initialize()
     {
         await Task.Run(() =>
         {
@@ -97,24 +95,24 @@ public partial class AdvancedSearchViewModel :
         }
         
         Criterias.Add($"{SelectedColumnName} {SelectedRelation} {InputText}");
-
+    
         var queryBuilder = new StringBuilder(SelectedColumnName);
-        queryBuilder.Append(' ');
         var relation = SelectedRelation switch
         {
-            "Is" => "= ",
-            "Is not" => "<> ",
-            "Contains" => "LIKE ",
-            "Does not contain" => "NOT LIKE ",
-            "Bigger than" => "> ",
-            "Less than" => "< ",
-            "More than" => "> ",
+            "Is" => " = ",
+            "Is not" => " <> ",
+            "Contains" => " LIKE ",
+            "Does not contain" => " NOT LIKE ",
+            "Bigger than" => " > ",
+            "Less than" => " < ",
+            "More than" => " > ",
             _ => throw new IndexOutOfRangeException($"This relation is not handled: {SelectedRelation}")
         };
         queryBuilder.Append(relation);
-
+    
         var param = new DynamicParameters();
-        if (SelectedRelation is "Contains" or "Does not Contain")
+        // Fix: Check for both Contains and Does not contain with lowercase
+        if (SelectedRelation is "Contains" or "Does not contain")
         {
             param.Add($"param{_queryStatements.Count}", $"%{InputText}%");
         }
@@ -122,7 +120,7 @@ public partial class AdvancedSearchViewModel :
         {
             param.Add($"param{_queryStatements.Count}", $"{InputText}");
         }
-
+    
         queryBuilder.Append($"@param{_queryStatements.Count}");
         
         _queryStatements.Add(new ParameterizedQuery(queryBuilder.ToString(), param));

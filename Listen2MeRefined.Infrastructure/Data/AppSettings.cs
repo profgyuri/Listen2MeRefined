@@ -1,7 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace Listen2MeRefined.Infrastructure.Data;
+using System.ComponentModel.DataAnnotations;
 using Listen2MeRefined.Infrastructure.Storage;
-
-namespace Listen2MeRefined.Infrastructure.Data;
 
 public sealed class AppSettings : Settings
 {

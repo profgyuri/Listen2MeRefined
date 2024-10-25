@@ -57,13 +57,13 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource ThirnaryDarkBrush}"/>
-                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource TertiaryDarkBrush}"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
                                         <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource ThirnaryMidBrush}"/>
-                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource TertiaryMidBrush}"/>
+                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
                                         <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -94,13 +94,13 @@
                 <Style TargetType="DataGridRow">
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource ThirnaryDarkBrush}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                            <Setter Property="Background" Value="{StaticResource TertiaryDarkBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
                             <Setter Property="BorderThickness" Value="1"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource ThirnaryMidBrush}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                            <Setter Property="Background" Value="{StaticResource TertiaryMidBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
                             <Setter Property="BorderThickness" Value="1"/>
                         </Trigger>
                         <MultiTrigger>
@@ -116,8 +116,8 @@
                                 <Condition Property="IsMouseOver" Value="False"/>
                                 <Condition Property="IsSelected" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{StaticResource ThirnaryMidBrush}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource ThirnaryLightMidBrush}"/>
+                            <Setter Property="Background" Value="{StaticResource TertiaryMidBrush}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
                             <Setter Property="BorderThickness" Value="1"/>
                         </MultiTrigger>
                     </Style.Triggers>
@@ -127,9 +127,9 @@
     </Style>
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThirnaryBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="Padding" Value="5" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThirnaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource PrimaryBrush}" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
@@ -168,15 +168,15 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{StaticResource ThirnaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource ThirnaryBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource ThirnaryMidBrush}" />
+                <Setter Property="Background" Value="{StaticResource TertiaryMidBrush}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{StaticResource ThirnaryDarkBrush}" />
+                <Setter Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>

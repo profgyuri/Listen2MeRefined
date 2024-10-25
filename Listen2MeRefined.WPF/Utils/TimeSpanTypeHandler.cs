@@ -1,8 +1,7 @@
-﻿using System;
+﻿namespace Listen2MeRefined.WPF;
+using System;
 using System.Data;
 using Dapper;
-
-namespace Listen2MeRefined.WPF;
 
 public sealed class TimeSpanTypeHandler : SqlMapper.TypeHandler<TimeSpan>
 {

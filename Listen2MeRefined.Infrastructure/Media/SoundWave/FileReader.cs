@@ -1,6 +1,5 @@
-using NAudio.Wave;
-
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
+using NAudio.Wave;
 
 public sealed class FileReader
     : IFileReader<ISampleProvider>

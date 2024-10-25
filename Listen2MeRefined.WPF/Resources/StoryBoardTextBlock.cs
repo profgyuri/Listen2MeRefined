@@ -1,8 +1,8 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-
-namespace Listen2MeRefined.WPF
+﻿namespace Listen2MeRefined.WPF
 {
+    using System.Windows;
+    using System.Windows.Controls;
+
     public class StoryboardTextBlock : TextBlock
     {
         public static readonly DependencyProperty StoryboardNameProperty =

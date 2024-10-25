@@ -1,7 +1,5 @@
-using Listen2MeRefined.Infrastructure.Data;
-using MediatR;
-
 namespace Listen2MeRefined.Infrastructure.Notifications;
+using MediatR;
 
 public sealed class AdvancedSearchNotification : INotification
 {

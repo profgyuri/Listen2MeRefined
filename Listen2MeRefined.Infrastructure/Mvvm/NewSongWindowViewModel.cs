@@ -9,8 +9,17 @@ using System.Threading.Tasks;
 
 public sealed partial class NewSongWindowViewModel :
     ObservableObject,
-    INotificationHandler<NewSongWindowPositionChangedNotification>
+    INotificationHandler<NewSongWindowPositionChangedNotification>,
+    INotificationHandler<CurrentSongNotification>
 {
+    [ObservableProperty] private AudioModel _song = new()
+    {
+        Artist = "Artist",
+        Title = "Title",
+        Genre = "Genre",
+        Path = ""
+    };
+
     private readonly ISettingsManager<AppSettings> _settingsManager;
 
     public bool IsTopmost { get; set; }
@@ -25,6 +34,12 @@ public sealed partial class NewSongWindowViewModel :
     {
         IsTopmost = notification.Position == "Always on top";
         OnPropertyChanged(nameof(IsTopmost));
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        Song = notification.Audio;
         return Task.CompletedTask;
     }
 }

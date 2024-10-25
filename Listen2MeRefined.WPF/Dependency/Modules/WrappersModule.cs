@@ -1,8 +1,8 @@
-using Autofac;
-using Listen2MeRefined.Core.Source;
-using Listen2MeRefined.Infrastructure.Media;
-
 namespace Listen2MeRefined.WPF.Dependency.Modules;
+using Autofac;
+using Listen2MeRefined.Infrastructure;
+using Listen2MeRefined.Infrastructure.Media;
+using Listen2MeRefined.WPF.Utils;
 
 public class WrappersModule : Module
 {
@@ -14,7 +14,7 @@ public class WrappersModule : Module
             .SingleInstance();
 
         builder
-            .RegisterType<GmaGlobalHookHandler>()
+            .RegisterType<SharpHookHandler>()
             .As<IGlobalHook>()
             .SingleInstance();
         

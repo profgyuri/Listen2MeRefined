@@ -1,6 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-
-namespace Listen2MeRefined.Infrastructure.Data.Dapper;
+﻿namespace Listen2MeRefined.Infrastructure.Data.Dapper;
+using Microsoft.Data.SqlClient;
 
 public sealed class DbConnection : IDisposable
 {

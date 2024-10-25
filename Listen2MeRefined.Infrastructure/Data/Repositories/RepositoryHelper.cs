@@ -1,7 +1,6 @@
-using System.Text;
-using Dapper;
-
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+using System.Text;
+using global::Dapper;
 
 internal static class RepositoryHelper
 {

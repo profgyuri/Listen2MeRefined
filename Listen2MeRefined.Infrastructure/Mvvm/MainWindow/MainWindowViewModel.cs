@@ -1,15 +1,22 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class MainWindowViewModel : 
     ObservableObject,
-    INotificationHandler<FontFamilyChangedNotification>
+    INotificationHandler<FontFamilyChangedNotification>,
+    INotificationHandler<CurrentSongNotification>
 {
     [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
     [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
     [ObservableProperty] private ListsViewModel _listsViewModel;
+    [ObservableProperty] private AudioModel _song = new()
+    {
+        Artist = "Artist",
+        Title = "Title",
+        Genre = "Genre",
+        Path = ""
+    };
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
@@ -19,8 +26,7 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager,
-        IGlobalHook globalHook)
+        StartupManager startupManager)
     {
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
@@ -28,8 +34,12 @@ public sealed partial class MainWindowViewModel :
 
         Task.Run(async () => IsUpdateExclamationMarkVisible = !await versionChecker.IsLatestAsync());
         Task.Run(startupManager.StartAsync);
+    }
 
-        globalHook.Register();
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        Song = notification.Audio;
+        return Task.CompletedTask;
     }
 
     #region Implementation of INotificationHandler<in FontFamilyChangedNotification>

@@ -1,9 +1,8 @@
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
-using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Storage;
-
-namespace Listen2MeRefined.WPF.Dependency.Modules;
+using Listen2MeRefined.Infrastructure.Versioning;
 
 public class UtilsModule : Module
 {

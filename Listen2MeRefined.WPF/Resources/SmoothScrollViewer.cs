@@ -1,11 +1,10 @@
-﻿using System;
+﻿namespace Listen2MeRefined.WPF;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-
-namespace Listen2MeRefined.WPF;
 
 [TemplatePart(Name = "PART_AniVerticalScrollBar", Type = typeof(ScrollBar))]
 [TemplatePart(Name = "PART_AniHorizontalScrollBar", Type = typeof(ScrollBar))]

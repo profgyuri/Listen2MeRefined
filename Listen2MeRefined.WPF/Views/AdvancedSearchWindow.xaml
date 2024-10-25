@@ -22,13 +22,13 @@
     <Window.Resources>
         <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThirnaryBrush}" />
+            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
         </Style>
     </Window.Resources>
 
     <Border
         BorderThickness="2"
-        BorderBrush="{StaticResource ThirnaryBrush}"
+        BorderBrush="{StaticResource TertiaryBrush}"
         Background="{StaticResource PrimaryBrush}"
         CornerRadius="8">
 
@@ -92,7 +92,7 @@
                     Grid.Row="1"
                     Grid.Column="2"
                     Grid.ColumnSpan="2"
-                    BorderBrush="{StaticResource ThirnaryBrush}"
+                    BorderBrush="{StaticResource TertiaryBrush}"
                     Margin="5 0"
                     materialDesign:TextFieldAssist.SuffixText="{Binding RangeSuffixText}"/>
                 <Button
@@ -137,14 +137,14 @@
                     Orientation="Horizontal">
                     <RadioButton
                         Style="{StaticResource MaterialDesignTabRadioButton}"
-                        Foreground="{DynamicResource ThirnaryBrush}"
-                        BorderBrush="{DynamicResource ThirnaryBrush}"
+                        Foreground="{DynamicResource TertiaryBrush}"
+                        BorderBrush="{DynamicResource TertiaryBrush}"
                         IsChecked="{Binding MatchAll}"
                         Content="Match All" />
                     <RadioButton
                         Style="{StaticResource MaterialDesignTabRadioButton}"
-                        Foreground="{DynamicResource ThirnaryBrush}"
-                        BorderBrush="{DynamicResource ThirnaryBrush}"
+                        Foreground="{DynamicResource TertiaryBrush}"
+                        BorderBrush="{DynamicResource TertiaryBrush}"
                         IsChecked="True"
                         Content="Match Any" />
                 </StackPanel>

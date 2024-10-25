@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
+﻿namespace Listen2MeRefined.WPF.Resources;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
-namespace Listen2MeRefined.WPF.Resources;
 
 /// <summary>
 /// Interaction logic for RatingBar.xaml
@@ -47,11 +45,11 @@ public partial class RatingBar : UserControl
                 // Change the color of each button which has the same or lesser value of what's being hovered or clicked on
                 if (childRatingValue <= RatingValue)
                 {
-                    childButton.Foreground = (SolidColorBrush)FindResource("ThirnaryBrush");
+                    childButton.Foreground = (SolidColorBrush)FindResource("TertiaryBrush");
                 }
                 else
                 {
-                    childButton.Foreground = (SolidColorBrush)FindResource("ThirnaryMidBrush");
+                    childButton.Foreground = (SolidColorBrush)FindResource("TertiaryMidBrush");
                 }
             }
         }
@@ -73,11 +71,11 @@ public partial class RatingBar : UserControl
                 // Change the color of each button which has the same or lesser value of what's being hovered or clicked on
                 if (childRatingValue <= previewValue)
                 {
-                    childButton.Foreground = (SolidColorBrush)FindResource("ThirnaryLightBrush");
+                    childButton.Foreground = (SolidColorBrush)FindResource("TertiaryLightBrush");
                 }
                 else
                 {
-                    childButton.Foreground = (SolidColorBrush)FindResource("ThirnaryMidBrush");
+                    childButton.Foreground = (SolidColorBrush)FindResource("TertiaryMidBrush");
                 }
             }
         }
@@ -98,11 +96,11 @@ public partial class RatingBar : UserControl
                 // Change the color of each button which has the same or lesser value of what's being hovered or clicked on
                 if (childRatingValue <= RatingValue)
                 {
-                    childButton.Foreground = (SolidColorBrush)FindResource("ThirnaryBrush");
+                    childButton.Foreground = (SolidColorBrush)FindResource("TertiaryBrush");
                 }
                 else
                 {
-                    childButton.Foreground = (SolidColorBrush)FindResource("ThirnaryMidBrush");
+                    childButton.Foreground = (SolidColorBrush)FindResource("TertiaryMidBrush");
                 }
             }
         }
