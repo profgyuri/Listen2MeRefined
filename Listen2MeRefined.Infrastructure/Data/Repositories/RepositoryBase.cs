@@ -40,29 +40,29 @@ public abstract class RepositoryBase<T> : IRepository<T>
 
     #region Implementation of IDataReader<T>
     /// <inheritdoc />
-    public async Task<IEnumerable<T>> ReadAsync()
+    public virtual async Task<IEnumerable<T>> ReadAsync()
     {
         var sql = $"SELECT * FROM {_tableName}";
         return await _dbConnection.QueryAsync<T>(sql);
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<T>> ReadAsync(string searchTerm)
+    public virtual async Task<IEnumerable<T>> ReadAsync(string searchTerm)
     {
-        var query = RepositoryHelper.GetParameterizedQueryWithSearchTerm<AudioModel>(searchTerm, _tableName);
+        var query = RepositoryHelper.GetParameterizedQueryWithSearchTerm<T>(searchTerm, _tableName);
         return await _dbConnection.QueryAsync<T>(query.QueryString, query.Parameters);
     }
     #endregion
 
     #region Implementation of IDataUpdater<in T>
     /// <inheritdoc />
-    public async Task UpdateAsync(T data)
+    public virtual async Task UpdateAsync(T data)
     {
         await _dbConnection.UpdateAsync(data);
     }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(IEnumerable<T> list)
+    public virtual async Task UpdateAsync(IEnumerable<T> list)
     {
         try
         {
@@ -79,21 +79,21 @@ public abstract class RepositoryBase<T> : IRepository<T>
 
     #region Implementation of IDataRemover<T>
     /// <inheritdoc />
-    public async Task RemoveAsync(T data)
+    public virtual async Task RemoveAsync(T data)
     {
         _dataContext.Set<T>().Remove(data);
         await _dataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task RemoveAsync(IEnumerable<T> list)
+    public virtual async Task RemoveAsync(IEnumerable<T> list)
     {
         _dataContext.Set<T>().RemoveRange(list);
         await _dataContext.SaveChangesAsync();
     }
 
     /// <inheritdoc />
-    public async Task RemoveAllAsync()
+    public virtual async Task RemoveAllAsync()
     {
         var sql = $"DELETE FROM {_tableName}";
         await _dbConnection.ExecuteAsync(sql);

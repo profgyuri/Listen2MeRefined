@@ -15,4 +15,14 @@ public sealed class DataContext : DbContext
         //optionsBuilder.UseSqlServer(DbInfo.MssqlConnectionString);
         optionsBuilder.UseSqlite(DbInfo.SqliteConnectionString);
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Configure many-to-many relationship
+        modelBuilder.Entity<AudioModel>()
+            .HasMany(s => s.Playlists)
+            .WithMany(p => p.Songs); // Junction table
+            
+        base.OnModelCreating(modelBuilder);
+    }
 }

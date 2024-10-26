@@ -31,6 +31,8 @@ public sealed class AudioModel : Model
     public TimeSpan Length { get; set; }
     public string? Path { get; init; }
 
+    public List<PlaylistModel> Playlists { get; set; } = new();
+
     /// <summary>
     /// Updates the properties of this instance with the properties of the given instance.
     /// </summary>
