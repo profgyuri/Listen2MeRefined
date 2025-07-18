@@ -59,7 +59,8 @@
                     Click="SettingsWindow_Click"
                     Grid.Column="1"
                     Style="{StaticResource TitleBarButton}"
-                    Content="{materialDesign:PackIcon Kind=Gear,Size=15}" />
+                    Content="{materialDesign:PackIcon Kind=Gear,Size=15}" 
+                    AutomationProperties.AutomationId="SettingsWindowButton"/>
                 <TextBlock
                     x:Name="UpdateNotification"
                     IsHitTestVisible="False"
@@ -78,20 +79,23 @@
                     Padding="0 0 0 5"
                     Style="{StaticResource TitleBarButton}"
                     Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
-                    VerticalContentAlignment="Bottom" />
+                    VerticalContentAlignment="Bottom"
+                    AutomationProperties.AutomationId="MinimizeWindowButton"/>
                 <Button
                     x:Name="MaximizeWindow"
                     Click="MaximizeWindow_Click"
                     Grid.Column="3"
                     Style="{StaticResource TitleBarButton}"
-                    Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}" />
+                    Content="{materialDesign:PackIcon Kind=WindowMaximize,Size=15}" 
+                    AutomationProperties.AutomationId="MaximizeWindowButton"/>
                 <Button
                     x:Name="CloseWindow"
                     Click="CloseWindow_Click"
                     Grid.Column="4"
                     Content="{materialDesign:PackIcon Kind=Close,Size=15}"
                     Style="{StaticResource WindowCloseButton}"
-                    materialDesign:ButtonAssist.CornerRadius="0 8 0 0" />
+                    materialDesign:ButtonAssist.CornerRadius="0 8 0 0"
+                    AutomationProperties.AutomationId="CloseWindowButton"/>
             </Grid>
 
             <!--Content -->
@@ -189,27 +193,32 @@
                             <Button
                                 Command="{Binding PreviousCommand}"
                                 Style="{StaticResource PlayerButton}"
-                                Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
+                                Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"
+                                AutomationProperties.AutomationId="PreviousButton"/>
                             <Button
                                 Grid.Column="1"
                                 Command="{Binding StopCommand}"
                                 Style="{StaticResource PlayerButton}"
-                                Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
+                                Content="{materialDesign:PackIcon Kind=Stop,Size=20}" 
+                                AutomationProperties.AutomationId="StopButton"/>
                             <Button
                                 Grid.Column="2"
                                 Command="{Binding PlayPauseCommand}"
                                 Style="{StaticResource PlayerButton}"
-                                Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
+                                Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" 
+                                AutomationProperties.AutomationId="PlayPauseButton"/>
                             <Button
                                 Grid.Column="3"
                                 Command="{Binding NextCommand}"
                                 Style="{StaticResource PlayerButton}"
-                                Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
+                                Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" 
+                                AutomationProperties.AutomationId="NextButton"/>
                             <Button
                                 Grid.Column="4"
                                 Command="{Binding ShuffleCommand}"
                                 Style="{StaticResource PlayerButton}"
-                                Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
+                                Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}"
+                                AutomationProperties.AutomationId="ShuffleButton"/>
                             <wpf:WaveSlider
                                 Style="{StaticResource NoHaloSlider}"
                                 Foreground="{StaticResource TertiaryBrush}"
@@ -235,7 +244,8 @@
                     <TabItem
                         Header="Search Results"
                         IsSelected="{Binding IsSearchResultsTabVisible}"
-                        Cursor="Hand">
+                        Cursor="Hand"
+                        AutomationProperties.AutomationId="SearchResultsTab">
                         <Border
                             Grid.Row="1"
                             Margin="0 10 0 0"
@@ -265,8 +275,9 @@
                                     Margin="10 0"
                                     BorderThickness="0"
                                     Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}"
-                                    Command="{Binding SendSelectedToPlaylistCommand}"
-                                    ToolTip="Add Selected / All to Playlist"/>
+                                    Command="{Binding SendSelectedToQueueCommand}"
+                                    ToolTip="Add Selected / All to Queue"
+                                    AutomationProperties.AutomationId="SendToQueueButton"/>
 
                                 <DataGrid
                                     x:Name="SearchResults"
@@ -278,9 +289,10 @@
                                     dd:DragDrop.IsDropTarget="True"
                                     ItemsSource="{Binding SearchResults}"
                                     SelectionChanged="SearchResults_SelectionChanged"
-                                    Style="{StaticResource SearchResultGrid}">
+                                    Style="{StaticResource SearchResultGrid}"
+                                    AutomationProperties.AutomationId="SearchResultsList">
                                     <DataGrid.InputBindings>
-                                        <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
+                                        <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToQueueCommand}"/>
                                     </DataGrid.InputBindings>
                                     <DataGrid.Columns>
                                         <DataGridTextColumn 
@@ -322,7 +334,8 @@
                     <TabItem
                         Header="Song Menu"
                         IsSelected="{Binding IsSongMenuTabVisible}"
-                        Cursor="Hand">
+                        Cursor="Hand"
+                        AutomationProperties.AutomationId="SongMenuTab">
                         <ScrollViewer
                             VerticalScrollBarVisibility="Auto"
                             HorizontalScrollBarVisibility="Disabled">
@@ -356,13 +369,15 @@
                                 Grid.ColumnSpan="2"
                                 Command="{Binding JumpToSelecteSongCommand}"
                                 Width="380"
-                                Content="Play This Song"/>
+                                Content="Play This Song"
+                                AutomationProperties.AutomationId="PlayThisButton"/>
                             <Button
                                 Grid.ColumnSpan="2"
                                 Grid.Row="1"
                                 Width="380"
                                 Command="{Binding SetSelectedSongAsNextCommand}"
-                                Content="Play After The Current Song"/>
+                                Content="Play After The Current Song"
+                                AutomationProperties.AutomationId="PlayNextButton"/>
                             <Separator
                                 Grid.Row="2"/>
 
@@ -450,7 +465,8 @@
                                     Grid.ColumnSpan="2"
                                     Width="380"
                                     Command="{Binding ScanSelectedSongCommand}"
-                                    Content="Scan This Song"/>
+                                    Content="Scan This Song"
+                                    AutomationProperties.AutomationId="ScanThisButton"/>
                             </Grid>
 
                             <Separator
@@ -459,16 +475,17 @@
                             <Button
                                 Grid.ColumnSpan="2"
                                 Grid.Row="5"
-                                Command="{Binding RemoveSelectedFromPlaylistCommand}"
+                                Command="{Binding RemoveSelectedFromQueueCommand}"
                                 Width="380"
-                                Content="Remove From Playlist"/>
+                                Content="Remove From Queue"
+                                AutomationProperties.AutomationId="RemoveFromQueueButton"/>
 
                         </Grid>
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>
 
-                <!-- Playlist -->
+                <!-- Queue -->
                 <Border
                     DataContext="{Binding ListsViewModel}"
                     Margin="10 20 0 14"
@@ -488,7 +505,7 @@
 
                         <TextBlock
                             Grid.Column="1"
-                            Text="Playlist"
+                            Text="Queue"
                             Style="{StaticResource ElementContainerText}"
                             Margin="0 6 0 20"
                             Background="Transparent"/>
@@ -497,26 +514,28 @@
                             Grid.Column="2"
                             Style="{StaticResource InteractionButton}"
                             Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=32}"
-                            Command="{Binding RemoveSelectedFromPlaylistCommand}"
+                            Command="{Binding RemoveSelectedFromQueueCommand}"
                             BorderThickness="0"
-                            ToolTip="Remove Selected / All from Playlist"/>
+                            ToolTip="Remove Selected / All from Queue"
+                            AutomationProperties.AutomationId="RemoveFromQueueButton"/>
 
                         <ListView
-                            x:Name="Playlist"
+                            x:Name="Queue"
                             Grid.ColumnSpan="5"
                             Grid.Row="1"
-                            MouseDoubleClick="Playlist_MouseDoubleClick"
-                            MouseUp="Playlist_MouseUp"
+                            MouseDoubleClick="Queue_MouseDoubleClick"
+                            MouseUp="Queue_MouseUp"
                             dd:DragDrop.IsDragSource="True"
                             dd:DragDrop.IsDropTarget="True"
-                            ItemsSource="{Binding PlayList}"
+                            ItemsSource="{Binding Queue}"
                             Style="{StaticResource CustomHighlightSongsListView}"
                             SelectedIndex="{Binding SelectedIndex}"
                             SelectedItem="{Binding SelectedSong}"
-                            SelectionChanged="Playlist_SelectionChanged">
+                            SelectionChanged="Queue_SelectionChanged"
+                            AutomationProperties.AutomationId="QueueList">
                             <ListView.InputBindings>
-                                <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
-                                <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
+                                <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromQueueCommand}"/>
+                                <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding RemoveSelectedFromQueueCommand}"/>
                             </ListView.InputBindings>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -604,7 +623,8 @@
                         Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                         materialDesign:HintAssist.Hint="Quick Search"
                         BorderBrush="{StaticResource TertiaryBrush}"
-                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource TertiaryBrush}">
+                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource TertiaryBrush}"
+                        AutomationProperties.AutomationId="QuickSearchText">
                         <TextBox.InputBindings>
                             <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
                         </TextBox.InputBindings>
@@ -615,7 +635,8 @@
                         Command="{Binding QuickSearchCommand}"
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=Search,Size=20}"
-                        ToolTip="Quick Search" />
+                        ToolTip="Quick Search"
+                        AutomationProperties.AutomationId="QuickSearchButton"/>
                     <Button
                         x:Name="AdvancedSearchWindow"
                         Grid.Column="2"
@@ -623,7 +644,8 @@
                         Style="{StaticResource InteractionButton}"
                         Content="{materialDesign:PackIcon Kind=BookOpenOutline}"
                         ToolTip="Advanced Search"
-                        Click="AdvancedSearchWindow_Click" />
+                        Click="AdvancedSearchWindow_Click" 
+                        AutomationProperties.AutomationId="AdvancedSearchButton"/>
 
                 </Grid>
 

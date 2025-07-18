@@ -11,7 +11,7 @@ using SkiaSharp;
 /// </summary>
 public sealed class WindowsMusicPlayer : 
     IMediaController, 
-    IPlaylistReference,
+    IQueueReference,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
     private bool _startSongAutomatically;
@@ -22,7 +22,7 @@ public sealed class WindowsMusicPlayer :
     private AudioModel? _currentSong;
     private WaveStream? _fileReader;
     private WaveOutEvent _waveOutEvent = new();
-    private ObservableCollection<AudioModel> _playlist = new();
+    private ObservableCollection<AudioModel> _queue = new();
     private PlaybackState _playbackState = PlaybackState.Stopped;
 
     private readonly ILogger _logger;
@@ -62,9 +62,9 @@ public sealed class WindowsMusicPlayer :
     }
 
     /// <inheritdoc />
-    public void PassPlaylist(ref ObservableCollection<AudioModel> playlist)
+    public void PassQueue(ref ObservableCollection<AudioModel> queue)
     {
-        _playlist = playlist;
+        _queue = queue;
     }
 
     #region IMediaController
@@ -103,34 +103,34 @@ public sealed class WindowsMusicPlayer :
 
     public async Task NextAsync()
     {
-        if (!_playlist.Any())
+        if (!_queue.Any())
         {
-            _logger.Verbose("Playback is stopped, because the playlist is empty!");
+            _logger.Verbose("Playback is stopped, because the queue is empty!");
             Stop();
             return;
         }
 
-        _currentSongIndex = (_currentSongIndex + 1) % _playlist!.Count;
+        _currentSongIndex = (_currentSongIndex + 1) % _queue!.Count;
 
         await LoadCurrentSong();
 
         _logger.Debug("Jumping to the next song at index {Current} with the maximum possible index of {Maximum}...",
-            _currentSongIndex, _playlist.Count - 1);
+            _currentSongIndex, _queue.Count - 1);
     }
 
     public async Task PreviousAsync()
     {
-        if (!_playlist.Any())
+        if (!_queue.Any())
         {
             return;
         }
 
-        _currentSongIndex = (_currentSongIndex - 1 + _playlist!.Count) % _playlist.Count;
+        _currentSongIndex = (_currentSongIndex - 1 + _queue!.Count) % _queue.Count;
 
         await LoadCurrentSong();
 
         _logger.Debug("Jumping to the previous song at index {Current} with the maximum possible index of {Maximum}...",
-            _currentSongIndex, _playlist.Count - 1);
+            _currentSongIndex, _queue.Count - 1);
     }
 
     public async Task JumpToIndexAsync(int index)
@@ -141,21 +141,21 @@ public sealed class WindowsMusicPlayer :
 
     public async Task Shuffle()
     {
-        if (!_playlist.Any())
+        if (!_queue.Any())
         {
             return;
         }
 
-        _logger.Information("Shuffling playlist...");
+        _logger.Information("Shuffling queue...");
 
-        _playlist.Shuffle();
+        _queue.Shuffle();
 
-        var index = _playlist.IndexOf(_currentSong);
+        var index = _queue.IndexOf(_currentSong);
         _currentSongIndex = 0;
 
         if (index > -1)
         {
-            (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
+            (_queue[index], _queue[0]) = (_queue[0], _queue[index]);
         }
         else
         {
@@ -167,13 +167,13 @@ public sealed class WindowsMusicPlayer :
     #region Helpers
     private async Task LoadCurrentSong()
     {
-        _currentSong = _playlist[_currentSongIndex];
+        _currentSong = _queue[_currentSongIndex];
         _logger.Information("Loading audio: {Song}", _currentSong);
 
         if (!File.Exists(_currentSong.Path))
         {
             _logger.Debug("Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
-            _playlist.Remove(_currentSong);
+            _queue.Remove(_currentSong);
             await NextAsync();
             return;
         }
@@ -263,7 +263,7 @@ public sealed class WindowsMusicPlayer :
 
     private async Task StartPlayback()
     {
-        if (!_playlist.Any())
+        if (!_queue.Any())
         {
             return;
         }

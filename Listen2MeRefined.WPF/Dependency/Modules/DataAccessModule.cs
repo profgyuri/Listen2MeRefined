@@ -41,5 +41,9 @@ public class DataAccessModule : Module
         builder
             .RegisterType<MusicFolderRepository>()
             .As<IRepository<MusicFolderModel>>();
+        
+        builder
+            .RegisterType<PlaylistRepository>()
+            .As<IRepository<PlaylistModel>>();
     }
 }

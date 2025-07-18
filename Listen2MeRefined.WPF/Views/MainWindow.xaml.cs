@@ -181,7 +181,7 @@ public sealed partial class MainWindow : Window
     }
     #endregion
 
-    private void Playlist_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    private void Queue_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
         if (sender is ListView listView && listView.SelectedItem != null)
         {
@@ -192,12 +192,12 @@ public sealed partial class MainWindow : Window
 
         foreach (var audio in e.AddedItems)
         {
-            vm.ListsViewModel.AddSelectedPlaylistItems((AudioModel)audio);
+            vm.ListsViewModel.AddSelectedQueueItems((AudioModel)audio);
         }
 
         foreach (var audio in e.RemovedItems)
         {
-            vm.ListsViewModel.RemoveSelectedPlaylistItems((AudioModel)audio);
+            vm.ListsViewModel.RemoveSelectedQueueItems((AudioModel)audio);
         }
     }
 
@@ -216,7 +216,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void Playlist_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void Queue_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left)
         {
@@ -225,7 +225,7 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void Playlist_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void Queue_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Right)
         {

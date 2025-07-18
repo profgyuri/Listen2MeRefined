@@ -24,26 +24,26 @@ public partial class ListsViewModel :
 
     private int _currentSongIndex = -1;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
-    private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
+    private readonly HashSet<AudioModel> _selectedQueueItems = new();
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
-    [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
+    [ObservableProperty] private ObservableCollection<AudioModel> _queue = new();
     [ObservableProperty] private bool _isSearchResultsTabVisible = true;
     [ObservableProperty] private bool _isSongMenuTabVisible;
 
     public ListsViewModel(
         ILogger logger,
-        IPlaylistReference playlistReference,
+        IQueueReference queueReference,
         IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
         IFileScanner fileScanner,
         IMediaController mediaController)
     {
         _logger = logger;
 
-        playlistReference.PassPlaylist(ref _playList);
+        queueReference.PassQueue(ref _queue);
         _advancedAudioReader = advancedAudioReader;
         _fileScanner = fileScanner;
         _mediaController = mediaController;
@@ -59,7 +59,7 @@ public partial class ListsViewModel :
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         SelectedSong = notification.Audio;
-        _currentSongIndex = PlayList.IndexOf(SelectedSong);
+        _currentSongIndex = Queue.IndexOf(SelectedSong);
         await Task.CompletedTask;
     }
 
@@ -91,17 +91,17 @@ public partial class ListsViewModel :
     }
 
     [RelayCommand]
-    private void SendSelectedToPlaylist()
+    private void SendSelectedToQueue()
     {
         if (!_selectedSearchResults.Any())
         {
-            _logger.Verbose("Sending all {Count} search results to the playlist", _selectedSearchResults.Count);
-            SendAllToPlaylist();
+            _logger.Verbose("Sending all {Count} search results to the Queue", _selectedSearchResults.Count);
+            SendAllToQueue();
             return;
         }
 
-        _logger.Verbose("Sending {Count} selected search results to the playlist", _selectedSearchResults.Count);
-        PlayList.AddRange(_selectedSearchResults);
+        _logger.Verbose("Sending {Count} selected search results to the Queue", _selectedSearchResults.Count);
+        Queue.AddRange(_selectedSearchResults);
 
         while (_selectedSearchResults.Count > 0)
         {
@@ -111,56 +111,56 @@ public partial class ListsViewModel :
         }
     }
 
-    private void SendAllToPlaylist()
+    private void SendAllToQueue()
     {
-        PlayList.AddRange(SearchResults);
+        Queue.AddRange(SearchResults);
         SearchResults.Clear();
         _selectedSearchResults.Clear();
     }
 
     [RelayCommand]
-    private void RemoveSelectedFromPlaylist()
+    private void RemoveSelectedFromQueue()
     {
-        if (_selectedSearchResults.Count == 0)
+        if (_selectedQueueItems.Count == 0)
         {
-            _logger.Verbose($"Removing all item from playlist");
-            ClearPlaylist();
+            _logger.Verbose($"Removing all item from queue");
+            ClearQueue();
             return;
         }
 
-        _logger.Verbose($"Removing selected items from playlist");
-        while (_selectedPlaylistItems.Count > 0)
+        _logger.Verbose($"Removing selected items from queue");
+        while (_selectedQueueItems.Count > 0)
         {
-            var toRemove = _selectedPlaylistItems.First();
-            PlayList.Remove(toRemove);
-            _selectedPlaylistItems.Remove(toRemove);
+            var toRemove = _selectedQueueItems.First();
+            Queue.Remove(toRemove);
+            _selectedQueueItems.Remove(toRemove);
         }
     }
 
-    private void ClearPlaylist()
+    private void ClearQueue()
     {
-        PlayList.Clear();
-        _selectedPlaylistItems.Clear();
+        Queue.Clear();
+        _selectedQueueItems.Clear();
     }
 
     [RelayCommand]
     private void SetSelectedSongAsNext()
     {
-        if (SelectedSong is null || PlayList.Count <= 1)
+        if (SelectedSong is null || Queue.Count <= 1)
         {
             return;
         }
 
         _logger.Verbose($"Setting {SelectedSong.Title} as next song");
-        var selectedSongIndex = PlayList.IndexOf(SelectedSong);
+        var selectedSongIndex = Queue.IndexOf(SelectedSong);
         var newIndex = _currentSongIndex + 1;
 
-        if (newIndex >= PlayList.Count)
+        if (newIndex >= Queue.Count)
         {
             newIndex = 0;
         }
 
-        PlayList.Move(selectedSongIndex, newIndex);
+        Queue.Move(selectedSongIndex, newIndex);
     }
 
     [RelayCommand]
@@ -173,8 +173,8 @@ public partial class ListsViewModel :
 
         _logger.Verbose($"Scanning {SelectedSong.Title}");
         var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
-        var index = PlayList.IndexOf(SelectedSong);
-        PlayList[index] = scanned;
+        var index = Queue.IndexOf(SelectedSong);
+        Queue[index] = scanned;
         SelectedSong = scanned;
     }
 
@@ -203,13 +203,13 @@ public partial class ListsViewModel :
         _selectedSearchResults?.Remove(song);
     }
 
-    public void AddSelectedPlaylistItems(AudioModel song)
+    public void AddSelectedQueueItems(AudioModel song)
     {
-        _selectedPlaylistItems.Add(song);
+        _selectedQueueItems.Add(song);
     }
 
-    public void RemoveSelectedPlaylistItems(AudioModel song)
+    public void RemoveSelectedQueueItems(AudioModel song)
     {
-        _selectedPlaylistItems.Remove(song);
+        _selectedQueueItems.Remove(song);
     }
 }
