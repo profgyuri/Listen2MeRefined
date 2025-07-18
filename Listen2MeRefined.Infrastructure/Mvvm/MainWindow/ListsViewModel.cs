@@ -33,6 +33,7 @@ public partial class ListsViewModel :
     [ObservableProperty] private ObservableCollection<AudioModel> _queue = new();
     [ObservableProperty] private bool _isSearchResultsTabVisible = true;
     [ObservableProperty] private bool _isSongMenuTabVisible;
+    [ObservableProperty] private bool _isMultipleQueueItemsSelected;
 
     public ListsViewModel(
         ILogger logger,
@@ -206,10 +207,14 @@ public partial class ListsViewModel :
     public void AddSelectedQueueItems(AudioModel song)
     {
         _selectedQueueItems.Add(song);
+
+        IsMultipleQueueItemsSelected = _selectedQueueItems.Count > 1;
     }
 
     public void RemoveSelectedQueueItems(AudioModel song)
     {
         _selectedQueueItems.Remove(song);
+
+        IsMultipleQueueItemsSelected = _selectedQueueItems.Count > 1;
     }
 }

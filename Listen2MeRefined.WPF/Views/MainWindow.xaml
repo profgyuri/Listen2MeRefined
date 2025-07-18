@@ -368,6 +368,7 @@
                             <Button
                                 Grid.ColumnSpan="2"
                                 Command="{Binding JumpToSelecteSongCommand}"
+                                IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"
                                 Width="380"
                                 Content="Play This Song"
                                 AutomationProperties.AutomationId="PlayThisButton"/>
@@ -376,6 +377,7 @@
                                 Grid.Row="1"
                                 Width="380"
                                 Command="{Binding SetSelectedSongAsNextCommand}"
+                                IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"
                                 Content="Play After The Current Song"
                                 AutomationProperties.AutomationId="PlayNextButton"/>
                             <Separator
@@ -425,7 +427,8 @@
                                     Content="Artist:"/>
                                 <TextBox
                                     Grid.Column="1"
-                                    Text="{Binding SelectedSong.Artist}"/>
+                                    Text="{Binding SelectedSong.Artist}"
+                                    IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"/>
                                 <Label
                                     Grid.Column="0"
                                     Grid.Row="1"
@@ -433,7 +436,8 @@
                                 <TextBox
                                     Grid.Column="1"
                                     Grid.Row="1"
-                                    Text="{Binding SelectedSong.Title}"/>
+                                    Text="{Binding SelectedSong.Title}"
+                                    IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"/>
                                 <Label
                                     Grid.Column="0"
                                     Grid.Row="2"
@@ -441,7 +445,8 @@
                                 <TextBox
                                     Grid.Column="1"
                                     Grid.Row="2"
-                                    Text="{Binding SelectedSong.Genre}"/>
+                                    Text="{Binding SelectedSong.Genre}"
+                                    IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"/>
                                 <Label
                                     Grid.Column="0"
                                     Grid.Row="3"
@@ -450,7 +455,8 @@
                                     Grid.Column="1"
                                     Grid.Row="3"
                                     Margin="0 5"
-                                    Content="{Binding SelectedSong.Bitrate}"/>
+                                    Content="{Binding SelectedSong.Bitrate}"
+                                    IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"/>
                                 <Label
                                     Grid.Column="0"
                                     Grid.Row="4"
@@ -459,12 +465,14 @@
                                     Grid.Column="1"
                                     Grid.Row="4"
                                     Margin="0 5"
-                                    Content="{Binding SelectedSong.BPM}"/>
+                                    Content="{Binding SelectedSong.BPM}"
+                                    IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"/>
                                 <Button
                                     Grid.Row="6"
                                     Grid.ColumnSpan="2"
                                     Width="380"
                                     Command="{Binding ScanSelectedSongCommand}"
+                                    IsEnabled="{Binding IsMultipleQueueItemsSelected, Converter={StaticResource InvertBooleanConverter}}"
                                     Content="Scan This Song"
                                     AutomationProperties.AutomationId="ScanThisButton"/>
                             </Grid>
