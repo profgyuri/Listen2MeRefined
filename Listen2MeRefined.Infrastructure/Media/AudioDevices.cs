@@ -6,19 +6,24 @@ internal static class AudioDevices
 {
     internal static IEnumerable<AudioOutputDevice> GetOutputDevices()
     {
-        var list = new List<AudioOutputDevice>();
         var deviceEnumerator = new MMDeviceEnumerator();
-        var devices = deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+        var devices = deviceEnumerator
+            .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
+            .Select(x => x.FriendlyName)
+            .ToList();
+        var def = deviceEnumerator
+            .GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
+            .FriendlyName;
 
-        list.Add(new AudioOutputDevice(-1, "Windows Default"));
+        yield return new AudioOutputDevice(-1, "Windows Default");
 
-        for (var i = 0; i < WaveOut.DeviceCount; i++)
+        devices.Remove(def);
+        devices.Insert(0, def);
+
+        for (var i = 0; i < devices.Count; i++)
         {
-            var caps = WaveOut.GetCapabilities(i);
-            var name = devices.First(x => x.FriendlyName.StartsWith(caps.ProductName)).FriendlyName;
-            list.Add(new AudioOutputDevice(i, name));
+            var device = devices[i];
+           yield return new AudioOutputDevice(i, device);
         }
-
-        return list;
     }
 }
