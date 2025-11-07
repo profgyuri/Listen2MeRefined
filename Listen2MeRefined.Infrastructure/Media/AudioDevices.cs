@@ -1,6 +1,6 @@
 namespace Listen2MeRefined.Infrastructure.Media;
+
 using NAudio.CoreAudioApi;
-using NAudio.Wave;
 
 internal static class AudioDevices
 {
@@ -23,7 +23,7 @@ internal static class AudioDevices
         for (var i = 0; i < devices.Count; i++)
         {
             var device = devices[i];
-           yield return new AudioOutputDevice(i, device);
+            yield return new AudioOutputDevice(i, device);
         }
     }
 }
