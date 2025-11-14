@@ -297,6 +297,12 @@ public sealed class WindowsMusicPlayer :
         AudioOutputDeviceChangedNotification notification,
         CancellationToken cancellationToken)
     {
+        // Avoid changing to the same device
+        if (notification.Device.Index == _outputDeviceIndex)
+        {
+            return;
+        }
+
         _logger.Information("Changing audio output device to {DeviceName}", notification.Device.Name);
         _outputDeviceIndex = notification.Device.Index;
 

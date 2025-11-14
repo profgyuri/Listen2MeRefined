@@ -8,6 +8,7 @@ public sealed class AppSettings : Settings
 
     public string FontFamily { get; set; } = "";
     public string NewSongWindowPosition { get; set; } = "";
+    public string AudioOutputDeviceName { get; set; } = "";
     public List<MusicFolderModel> MusicFolders { get; set; } = new();
     public bool ScanOnStartup { get; set; } = true;
 }

@@ -7,6 +7,7 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
+    private SettingsWindowViewModel _settingsWindowViewModel;
     [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
     [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
     [ObservableProperty] private ListsViewModel _listsViewModel;
@@ -26,12 +27,13 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager)
+        StartupManager startupManager,
+        SettingsWindowViewModel settingsWindowViewModel)
     {
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
         _listsViewModel = listsViewModel;
-
+        Task.Run(() => _settingsWindowViewModel = settingsWindowViewModel);
         Task.Run(async () => IsUpdateExclamationMarkVisible = !await versionChecker.IsLatestAsync());
         Task.Run(startupManager.StartAsync);
     }

@@ -124,6 +124,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         OnPropertyChanged(nameof(SelectedAudioOutputDevice));
+        _settingsManager.SaveSettings(x => x.AudioOutputDeviceName = value.Name);
         _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
 
@@ -240,10 +241,10 @@ public sealed partial class SettingsWindowViewModel :
     {
         var devices = await Task.Run(() =>
         {
-            var result = new List<AudioOutputDevice>();
+            var result = Enumerable.Empty<AudioOutputDevice>();
             try
             {
-                result = AudioDevices.GetOutputDevices().ToList();
+                result = AudioDevices.GetOutputDevices();
             }
             catch (Exception ex)
             {
@@ -261,6 +262,18 @@ public sealed partial class SettingsWindowViewModel :
             AudioOutputDevices.Add(device);
         }
         
-        SelectedAudioOutputDevice = AudioOutputDevices[0];
+        var selectedIndex = 0; // The first element is "Windows Default"
+        var savedName = _settingsManager.Settings.AudioOutputDeviceName;
+        if (!string.IsNullOrEmpty(savedName))
+        {
+            var audioOutputDevice = AudioOutputDevices
+                .FirstOrDefault(x => x.Name.Equals(savedName, StringComparison.OrdinalIgnoreCase));
+            if (audioOutputDevice is not null)
+            {
+                selectedIndex = AudioOutputDevices.IndexOf(audioOutputDevice);
+            }
+        }
+
+        SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
 }
