@@ -1,12 +1,13 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Storage;
-using Microsoft.EntityFrameworkCore;
-using MediatR;
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Storage;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 public class StartupManager : IDisposable
 {
