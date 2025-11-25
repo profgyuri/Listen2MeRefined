@@ -33,7 +33,7 @@ public sealed partial class MainWindowViewModel :
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
         _listsViewModel = listsViewModel;
-        Task.Run(() => _settingsWindowViewModel = settingsWindowViewModel);
+        _ = Task.Run(() => _settingsWindowViewModel = settingsWindowViewModel).Result;
         Task.Run(async () => IsUpdateExclamationMarkVisible = !await versionChecker.IsLatestAsync());
         Task.Run(startupManager.StartAsync);
     }
