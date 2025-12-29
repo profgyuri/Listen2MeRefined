@@ -11,6 +11,16 @@ public sealed partial class SettingsWindow : Window
         InitializeComponent();
 
         DataContext = viewModel;
+
+        Loaded += SettingsWindow_Loaded;
+    }
+
+    private async void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is SettingsWindowViewModel viewModel)
+        {
+            await viewModel.InitializeAsync().ConfigureAwait(false);
+        }
     }
 
     private void OpenFolderBrowser_Click(

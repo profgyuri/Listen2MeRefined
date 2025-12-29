@@ -1,13 +1,16 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using System.Diagnostics;
 
 public sealed partial class MainWindowViewModel : 
     ObservableObject,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
-    private SettingsWindowViewModel _settingsWindowViewModel;
+    private readonly IVersionChecker _versionChecker;
+    private readonly StartupManager _startupManager;
+    
     [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
     [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
     [ObservableProperty] private ListsViewModel _listsViewModel;
@@ -27,15 +30,36 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager,
-        SettingsWindowViewModel settingsWindowViewModel)
+        StartupManager startupManager)
     {
+        _versionChecker = versionChecker ?? throw new ArgumentNullException(nameof(versionChecker));
+        _startupManager = startupManager ?? throw new ArgumentNullException(nameof(startupManager));
+
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
         _listsViewModel = listsViewModel;
-        _ = Task.Run(() => _settingsWindowViewModel = settingsWindowViewModel).Result;
-        Task.Run(async () => IsUpdateExclamationMarkVisible = !await versionChecker.IsLatestAsync());
-        Task.Run(startupManager.StartAsync);
+    }
+
+    public async Task InitializeAsync()
+    {
+        try
+        {
+            var isLatest = await _versionChecker.IsLatestAsync().ConfigureAwait(true);
+            IsUpdateExclamationMarkVisible = !isLatest;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Version check failed: {ex}");
+        }
+
+        try
+        {
+            await _startupManager.StartAsync().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"StartupManager.StartAsync failed: {ex}");
+        }
     }
 
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)

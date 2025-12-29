@@ -9,7 +9,7 @@ public class ViewsModule : Module
         builder.RegisterType<MainWindow>().SingleInstance();
         builder.RegisterType<FolderBrowserWindow>().InstancePerLifetimeScope();
         builder.RegisterType<AdvancedSearchWindow>().InstancePerLifetimeScope();
-        builder.RegisterType<SettingsWindow>().InstancePerLifetimeScope();
+        builder.RegisterType<SettingsWindow>().SingleInstance();
         builder.RegisterType<NewSongWindow>().SingleInstance();
     }
 }

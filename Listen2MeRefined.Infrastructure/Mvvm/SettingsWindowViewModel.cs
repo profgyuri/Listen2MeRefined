@@ -52,16 +52,16 @@ public sealed partial class SettingsWindowViewModel :
     public bool DontScanOnStartup => !ScanOnStartup;
 
     public SettingsWindowViewModel(
-        ILogger logger,
-        ISettingsManager<AppSettings> settingsManager,
-        IRepository<AudioModel> audioRepository,
-        IMediator mediator,
-        FontFamilies installedFontFamilies,
-        IRepository<MusicFolderModel> musicFolderRepository,
-        IRepository<PlaylistModel> playlistRepository,
-        IFolderScanner folderScanner,
-        IVersionChecker versionChecker,
-        IFromFolderRemover fromFolderRemover)
+     ILogger logger,
+     ISettingsManager<AppSettings> settingsManager,
+     IRepository<AudioModel> audioRepository,
+     IMediator mediator,
+     FontFamilies installedFontFamilies,
+     IRepository<MusicFolderModel> musicFolderRepository,
+     IRepository<PlaylistModel> playlistRepository,
+     IFolderScanner folderScanner,
+     IVersionChecker versionChecker,
+     IFromFolderRemover fromFolderRemover)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -73,38 +73,36 @@ public sealed partial class SettingsWindowViewModel :
         _folderScanner = folderScanner;
         _versionChecker = versionChecker;
         _fromFolderRemover = fromFolderRemover;
-
-        Initialize().ConfigureAwait(false);
     }
 
-    private async Task Initialize()
+    public async Task InitializeAsync()
     {
-        await Task.Run(async () =>
-        {
-            FontFamilies = new(_installedFontFamilies.FontFamilyNames);
+        FontFamilies = new(_installedFontFamilies.FontFamilyNames);
 
-            var settings = _settingsManager.Settings;
-            Folders = new(settings.MusicFolders.Select(x => x.FullPath));
-            FontFamily = settings.FontFamily;
-            SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
-            NewSongWindowPositions = new()
-            {
-                "Default",
-                "Always on top",
-                //todo: "Off"
-            };
-            SelectedNewSongWindowPosition = settings.NewSongWindowPosition;
-            if (await _versionChecker.IsLatestAsync())
-            {
-                UpdateAvailableText = "You are using the latest version!";
-                IsUpdateButtonVisible = false;
-            }
-            else
-            {
-                UpdateAvailableText = "Newer version is available!";
-                IsUpdateButtonVisible = true;
-            }
-        });
+        var settings = _settingsManager.Settings;
+        Folders = new(settings.MusicFolders.Select(x => x.FullPath));
+        FontFamily = settings.FontFamily;
+        SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily)
+            ? "Segoe UI"
+            : settings.FontFamily;
+
+        NewSongWindowPositions = new()
+        {
+            "Default",
+            "Always on top",
+        };
+        SelectedNewSongWindowPosition = settings.NewSongWindowPosition;
+
+        if (await _versionChecker.IsLatestAsync())
+        {
+            UpdateAvailableText = "You are using the latest version!";
+            IsUpdateButtonVisible = false;
+        }
+        else
+        {
+            UpdateAvailableText = "Newer version is available!";
+            IsUpdateButtonVisible = true;
+        }
 
         await GetAudioOutputDevices();
     }

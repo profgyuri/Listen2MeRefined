@@ -2,6 +2,7 @@
 
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
@@ -35,17 +36,20 @@ public class StartupManager : IDisposable
     public async Task StartAsync()
     {
         // Initialize hooks last and don't block startup
-        await Task.Run(async () =>
-        {
-            await _dataContext.Database.MigrateAsync();
-            await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily));
+        await _dataContext.Database.MigrateAsync();
+        await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily));
 
-            if (_settingsManager.Settings.ScanOnStartup)
-            {
-                await _folderScanner.ScanAllAsync();
-            }
-        });
-    
+        if (_settingsManager.Settings.ScanOnStartup)
+        {
+            await _folderScanner.ScanAllAsync();
+        }
+
+        var allDevices = AudioDevices.GetOutputDevices();
+        var outputDevice =
+            allDevices.FirstOrDefault(x => x.Name == _settingsManager.Settings.AudioOutputDeviceName) ??
+            allDevices.FirstOrDefault()!;
+        await _mediator.Publish(new AudioOutputDeviceChangedNotification(outputDevice));
+
         // Initialize hooks after everything else is ready
         await _globalHook.RegisterAsync();
     }

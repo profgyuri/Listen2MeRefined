@@ -26,6 +26,16 @@ public sealed partial class MainWindow : Window
 
         DataContext = viewModel;
         _globalHook = globalHook;
+
+        Loaded += MainWindow_Loaded;
+    }
+
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+        {
+            await vm.InitializeAsync();
+        }
     }
 
     private void CloseWindow_Click(
