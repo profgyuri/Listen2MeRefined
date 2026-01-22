@@ -26,16 +26,6 @@ public sealed partial class MainWindow : Window
 
         DataContext = viewModel;
         _globalHook = globalHook;
-
-        Loaded += MainWindow_Loaded;
-    }
-
-    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is MainWindowViewModel vm)
-        {
-            await vm.InitializeAsync();
-        }
     }
 
     private void CloseWindow_Click(
@@ -63,19 +53,19 @@ public sealed partial class MainWindow : Window
         WindowState = WindowState.Minimized;
     }
 
-    private void SettingsWindow_Click(
+    private async void SettingsWindow_Click(
         object sender,
         RoutedEventArgs e)
     {
         UpdateNotification.Visibility = Visibility.Collapsed;
-        WindowManager.ShowWindow<SettingsWindow>(Left + Width / 2, Top + Height / 2);
+        await WindowManager.ShowWindowAsync<SettingsWindow>(Left + Width / 2, Top + Height / 2);
     }
 
-    private void AdvancedSearchWindow_Click(
+    private async void AdvancedSearchWindow_Click(
         object sender,
         RoutedEventArgs e)
     {
-        WindowManager.ShowWindow<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
+        await WindowManager.ShowWindowAsync<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
         var vm = (MainWindowViewModel)DataContext;
         vm.ListsViewModel.SwitchToSearchResultsTab();
     }

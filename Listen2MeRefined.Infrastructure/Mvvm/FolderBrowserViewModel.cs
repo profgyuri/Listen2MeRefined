@@ -6,7 +6,7 @@ using Listen2MeRefined.Infrastructure.SystemOperations;
 using MediatR;
 
 public sealed partial class FolderBrowserViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
@@ -29,18 +29,16 @@ public sealed partial class FolderBrowserViewModel :
         _folderBrowser = folderBrowser;
         _mediator = mediator;
         _settingsManager = settingsManager;
-        
-        Initialize().ConfigureAwait(false);
     }
 
-    private async Task Initialize()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         await Task.Run(() =>
         {
             FontFamily = _settingsManager.Settings.FontFamily;
 
             ChangeDirectory();
-        });
+        }, ct);
     }
 
     [RelayCommand]

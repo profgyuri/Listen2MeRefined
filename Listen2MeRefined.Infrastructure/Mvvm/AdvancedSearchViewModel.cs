@@ -7,7 +7,7 @@ using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
 
 public partial class AdvancedSearchViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly IMediator _mediator;
@@ -67,11 +67,9 @@ public partial class AdvancedSearchViewModel :
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
-        
-        Initialize().ConfigureAwait(false);
     }
 
-    public async Task Initialize()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         await Task.Run(() =>
         {
@@ -81,7 +79,7 @@ public partial class AdvancedSearchViewModel :
             Relation = _stringRelations;
             SelectedColumnName = ColumnName.First();
             SelectedRelation = Relation.First();
-        });
+        }, ct);
     }
 
     [RelayCommand]

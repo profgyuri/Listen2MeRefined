@@ -7,7 +7,7 @@ using MediatR;
 using SkiaSharp;
 
 public partial class PlayerControlsViewModel :
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<CurrentSongNotification>
 {
     private readonly ILogger _logger;
@@ -40,22 +40,21 @@ public partial class PlayerControlsViewModel :
         _waveFormDrawer = waveFormDrawer;
         _mediaController = mediaController;
         _timedTask = timedTask;
+    }
+
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
+    {
         _timedTask.Start(
             TimeSpan.FromMilliseconds(100),
             () => OnPropertyChanged(nameof(CurrentTime)));
 
-        AsyncInit().ConfigureAwait(false);
-    }
-
-    private async Task AsyncInit()
-    {
-       await Task.Run(async () =>
+        await Task.Run(async () =>
         {
             WaveFormWidth = 480;
             WaveFormHeight = 70;
             _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
             await DrawPlaceholderLineAsync();
-        });
+        }, ct);
     }
 
     private async Task DrawPlaceholderLineAsync()

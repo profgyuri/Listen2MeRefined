@@ -15,17 +15,26 @@ public sealed partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Subscribe as early as possible
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
         base.OnStartup(e);
 
         SqlMapper.AddTypeHandler(new TimeSpanTypeHandler());
         RenderOptions.ProcessRenderMode = RenderMode.Default;
 
-        // Set ShutdownMode to OnMainWindowClose
         ShutdownMode = ShutdownMode.OnMainWindowClose;
-        WindowManager.ShowWindow<MainWindow>(false);
 
-        // Subscribe to the UnhandledException event
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        try
+        {
+            WindowManager.ShowMainWindow<MainWindow>();
+        }
+        catch (Exception ex)
+        {
+            // log / show message, then shut down cleanly
+            MessageBox.Show(ex.ToString(), "Startup failed");
+            Shutdown(-1);
+        }
     }
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -11,13 +11,14 @@ using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Media;
 
 public partial class ListsViewModel :
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
     INotificationHandler<QuickSearchResultsNotification>
 {
     private readonly ILogger _logger;
+    private readonly IPlaylistReference _playlistReference;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly IFileScanner _fileScanner;
     private readonly IMediaController _mediaController;
@@ -42,11 +43,15 @@ public partial class ListsViewModel :
         IMediaController mediaController)
     {
         _logger = logger;
-
-        playlistReference.PassPlaylist(ref _playList);
+        _playlistReference = playlistReference;
         _advancedAudioReader = advancedAudioReader;
         _fileScanner = fileScanner;
         _mediaController = mediaController;
+    }
+
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
+    {
+        _playlistReference.PassPlaylist(ref _playList);
     }
 
     #region Notifcation Handlers

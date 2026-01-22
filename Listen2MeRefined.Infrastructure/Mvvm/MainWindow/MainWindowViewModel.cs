@@ -4,7 +4,7 @@ using MediatR;
 using System.Diagnostics;
 
 public sealed partial class MainWindowViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
@@ -40,11 +40,11 @@ public sealed partial class MainWindowViewModel :
         _listsViewModel = listsViewModel;
     }
 
-    public async Task InitializeAsync()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         try
         {
-            var isLatest = await _versionChecker.IsLatestAsync().ConfigureAwait(true);
+            var isLatest = await _versionChecker.IsLatestAsync();
             IsUpdateExclamationMarkVisible = !isLatest;
         }
         catch (Exception ex)
@@ -54,7 +54,7 @@ public sealed partial class MainWindowViewModel :
 
         try
         {
-            await _startupManager.StartAsync().ConfigureAwait(false);
+            await _startupManager.StartAsync();
         }
         catch (Exception ex)
         {

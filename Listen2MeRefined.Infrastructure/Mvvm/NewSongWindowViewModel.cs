@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 public sealed partial class NewSongWindowViewModel :
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<NewSongWindowPositionChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
@@ -27,7 +27,13 @@ public sealed partial class NewSongWindowViewModel :
     public NewSongWindowViewModel(ISettingsManager<AppSettings> settingsManager)
     {
         _settingsManager = settingsManager;
+    }
+
+    protected override Task InitializeCoreAsync(CancellationToken ct)
+    {
         IsTopmost = _settingsManager.Settings.NewSongWindowPosition == "Always on top";
+
+        return base.InitializeCoreAsync(ct);
     }
 
     public Task Handle(NewSongWindowPositionChangedNotification notification, CancellationToken cancellationToken)

@@ -5,7 +5,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 
 public partial class SearchbarViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;

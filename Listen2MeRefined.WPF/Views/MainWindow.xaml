@@ -10,6 +10,7 @@
         xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
         xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
         xmlns:local="clr-namespace:Listen2MeRefined.WPF.Resources"
+        xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -172,6 +173,7 @@
 
                     <Border
                         DataContext="{Binding PlayerControlsViewModel}"
+                        utils:ViewModelInitialization.AutoInitialize="True"
                         Grid.Column="1"
                         Style="{StaticResource ContainerBorder}">
                         <Grid>
@@ -471,6 +473,7 @@
                 <!-- Playlist -->
                 <Border
                     DataContext="{Binding ListsViewModel}"
+                    utils:ViewModelInitialization.AutoInitialize="True"
                     Margin="10 20 0 14"
                     Grid.Row="1"
                     Grid.Column="1"
@@ -591,6 +594,7 @@
                 <!-- Searchbar -->
                 <Grid
                     DataContext="{Binding SearchbarViewModel}"
+                    utils:ViewModelInitialization.AutoInitialize="True"
                     Grid.Row="2"
                     Grid.ColumnSpan="2"
                     Margin="0 10 0 0">

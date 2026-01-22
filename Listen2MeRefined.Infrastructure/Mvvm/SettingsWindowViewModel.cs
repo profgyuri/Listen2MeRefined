@@ -7,7 +7,7 @@ using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
 
 public sealed partial class SettingsWindowViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
@@ -75,7 +75,7 @@ public sealed partial class SettingsWindowViewModel :
         _fromFolderRemover = fromFolderRemover;
     }
 
-    public async Task InitializeAsync()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         FontFamilies = new(_installedFontFamilies.FontFamilyNames);
 

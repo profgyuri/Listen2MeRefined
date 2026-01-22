@@ -1,8 +1,11 @@
 ﻿namespace Listen2MeRefined.WPF;
-using System.Windows;
 using Autofac;
-using Listen2MeRefined.WPF.Views;
 using Listen2MeRefined.WPF.Dependency;
+using Listen2MeRefined.WPF.Views;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 
 internal static class WindowManager
 {
@@ -12,24 +15,45 @@ internal static class WindowManager
     ///     Shows a window registered in the dependency framework.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="isModal">
-    ///     Set to <see langword="true" /> if the method should return only after closing the window,
-    ///     set to <see langword="false" /> to return immediately.
-    /// </param>
-    internal static bool? ShowWindow<T>(bool isModal = true)
+    internal static void ShowMainWindow<T>()
         where T : Window
     {
-        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
-        var window = scope.Resolve<T>();
+        var scope = IocContainer.GetContainer().BeginLifetimeScope();
 
-        if (isModal)
+        try
         {
-            var result = window.ShowDialog();
-            return result;
-        }
+            var window = scope.Resolve<T>();
 
-        window.Show();
-        return null;
+            Application.Current.MainWindow = window;
+            window.Closed += (_, __) => scope.Dispose();
+
+            if (window.DataContext is IAsyncInitializable init)
+            {
+                async void Handler(object? sender, EventArgs e)
+                {
+                    window.ContentRendered -= Handler;
+
+                    try
+                    {
+                        await init.InitializeAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString(), "Initialization failed");
+                        window.Close();
+                    }
+                }
+
+                window.ContentRendered += Handler;
+            }
+
+            window.Show();
+        }
+        catch
+        {
+            scope.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
@@ -40,17 +64,27 @@ internal static class WindowManager
     /// <param name="top"></param>
     /// <param name="isModal"></param>
     /// <returns></returns>
-    internal static bool? ShowWindow<T>(
-        double left,
-        double top,
-        bool isModal = true)
-        where T : Window
+    internal static async Task<bool?> ShowWindowAsync<T>(
+    double left,
+    double top,
+    bool isModal = true,
+    CancellationToken ct = default)
+    where T : Window
+{
+    var scope = IocContainer.GetContainer().BeginLifetimeScope();
+
+    try
     {
-        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
         var window = scope.Resolve<T>();
 
         window.Left = left - window.Width / 2;
-        window.Top = top - window.Height / 2;
+        window.Top  = top  - window.Height / 2;
+
+        // Ensure scope survives for modeless windows
+        window.Closed += (_, __) => scope.Dispose();
+
+        if (window.DataContext is IAsyncInitializable init)
+            await init.InitializeAsync(ct); // keep on UI thread
 
         if (isModal)
         {
@@ -61,6 +95,12 @@ internal static class WindowManager
         window.Show();
         return null;
     }
+    catch
+    {
+        scope.Dispose();
+        throw;
+    }
+}
 
     /// <summary>
     ///     Shows the New Song Window when the mouse coordinates are in a corner.
