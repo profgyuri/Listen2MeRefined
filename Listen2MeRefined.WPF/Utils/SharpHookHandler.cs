@@ -1,16 +1,15 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Listen2MeRefined.WPF.Utils;
+﻿namespace Listen2MeRefined.WPF.Utils;
 
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.WPF.Views;
 using Serilog;
 using SharpHook;
-using SharpHook.Native;
+using SharpHook.Data;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 internal sealed class SharpHookHandler
     : Listen2MeRefined.Infrastructure.IGlobalHook
