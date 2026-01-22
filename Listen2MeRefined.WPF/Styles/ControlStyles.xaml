@@ -360,6 +360,7 @@
                         <ControlTemplate TargetType="{x:Type ScrollBar}">
                             <Grid x:Name="GridRoot" Background="{TemplateBinding Background}">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
                                 <Track x:Name="PART_Track">
