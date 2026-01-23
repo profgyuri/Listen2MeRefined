@@ -1,20 +1,21 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
-using System.Diagnostics;
 
 public sealed partial class MainWindowViewModel : 
     ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
+    private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
     private readonly IVersionChecker _versionChecker;
     private readonly StartupManager _startupManager;
     
-    [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
-    [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
-    [ObservableProperty] private ListsViewModel _listsViewModel;
+    public SearchbarViewModel SearchbarViewModel { get; }
+    public PlayerControlsViewModel PlayerControlsViewModel { get; }
+    public ListsViewModel ListsViewModel { get; }
+
     [ObservableProperty] private AudioModel _song = new()
     {
         Artist = "Artist",
@@ -22,11 +23,11 @@ public sealed partial class MainWindowViewModel :
         Genre = "Genre",
         Path = ""
     };
-
     [ObservableProperty] private string _fontFamily = "";
-    [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
+    [ObservableProperty] private bool _isUpdateAvailable;
 
     public MainWindowViewModel(
+        ILogger logger,
         IUiDispatcher ui,
         IVersionChecker versionChecker,
         SearchbarViewModel searchbarViewModel,
@@ -34,12 +35,14 @@ public sealed partial class MainWindowViewModel :
         ListsViewModel listsViewModel,
         StartupManager startupManager)
     {
+        _logger = logger;
         _ui = ui;
         _versionChecker = versionChecker;
         _startupManager = startupManager;
-        _searchbarViewModel = searchbarViewModel;
-        _playerControlsViewModel = playerControlsViewModel;
-        _listsViewModel = listsViewModel;
+
+        SearchbarViewModel = searchbarViewModel;
+        PlayerControlsViewModel = playerControlsViewModel;
+        ListsViewModel = listsViewModel;
     }
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
@@ -47,20 +50,26 @@ public sealed partial class MainWindowViewModel :
         try
         {
             var isLatest = await _versionChecker.IsLatestAsync();
-            await _ui.InvokeAsync(() => IsUpdateExclamationMarkVisible = !isLatest, ct);
+            await _ui.InvokeAsync(() => IsUpdateAvailable = !isLatest, ct);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Version check failed: {ex}");
+            _logger.Warning($"Version check failed: {ex}");
+            await _ui.InvokeAsync(() => IsUpdateAvailable = false, ct);
         }
 
         try
         {
             await _startupManager.StartAsync();
         }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            throw; // no fatal log
+        }
         catch (Exception ex)
         {
-            Debug.WriteLine($"StartupManager.StartAsync failed: {ex}");
+            _logger.Fatal(ex, "StartupManager.StartAsync failed");
+            throw;
         }
     }
 

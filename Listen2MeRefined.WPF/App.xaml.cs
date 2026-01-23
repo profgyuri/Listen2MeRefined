@@ -31,8 +31,6 @@ public sealed partial class App : Application
         }
         catch (Exception ex)
         {
-            // log / show message, then shut down cleanly
-            MessageBox.Show(ex.ToString(), "Startup failed");
             Shutdown(-1);
         }
     }

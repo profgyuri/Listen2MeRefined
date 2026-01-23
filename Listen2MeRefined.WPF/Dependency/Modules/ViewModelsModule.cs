@@ -26,17 +26,17 @@ public class ViewModelsModule : Module
             .RegisterType<SearchbarViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
-            .SingleInstance();
+            .InstancePerLifetimeScope();
         builder
             .RegisterType<PlayerControlsViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
-            .SingleInstance();
+            .InstancePerLifetimeScope();
         builder
             .RegisterType<ListsViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
-            .SingleInstance();
+            .InstancePerLifetimeScope();
         builder
             .RegisterType<StartupManager>()
             .AsSelf()
