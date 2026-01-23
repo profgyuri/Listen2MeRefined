@@ -8,6 +8,7 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
+    private readonly IUiDispatcher _ui;
     private readonly IVersionChecker _versionChecker;
     private readonly StartupManager _startupManager;
     
@@ -26,15 +27,16 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
 
     public MainWindowViewModel(
+        IUiDispatcher ui,
         IVersionChecker versionChecker,
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
         StartupManager startupManager)
     {
-        _versionChecker = versionChecker ?? throw new ArgumentNullException(nameof(versionChecker));
-        _startupManager = startupManager ?? throw new ArgumentNullException(nameof(startupManager));
-
+        _ui = ui;
+        _versionChecker = versionChecker;
+        _startupManager = startupManager;
         _searchbarViewModel = searchbarViewModel;
         _playerControlsViewModel = playerControlsViewModel;
         _listsViewModel = listsViewModel;
@@ -45,7 +47,7 @@ public sealed partial class MainWindowViewModel :
         try
         {
             var isLatest = await _versionChecker.IsLatestAsync();
-            IsUpdateExclamationMarkVisible = !isLatest;
+            await _ui.InvokeAsync(() => IsUpdateExclamationMarkVisible = !isLatest, ct);
         }
         catch (Exception ex)
         {
@@ -62,20 +64,17 @@ public sealed partial class MainWindowViewModel :
         }
     }
 
-    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    Task INotificationHandler<CurrentSongNotification>.Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        Song = notification.Audio;
-        return Task.CompletedTask;
+        return _ui.InvokeAsync(() => Song = notification.Audio, cancellationToken);
     }
 
-    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
     /// <inheritdoc />
     Task INotificationHandler<FontFamilyChangedNotification>.Handle(
         FontFamilyChangedNotification notification,
         CancellationToken cancellationToken)
     {
-        FontFamily = notification.FontFamily;
-        return Task.CompletedTask;
+        return _ui.InvokeAsync(() => FontFamily = notification.FontFamily, cancellationToken);
     }
-    #endregion
 }

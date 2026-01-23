@@ -3,6 +3,8 @@ using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.Versioning;
+using Listen2MeRefined.WPF.Utils;
+using System.Windows;
 
 public class UtilsModule : Module
 {
@@ -15,5 +17,10 @@ public class UtilsModule : Module
         builder
             .RegisterType<VersionChecker>()
             .As<IVersionChecker>();
+
+        builder.Register(ctx =>
+            new WpfUiDispatcher(Application.Current.Dispatcher))
+               .As<IUiDispatcher>()
+               .SingleInstance();
     }
 }
