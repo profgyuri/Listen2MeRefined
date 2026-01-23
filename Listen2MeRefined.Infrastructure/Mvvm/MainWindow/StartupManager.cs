@@ -33,25 +33,28 @@ public class StartupManager : IDisposable
         _mediator = mediator;
     }
 
-    public async Task StartAsync()
+    public async Task StartAsync(CancellationToken ct)
     {
         // Initialize hooks last and don't block startup
-        await _dataContext.Database.MigrateAsync();
-        await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily));
+        await _dataContext.Database.MigrateAsync(cancellationToken: ct);
+        await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily), ct);
 
         if (_settingsManager.Settings.ScanOnStartup)
         {
-            await _folderScanner.ScanAllAsync();
+            await _folderScanner.ScanAllAsync(ct);
         }
 
         var allDevices = AudioDevices.GetOutputDevices();
         var outputDevice =
             allDevices.FirstOrDefault(x => x.Name == _settingsManager.Settings.AudioOutputDeviceName) ??
             allDevices.FirstOrDefault()!;
-        await _mediator.Publish(new AudioOutputDeviceChangedNotification(outputDevice));
+        await _mediator.Publish(new AudioOutputDeviceChangedNotification(outputDevice), ct);
 
         // Initialize hooks after everything else is ready
-        await _globalHook.RegisterAsync();
+        if (!ct.IsCancellationRequested)
+        {
+            await _globalHook.RegisterAsync();
+        }
     }
 
     protected virtual void Dispose(bool disposing)

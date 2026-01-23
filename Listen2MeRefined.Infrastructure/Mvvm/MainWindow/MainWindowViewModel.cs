@@ -60,7 +60,7 @@ public sealed partial class MainWindowViewModel :
 
         try
         {
-            await _startupManager.StartAsync();
+            await _startupManager.StartAsync(ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {

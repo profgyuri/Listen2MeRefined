@@ -27,7 +27,7 @@ public sealed class FolderScannerService : IFolderScanner
     
     #region Implementation of IFolderScanner
     /// <inheritdoc />
-    public async Task ScanAsync(string path)
+    public async Task ScanAsync(string path, CancellationToken ct)
     {
         _logger.Information("Scanning folder for audio files: {Path}", path);
         var files = await _fileEnumerator.EnumerateFilesAsync(path);
@@ -41,6 +41,12 @@ public sealed class FolderScannerService : IFolderScanner
 
         for (var i = 0; i < fromDb.Count; i++)
         {
+            if (ct.IsCancellationRequested)
+            {
+                _logger.Information("Scanning folder cancelled: {Path}", path);
+                return;
+            }
+
             var current = fromDb[i];
 
             if (!newSupportedFiles.Contains(current.Path!))
@@ -65,21 +71,26 @@ public sealed class FolderScannerService : IFolderScanner
     }
 
     /// <inheritdoc />
-    public async Task ScanAsync(IEnumerable<string> paths)
+    public async Task ScanAsync(IEnumerable<string> paths, CancellationToken ct)
     {
         foreach (var path in paths)
         {
-            await ScanAsync(path);
+            if (ct.IsCancellationRequested)
+            {
+                break;
+            }
+
+            await ScanAsync(path, ct);
         }
     }
     
     /// <inheritdoc />
-    public async Task ScanAllAsync()
+    public async Task ScanAllAsync(CancellationToken ct)
     {
         var paths =
             _settingsManager.Settings.MusicFolders
                 .Select(x => x.FullPath);
-        await ScanAsync(paths);
+        await ScanAsync(paths, ct);
     }
     #endregion
 

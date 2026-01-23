@@ -10,17 +10,17 @@ public interface IFolderScanner
     /// and also deletes the metadata of the files that are no longer in the folder.
     /// </summary>
     /// <param name="path">The path of the folder to scan.</param>
-    Task ScanAsync(string path);
+    Task ScanAsync(string path, CancellationToken ct = default);
     
     /// <summary>
     /// Creates or updates the database with the metadata of the media files,
     /// and also deletes the metadata of the files that are no longer in the folders.
     /// </summary>
     /// <param name="paths">The paths of the folders to scan.</param>
-    Task ScanAsync(IEnumerable<string> paths);
+    Task ScanAsync(IEnumerable<string> paths, CancellationToken ct = default);
     
     /// <summary>
     /// Scans all the stored folders and updates the database.
     /// </summary>
-    Task ScanAllAsync();
+    Task ScanAllAsync(CancellationToken ct = default);
 }
