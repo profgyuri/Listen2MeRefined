@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF.Utils;
+﻿using Listen2MeRefined.Infrastructure.Mvvm.Utils;
+
+namespace Listen2MeRefined.WPF.Utils;
 
 using System;
 using System.Threading;

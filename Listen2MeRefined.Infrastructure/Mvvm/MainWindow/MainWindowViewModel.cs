@@ -1,5 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Mvvm.Utils;
 using MediatR;
 
 public sealed partial class MainWindowViewModel : 

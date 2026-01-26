@@ -356,7 +356,7 @@
 
                             <Button
                                 Grid.ColumnSpan="2"
-                                Command="{Binding JumpToSelecteSongCommand}"
+                                Command="{Binding JumpToSelectedSongCommand}"
                                 Width="380"
                                 Content="Play This Song"/>
                             <Button

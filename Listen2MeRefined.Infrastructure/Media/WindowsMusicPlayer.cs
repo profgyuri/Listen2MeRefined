@@ -1,6 +1,5 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Media;
 using System.Collections.ObjectModel;
-using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using NAudio.Wave;
@@ -10,8 +9,7 @@ using SkiaSharp;
 ///     Wrapper class for NAudio.
 /// </summary>
 public sealed class WindowsMusicPlayer : 
-    IMediaController, 
-    IPlaylistReference,
+    IMediaController,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
     private bool _startSongAutomatically;
@@ -27,8 +25,10 @@ public sealed class WindowsMusicPlayer :
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
+    private readonly IPlaylistStore _playlistStore;
 
     private const int TimeCheckInterval = 500;
+    private readonly SemaphoreSlim _tickGate = new(1, 1);
 
     public double CurrentTime
     {
@@ -53,18 +53,14 @@ public sealed class WindowsMusicPlayer :
     public WindowsMusicPlayer(
         ILogger logger,
         IMediator mediator,
+        IPlaylistStore playlistStore,
         TimedTask timedTask)
     {
         _logger = logger;
         _mediator = mediator;
+        _playlistStore = playlistStore;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
-    }
-
-    /// <inheritdoc />
-    public void PassPlaylist(ref ObservableCollection<AudioModel> playlist)
-    {
-        _playlist = playlist;
     }
 
     #region IMediaController
@@ -103,19 +99,16 @@ public sealed class WindowsMusicPlayer :
 
     public async Task NextAsync()
     {
-        if (!_playlist.Any())
+        var list = _playlistStore.Snapshot();
+        if (list.Count == 0)
         {
             _logger.Verbose("Playback is stopped, because the playlist is empty!");
             Stop();
             return;
         }
 
-        _currentSongIndex = (_currentSongIndex + 1) % _playlist!.Count;
-
-        await LoadCurrentSong();
-
-        _logger.Debug("Jumping to the next song at index {Current} with the maximum possible index of {Maximum}...",
-            _currentSongIndex, _playlist.Count - 1);
+        _currentSongIndex = (_currentSongIndex + 1) % list.Count;
+        await LoadCurrentSong(list);
     }
 
     public async Task PreviousAsync()
@@ -141,39 +134,39 @@ public sealed class WindowsMusicPlayer :
 
     public async Task Shuffle()
     {
-        if (!_playlist.Any())
-        {
-            return;
-        }
+        var list = _playlistStore.Snapshot();
+        if (list.Count == 0) return;
 
+        var currentPath = _currentSong?.Path;
         _logger.Information("Shuffling playlist...");
 
-        _playlist.Shuffle();
+        _playlistStore.Shuffle(keepFirstByPath: true, firstPath: currentPath);
 
-        var index = _playlist.IndexOf(_currentSong);
         _currentSongIndex = 0;
-
-        if (index > -1)
-        {
-            (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
-        }
-        else
-        {
-            await LoadCurrentSong();
-        }
+        await LoadCurrentSong(_playlistStore.Snapshot());
     }
     #endregion
 
     #region Helpers
-    private async Task LoadCurrentSong()
+    private async Task LoadCurrentSong(IReadOnlyList<AudioModel>? list = null)
     {
-        _currentSong = _playlist[_currentSongIndex];
+        list ??= _playlistStore.Snapshot();
+        if (list.Count == 0)
+        {
+            Stop();
+            return;
+        }
+        
+        _currentSongIndex = Math.Clamp(_currentSongIndex, 0, list.Count - 1);
+        _currentSong = list[_currentSongIndex];
         _logger.Information("Loading audio: {Song}", _currentSong);
 
         if (!File.Exists(_currentSong.Path))
         {
-            _logger.Debug("Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
-            _playlist.Remove(_currentSong);
+            _logger.Debug("Removing missing file from playlist: {Path}", _currentSong.Path);
+            if (_currentSong.Path is not null)
+                _playlistStore.RemoveByPath(_currentSong.Path);
+
             await NextAsync();
             return;
         }
@@ -226,18 +219,24 @@ public sealed class WindowsMusicPlayer :
 
     private async Task CurrentTimeCheck()
     {
-        if (ShouldSkipTimeCheck())
-        {
+        if (!await _tickGate.WaitAsync(0))
             return;
-        }
 
-        if (ShouldSkipToNext())
+        try
         {
-            await NextAsync();
-        }
+            if (ShouldSkipTimeCheck())
+                return;
 
-        _previousTimeStamp = _fileReader!.CurrentTime.TotalMilliseconds;
-        _unpausedFor += TimeCheckInterval;
+            if (ShouldSkipToNext())
+                await NextAsync();
+
+            _previousTimeStamp = _fileReader!.CurrentTime.TotalMilliseconds;
+            _unpausedFor += TimeCheckInterval;
+        }
+        finally
+        {
+            _tickGate.Release();
+        }
     }
 
     /// <summary>
@@ -252,7 +251,7 @@ public sealed class WindowsMusicPlayer :
     /// <summary>
     /// Determines if the remainder of the current song should be skipped.
     /// </summary>
-    /// <returns>True if the song reached it's end, false otherwise.</returns>
+    /// <returns>True if the song reached its end, false otherwise.</returns>
     private bool ShouldSkipToNext()
     {
         return Math.Abs(_fileReader!.CurrentTime.TotalMilliseconds - _previousTimeStamp) < 0.1

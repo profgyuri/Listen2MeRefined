@@ -100,7 +100,7 @@ internal static class Extensions
     /// </summary>
     /// <typeparam name="T">The type of the collection.</typeparam>
     /// <param name="list">The collection to add the items to.</param>
-    /// <param name="items">The items to add to the collection.</param>
+    /// <param name="items">The items to add to the collection.</param>]
     public static void AddRange<T>(
         this IList<T> list,
         IList<T> items)
