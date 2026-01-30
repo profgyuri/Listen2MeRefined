@@ -34,23 +34,23 @@ public sealed class StartupManager : IDisposable
         _logger = logger;
         _dataContext = dataContext;
 
-        _logger.Verbose("StartupManager initialized");
+        _logger.Verbose("[StartupManager] Class initialized");
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        _logger.Information("Starting StartAsync from StartupManager...");
+        _logger.Information("[StartupManager] Starting StartAsync...");
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
         var ct = linked.Token;
 
         // Critical startup tasks
         await _dataContext.Database.MigrateAsync(ct).ConfigureAwait(false);
-        _logger.Information("Database migration completed.");
+        _logger.Information("[StartupManager] Database migration completed.");
 
         await _mediator.Publish(
             new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily), ct
         ).ConfigureAwait(false);
-        _logger.Information("Font family notification published with value {FontFamily}.",
+        _logger.Information("[StartupManager] Font family notification published with value {FontFamily}.",
             _settingsManager.Settings.FontFamily);
 
         // Output device selection (off-UI thread if needed)
@@ -60,7 +60,7 @@ public sealed class StartupManager : IDisposable
             return allDevices.FirstOrDefault(x => x.Name == _settingsManager.Settings.AudioOutputDeviceName)
                    ?? allDevices.FirstOrDefault();
         }, ct).ConfigureAwait(false);
-        _logger.Information("Selected audio output device: {DeviceName}.",
+        _logger.Information("[StartupManager] Selected audio output device: {DeviceName}.",
             outputDevice?.Name ?? "None");
 
         if (outputDevice is not null)
@@ -68,12 +68,13 @@ public sealed class StartupManager : IDisposable
             await _mediator.Publish(new AudioOutputDeviceChangedNotification(outputDevice), ct)
                 .ConfigureAwait(false);
         }
-        _logger.Information("Audio output device notification published.");
+
+        _logger.Information("[StartupManager] Audio output device notification published.");
 
         // Background scan (don’t block startup)
         if (_settingsManager.Settings.ScanOnStartup)
         {
-            _logger.Information("Starting folder scan in background...");
+            _logger.Information("[StartupManager] Starting folder scan in background...");
             _ = Task.Run(async () =>
             {
                 try
@@ -83,27 +84,27 @@ public sealed class StartupManager : IDisposable
                 catch (OperationCanceledException) { /* ignore */ }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Error during background folder scan on startup.");
+                    _logger.Error(ex, "[StartupManager] Error during background folder scan on startup.");
                 }
 
-                _logger.Information("Background folder scan completed.");
+                _logger.Information("[StartupManager] Background folder scan completed.");
             }, ct);
         }
 
-        _logger.Information("Registering global hooks...");
+        _logger.Information("[StartupManager] Registering global hooks...");
         // Initialize hooks after everything else is ready
         await _globalHook.RegisterAsync().ConfigureAwait(false);
-        _logger.Information("Global hooks registered.");
-        _logger.Information("StartupManager StartAsync completed.");
+        _logger.Information("[StartupManager] Global hooks registered.");
+        _logger.Information("[StartupManager] StartAsync completed.");
     }
 
     public void Dispose()
     {
-        _logger.Verbose("Disposing StartupManager...");
+        _logger.Verbose("[StartupManager] Disposing...");
         _cts.Cancel();
         _cts.Dispose();
-        _logger.Verbose("Unregistering global hooks...");
+        _logger.Verbose("[StartupManager] Unregistering global hooks...");
         _globalHook.Unregister();
-        _logger.Verbose("StartupManager disposed.");
+        _logger.Verbose("[StartupManager] Disposed.");
     }
 }

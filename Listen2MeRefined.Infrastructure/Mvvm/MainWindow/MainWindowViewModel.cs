@@ -45,18 +45,25 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel = searchbarViewModel;
         PlayerControlsViewModel = playerControlsViewModel;
         ListsViewModel = listsViewModel;
+
+        _logger.Information("[MainWindowViewModel] Class initialized");
     }
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
+        _logger.Information("[MainWindowViewModel] Starting InitializeCoreAsync...");
         try
         {
+            _logger.Information("[MainWindowViewModel] Checking for latest version...");
+
             var isLatest = await _versionChecker.IsLatestAsync();
             await _ui.InvokeAsync(() => IsUpdateAvailable = !isLatest, ct);
+
+            _logger.Information("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
         }
         catch (Exception ex)
         {
-            _logger.Warning($"Version check failed: {ex}");
+            _logger.Warning($"[MainWindowViewModel] Version check failed: {ex}");
             await _ui.InvokeAsync(() => IsUpdateAvailable = false, ct);
         }
 
@@ -66,11 +73,12 @@ public sealed partial class MainWindowViewModel :
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            throw; // no fatal log
+            _logger.Information("[MainWindowViewModel] StartupManager.StartAsync was canceled.");
+            throw;
         }
         catch (Exception ex)
         {
-            _logger.Fatal(ex, "StartupManager.StartAsync failed");
+            _logger.Fatal(ex, "[MainWindowViewModel] StartupManager.StartAsync failed");
             throw;
         }
     }
@@ -78,6 +86,7 @@ public sealed partial class MainWindowViewModel :
     /// <inheritdoc />
     Task INotificationHandler<CurrentSongNotification>.Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
+        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
         return _ui.InvokeAsync(() => Song = notification.Audio, cancellationToken);
     }
 
@@ -86,6 +95,7 @@ public sealed partial class MainWindowViewModel :
         FontFamilyChangedNotification notification,
         CancellationToken cancellationToken)
     {
+        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         return _ui.InvokeAsync(() => FontFamily = notification.FontFamily, cancellationToken);
     }
 }
