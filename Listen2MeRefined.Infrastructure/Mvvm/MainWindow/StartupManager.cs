@@ -1,78 +1,109 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+﻿using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 
-public class StartupManager : IDisposable
+namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+
+public sealed class StartupManager : IDisposable
 {
     private readonly IMediator _mediator;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IGlobalHook _globalHook;
     private readonly IFolderScanner _folderScanner;
+    private readonly ILogger _logger;
     private readonly DataContext _dataContext;
-    private bool disposedValue;
+
+    private readonly CancellationTokenSource _cts = new();
 
     public StartupManager(
         ISettingsManager<AppSettings> settingsManager,
         IGlobalHook globalHook,
         IFolderScanner folderScanner,
-        DataContext dataContext,
-        IMediator mediator)
+        IMediator mediator,
+        ILogger logger,
+        DataContext dataContext)
     {
         _settingsManager = settingsManager;
         _globalHook = globalHook;
         _folderScanner = folderScanner;
-        _dataContext = dataContext;
         _mediator = mediator;
+        _logger = logger;
+        _dataContext = dataContext;
+
+        _logger.Verbose("StartupManager initialized");
     }
 
-    public async Task StartAsync()
+    public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        // Initialize hooks last and don't block startup
-        await _dataContext.Database.MigrateAsync();
-        await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily));
+        _logger.Information("Starting StartAsync from StartupManager...");
+        using var linked = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
+        var ct = linked.Token;
 
+        // Critical startup tasks
+        await _dataContext.Database.MigrateAsync(ct).ConfigureAwait(false);
+        _logger.Information("Database migration completed.");
+
+        await _mediator.Publish(
+            new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily), ct
+        ).ConfigureAwait(false);
+        _logger.Information("Font family notification published with value {FontFamily}.",
+            _settingsManager.Settings.FontFamily);
+
+        // Output device selection (off-UI thread if needed)
+        var outputDevice = await Task.Run(() =>
+        {
+            var allDevices = AudioDevices.GetOutputDevices();
+            return allDevices.FirstOrDefault(x => x.Name == _settingsManager.Settings.AudioOutputDeviceName)
+                   ?? allDevices.FirstOrDefault();
+        }, ct).ConfigureAwait(false);
+        _logger.Information("Selected audio output device: {DeviceName}.",
+            outputDevice?.Name ?? "None");
+
+        if (outputDevice is not null)
+        {
+            await _mediator.Publish(new AudioOutputDeviceChangedNotification(outputDevice), ct)
+                .ConfigureAwait(false);
+        }
+        _logger.Information("Audio output device notification published.");
+
+        // Background scan (don’t block startup)
         if (_settingsManager.Settings.ScanOnStartup)
         {
-            await _folderScanner.ScanAllAsync();
-        }
-
-        var allDevices = AudioDevices.GetOutputDevices();
-        var outputDevice =
-            allDevices.FirstOrDefault(x => x.Name == _settingsManager.Settings.AudioOutputDeviceName) ??
-            allDevices.FirstOrDefault()!;
-        await _mediator.Publish(new AudioOutputDeviceChangedNotification(outputDevice));
-
-        // Initialize hooks after everything else is ready
-        await _globalHook.RegisterAsync();
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposedValue)
-        {
-            if (disposing)
+            _logger.Information("Starting folder scan in background...");
+            _ = Task.Run(async () =>
             {
-                _globalHook.Unregister();
-            }
+                try
+                {
+                    await _folderScanner.ScanAllAsync().ConfigureAwait(false);
+                }
+                catch (OperationCanceledException) { /* ignore */ }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Error during background folder scan on startup.");
+                }
 
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
-            disposedValue = true;
+                _logger.Information("Background folder scan completed.");
+            }, ct);
         }
+
+        _logger.Information("Registering global hooks...");
+        // Initialize hooks after everything else is ready
+        await _globalHook.RegisterAsync().ConfigureAwait(false);
+        _logger.Information("Global hooks registered.");
+        _logger.Information("StartupManager StartAsync completed.");
     }
 
     public void Dispose()
     {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        _logger.Verbose("Disposing StartupManager...");
+        _cts.Cancel();
+        _cts.Dispose();
+        _logger.Verbose("Unregistering global hooks...");
+        _globalHook.Unregister();
+        _logger.Verbose("StartupManager disposed.");
     }
 }

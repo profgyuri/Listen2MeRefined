@@ -1,4 +1,6 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+
+using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 
@@ -60,7 +62,7 @@ public sealed partial class MainWindowViewModel :
 
         try
         {
-            await _startupManager.StartAsync();
+            await _startupManager.StartAsync(ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
