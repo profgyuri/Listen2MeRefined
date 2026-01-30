@@ -34,7 +34,7 @@ public sealed class StartupManager : IDisposable
         _logger = logger;
         _dataContext = dataContext;
 
-        _logger.Verbose("[StartupManager] Class initialized");
+        _logger.Information("[StartupManager] Class initialized");
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)

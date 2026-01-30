@@ -1,13 +1,11 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Media;
 using System.Collections.ObjectModel;
-using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using NAudio.Wave;
-using SkiaSharp;
 
 /// <summary>
-///     Wrapper class for NAudio.
+/// Wrapper class for NAudio.
 /// </summary>
 public sealed class WindowsMusicPlayer : 
     IMediaController, 
@@ -59,6 +57,7 @@ public sealed class WindowsMusicPlayer :
         _mediator = mediator;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
+        _logger.Information("[WindowsMusicPlayer] initialized");
     }
 
     /// <inheritdoc />
@@ -67,22 +66,23 @@ public sealed class WindowsMusicPlayer :
         _playlist = playlist;
     }
 
-    #region IMediaController
     public async Task PlayPauseAsync()
     {
+        _logger.Information("[WindowsMusicPlayer] Toggling playback state...");
         if (_currentSong is null)
         {
+            _logger.Information("[WindowsMusicPlayer] No song is loaded, do nothing...");
             return;
         }
 
         if (_playbackState == PlaybackState.Playing)
         {
-            _logger.Verbose("Pausing playback");
+            _logger.Information("[WindowsMusicPlayer] Pausing playback");
             PausePlayback();
             return;
         }
 
-        _logger.Verbose("Starting playback");
+        _logger.Information("[WindowsMusicPlayer] Starting playback");
         await StartPlayback();
     }
 
@@ -91,7 +91,7 @@ public sealed class WindowsMusicPlayer :
         _waveOutEvent.Stop();
         _playbackState = PlaybackState.Stopped;
 
-        _logger.Verbose("Playback stopped by user");
+        _logger.Information("[WindowsMusicPlayer] Playback stopped by user");
 
         if (_fileReader is not null)
         {
@@ -105,37 +105,35 @@ public sealed class WindowsMusicPlayer :
     {
         if (!_playlist.Any())
         {
-            _logger.Verbose("Playback is stopped, because the playlist is empty!");
+            _logger.Information("[WindowsMusicPlayer] Playback is stopped, because the playlist is empty!");
             Stop();
             return;
         }
 
         _currentSongIndex = (_currentSongIndex + 1) % _playlist!.Count;
 
+        _logger.Information("[WindowsMusicPlayer] Jumping to next song...");
         await LoadCurrentSong();
-
-        _logger.Debug("Jumping to the next song at index {Current} with the maximum possible index of {Maximum}...",
-            _currentSongIndex, _playlist.Count - 1);
     }
 
     public async Task PreviousAsync()
     {
         if (!_playlist.Any())
         {
+            _logger.Information("[WindowsMusicPlayer] Cannot go to the previous song, because the playlist is empty!");
             return;
         }
 
         _currentSongIndex = (_currentSongIndex - 1 + _playlist!.Count) % _playlist.Count;
 
+        _logger.Information("[WindowsMusicPlayer] Jumping to previous song...");
         await LoadCurrentSong();
-
-        _logger.Debug("Jumping to the previous song at index {Current} with the maximum possible index of {Maximum}...",
-            _currentSongIndex, _playlist.Count - 1);
     }
 
     public async Task JumpToIndexAsync(int index)
     {
         _currentSongIndex = index;
+        _logger.Information("[WindowsMusicPlayer] Jumping to song at index {Index}...", index);
         await LoadCurrentSong();
     }
 
@@ -143,42 +141,43 @@ public sealed class WindowsMusicPlayer :
     {
         if (!_playlist.Any())
         {
+            _logger.Information("[WindowsMusicPlayer] Cannot shuffle an empty playlist!");
             return;
         }
 
-        _logger.Information("Shuffling playlist...");
+        _logger.Information("[WindowsMusicPlayer] Shuffling playlist...");
 
         _playlist.Shuffle();
+        _logger.Information("[WindowsMusicPlayer] Playlist shuffled.");
 
         var index = _playlist.IndexOf(_currentSong);
         _currentSongIndex = 0;
 
         if (index > -1)
         {
+            _logger.Information("[WindowsMusicPlayer] Moving current song to the top of the shuffled playlist...");
             (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
         }
         else
         {
+            _logger.Information("[WindowsMusicPlayer] Current song not found in playlist, loading the first song...");
             await LoadCurrentSong();
         }
     }
-    #endregion
-
-    #region Helpers
     private async Task LoadCurrentSong()
     {
         _currentSong = _playlist[_currentSongIndex];
-        _logger.Information("Loading audio: {Song}", _currentSong);
+        _logger.Information("[WindowsMusicPlayer] Loading audio: {Song}", _currentSong);
 
         if (!File.Exists(_currentSong.Path))
         {
-            _logger.Debug("Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
+            _logger.Information("[WindowsMusicPlayer] Skipping a song, that does not exist anymore at path: " + _currentSong.Path);
             _playlist.Remove(_currentSong);
             await NextAsync();
             return;
         }
 
-        _logger.Verbose("Determining the type of audio file reader");
+        _logger.Verbose("[WindowsMusicPlayer] Determining the type of audio file reader");
         _fileReader = _currentSong.Path.EndsWith(".wav") ? 
             new WaveFileReader(_currentSong.Path) : 
             new AudioFileReader(_currentSong.Path);
@@ -186,12 +185,12 @@ public sealed class WindowsMusicPlayer :
         if (_fileReader.WaveFormat.Encoding is WaveFormatEncoding.Extensible)
         {
             //just skip this, as I have no clue how to handle or convert this type
-            _logger.Debug("Unsupported (extensible) .wav file is being skipped: {Song}", _currentSong.Path);
+            _logger.Information("[WindowsMusicPlayer] Unsupported (extensible) .wav file is being skipped: {Song}", _currentSong.Path);
             await NextAsync();
             return;
         }
 
-        _logger.Verbose("Publishing notification for the current song has changed");
+        _logger.Verbose("[WindowsMusicPlayer] Publishing current song changed notification...");
         await _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
@@ -201,13 +200,14 @@ public sealed class WindowsMusicPlayer :
 
         if (_startSongAutomatically)
         {
+            _logger.Information("[WindowsMusicPlayer] Starting playback of the loaded song automatically...");
             _waveOutEvent!.Play();
         }
     }
 
     private void ReNewWaveOutEvent()
     {
-        _logger.Information("Renewing waveout event...");
+        _logger.Information("[WindowsMusicPlayer] Renewing waveout event...");
 
         try
         {
@@ -220,7 +220,7 @@ public sealed class WindowsMusicPlayer :
         }
         catch (Exception e)
         {
-            _logger.Error(e, "Waveout event failed to load!");
+            _logger.Error(e, "[WindowsMusicPlayer] Waveout event failed to load!");
         }
     }
 
@@ -228,11 +228,13 @@ public sealed class WindowsMusicPlayer :
     {
         if (ShouldSkipTimeCheck())
         {
+            _logger.Debug("[WindowsMusicPlayer] Skipping time check...");
             return;
         }
 
         if (ShouldSkipToNext())
         {
+            _logger.Information("[WindowsMusicPlayer] Current song reached its end, skipping to the next song...");
             await NextAsync();
         }
 
@@ -265,6 +267,7 @@ public sealed class WindowsMusicPlayer :
     {
         if (!_playlist.Any())
         {
+            _logger.Warning("[WindowsMusicPlayer] Cannot start playback, because the playlist is empty!");
             return;
         }
 
@@ -273,41 +276,44 @@ public sealed class WindowsMusicPlayer :
 
         if (_currentSong is null)
         {
+            _logger.Information("[WindowsMusicPlayer] No song is loaded, loading the current song...");
             await LoadCurrentSong();
         }
 
         _startSongAutomatically = true;
         _waveOutEvent.Play();
-        _logger.Debug("Playback started");
+        _logger.Information("[WindowsMusicPlayer] Playback started");
     }
 
     private void PausePlayback()
     {
+        _logger.Information("[WindowsMusicPlayer] Pausing playback...");
         _waveOutEvent.Pause();
         _startSongAutomatically = false;
         _playbackState = PlaybackState.Paused;
 
-        _logger.Debug("Playback paused");
+        _logger.Information("[WindowsMusicPlayer] Playback paused");
     }
-    #endregion
 
-    #region Implementation of INotificationHandler<in AudioOutputDeviceChangedNotification>
     /// <inheritdoc />
     public async Task Handle(
         AudioOutputDeviceChangedNotification notification,
         CancellationToken cancellationToken)
     {
+        _logger.Information("[WindowsMusicPlayer] Received audio output device changed notification: {DeviceName}", notification.Device.Name);
         // Avoid changing to the same device
         if (notification.Device.Index == _outputDeviceIndex)
         {
+            _logger.Information("[WindowsMusicPlayer] The selected audio output device is already in use. No changes made.");
             return;
         }
 
-        _logger.Information("Changing audio output device to {DeviceName}", notification.Device.Name);
+        _logger.Information("[WindowsMusicPlayer] Changing audio output device to {DeviceName}", notification.Device.Name);
         _outputDeviceIndex = notification.Device.Index;
 
         if (_fileReader is null)
         {
+            _logger.Information("[WindowsMusicPlayer] FileReader is not yet initialized, skipping device change...");
             return;
         }
         
@@ -322,8 +328,10 @@ public sealed class WindowsMusicPlayer :
 
         if (isPlaying)
         {
+            _logger.Information("[WindowsMusicPlayer] Resuming playback after device change...");
             await PlayPauseAsync();
         }
+
+        _logger.Information("[WindowsMusicPlayer] Audio output device changed successfully to {DeviceName}", notification.Device.Name);
     }
-    #endregion
 }
