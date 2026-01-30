@@ -2,13 +2,12 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+        <TargetFramework>net10.0-windows7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <AssemblyName>Listen2Me</AssemblyName>
         <ApplicationIcon>Resources\Listen2Me.ico</ApplicationIcon>
         <UseWindowsForms>True</UseWindowsForms>
-        <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
     <ItemGroup>

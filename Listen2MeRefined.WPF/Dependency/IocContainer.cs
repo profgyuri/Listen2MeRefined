@@ -6,14 +6,14 @@ using MediatR.Extensions.Autofac.DependencyInjection.Builder;
 internal static class IocContainer
 {
     private static IContainer? _container;
-    private static ILifetimeScope? _appScope;
 
-    internal static IContainer Container => _container ??= BuildContainer();
-
-    internal static ILifetimeScope AppScope => _appScope ??= Container.BeginLifetimeScope("App");
-
-    private static IContainer BuildContainer()
+    internal static IContainer GetContainer()
     {
+        if (_container is not null)
+        {
+            return _container;
+        }
+
         var builder = new ContainerBuilder();
 
         var configuration = MediatRConfigurationBuilder
@@ -24,15 +24,6 @@ internal static class IocContainer
         builder.RegisterMediatR(configuration);
         builder.RegisterAssemblyModules(typeof(IocContainer).Assembly);
 
-        return builder.Build();
-    }
-
-    internal static void DisposeAppScope()
-    {
-        _appScope?.Dispose();
-        _appScope = null;
-
-        _container?.Dispose();
-        _container = null;
+        return _container = builder.Build();
     }
 }

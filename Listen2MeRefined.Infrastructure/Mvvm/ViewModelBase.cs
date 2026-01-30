@@ -1,6 +1,4 @@
-﻿using Listen2MeRefined.Infrastructure.Mvvm.Utils;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public abstract class ViewModelBase : ObservableObject, IAsyncInitializable
 {

@@ -15,7 +15,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.AppSettings", b =>
                 {
@@ -65,7 +65,6 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Path")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("PlaylistModelId")

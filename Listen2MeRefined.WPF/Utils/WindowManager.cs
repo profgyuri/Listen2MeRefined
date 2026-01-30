@@ -1,6 +1,4 @@
-﻿using Listen2MeRefined.Infrastructure.Mvvm.Utils;
-
-namespace Listen2MeRefined.WPF;
+﻿namespace Listen2MeRefined.WPF;
 using Autofac;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Views;

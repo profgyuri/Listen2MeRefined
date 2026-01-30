@@ -1,8 +1,6 @@
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.Infrastructure.Mvvm.Utils;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Listen2MeRefined.WPF.Utils;
@@ -24,10 +22,5 @@ public class UtilsModule : Module
             new WpfUiDispatcher(Application.Current.Dispatcher))
                .As<IUiDispatcher>()
                .SingleInstance();
-        
-        builder
-            .RegisterType<PlaylistStore>()
-            .As<IPlaylistStore>()
-            .SingleInstance();
     }
 }

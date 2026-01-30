@@ -23,7 +23,7 @@ public class AdvancedSearchViewModelTests : IClassFixture<AdvancedSearchTestFixt
         
         // Wait for the ViewModel's initialization to complete
         // This is important because AdvancedSearchViewModel.Initialize() is async
-        //Task.Run(_viewModel.Initialize).Wait();
+        Task.Run(_viewModel.Initialize).Wait();
     }
 
     private void InitializeViewModel()

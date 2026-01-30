@@ -29,7 +29,7 @@ public sealed class AudioModel : Model
     }
 
     public TimeSpan Length { get; set; }
-    public required string Path { get; init; }
+    public string? Path { get; init; }
 
     /// <summary>
     /// Updates the properties of this instance with the properties of the given instance.
@@ -57,9 +57,9 @@ public sealed class AudioModel : Model
 
     /// <inheritdoc />
     public override int GetHashCode()
-        => Path is null
-            ? 0
-            : StringComparer.OrdinalIgnoreCase.GetHashCode(Path);
+    {
+        return Path?.GetHashCode() ?? -1;
+    }
 
     public override string ToString()
     {
