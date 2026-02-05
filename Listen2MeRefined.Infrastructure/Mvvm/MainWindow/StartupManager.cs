@@ -34,12 +34,12 @@ public sealed class StartupManager : IDisposable
         _logger = logger;
         _dataContext = dataContext;
 
-        _logger.Information("[StartupManager] Class initialized");
+        _logger.Debug("[StartupManager] Class initialized");
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        _logger.Information("[StartupManager] Starting StartAsync...");
+        _logger.Debug("[StartupManager] Starting StartAsync...");
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token, cancellationToken);
         var ct = linked.Token;
 
@@ -50,7 +50,7 @@ public sealed class StartupManager : IDisposable
         await _mediator.Publish(
             new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily), ct
         ).ConfigureAwait(false);
-        _logger.Information("[StartupManager] Font family notification published with value {FontFamily}.",
+        _logger.Debug("[StartupManager] Font family notification published with value {FontFamily}.",
             _settingsManager.Settings.FontFamily);
 
         // Output device selection (off-UI thread if needed)
@@ -69,7 +69,7 @@ public sealed class StartupManager : IDisposable
                 .ConfigureAwait(false);
         }
 
-        _logger.Information("[StartupManager] Audio output device notification published.");
+        _logger.Debug("[StartupManager] Audio output device notification published.");
 
         // Background scan (don’t block startup)
         if (_settingsManager.Settings.ScanOnStartup)
@@ -95,7 +95,7 @@ public sealed class StartupManager : IDisposable
         // Initialize hooks after everything else is ready
         await _globalHook.RegisterAsync().ConfigureAwait(false);
         _logger.Information("[StartupManager] Global hooks registered.");
-        _logger.Information("[StartupManager] StartAsync completed.");
+        _logger.Debug("[StartupManager] StartAsync completed.");
     }
 
     public void Dispose()

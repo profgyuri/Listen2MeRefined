@@ -46,12 +46,12 @@ public sealed partial class MainWindowViewModel :
         PlayerControlsViewModel = playerControlsViewModel;
         ListsViewModel = listsViewModel;
 
-        _logger.Information("[MainWindowViewModel] Class initialized");
+        _logger.Debug("[MainWindowViewModel] Class initialized");
     }
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
-        _logger.Information("[MainWindowViewModel] Starting InitializeCoreAsync...");
+        _logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
         try
         {
             _logger.Information("[MainWindowViewModel] Checking for latest version...");
@@ -81,6 +81,8 @@ public sealed partial class MainWindowViewModel :
             _logger.Fatal(ex, "[MainWindowViewModel] StartupManager.StartAsync failed");
             throw;
         }
+
+        _logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
     }
 
     /// <inheritdoc />
