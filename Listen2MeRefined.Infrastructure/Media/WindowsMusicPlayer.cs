@@ -228,7 +228,6 @@ public sealed class WindowsMusicPlayer :
     {
         if (ShouldSkipTimeCheck())
         {
-            _logger.Debug("[WindowsMusicPlayer] Skipping time check...");
             return;
         }
 
