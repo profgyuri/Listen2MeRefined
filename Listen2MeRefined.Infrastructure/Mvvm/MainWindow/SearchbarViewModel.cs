@@ -23,24 +23,36 @@ public partial class SearchbarViewModel :
         _logger = logger;
         _audioRepository = audioRepository;
         _mediator = mediator;
+
+        _logger.Debug("[SearchbarViewModel] initialized");
     }
 
     [RelayCommand]
     private async Task QuickSearch()
     {
-        _logger.Information("Searching for \'{SearchTerm}\'", SearchTerm);
+        _logger.Information("[SearchbarViewModel] Searching for \'{SearchTerm}\'", SearchTerm);
         var results = string.IsNullOrEmpty(SearchTerm)
                 ? await _audioRepository.ReadAsync()
                 : await _audioRepository.ReadAsync(SearchTerm);
 
         if (results is not null)
         {
-            await _mediator.Publish(new QuickSearchResultsNotification(results));
+            var result = results.ToArray();
+            _logger.Information("[SearchbarViewModel] Found {ResultCount} results", result.Length);
+            if (result.Length > 0)
+            {
+                _logger.Verbose(
+                    "[SearchbarViewModel] First {Shown} results are: {@Results}",
+                    Math.Min(5, result.Length),
+                    result.Take(5));
+            }
+            await _mediator.Publish(new QuickSearchResultsNotification(result));
         }
     }
 
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
+        _logger.Information("[SearchbarViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         FontFamily = notification.FontFamily;
         await Task.CompletedTask;
     }

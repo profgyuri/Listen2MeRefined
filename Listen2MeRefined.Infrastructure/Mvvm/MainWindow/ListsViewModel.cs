@@ -84,7 +84,7 @@ public partial class ListsViewModel :
         if (result.Length > 0)
         {
             _logger.Verbose(
-                "First {Shown} results are: {@Results}",
+                "[ListsViewModel] First {Shown} results are: {@Results}",
                 Math.Min(5, result.Length),
                 result.Take(5));
         }
@@ -101,7 +101,7 @@ public partial class ListsViewModel :
         if (result.Length > 0)
         {
             _logger.Verbose(
-                "First {Shown} results are: {@Results}",
+                "[ListsViewModel] First {Shown} results are: {@Results}",
                 Math.Min(5, result.Length),
                 result.Take(5));
         }

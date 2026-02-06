@@ -67,6 +67,8 @@ public partial class AdvancedSearchViewModel :
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
+
+        _logger.Debug("[AdvancedSearchViewModel] initialized");
     }
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
@@ -80,6 +82,8 @@ public partial class AdvancedSearchViewModel :
             SelectedColumnName = ColumnName.First();
             SelectedRelation = Relation.First();
         }, ct);
+
+        _logger.Debug("[AdvancedSearchViewModel] Finished InitializeCoreAsync");
     }
 
     [RelayCommand]
@@ -89,6 +93,7 @@ public partial class AdvancedSearchViewModel :
             string.IsNullOrEmpty(SelectedRelation) ||
             string.IsNullOrEmpty(InputText))
         {
+            _logger.Warning("[AdvancedSearchViewModel] Cannot add criteria. One or more fields are empty.");
             return;
         }
         
@@ -107,7 +112,7 @@ public partial class AdvancedSearchViewModel :
             _ => throw new IndexOutOfRangeException($"This relation is not handled: {SelectedRelation}")
         };
         queryBuilder.Append(relation);
-    
+
         var param = new DynamicParameters();
         // Fix: Check for both Contains and Does not contain with lowercase
         if (SelectedRelation is "Contains" or "Does not contain")
@@ -120,9 +125,11 @@ public partial class AdvancedSearchViewModel :
         }
     
         queryBuilder.Append($"@param{_queryStatements.Count}");
-        
-        _queryStatements.Add(new ParameterizedQuery(queryBuilder.ToString(), param));
-        
+
+        var query = new ParameterizedQuery(queryBuilder.ToString(), param);
+        _queryStatements.Add(query);
+        _logger.Debug("[AdvancedSearchViewModel] Added criteria: {QueryString} with parameters: {@Param}", query.QueryString, param);
+
         InputText = "";
     }
 
@@ -132,6 +139,7 @@ public partial class AdvancedSearchViewModel :
         if (!string.IsNullOrEmpty(SelectedCriteria) && Criterias.Contains(SelectedCriteria))
         {
             Criterias.Remove(SelectedCriteria);
+            _logger.Debug("[AdvancedSearchViewModel] Deleted criteria: {Criteria}", SelectedCriteria);
         }
     }
     
@@ -142,10 +150,12 @@ public partial class AdvancedSearchViewModel :
             return;
         }
         
-        _logger.Debug($"Starting advanced search with these filters:\n{Criterias}", string.Join('\n', Criterias));
+        _logger.Information($"Starting advanced search with these filters: {@Criterias}", Criterias);
         _mediator.Publish(new AdvancedSearchNotification(_queryStatements, MatchAll));
         _queryStatements.Clear();
         Criterias.Clear();
+        
+        _logger.Information("[AdvancedSearchViewModel] Search executed and criteria cleared.");
     }
     
     private static List<string> GetAudioModelProperties()
@@ -159,14 +169,13 @@ public partial class AdvancedSearchViewModel :
             .ToList();
     }
 
-    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
     /// <inheritdoc />
     Task INotificationHandler<FontFamilyChangedNotification>.Handle(
         FontFamilyChangedNotification notification,
         CancellationToken cancellationToken)
     {
+        _logger.Information("[AdvancedSearchViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         FontFamily = notification.FontFamily;
         return Task.CompletedTask;
     }
-    #endregion
 }
