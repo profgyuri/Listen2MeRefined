@@ -40,6 +40,8 @@ public partial class PlayerControlsViewModel :
         _waveFormDrawer = waveFormDrawer;
         _mediaController = mediaController;
         _timedTask = timedTask;
+
+        _logger.Debug("[PlayerControlsViewModel] initialized");
     }
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
@@ -55,6 +57,8 @@ public partial class PlayerControlsViewModel :
             _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
             await DrawPlaceholderLineAsync();
         }, ct);
+
+           _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
     }
 
     private async Task DrawPlaceholderLineAsync()
@@ -64,40 +68,44 @@ public partial class PlayerControlsViewModel :
 
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
+        _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
         await DrawPlaceholderLineAsync();
         WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
         TotalTime = notification.Audio.Length.TotalMilliseconds;
     }
 
-    #region Commands
     [RelayCommand]
     private async Task PlayPause()
     {
+        _logger.Debug("[PlayerControlsViewModel] Toggling play/pause");
         await _mediaController.PlayPauseAsync();
     }
 
     [RelayCommand]
     private void Stop()
     {
+        _logger.Debug("[PlayerControlsViewModel] Stopping playback");
         _mediaController.Stop();
     }
 
     [RelayCommand]
     private async Task Next()
     {
+        _logger.Debug("[PlayerControlsViewModel] Skipping to next track");
         await _mediaController.NextAsync();
     }
 
     [RelayCommand]
     private async Task Previous()
     {
+        _logger.Debug("[PlayerControlsViewModel] Skipping to previous track");
         await _mediaController.PreviousAsync();
     }
 
     [RelayCommand]
     private async Task Shuffle()
     {
+        _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
         await _mediaController.Shuffle();
     }
-    #endregion
 }
