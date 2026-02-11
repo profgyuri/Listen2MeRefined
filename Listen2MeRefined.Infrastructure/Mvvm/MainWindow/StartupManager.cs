@@ -16,6 +16,7 @@ public sealed class StartupManager : IDisposable
     private readonly IFolderScanner _folderScanner;
     private readonly ILogger _logger;
     private readonly DataContext _dataContext;
+    private readonly IOutputDevice _outputDevice;
 
     private readonly CancellationTokenSource _cts = new();
 
@@ -25,7 +26,8 @@ public sealed class StartupManager : IDisposable
         IFolderScanner folderScanner,
         IMediator mediator,
         ILogger logger,
-        DataContext dataContext)
+        DataContext dataContext, 
+        IOutputDevice outputDevice)
     {
         _settingsManager = settingsManager;
         _globalHook = globalHook;
@@ -33,6 +35,7 @@ public sealed class StartupManager : IDisposable
         _mediator = mediator;
         _logger = logger;
         _dataContext = dataContext;
+        _outputDevice = outputDevice;
 
         _logger.Debug("[StartupManager] Class initialized");
     }
@@ -56,7 +59,7 @@ public sealed class StartupManager : IDisposable
         // Output device selection (off-UI thread if needed)
         var outputDevice = await Task.Run(() =>
         {
-            var allDevices = AudioDevices.GetOutputDevices();
+            var allDevices = _outputDevice.EnumerateOutputDevices().ToArray();
             return allDevices.FirstOrDefault(x => x.Name == _settingsManager.Settings.AudioOutputDeviceName)
                    ?? allDevices.FirstOrDefault();
         }, ct).ConfigureAwait(false);

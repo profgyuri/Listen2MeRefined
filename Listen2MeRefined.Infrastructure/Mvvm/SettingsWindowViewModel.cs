@@ -20,6 +20,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly FontFamilies _installedFontFamilies;
     private readonly IVersionChecker _versionChecker;
     private readonly IFromFolderRemover _fromFolderRemover;
+    private readonly IOutputDevice _outputDevice;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -61,7 +62,8 @@ public sealed partial class SettingsWindowViewModel :
      IRepository<PlaylistModel> playlistRepository,
      IFolderScanner folderScanner,
      IVersionChecker versionChecker,
-     IFromFolderRemover fromFolderRemover)
+     IFromFolderRemover fromFolderRemover, 
+     IOutputDevice outputDevice)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -73,6 +75,7 @@ public sealed partial class SettingsWindowViewModel :
         _folderScanner = folderScanner;
         _versionChecker = versionChecker;
         _fromFolderRemover = fromFolderRemover;
+        _outputDevice = outputDevice;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
     }
@@ -252,7 +255,7 @@ public sealed partial class SettingsWindowViewModel :
             var result = Enumerable.Empty<AudioOutputDevice>();
             try
             {
-                result = AudioDevices.GetOutputDevices();
+                result = _outputDevice.EnumerateOutputDevices();
             }
             catch (Exception ex)
             {
