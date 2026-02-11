@@ -1,15 +1,14 @@
-﻿namespace Listen2MeRefined.Infrastructure.Media;
-using System.Collections.ObjectModel;
-using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using NAudio.Wave;
+
+namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 /// <summary>
 /// Wrapper class for NAudio.
 /// </summary>
-public sealed class WindowsMusicPlayer : 
-    IMediaController, 
-    IPlaylistReference,
+public sealed class NAudioMusicPlayer : 
+    IMusicPlayerController,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
     private bool _startSongAutomatically;
@@ -20,11 +19,11 @@ public sealed class WindowsMusicPlayer :
     private AudioModel? _currentSong;
     private WaveStream? _fileReader;
     private WaveOutEvent _waveOutEvent = new();
-    private ObservableCollection<AudioModel> _playlist = new();
     private PlaybackState _playbackState = PlaybackState.Stopped;
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
+    private readonly IPlaylist _playlist;
 
     private const int TimeCheckInterval = 500;
 
@@ -48,22 +47,17 @@ public sealed class WindowsMusicPlayer :
         set => _waveOutEvent.Volume = value;
     }
 
-    public WindowsMusicPlayer(
+    public NAudioMusicPlayer(
         ILogger logger,
         IMediator mediator,
-        TimedTask timedTask)
+        TimedTask timedTask, IPlaylist playlist)
     {
         _logger = logger;
         _mediator = mediator;
+        _playlist = playlist;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
         _logger.Debug("[WindowsMusicPlayer] initialized");
-    }
-
-    /// <inheritdoc />
-    public void PassPlaylist(ref ObservableCollection<AudioModel> playlist)
-    {
-        _playlist = playlist;
     }
 
     public async Task PlayPauseAsync()

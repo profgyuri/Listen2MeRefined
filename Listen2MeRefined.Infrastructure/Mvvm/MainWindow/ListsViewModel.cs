@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Notifications;
@@ -18,10 +20,10 @@ public partial class ListsViewModel :
     INotificationHandler<QuickSearchResultsNotification>
 {
     private readonly ILogger _logger;
-    private readonly IPlaylistReference _playlistReference;
     private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
     private readonly IFileScanner _fileScanner;
-    private readonly IMediaController _mediaController;
+    private readonly IMusicPlayerController _musicPlayerController;
+    private readonly IPlaylist _playList;
 
     private int _currentSongIndex = -1;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
@@ -31,31 +33,26 @@ public partial class ListsViewModel :
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
-    [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
     [ObservableProperty] private bool _isSearchResultsTabVisible = true;
     [ObservableProperty] private bool _isSongMenuTabVisible;
+    
+    public ObservableCollection<AudioModel> PlayList => 
+        _playList.Items as ObservableCollection<AudioModel> ??
+        throw new InvalidOperationException("PlayList is not an ObservableCollection");
 
     public ListsViewModel(
         ILogger logger,
-        IPlaylistReference playlistReference,
         IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
         IFileScanner fileScanner,
-        IMediaController mediaController)
+        IMusicPlayerController musicPlayerController, IPlaylist playList)
     {
         _logger = logger;
-        _playlistReference = playlistReference;
         _advancedAudioReader = advancedAudioReader;
         _fileScanner = fileScanner;
-        _mediaController = mediaController;
+        _musicPlayerController = musicPlayerController;
+        _playList = playList;
 
         _logger.Debug("[ListsViewModel] Class initialized");
-    }
-
-    protected override async Task InitializeCoreAsync(CancellationToken ct)
-    {
-        _playlistReference.PassPlaylist(ref _playList);
-
-        _logger.Debug("[ListsViewModel] Finished InitializeCoreAsync");
     }
 
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
@@ -118,7 +115,7 @@ public partial class ListsViewModel :
         if (SelectedIndex > -1)
         {
             _logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
-            await _mediaController.JumpToIndexAsync(SelectedIndex);
+            await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
         }
     }
 

@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
@@ -12,7 +14,7 @@ public partial class PlayerControlsViewModel :
 {
     private readonly ILogger _logger;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
-    private readonly IMediaController _mediaController;
+    private readonly IMusicPlayerController _musicPlayerController;
     private readonly TimedTask _timedTask;
 
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
@@ -22,10 +24,10 @@ public partial class PlayerControlsViewModel :
 
     public double CurrentTime
     {
-        get => _mediaController.CurrentTime;
+        get => _musicPlayerController.CurrentTime;
         set
         {
-            _mediaController.CurrentTime = value;
+            _musicPlayerController.CurrentTime = value;
             OnPropertyChanged();
         }
     }
@@ -33,12 +35,12 @@ public partial class PlayerControlsViewModel :
     public PlayerControlsViewModel(
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
-        IMediaController mediaController,
+        IMusicPlayerController musicPlayerController,
         TimedTask timedTask)
     {
         _logger = logger;
         _waveFormDrawer = waveFormDrawer;
-        _mediaController = mediaController;
+        _musicPlayerController = musicPlayerController;
         _timedTask = timedTask;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
@@ -78,34 +80,34 @@ public partial class PlayerControlsViewModel :
     private async Task PlayPause()
     {
         _logger.Debug("[PlayerControlsViewModel] Toggling play/pause");
-        await _mediaController.PlayPauseAsync();
+        await _musicPlayerController.PlayPauseAsync();
     }
 
     [RelayCommand]
     private void Stop()
     {
         _logger.Debug("[PlayerControlsViewModel] Stopping playback");
-        _mediaController.Stop();
+        _musicPlayerController.Stop();
     }
 
     [RelayCommand]
     private async Task Next()
     {
         _logger.Debug("[PlayerControlsViewModel] Skipping to next track");
-        await _mediaController.NextAsync();
+        await _musicPlayerController.NextAsync();
     }
 
     [RelayCommand]
     private async Task Previous()
     {
         _logger.Debug("[PlayerControlsViewModel] Skipping to previous track");
-        await _mediaController.PreviousAsync();
+        await _musicPlayerController.PreviousAsync();
     }
 
     [RelayCommand]
     private async Task Shuffle()
     {
         _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
-        await _mediaController.Shuffle();
+        await _musicPlayerController.Shuffle();
     }
 }

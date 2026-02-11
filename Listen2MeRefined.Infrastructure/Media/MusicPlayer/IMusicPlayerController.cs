@@ -1,9 +1,9 @@
-﻿namespace Listen2MeRefined.Infrastructure.Media;
+﻿namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 /// <summary>
 ///     Contract for controlling any media element.
 /// </summary>
-public interface IMediaController
+public interface IMusicPlayerController
 {
     double CurrentTime { get; set; }
 
