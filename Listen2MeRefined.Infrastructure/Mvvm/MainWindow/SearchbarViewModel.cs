@@ -1,8 +1,7 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public partial class SearchbarViewModel : 
     ViewModelBase,
@@ -50,10 +49,10 @@ public partial class SearchbarViewModel :
         }
     }
 
-    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[SearchbarViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         FontFamily = notification.FontFamily;
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }

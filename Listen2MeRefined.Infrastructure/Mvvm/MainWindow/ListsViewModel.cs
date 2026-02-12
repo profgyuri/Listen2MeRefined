@@ -1,16 +1,10 @@
-﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Services;
+using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Notifications;
-using MediatR;
-using System.Collections.ObjectModel;
-using System.Threading;
-using System.Threading.Tasks;
-using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Media;
 
 public partial class ListsViewModel :
     ViewModelBase,
@@ -53,60 +47,6 @@ public partial class ListsViewModel :
         _playList = playList;
 
         _logger.Debug("[ListsViewModel] Class initialized");
-    }
-
-    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
-        FontFamily = notification.FontFamily;
-        await Task.CompletedTask;
-    }
-
-    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
-        SelectedSong = notification.Audio;
-        _currentSongIndex = PlayList.IndexOf(SelectedSong);
-        await Task.CompletedTask;
-    }
-
-    public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchAll: {MatchAll})",
-            notification.Filters, notification.MatchAll);
-        var result =
-            (await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll)).ToArray();
-
-        _logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
-        if (result.Length > 0)
-        {
-            _logger.Verbose(
-                "[ListsViewModel] First {Shown} results are: {@Results}",
-                Math.Min(5, result.Length),
-                result.Take(5));
-        }
-
-        SearchResults.Clear();
-        SearchResults.AddRange(result);
-    }
-
-    public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
-    {
-        var result = notification.Results.ToArray();
-
-        _logger.Information("[ListsViewModel] Received quick search results with {Count} results", result.Length);
-        if (result.Length > 0)
-        {
-            _logger.Verbose(
-                "[ListsViewModel] First {Shown} results are: {@Results}",
-                Math.Min(5, result.Length),
-                result.Take(5));
-        }
-
-        SwitchToSearchResultsTab();
-        SearchResults.Clear();
-        SearchResults.AddRange(notification.Results);
-        await Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -242,5 +182,59 @@ public partial class ListsViewModel :
     public void RemoveSelectedPlaylistItems(AudioModel song)
     {
         _selectedPlaylistItems.Remove(song);
+    }
+    
+    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
+        FontFamily = notification.FontFamily;
+        await Task.CompletedTask;
+    }
+
+    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
+        SelectedSong = notification.Audio;
+        _currentSongIndex = PlayList.IndexOf(SelectedSong);
+        await Task.CompletedTask;
+    }
+
+    public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchAll: {MatchAll})",
+            notification.Filters, notification.MatchAll);
+        var result =
+            (await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll)).ToArray();
+
+        _logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
+        if (result.Length > 0)
+        {
+            _logger.Verbose(
+                "[ListsViewModel] First {Shown} results are: {@Results}",
+                Math.Min(5, result.Length),
+                result.Take(5));
+        }
+
+        SearchResults.Clear();
+        SearchResults.AddRange(result);
+    }
+
+    public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
+    {
+        var result = notification.Results.ToArray();
+
+        _logger.Information("[ListsViewModel] Received quick search results with {Count} results", result.Length);
+        if (result.Length > 0)
+        {
+            _logger.Verbose(
+                "[ListsViewModel] First {Shown} results are: {@Results}",
+                Math.Min(5, result.Length),
+                result.Take(5));
+        }
+
+        SwitchToSearchResultsTab();
+        SearchResults.Clear();
+        SearchResults.AddRange(notification.Results);
+        await Task.CompletedTask;
     }
 }

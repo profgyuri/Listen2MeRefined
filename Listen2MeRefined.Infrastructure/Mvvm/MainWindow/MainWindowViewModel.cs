@@ -1,8 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+﻿using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class MainWindowViewModel : 
     ViewModelBase,
@@ -85,17 +85,13 @@ public sealed partial class MainWindowViewModel :
         _logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
     }
 
-    /// <inheritdoc />
-    Task INotificationHandler<CurrentSongNotification>.Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
         return _ui.InvokeAsync(() => Song = notification.Audio, cancellationToken);
     }
 
-    /// <inheritdoc />
-    Task INotificationHandler<FontFamilyChangedNotification>.Handle(
-        FontFamilyChangedNotification notification,
-        CancellationToken cancellationToken)
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         return _ui.InvokeAsync(() => FontFamily = notification.FontFamily, cancellationToken);

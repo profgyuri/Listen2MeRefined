@@ -1,12 +1,10 @@
 ﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using SkiaSharp;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public partial class PlayerControlsViewModel :
     ViewModelBase,
