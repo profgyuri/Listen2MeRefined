@@ -12,7 +12,6 @@ public sealed class NAudioMusicPlayer :
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
     private bool _startSongAutomatically;
-    private int _currentSongIndex;
     private int _outputDeviceIndex = -1;
     private double _previousTimeStamp;
     private double _unpausedFor;
@@ -23,7 +22,7 @@ public sealed class NAudioMusicPlayer :
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
-    private readonly IPlaylist _playlist;
+    private readonly IPlaybackQueueService _playbackQueueService;
 
     private const int TimeCheckInterval = 500;
 
@@ -50,11 +49,12 @@ public sealed class NAudioMusicPlayer :
     public NAudioMusicPlayer(
         ILogger logger,
         IMediator mediator,
-        TimedTask timedTask, IPlaylist playlist)
+        TimedTask timedTask,
+        IPlaybackQueueService playbackQueueService)
     {
         _logger = logger;
         _mediator = mediator;
-        _playlist = playlist;
+        _playbackQueueService = playbackQueueService;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
         _logger.Debug("[WindowsMusicPlayer] initialized");
@@ -97,77 +97,86 @@ public sealed class NAudioMusicPlayer :
 
     public async Task NextAsync()
     {
-        if (!_playlist.Any())
+        var nextTrack = _playbackQueueService.GetNextTrack();
+        if (nextTrack is null)
         {
             _logger.Information("[WindowsMusicPlayer] Playback is stopped, because the playlist is empty!");
             Stop();
             return;
         }
 
-        _currentSongIndex = (_currentSongIndex + 1) % _playlist!.Count;
-
         _logger.Information("[WindowsMusicPlayer] Jumping to next song...");
-        await LoadCurrentSong();
+        await LoadSong(nextTrack);
     }
 
     public async Task PreviousAsync()
     {
-        if (!_playlist.Any())
+        var previousTrack = _playbackQueueService.GetPreviousTrack();
+        if (previousTrack is null)
         {
             _logger.Warning("[WindowsMusicPlayer] Cannot go to the previous song, because the playlist is empty!");
             return;
         }
 
-        _currentSongIndex = (_currentSongIndex - 1 + _playlist!.Count) % _playlist.Count;
-
         _logger.Information("[WindowsMusicPlayer] Jumping to previous song...");
-        await LoadCurrentSong();
+        await LoadSong(previousTrack);
     }
 
     public async Task JumpToIndexAsync(int index)
     {
-        _currentSongIndex = index;
+        var track = _playbackQueueService.GetTrackAtIndex(index);
+        if (track is null)
+        {
+            _logger.Warning("[WindowsMusicPlayer] Cannot jump to song at index {Index}, because the playlist is empty!", index);
+            return;
+        }
+
         _logger.Information("[WindowsMusicPlayer] Jumping to song at index {Index}...", index);
-        await LoadCurrentSong();
+        await LoadSong(track);
     }
 
     public async Task Shuffle()
     {
-        if (!_playlist.Any())
+        var shuffledCurrentTrack = _playbackQueueService.Shuffle(_currentSong);
+        if (shuffledCurrentTrack is null)
         {
             _logger.Warning("[WindowsMusicPlayer] Cannot shuffle an empty playlist!");
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Shuffling playlist...");
+        _logger.Information("[WindowsMusicPlayer] Playlist shuffled.");
 
-        _playlist.Shuffle();
-        _logger.Verbose("[WindowsMusicPlayer] Playlist shuffled.");
-
-        var index = _playlist.IndexOf(_currentSong);
-        _currentSongIndex = 0;
-
-        if (index > -1)
+        if (_currentSong is null)
         {
-            _logger.Debug("[WindowsMusicPlayer] Moving current song to the top of the shuffled playlist...");
-            (_playlist[index], _playlist[0]) = (_playlist[0], _playlist[index]);
-        }
-        else
-        {
-            _logger.Debug("[WindowsMusicPlayer] Current song not found in playlist, loading the first song...");
-            await LoadCurrentSong();
+            _logger.Debug("[WindowsMusicPlayer] No song is currently loaded, loading shuffled track...");
+            await LoadSong(shuffledCurrentTrack);
         }
     }
+    
     private async Task LoadCurrentSong()
     {
-        _currentSong = _playlist[_currentSongIndex];
+        var currentTrack = _playbackQueueService.GetCurrentTrack();
+        if (currentTrack is null)
+        {
+            _logger.Warning("[WindowsMusicPlayer] Cannot load current song, because the playlist is empty!");
+            Stop();
+            return;
+        }
+
+        await LoadSong(currentTrack);
+    }
+
+    
+    private async Task LoadSong(AudioModel song)
+    {
+        _currentSong = song;
         _logger.Information("[WindowsMusicPlayer] Loading audio: {@Song}", _currentSong);
 
         if (!File.Exists(_currentSong.Path))
         {
             _logger.Warning("[WindowsMusicPlayer] Skipping a song, that does not exist anymore at path: {Path}", _currentSong.Path);
-            _playlist.Remove(_currentSong);
-            await NextAsync();
+            _playbackQueueService.RemoveTrack(_currentSong);
+            await LoadCurrentSong();
             return;
         }
 
@@ -181,7 +190,8 @@ public sealed class NAudioMusicPlayer :
             //just skip this, as I have no clue how to handle or convert this type
             //TODO: find a way to convert or play extensible wav files
             _logger.Warning("[WindowsMusicPlayer] Unsupported (extensible) .wav file is being skipped: {Song}", _currentSong.Path);
-            await NextAsync();
+            _playbackQueueService.RemoveTrack(_currentSong);
+            await LoadCurrentSong();
             return;
         }
 
@@ -189,7 +199,7 @@ public sealed class NAudioMusicPlayer :
         await _mediator.Publish(new CurrentSongNotification(_currentSong));
 
         ReNewWaveOutEvent();
-
+        
         _previousTimeStamp = -1;
         _unpausedFor = 0;
 
@@ -248,7 +258,7 @@ public sealed class NAudioMusicPlayer :
     /// <summary>
     /// Determines if the remainder of the current song should be skipped.
     /// </summary>
-    /// <returns>True if the song reached it's end, false otherwise.</returns>
+    /// <returns>True if the song reached its end, false otherwise.</returns>
     private bool ShouldSkipToNext()
     {
         return Math.Abs(_fileReader!.CurrentTime.TotalMilliseconds - _previousTimeStamp) < 0.1
@@ -259,7 +269,7 @@ public sealed class NAudioMusicPlayer :
 
     private async Task StartPlayback()
     {
-        if (!_playlist.Any())
+        if (_playbackQueueService.GetCurrentTrack() is null)
         {
             _logger.Warning("[WindowsMusicPlayer] Cannot start playback, because the playlist is empty!");
             return;

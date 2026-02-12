@@ -16,5 +16,10 @@ public class MusicPlayerModule : Module
             .RegisterType<Playlist>()
             .As<IPlaylist>()
             .SingleInstance();
+        
+        builder
+            .RegisterType<PlaybackQueueService>()
+            .As<IPlaybackQueueService>()
+            .SingleInstance();
     }
 }

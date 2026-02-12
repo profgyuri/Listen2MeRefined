@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
-public class Playlist : IPlaylist
+public sealed class Playlist : IPlaylist
 {
     private ObservableCollection<AudioModel> _items = new();
     public IList<AudioModel> Items => _items;
