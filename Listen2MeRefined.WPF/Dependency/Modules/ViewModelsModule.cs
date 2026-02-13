@@ -32,12 +32,12 @@ public class ViewModelsModule : Module
             .RegisterType<PlayerControlsViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
-            .InstancePerLifetimeScope();
+            .SingleInstance();
         builder
             .RegisterType<ListsViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
-            .InstancePerLifetimeScope();
+            .SingleInstance();
         builder
             .RegisterType<StartupManager>()
             .AsSelf()

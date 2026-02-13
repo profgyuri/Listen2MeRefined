@@ -14,7 +14,7 @@ public partial class ListsViewModel :
     INotificationHandler<QuickSearchResultsNotification>
 {
     private readonly ILogger _logger;
-    private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
+    private readonly IAdvancedDataReader<AdvancedFilter, AudioModel> _advancedAudioReader;
     private readonly IFileScanner _fileScanner;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
@@ -36,7 +36,7 @@ public partial class ListsViewModel :
 
     public ListsViewModel(
         ILogger logger,
-        IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
+        IAdvancedDataReader<AdvancedFilter, AudioModel> advancedAudioReader,
         IFileScanner fileScanner,
         IMusicPlayerController musicPlayerController, IPlaylist playList)
     {
@@ -50,7 +50,7 @@ public partial class ListsViewModel :
     }
 
     [RelayCommand]
-    public async Task JumpToSelecteSong()
+    public async Task JumpToSelectedSong()
     {
         if (SelectedIndex > -1)
         {
@@ -215,8 +215,14 @@ public partial class ListsViewModel :
                 result.Take(5));
         }
 
+        SwitchToSearchResultsTab();
         SearchResults.Clear();
         SearchResults.AddRange(result);
+    }
+
+    partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
+    {
+        _logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
     }
 
     public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)

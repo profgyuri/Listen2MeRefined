@@ -221,7 +221,7 @@ public sealed partial class MainWindow : Window
         if (e.ChangedButton == MouseButton.Left)
         {
             var vm = (MainWindowViewModel)DataContext;
-            vm.ListsViewModel.JumpToSelecteSong().ConfigureAwait(false);
+            vm.ListsViewModel.JumpToSelectedSong().ConfigureAwait(false);
         }
     }
 

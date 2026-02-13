@@ -6,42 +6,70 @@ using Microsoft.EntityFrameworkCore;
 
 public sealed class AudioRepository : 
     RepositoryBase<AudioModel>,
-    IAdvancedDataReader<ParameterizedQuery, AudioModel>,
+    IAdvancedDataReader<AdvancedFilter, AudioModel>,
     IFromFolderRemover
 {
     public AudioRepository(DataContext dataContext, IDbConnection dbConnection, ILogger logger)
         : base(logger, dataContext, dbConnection)
     { }
 
-    #region Implementation of IAdvancedDataReader<in ParameterizedQuery,AudioModel>
-    /// <inheritdoc />
-    public async Task<IEnumerable<AudioModel>> ReadAsync(IEnumerable<ParameterizedQuery> criterias, bool matchAll)
+    public async Task<IEnumerable<AudioModel>> ReadAsync(IEnumerable<AdvancedFilter> criterias, bool matchAll)
     {
-        var concatenation = matchAll ? "AND" : "OR";
-        var parameterizedQueries = criterias as ParameterizedQuery[] ?? criterias.ToArray();
-        var clauses = parameterizedQueries.Select(x => x.QueryString);
-        var parameterList = parameterizedQueries.Select(x => x.Parameters);
+        var filters = criterias as AdvancedFilter[] ?? criterias.ToArray();
+        if (filters.Length == 0)
+        {
+            return Enumerable.Empty<AudioModel>();
+        }
+        
+        var validFields = typeof(AudioModel)
+            .GetProperties()
+            .Select(x => x.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
         var parameters = new DynamicParameters();
+        var clauses = new List<string>(filters.Length);
 
-        foreach (var param in parameterList)
+        for (var i = 0; i < filters.Length; i++)
         {
-            parameters.AddDynamicParams(param);
+            var filter = filters[i];
+            if (!validFields.Contains(filter.Field))
+            {
+                throw new InvalidOperationException($"Unsupported filter field: {filter.Field}");
+            }
+
+            var parameterName = $"p{i}";
+            var sqlOperator = GetSqlOperator(filter.Operator);
+            var value = filter.Operator is AdvancedFilterOperator.Contains or AdvancedFilterOperator.NotContains
+                ? $"%{filter.Value}%"
+                : filter.Value;
+
+            parameters.Add(parameterName, value);
+            clauses.Add($"{filter.Field} {sqlOperator} @{parameterName} COLLATE NOCASE");
         }
 
-        var builder = new StringBuilder();
-        builder.Append($"SELECT * FROM {_dataContext.Model.FindEntityType(typeof(AudioModel))!.GetTableName()!} WHERE ");
-        foreach (var clause in clauses)
-        {
-            builder.Append(clause);
-            builder.Append(" COLLATE NOCASE");
-            builder.Append($" {concatenation} ");
-        }
+        var joiner = matchAll ? " AND " : " OR ";
+        var whereClause = string.Join(joiner, clauses);
+        var tableName = _dataContext.Model.FindEntityType(typeof(AudioModel))!.GetTableName()!;
+        var query = new StringBuilder($"SELECT * FROM {tableName} WHERE ")
+            .Append(whereClause)
+            .ToString();
 
-        builder.Remove(builder.Length - concatenation.Length - 1, concatenation.Length);
-        var query = builder.ToString();
         return await _dbConnection.QueryAsync<AudioModel>(query, parameters);
+        
+        static string GetSqlOperator(AdvancedFilterOperator op)
+        {
+            return op switch
+            {
+                AdvancedFilterOperator.Equal => "=",
+                AdvancedFilterOperator.NotEqual => "<>",
+                AdvancedFilterOperator.Contains => "LIKE",
+                AdvancedFilterOperator.NotContains => "NOT LIKE",
+                AdvancedFilterOperator.GreaterThan => ">",
+                AdvancedFilterOperator.LessThan => "<",
+                _ => throw new ArgumentOutOfRangeException(nameof(op), op, "Unsupported advanced filter operator")
+            };
+        }
     }
-    #endregion
 
     public async Task RemoveFromFolderAsync(string folderPath)
     {
