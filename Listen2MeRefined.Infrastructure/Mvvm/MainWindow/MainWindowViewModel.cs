@@ -1,5 +1,5 @@
-﻿using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
-using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
