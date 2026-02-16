@@ -1,6 +1,7 @@
-namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+using Listen2MeRefined.Infrastructure.Startup;
+
+namespace Listen2MeRefined.WPF.Dependency.Modules;
 
 public class ViewModelsModule : Module
 {
@@ -35,6 +36,16 @@ public class ViewModelsModule : Module
             .SingleInstance();
         builder
             .RegisterType<ListsViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<PlaylistPaneViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<SearchResultsPaneViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();

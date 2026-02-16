@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
+namespace Listen2MeRefined.Infrastructure.Mvvm;
+
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public partial class ListsViewModel :
     ViewModelBase,
@@ -49,15 +49,14 @@ public partial class ListsViewModel :
         _logger.Debug("[ListsViewModel] Class initialized");
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
     public async Task JumpToSelectedSong()
     {
-        if (SelectedIndex > -1)
-        {
-            _logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
-            await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
-        }
+        _logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
+        await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
     }
+
+    private bool CanJumpToSelectedSong() => SelectedIndex > -1;
 
     [RelayCommand]
     private void SendSelectedToPlaylist()
@@ -164,24 +163,36 @@ public partial class ListsViewModel :
         IsSearchResultsTabVisible = true;
         IsSongMenuTabVisible = false;
     }
-    public void AddSelectedSearchResult(AudioModel song)
+    public void AddSelectedSearchResults(IEnumerable<AudioModel> songs)
     {
-        _selectedSearchResults.Add(song);
+        foreach (var song in songs)
+        {
+            _selectedSearchResults.Add(song);
+        }
     }
 
-    public void RemoveSelectedSearchResult(AudioModel song)
+    public void RemoveSelectedSearchResults(IEnumerable<AudioModel> songs)
     {
-        _selectedSearchResults?.Remove(song);
+        foreach (var song in songs)
+        {
+            _selectedSearchResults.Remove(song);
+        }
     }
 
-    public void AddSelectedPlaylistItems(AudioModel song)
+    public void AddSelectedPlaylistItems(IEnumerable<AudioModel> songs)
     {
-        _selectedPlaylistItems.Add(song);
+        foreach (var song in songs)
+        {
+            _selectedPlaylistItems.Add(song);
+        }
     }
 
-    public void RemoveSelectedPlaylistItems(AudioModel song)
+    public void RemoveSelectedPlaylistItems(IEnumerable<AudioModel> songs)
     {
-        _selectedPlaylistItems.Remove(song);
+        foreach (var song in songs)
+        {
+            _selectedPlaylistItems.Remove(song);
+        }
     }
     
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
@@ -218,6 +229,12 @@ public partial class ListsViewModel :
         SwitchToSearchResultsTab();
         SearchResults.Clear();
         SearchResults.AddRange(result);
+    }
+
+
+    partial void OnSelectedIndexChanged(int value)
+    {
+        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)

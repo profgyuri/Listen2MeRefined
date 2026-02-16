@@ -1,0 +1,28 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.MainWindow.PlaybackControlsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
+             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
+    <Border DataContext="{Binding PlayerControlsViewModel}" utils:ViewModelInitialization.AutoInitialize="True" Style="{StaticResource ContainerBorder}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
+            <Button Grid.Column="1" Command="{Binding StopCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
+            <Button Grid.Column="2" Command="{Binding PlayPauseCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
+            <Button Grid.Column="3" Command="{Binding NextCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
+            <Button Grid.Column="4" Command="{Binding ShuffleCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
+            <wpf:WaveSlider Style="{StaticResource NoHaloSlider}" Foreground="{StaticResource TertiaryBrush}" WaveBitmap="{Binding WaveForm}" Grid.Row="1" Minimum="0" Maximum="{Binding TotalTime}" Value="{Binding CurrentTime}" Grid.ColumnSpan="5" Width="{Binding WaveFormWidth}" Height="{Binding WaveFormHeight}"/>
+        </Grid>
+    </Border>
+</UserControl>
