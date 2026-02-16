@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
@@ -28,6 +29,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     public PlaylistPaneViewModel(ListsViewModel lists)
     {
         _lists = lists;
+        _lists.PropertyChanged += ListsOnPropertyChanged;
     }
 
     [RelayCommand]
@@ -35,4 +37,16 @@ public partial class PlaylistPaneViewModel : ViewModelBase
 
     [RelayCommand]
     private void PlaylistSelectionRemoved(IList items) => _lists.RemoveSelectedPlaylistItems(items.Cast<AudioModel>());
+
+    private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ListsViewModel.SelectedSong))
+        {
+            OnPropertyChanged(nameof(SelectedSong));
+        }
+        else if (e.PropertyName == nameof(ListsViewModel.SelectedIndex))
+        {
+            OnPropertyChanged(nameof(SelectedIndex));
+        }
+    }
 }
