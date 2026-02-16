@@ -1,10 +1,10 @@
-﻿using System.Collections.ObjectModel;
+namespace Listen2MeRefined.Infrastructure.Mvvm;
+
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using MediatR;
-
-namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public partial class ListsViewModel :
     ViewModelBase,
