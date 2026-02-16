@@ -1,100 +1,124 @@
 ﻿using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
-using NAudio.Wave;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 /// <summary>
 /// Wrapper class for NAudio.
 /// </summary>
-public sealed class NAudioMusicPlayer : 
+public sealed class NAudioMusicPlayer :
     IMusicPlayerController,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
+    private enum PlayerState
+    {
+        Stopped,
+        Playing,
+        Paused
+    }
+
     private bool _startSongAutomatically;
     private int _outputDeviceIndex = -1;
-    private double _previousTimeStamp;
-    private double _unpausedFor;
     private AudioModel? _currentSong;
-    private WaveStream? _fileReader;
-    private WaveOutEvent _waveOutEvent = new();
-    private PlaybackState _playbackState = PlaybackState.Stopped;
+    private NAudio.Wave.WaveStream? _fileReader;
+    private PlayerState _state = PlayerState.Stopped;
 
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IPlaybackQueueService _playbackQueueService;
+    private readonly ITrackLoader _trackLoader;
+    private readonly IPlaybackOutput _playbackOutput;
+    private readonly IPlaybackProgressMonitor _playbackProgressMonitor;
 
     private const int TimeCheckInterval = 500;
 
+    /// <summary>
+    /// Gets or sets the current playback position in milliseconds.
+    /// </summary>
     public double CurrentTime
     {
         get => _fileReader?.CurrentTime.TotalMilliseconds ?? 0;
         set
         {
-            if (_fileReader == null)
+            if (_fileReader is not null)
             {
-                return;
+                _fileReader.CurrentTime = TimeSpan.FromMilliseconds(value);
             }
-
-            _fileReader.CurrentTime = TimeSpan.FromMilliseconds(value);
         }
     }
 
+    /// <summary>
+    /// Gets or sets the playback output volume.
+    /// </summary>
     public float Volume
     {
-        get => _waveOutEvent.Volume;
-        set => _waveOutEvent.Volume = value;
+        get => _playbackOutput.Volume;
+        set => _playbackOutput.Volume = value;
     }
 
+    /// <summary>
+    /// Initializes a new player orchestrator with the required playback collaborators.
+    /// </summary>
     public NAudioMusicPlayer(
         ILogger logger,
         IMediator mediator,
         TimedTask timedTask,
-        IPlaybackQueueService playbackQueueService)
+        IPlaybackQueueService playbackQueueService,
+        ITrackLoader trackLoader,
+        IPlaybackOutput playbackOutput,
+        IPlaybackProgressMonitor playbackProgressMonitor)
     {
         _logger = logger;
         _mediator = mediator;
         _playbackQueueService = playbackQueueService;
+        _trackLoader = trackLoader;
+        _playbackOutput = playbackOutput;
+        _playbackProgressMonitor = playbackProgressMonitor;
 
-        timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), async () => await CurrentTimeCheck());
+        timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), () => CheckPlaybackProgressAsync().GetAwaiter().GetResult());
         _logger.Debug("[WindowsMusicPlayer] initialized");
     }
 
+    /// <summary>
+    /// Toggles playback between play and pause for the current track.
+    /// </summary>
     public async Task PlayPauseAsync()
     {
-        _logger.Debug("[WindowsMusicPlayer] Toggling playback state...");
         if (_currentSong is null)
         {
-            _logger.Debug("[WindowsMusicPlayer] No song is loaded, do nothing...");
+            await StartPlaybackAsync();
             return;
         }
 
-        if (_playbackState == PlaybackState.Playing)
+        if (_state == PlayerState.Playing)
         {
-            _logger.Information("[WindowsMusicPlayer] Pausing playback");
             PausePlayback();
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Starting playback");
-        await StartPlayback();
+        await StartPlaybackAsync();
     }
 
+    /// <summary>
+    /// Stops playback and seeks to the beginning of the current track.
+    /// </summary>
     public void Stop()
     {
-        _waveOutEvent.Stop();
-        _playbackState = PlaybackState.Stopped;
-
-        _logger.Debug("[WindowsMusicPlayer] Playback stopped by user");
-
+        _playbackOutput.Stop();
         if (_fileReader is not null)
         {
-            _fileReader.CurrentTime = TimeSpan.FromSeconds(0);
+            _fileReader.CurrentTime = TimeSpan.Zero;
         }
 
         _startSongAutomatically = false;
+        SetState(PlayerState.Stopped);
+        _playbackProgressMonitor.Reset();
+        _logger.Debug("[WindowsMusicPlayer] Playback stopped by user");
     }
 
+    /// <summary>
+    /// Advances to the next track in the playback queue.
+    /// </summary>
     public async Task NextAsync()
     {
         var nextTrack = _playbackQueueService.GetNextTrack();
@@ -105,10 +129,12 @@ public sealed class NAudioMusicPlayer :
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Jumping to next song...");
-        await LoadSong(nextTrack);
+        await LoadSongAsync(nextTrack);
     }
 
+    /// <summary>
+    /// Moves to the previous track in the playback queue.
+    /// </summary>
     public async Task PreviousAsync()
     {
         var previousTrack = _playbackQueueService.GetPreviousTrack();
@@ -118,10 +144,13 @@ public sealed class NAudioMusicPlayer :
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Jumping to previous song...");
-        await LoadSong(previousTrack);
+        await LoadSongAsync(previousTrack);
     }
 
+    /// <summary>
+    /// Jumps playback to the track at the provided queue index.
+    /// </summary>
+    /// <param name="index">The target track index.</param>
     public async Task JumpToIndexAsync(int index)
     {
         var track = _playbackQueueService.GetTrackAtIndex(index);
@@ -131,10 +160,12 @@ public sealed class NAudioMusicPlayer :
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Jumping to song at index {Index}...", index);
-        await LoadSong(track);
+        await LoadSongAsync(track);
     }
 
+    /// <summary>
+    /// Shuffles the queue while keeping the current track consistent when available.
+    /// </summary>
     public async Task Shuffle()
     {
         var shuffledCurrentTrack = _playbackQueueService.Shuffle(_currentSong);
@@ -144,130 +175,43 @@ public sealed class NAudioMusicPlayer :
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Playlist shuffled.");
-
         if (_currentSong is null)
         {
-            _logger.Debug("[WindowsMusicPlayer] No song is currently loaded, loading shuffled track...");
-            await LoadSong(shuffledCurrentTrack);
-        }
-    }
-    
-    private async Task LoadCurrentSong()
-    {
-        var currentTrack = _playbackQueueService.GetCurrentTrack();
-        if (currentTrack is null)
-        {
-            _logger.Warning("[WindowsMusicPlayer] Cannot load current song, because the playlist is empty!");
-            Stop();
-            return;
-        }
-
-        await LoadSong(currentTrack);
-    }
-
-    
-    private async Task LoadSong(AudioModel song)
-    {
-        _currentSong = song;
-        _logger.Information("[WindowsMusicPlayer] Loading audio: {@Song}", _currentSong);
-
-        if (!File.Exists(_currentSong.Path))
-        {
-            _logger.Warning("[WindowsMusicPlayer] Skipping a song, that does not exist anymore at path: {Path}", _currentSong.Path);
-            _playbackQueueService.RemoveTrack(_currentSong);
-            await LoadCurrentSong();
-            return;
-        }
-
-        _logger.Verbose("[WindowsMusicPlayer] Determining the type of audio file reader");
-        _fileReader = _currentSong.Path.EndsWith(".wav") ? 
-            new WaveFileReader(_currentSong.Path) : 
-            new AudioFileReader(_currentSong.Path);
-
-        if (_fileReader.WaveFormat.Encoding is WaveFormatEncoding.Extensible)
-        {
-            //just skip this, as I have no clue how to handle or convert this type
-            //TODO: find a way to convert or play extensible wav files
-            _logger.Warning("[WindowsMusicPlayer] Unsupported (extensible) .wav file is being skipped: {Song}", _currentSong.Path);
-            _playbackQueueService.RemoveTrack(_currentSong);
-            await LoadCurrentSong();
-            return;
-        }
-
-        _logger.Debug("[WindowsMusicPlayer] Publishing current song changed notification with {@Song}", _currentSong);
-        await _mediator.Publish(new CurrentSongNotification(_currentSong));
-
-        ReNewWaveOutEvent();
-        
-        _previousTimeStamp = -1;
-        _unpausedFor = 0;
-
-        if (_startSongAutomatically)
-        {
-            _logger.Information("[WindowsMusicPlayer] Starting playback of the loaded song automatically...");
-            _waveOutEvent!.Play();
+            await LoadSongAsync(shuffledCurrentTrack);
         }
     }
 
-    private void ReNewWaveOutEvent()
+    internal async Task CheckPlaybackProgressAsync()
     {
-        _logger.Information("[WindowsMusicPlayer] Renewing waveout event...");
-
-        try
-        {
-            _waveOutEvent.Dispose();
-            _waveOutEvent = new WaveOutEvent
-            {
-                DeviceNumber = _outputDeviceIndex
-            };
-            _waveOutEvent.Init(_fileReader);
-        }
-        catch (Exception e)
-        {
-            _logger.Error(e, "[WindowsMusicPlayer] Waveout event failed to load!");
-        }
-    }
-
-    private async Task CurrentTimeCheck()
-    {
-        if (ShouldSkipTimeCheck())
+        if (_fileReader is null)
         {
             return;
         }
 
-        if (ShouldSkipToNext())
+        if (_playbackProgressMonitor.ShouldAdvance(_fileReader.CurrentTime, _fileReader.TotalTime, _state == PlayerState.Playing))
         {
             _logger.Debug("[WindowsMusicPlayer] Current song reached its end, skipping to the next song...");
             await NextAsync();
         }
-
-        _previousTimeStamp = _fileReader!.CurrentTime.TotalMilliseconds;
-        _unpausedFor += TimeCheckInterval;
     }
 
     /// <summary>
-    /// Checks if any song is being played currently.
+    /// Reconfigures audio output when the selected audio device changes.
     /// </summary>
-    /// <returns>True if a song is being played, false otherwise.</returns>
-    private bool ShouldSkipTimeCheck()
+    /// <param name="notification">The device change notification.</param>
+    /// <param name="cancellationToken">Token that can cancel notification processing.</param>
+    public async Task Handle(AudioOutputDeviceChangedNotification notification, CancellationToken cancellationToken)
     {
-        return _fileReader is null || _playbackState is not PlaybackState.Playing;
+        if (notification.Device.Index == _outputDeviceIndex)
+        {
+            return;
+        }
+
+        _outputDeviceIndex = notification.Device.Index;
+        await ReconfigureOutputAsync(_state == PlayerState.Playing, preservePosition: true);
     }
 
-    /// <summary>
-    /// Determines if the remainder of the current song should be skipped.
-    /// </summary>
-    /// <returns>True if the song reached its end, false otherwise.</returns>
-    private bool ShouldSkipToNext()
-    {
-        return Math.Abs(_fileReader!.CurrentTime.TotalMilliseconds - _previousTimeStamp) < 0.1
-               && _previousTimeStamp >= TimeCheckInterval
-               && _unpausedFor > TimeCheckInterval
-               && _fileReader.CurrentTime.TotalMilliseconds > _fileReader.TotalTime.TotalMilliseconds - 1000;
-    }
-
-    private async Task StartPlayback()
+    private async Task StartPlaybackAsync()
     {
         if (_playbackQueueService.GetCurrentTrack() is null)
         {
@@ -275,67 +219,110 @@ public sealed class NAudioMusicPlayer :
             return;
         }
 
-        _playbackState = PlaybackState.Playing;
-        _unpausedFor = 0;
-
         if (_currentSong is null)
         {
-            _logger.Debug("[WindowsMusicPlayer] No song is loaded, loading the current song {@Song}", _currentSong);
-            await LoadCurrentSong();
+            await LoadCurrentSongAsync();
+            return;
         }
 
         _startSongAutomatically = true;
-        _waveOutEvent.Play();
-        _logger.Information("[WindowsMusicPlayer] Playback started");
+        _playbackOutput.Play();
+        SetState(PlayerState.Playing);
     }
 
     private void PausePlayback()
     {
-        _logger.Information("[WindowsMusicPlayer] Pausing playback...");
-        _waveOutEvent.Pause();
+        _playbackOutput.Pause();
         _startSongAutomatically = false;
-        _playbackState = PlaybackState.Paused;
-
-        _logger.Verbose("[WindowsMusicPlayer] Playback paused");
+        SetState(PlayerState.Paused);
     }
 
-    /// <inheritdoc />
-    public async Task Handle(
-        AudioOutputDeviceChangedNotification notification,
-        CancellationToken cancellationToken)
+    private async Task LoadCurrentSongAsync()
     {
-        _logger.Information("[WindowsMusicPlayer] Received audio output device changed notification: {DeviceName}", notification.Device.Name);
-        // Avoid changing to the same device
-        if (notification.Device.Index == _outputDeviceIndex)
+        var currentTrack = _playbackQueueService.GetCurrentTrack();
+        if (currentTrack is null)
         {
-            _logger.Debug("[WindowsMusicPlayer] The selected audio output device is already in use. No changes made.");
+            Stop();
             return;
         }
 
-        _logger.Information("[WindowsMusicPlayer] Changing audio output device to {DeviceName}", notification.Device.Name);
-        _outputDeviceIndex = notification.Device.Index;
+        await LoadSongAsync(currentTrack);
+    }
 
+    private async Task LoadSongAsync(AudioModel song)
+    {
+        _currentSong = song;
+
+        var loadResult = _trackLoader.Load(song);
+        if (!loadResult.IsSuccess)
+        {
+            await HandleUnplayableTrackAsync(song, loadResult);
+            return;
+        }
+
+        _fileReader?.Dispose();
+        _fileReader = loadResult.Reader;
+
+        await _mediator.Publish(new CurrentSongNotification(_currentSong));
+
+        _playbackProgressMonitor.Reset();
+
+        var reconfigured = await ReconfigureOutputAsync(_startSongAutomatically, preservePosition: false);
+        if (reconfigured && _startSongAutomatically)
+        {
+            SetState(PlayerState.Playing);
+        }
+    }
+
+    private async Task<bool> ReconfigureOutputAsync(bool resumePlayback, bool preservePosition)
+    {
         if (_fileReader is null)
         {
-            _logger.Warning("[WindowsMusicPlayer] FileReader is not yet initialized, skipping device change...");
-            return;
+            return false;
         }
-        
+
         var timeStamp = _fileReader.CurrentTime;
-
-        var isPlaying = _playbackState == PlaybackState.Playing;
-        
-        ReNewWaveOutEvent();
-        Stop();
-
-        _fileReader.CurrentTime = timeStamp;
-
-        if (isPlaying)
+        var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
+        if (!result.IsSuccess)
         {
-            _logger.Information("[WindowsMusicPlayer] Resuming playback after device change...");
-            await PlayPauseAsync();
+            _logger.Warning(result.Exception, "[WindowsMusicPlayer] Failed to reconfigure audio output: {Context}", result.Context);
+            if (!result.PreservedPreviousOutput)
+            {
+                _startSongAutomatically = false;
+                SetState(PlayerState.Stopped);
+            }
+
+            return false;
         }
 
-        _logger.Verbose("[WindowsMusicPlayer] Audio output device changed successfully to {DeviceName}", notification.Device.Name);
+        if (preservePosition)
+        {
+            _fileReader.CurrentTime = timeStamp;
+        }
+
+        if (resumePlayback)
+        {
+            _playbackOutput.Play();
+            SetState(PlayerState.Playing);
+            _startSongAutomatically = true;
+        }
+        else if (_state == PlayerState.Paused)
+        {
+            _playbackOutput.Pause();
+        }
+
+        return true;
+    }
+
+    private async Task HandleUnplayableTrackAsync(AudioModel track, TrackLoadResult result)
+    {
+        _logger.Warning("[WindowsMusicPlayer] Skipping song {Path}. Status: {Status}. Reason: {Reason}", track.Path, result.Status, result.Reason);
+        _playbackQueueService.RemoveTrack(track);
+        await LoadCurrentSongAsync();
+    }
+
+    private void SetState(PlayerState newState)
+    {
+        _state = newState;
     }
 }
