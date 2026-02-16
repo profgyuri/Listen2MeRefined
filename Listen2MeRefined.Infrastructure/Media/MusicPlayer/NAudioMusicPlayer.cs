@@ -160,6 +160,14 @@ public sealed class NAudioMusicPlayer :
             return;
         }
 
+        if (_state == PlayerState.Playing &&
+            _currentSong is not null &&
+            string.Equals(track.Path, _currentSong.Path, StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.Debug("[WindowsMusicPlayer] Ignoring jump to already playing track at index {Index}", index);
+            return;
+        }
+
         await LoadSongAsync(track);
     }
 
@@ -213,7 +221,8 @@ public sealed class NAudioMusicPlayer :
 
     private async Task StartPlaybackAsync()
     {
-        if (_playbackQueueService.GetCurrentTrack() is null)
+        var currentTrack = _playbackQueueService.GetCurrentTrack();
+        if (currentTrack is null)
         {
             _logger.Warning("[WindowsMusicPlayer] Cannot start playback, because the playlist is empty!");
             return;
@@ -221,7 +230,8 @@ public sealed class NAudioMusicPlayer :
 
         if (_currentSong is null)
         {
-            await LoadCurrentSongAsync();
+            _startSongAutomatically = true;
+            await LoadSongAsync(currentTrack);
             return;
         }
 
@@ -251,6 +261,17 @@ public sealed class NAudioMusicPlayer :
 
     private async Task LoadSongAsync(AudioModel song)
     {
+        var wasPlayingBeforeSwitch = _state == PlayerState.Playing;
+        var shouldResumeAfterLoad = wasPlayingBeforeSwitch || _startSongAutomatically;
+        var isTrackSwitch = _currentSong is null ||
+                            !string.Equals(_currentSong.Path, song.Path, StringComparison.OrdinalIgnoreCase);
+
+        if (isTrackSwitch && wasPlayingBeforeSwitch)
+        {
+            _playbackOutput.Pause();
+            SetState(PlayerState.Paused);
+        }
+
         _currentSong = song;
 
         var loadResult = _trackLoader.Load(song);
@@ -267,8 +288,8 @@ public sealed class NAudioMusicPlayer :
 
         _playbackProgressMonitor.Reset();
 
-        var reconfigured = await ReconfigureOutputAsync(_startSongAutomatically, preservePosition: false);
-        if (reconfigured && _startSongAutomatically)
+        var reconfigured = await ReconfigureOutputAsync(shouldResumeAfterLoad, preservePosition: false);
+        if (reconfigured && shouldResumeAfterLoad)
         {
             SetState(PlayerState.Playing);
         }

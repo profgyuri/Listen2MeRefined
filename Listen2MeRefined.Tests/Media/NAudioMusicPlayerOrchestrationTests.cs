@@ -178,6 +178,44 @@ public class NAudioMusicPlayerOrchestrationTests
     }
 
     [Fact]
+    public async Task JumpToCurrentIndexWhilePlaying_DoesNotRestartTrack()
+    {
+        var current = new AudioModel { Path = "current.mp3" };
+        using var currentStream = CreateWaveStream();
+
+        var queue = new Mock<IPlaybackQueueService>();
+        queue.Setup(x => x.GetCurrentTrack()).Returns(current);
+        queue.Setup(x => x.GetTrackAtIndex(0)).Returns(current);
+
+        var loader = new Mock<ITrackLoader>();
+        loader.Setup(x => x.Load(current)).Returns(TrackLoadResult.Success(currentStream));
+
+        var output = new Mock<IPlaybackOutput>();
+        output.Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
+            .Returns(new PlaybackOutputReconfigureResult(true, false));
+
+        var timedTask = new TimedTask();
+
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            Mock.Of<IMediator>(),
+            timedTask,
+            queue.Object,
+            loader.Object,
+            output.Object,
+            new PlaybackProgressMonitor());
+
+        await player.PlayPauseAsync();
+        player.CurrentTime = 1234;
+
+        await player.JumpToIndexAsync(0);
+
+        Assert.InRange(player.CurrentTime, 1233, 1235);
+        loader.Verify(x => x.Load(current), Times.Once);
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
     public void EndOfTrackMonitor_OnlyAdvancesAtBoundary()
     {
         var monitor = new PlaybackProgressMonitor();
