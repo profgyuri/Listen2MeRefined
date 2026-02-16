@@ -37,7 +37,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Listen2MeRefined.Infrastructure\Listen2MeRefined.Infrastructure.csproj" />
-        <ProjectReference Include="..\Listen2MeRefined.Tests\Listen2MeRefined.Tests.csproj" />
     </ItemGroup>
 
 </Project>
