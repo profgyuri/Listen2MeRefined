@@ -1,0 +1,79 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.MainWindow.MainTabsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow">
+    <TabControl materialDesign:ColorZoneAssist.Foreground="{StaticResource TertiaryBrush}"
+                materialDesign:ColorZoneAssist.Mode="Custom"
+                Margin="0 20 10 14">
+        <TabItem Header="Search Results" IsSelected="{Binding IsSearchResultsTabVisible}" Cursor="Hand">
+            <views:SearchResultsPaneView DataContext="{Binding DataContext.SearchResultsPaneViewModel, RelativeSource={RelativeSource AncestorType=Window}}" />
+        </TabItem>
+        <TabItem Header="Song Menu" IsSelected="{Binding IsSongMenuTabVisible}" Cursor="Hand">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid Margin="0 10 0 0">
+                    <Grid.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+                            <Setter Property="Margin" Value="0 5"/>
+                        </Style>
+                        <Style TargetType="Separator">
+                            <Setter Property="Margin" Value="0 10"/>
+                            <Setter Property="Grid.ColumnSpan" Value="2" />
+                            <Setter Property="Background" Value="{StaticResource DarkBorderBrush}" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.ColumnSpan="2" Command="{Binding JumpToSelectedSongCommand}" Width="380" Content="Jump To This Song"/>
+                    <Button Grid.Row="1" Grid.ColumnSpan="2" Command="{Binding SetSelectedSongAsNextCommand}" Width="380" Content="Set As Next Song"/>
+
+                    <Separator Grid.Row="2"/>
+
+                    <Grid Grid.Row="3" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Artist:"/>
+                        <TextBox Grid.Column="1" Text="{Binding SelectedSong.Artist}"/>
+                        <Label Grid.Row="1" Content="Title:"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedSong.Title}"/>
+                        <Label Grid.Row="2" Content="Genre:"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedSong.Genre}"/>
+                        <Label Grid.Row="3" Content="Bitrate:"/>
+                        <Label Grid.Row="3" Grid.Column="1" Margin="0 5" Content="{Binding SelectedSong.Bitrate}"/>
+                        <Label Grid.Row="4" Content="BPM:"/>
+                        <Label Grid.Row="4" Grid.Column="1" Margin="0 5" Content="{Binding SelectedSong.BPM}"/>
+                        <Button Grid.Row="6" Grid.ColumnSpan="2" Width="380" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song"/>
+                    </Grid>
+
+                    <Separator Grid.Row="4"/>
+
+                    <Button Grid.ColumnSpan="2" Grid.Row="5" Command="{Binding RemoveSelectedFromPlaylistCommand}" Width="380" Content="Remove From Playlist"/>
+                </Grid>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
+</UserControl>

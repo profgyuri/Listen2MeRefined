@@ -1,8 +1,8 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Startup;
-using MediatR;
-
 namespace Listen2MeRefined.Infrastructure.Mvvm;
+
+using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+using Listen2MeRefined.Infrastructure.Notifications;
+using MediatR;
 
 public sealed partial class MainWindowViewModel : 
     ViewModelBase,
@@ -13,10 +13,13 @@ public sealed partial class MainWindowViewModel :
     private readonly IUiDispatcher _ui;
     private readonly IVersionChecker _versionChecker;
     private readonly StartupManager _startupManager;
+    private readonly IMainWindowNavigationService _navigationService;
     
     public SearchbarViewModel SearchbarViewModel { get; }
     public PlayerControlsViewModel PlayerControlsViewModel { get; }
     public ListsViewModel ListsViewModel { get; }
+    public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
+    public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
 
     [ObservableProperty] private AudioModel _song = new()
     {
@@ -27,6 +30,7 @@ public sealed partial class MainWindowViewModel :
     };
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private bool _isUpdateAvailable;
+    [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
 
     public MainWindowViewModel(
         ILogger logger,
@@ -35,16 +39,22 @@ public sealed partial class MainWindowViewModel :
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager)
+        PlaylistPaneViewModel playlistPaneViewModel,
+        SearchResultsPaneViewModel searchResultsPaneViewModel,
+        StartupManager startupManager,
+        IMainWindowNavigationService navigationService)
     {
         _logger = logger;
         _ui = ui;
         _versionChecker = versionChecker;
         _startupManager = startupManager;
+        _navigationService = navigationService;
 
         SearchbarViewModel = searchbarViewModel;
         PlayerControlsViewModel = playerControlsViewModel;
         ListsViewModel = listsViewModel;
+        PlaylistPaneViewModel = playlistPaneViewModel;
+        SearchResultsPaneViewModel = searchResultsPaneViewModel;
 
         _logger.Debug("[MainWindowViewModel] Class initialized");
     }
@@ -95,5 +105,49 @@ public sealed partial class MainWindowViewModel :
     {
         _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         return _ui.InvokeAsync(() => FontFamily = notification.FontFamily, cancellationToken);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
+    private async Task OpenSettingsWindow()
+    {
+        await NavigateAuxiliaryAsync(async () =>
+        {
+            IsUpdateAvailable = false;
+            await _navigationService.OpenSettingsAsync();
+        });
+    }
+
+    [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
+    private async Task OpenAdvancedSearchWindow()
+    {
+        await NavigateAuxiliaryAsync(async () =>
+        {
+            await _navigationService.OpenAdvancedSearchAsync();
+            ListsViewModel.SwitchToSearchResultsTab();
+        });
+    }
+
+    partial void OnCanNavigateToAuxiliaryWindowsChanged(bool value)
+    {
+        OpenSettingsWindowCommand.NotifyCanExecuteChanged();
+        OpenAdvancedSearchWindowCommand.NotifyCanExecuteChanged();
+    }
+
+    private async Task NavigateAuxiliaryAsync(Func<Task> action)
+    {
+        if (!CanNavigateToAuxiliaryWindows)
+        {
+            return;
+        }
+
+        CanNavigateToAuxiliaryWindows = false;
+        try
+        {
+            await action();
+        }
+        finally
+        {
+            CanNavigateToAuxiliaryWindows = true;
+        }
     }
 }

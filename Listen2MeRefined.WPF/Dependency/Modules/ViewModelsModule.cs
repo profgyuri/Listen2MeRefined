@@ -40,6 +40,16 @@ public class ViewModelsModule : Module
             .AsImplementedInterfaces()
             .SingleInstance();
         builder
+            .RegisterType<PlaylistPaneViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
+            .RegisterType<SearchResultsPaneViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+        builder
             .RegisterType<StartupManager>()
             .AsSelf()
             .AsImplementedInterfaces()
