@@ -1,8 +1,8 @@
-﻿namespace Listen2MeRefined.WPF;
-
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using Listen2MeRefined.Infrastructure;
+
+namespace Listen2MeRefined.WPF;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml

@@ -1,8 +1,8 @@
-namespace Listen2MeRefined.WPF.Utils;
-
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.WPF.Views;
 using System.Windows;
+
+namespace Listen2MeRefined.WPF.Utils;
 
 public sealed class MainWindowNavigationService : IMainWindowNavigationService
 {
