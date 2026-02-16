@@ -76,7 +76,7 @@ public sealed class NAudioMusicPlayer :
         _playbackProgressMonitor = playbackProgressMonitor;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), () => CheckPlaybackProgressAsync().GetAwaiter().GetResult());
-        _logger.Debug("[WindowsMusicPlayer] initialized");
+        _logger.Debug("[NAudioMMusicPlayer] initialized");
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public sealed class NAudioMusicPlayer :
         _startSongAutomatically = false;
         SetState(PlayerState.Stopped);
         _playbackProgressMonitor.Reset();
-        _logger.Debug("[WindowsMusicPlayer] Playback stopped by user");
+        _logger.Debug("[NAudioMMusicPlayer] Playback stopped by user");
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public sealed class NAudioMusicPlayer :
         var nextTrack = _playbackQueueService.GetNextTrack();
         if (nextTrack is null)
         {
-            _logger.Information("[WindowsMusicPlayer] Playback is stopped, because the playlist is empty!");
+            _logger.Information("[NAudioMMusicPlayer] Playback is stopped, because the playlist is empty!");
             Stop();
             return;
         }
@@ -140,7 +140,7 @@ public sealed class NAudioMusicPlayer :
         var previousTrack = _playbackQueueService.GetPreviousTrack();
         if (previousTrack is null)
         {
-            _logger.Warning("[WindowsMusicPlayer] Cannot go to the previous song, because the playlist is empty!");
+            _logger.Warning("[NAudioMMusicPlayer] Cannot go to the previous song, because the playlist is empty!");
             return;
         }
 
@@ -156,7 +156,7 @@ public sealed class NAudioMusicPlayer :
         var track = _playbackQueueService.GetTrackAtIndex(index);
         if (track is null)
         {
-            _logger.Warning("[WindowsMusicPlayer] Cannot jump to song at index {Index}, because the playlist is empty!", index);
+            _logger.Warning("[NAudioMMusicPlayer] Cannot jump to song at index {Index}, because the playlist is empty!", index);
             return;
         }
 
@@ -164,7 +164,7 @@ public sealed class NAudioMusicPlayer :
             _currentSong is not null &&
             string.Equals(track.Path, _currentSong.Path, StringComparison.OrdinalIgnoreCase))
         {
-            _logger.Debug("[WindowsMusicPlayer] Ignoring jump to already playing track at index {Index}", index);
+            _logger.Debug("[NAudioMMusicPlayer] Ignoring jump to already playing track at index {Index}", index);
             return;
         }
 
@@ -179,7 +179,7 @@ public sealed class NAudioMusicPlayer :
         var shuffledCurrentTrack = _playbackQueueService.Shuffle(_currentSong);
         if (shuffledCurrentTrack is null)
         {
-            _logger.Warning("[WindowsMusicPlayer] Cannot shuffle an empty playlist!");
+            _logger.Warning("[NAudioMMusicPlayer] Cannot shuffle an empty playlist!");
             return;
         }
 
@@ -198,7 +198,7 @@ public sealed class NAudioMusicPlayer :
 
         if (_playbackProgressMonitor.ShouldAdvance(_fileReader.CurrentTime, _fileReader.TotalTime, _state == PlayerState.Playing))
         {
-            _logger.Debug("[WindowsMusicPlayer] Current song reached its end, skipping to the next song...");
+            _logger.Debug("[NAudioMMusicPlayer] Current song reached its end, skipping to the next song...");
             await NextAsync();
         }
     }
@@ -224,7 +224,7 @@ public sealed class NAudioMusicPlayer :
         var currentTrack = _playbackQueueService.GetCurrentTrack();
         if (currentTrack is null)
         {
-            _logger.Warning("[WindowsMusicPlayer] Cannot start playback, because the playlist is empty!");
+            _logger.Warning("[NAudioMMusicPlayer] Cannot start playback, because the playlist is empty!");
             return;
         }
 
@@ -306,7 +306,7 @@ public sealed class NAudioMusicPlayer :
         var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
         if (!result.IsSuccess)
         {
-            _logger.Warning(result.Exception, "[WindowsMusicPlayer] Failed to reconfigure audio output: {Context}", result.Context);
+            _logger.Warning(result.Exception, "[NAudioMMusicPlayer] Failed to reconfigure audio output: {Context}", result.Context);
             if (!result.PreservedPreviousOutput)
             {
                 _startSongAutomatically = false;
@@ -337,7 +337,7 @@ public sealed class NAudioMusicPlayer :
 
     private async Task HandleUnplayableTrackAsync(AudioModel track, TrackLoadResult result)
     {
-        _logger.Warning("[WindowsMusicPlayer] Skipping song {Path}. Status: {Status}. Reason: {Reason}", track.Path, result.Status, result.Reason);
+        _logger.Warning("[NAudioMMusicPlayer] Skipping song {Path}. Status: {Status}. Reason: {Reason}", track.Path, result.Status, result.Reason);
         _playbackQueueService.RemoveTrack(track);
         await LoadCurrentSongAsync();
     }
