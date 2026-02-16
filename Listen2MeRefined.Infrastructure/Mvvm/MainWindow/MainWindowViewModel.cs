@@ -1,8 +1,9 @@
-namespace Listen2MeRefined.Infrastructure.Mvvm;
-
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class MainWindowViewModel : 
     ViewModelBase,

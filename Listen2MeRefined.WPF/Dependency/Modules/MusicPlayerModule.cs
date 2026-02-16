@@ -12,7 +12,22 @@ public class MusicPlayerModule : Module
         builder
             .RegisterType<NAudioMusicPlayer>()
             .As<IMusicPlayerController>()
-            .As<INotificationHandler<AudioOutputDeviceChangedNotification>>()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+
+        builder
+            .RegisterType<NAudioTrackLoader>()
+            .As<ITrackLoader>()
+            .SingleInstance();
+
+        builder
+            .RegisterType<WaveOutPlaybackOutput>()
+            .As<IPlaybackOutput>()
+            .SingleInstance();
+
+        builder
+            .RegisterType<PlaybackProgressMonitor>()
+            .As<IPlaybackProgressMonitor>()
             .SingleInstance();
         
         builder
