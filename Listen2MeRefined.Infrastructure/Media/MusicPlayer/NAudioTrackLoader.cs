@@ -1,3 +1,4 @@
+using NAudio;
 using NAudio.Wave;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
@@ -13,7 +14,7 @@ public sealed class NAudioTrackLoader : ITrackLoader
 
         try
         {
-            var reader = track.Path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase)
+            WaveStream reader = track.Path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase)
                 ? new WaveFileReader(track.Path)
                 : new AudioFileReader(track.Path);
 
