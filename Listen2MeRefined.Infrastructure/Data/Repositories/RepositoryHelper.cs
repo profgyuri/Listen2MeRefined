@@ -1,6 +1,7 @@
-namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 using System.Text;
-using global::Dapper;
+using Dapper;
+
+namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 internal static class RepositoryHelper
 {
@@ -10,7 +11,7 @@ internal static class RepositoryHelper
     /// <param name="searchTerm">Expression to look for in the fields.</param>
     /// <param name="tableName">Name of the database table.</param>
     /// <typeparam name="T">Type of the model.</typeparam>
-    /// <returns>An object, that wraps the query to run, and it's dynamic parameter list.</returns>
+    /// <returns>An object that wraps the query to run, and its dynamic parameter list.</returns>
     internal static ParameterizedQuery GetParameterizedQueryWithSearchTerm<T>(
         string searchTerm,
         string tableName)
@@ -39,7 +40,7 @@ internal static class RepositoryHelper
     /// <param name="model">The not empty properties of this model will be used to build the query.</param>
     /// <param name="exact">If true, the query will look for exact matches, otherwise it will look for partial matches.</param>
     /// <typeparam name="T">Type of the model.</typeparam>
-    /// <returns>An object, that wraps the query to run, and it's dynamic parameter list.</returns>
+    /// <returns>An object that wraps the query to run, and its dynamic parameter list.</returns>
     internal static ParameterizedQuery GetParameterizedQueryWithModelProperties<T>(
         T model,
         string tableName,

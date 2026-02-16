@@ -1,10 +1,10 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Models;
-using global::Dapper.Contrib.Extensions;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
-using TableAttribute = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
+using Dapper.Contrib.Extensions;
 
-[Table("Songs")]
+namespace Listen2MeRefined.Infrastructure.Data.Models;
+
+[System.ComponentModel.DataAnnotations.Schema.Table("Songs")]
 public sealed class AudioModel : Model
 {
     public string? Artist { get; set; }
@@ -46,8 +46,6 @@ public sealed class AudioModel : Model
         Length = from.Length;
     }
 
-    #region Overrides of Object
-    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         // only true when the 2 paths are the same
@@ -55,7 +53,6 @@ public sealed class AudioModel : Model
                string.Equals(Path, audio.Path, StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <inheritdoc />
     public override int GetHashCode()
     {
         return Path?.GetHashCode() ?? -1;
@@ -72,5 +69,4 @@ public sealed class AudioModel : Model
         builder.AppendLine("}");
         return builder.ToString();
     }
-    #endregion
 }

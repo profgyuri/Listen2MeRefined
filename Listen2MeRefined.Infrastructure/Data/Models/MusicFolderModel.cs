@@ -2,22 +2,20 @@ namespace Listen2MeRefined.Infrastructure.Data.Models;
 
 public sealed class MusicFolderModel : Model
 {
-    public string FullPath { get; set; }
+    public string FullPath { get; init; }
 
     public MusicFolderModel()
     {
+        FullPath = string.Empty;
     }
-
+    
     public MusicFolderModel(string path)
     {
         FullPath = path;
     }
 
-    #region Overrides of Object
-    /// <inheritdoc />
     public override string ToString()
     {
         return FullPath;
     }
-    #endregion
 }

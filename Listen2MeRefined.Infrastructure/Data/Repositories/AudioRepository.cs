@@ -1,8 +1,9 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
-using System.Text;
-using global::Dapper;
+﻿using System.Text;
+using Dapper;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+
+namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public sealed class AudioRepository : 
     RepositoryBase<AudioModel>,

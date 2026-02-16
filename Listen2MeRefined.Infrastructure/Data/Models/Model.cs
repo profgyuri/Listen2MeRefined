@@ -1,5 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Listen2MeRefined.Infrastructure.Data.Models;
 
 public abstract class Model
 {
