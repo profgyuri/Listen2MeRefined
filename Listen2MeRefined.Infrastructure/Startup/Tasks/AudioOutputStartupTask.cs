@@ -1,7 +1,6 @@
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
-using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 

@@ -1,8 +1,7 @@
-﻿namespace Listen2MeRefined.Infrastructure.Versioning;
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Threading.Tasks;
+
+namespace Listen2MeRefined.Infrastructure.Versioning;
 
 public class VersionChecker : IVersionChecker
 {
@@ -79,5 +78,5 @@ class Release
 
 class Asset
 {
-    public string Browser_Download_Url { get; set; }
+    public string? Browser_Download_Url { get; set; }
 }

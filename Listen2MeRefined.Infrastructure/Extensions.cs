@@ -1,7 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using System.Security.Cryptography;
+
+namespace Listen2MeRefined.Infrastructure;
 
 internal static class Extensions
 {

@@ -1,5 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Storage;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+
+namespace Listen2MeRefined.Infrastructure.Storage;
 
 /// <summary>
 ///     Responsible to save the specified settings to a file in .json format.
@@ -29,12 +30,8 @@ public sealed class FileSettingsManager<T> : ISettingsManager<T>
         return JsonConvert.DeserializeObject<T>(text)!;
     }
 
-    #region Implementation of ISettingsManager<out T>
-    /// <inheritdoc />
     public T Settings => _settings ??= LoadSettings();
 
-    /// <inheritdoc />
-    /// <exception cref="ArgumentNullException"><paramref name="settings" /> is <see langword="null" />.</exception>
     public void SaveSettings(Action<T>? settings = null)
     {
         settings?.Invoke(_settings ??= new T());
@@ -42,5 +39,4 @@ public sealed class FileSettingsManager<T> : ISettingsManager<T>
         var text = JsonConvert.SerializeObject(_settings);
         File.WriteAllText(SettingsFileName, text);
     }
-    #endregion
 }

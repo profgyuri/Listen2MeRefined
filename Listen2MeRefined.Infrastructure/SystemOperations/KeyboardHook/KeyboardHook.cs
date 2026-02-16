@@ -1,7 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+
+namespace Listen2MeRefined.Infrastructure.SystemOperations.KeyboardHook;
 
 public sealed class KeyboardHook : IDisposable
 {
@@ -84,7 +85,6 @@ public sealed class KeyboardHook : IDisposable
         IntPtr wParam,
         IntPtr lParam);
 
-    #region Variables and constants
     private IntPtr _windowsHookHandle;
     private IntPtr _user32LibraryHandle;
     private HookProc _hookProc;
@@ -94,9 +94,7 @@ public sealed class KeyboardHook : IDisposable
     public event EventHandler<KeyboardHookEventArgs>? KeyboardPressed;
 
     private readonly HashSet<ConsoleKey> _registeredKeys;
-    #endregion
 
-    #region Disposal
     private void Dispose(bool disposing)
     {
         if (disposing && _windowsHookHandle != IntPtr.Zero)
@@ -140,9 +138,7 @@ public sealed class KeyboardHook : IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    #endregion
 
-    #region External dll imports
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr LoadLibrary(string lpFileName);
 
@@ -190,5 +186,4 @@ public sealed class KeyboardHook : IDisposable
         int code,
         IntPtr wParam,
         IntPtr lParam);
-    #endregion
 }

@@ -35,6 +35,20 @@ public sealed class TimedTask : IAsyncDisposable
         _timerTask = DoWorkAsync(action);
     }
 
+    /// <summary>
+    ///     Stops the timer but waits for the current tick to finish.
+    /// </summary>
+    public async Task StopAsync()
+    {
+        if (_timerTask is null)
+        {
+            return;
+        }
+
+        _cts.Cancel();
+        await _timerTask;
+    }
+    
     private async Task DoWorkAsync(Action action)
     {
         try
@@ -51,21 +65,6 @@ public sealed class TimedTask : IAsyncDisposable
     }
 
     /// <summary>
-    ///     Stops the timer, but waits for the current tick to finish.
-    /// </summary>
-    public async Task StopAsync()
-    {
-        if (_timerTask is null)
-        {
-            return;
-        }
-
-        _cts.Cancel();
-        await _timerTask;
-    }
-
-    #region Implementation of IAsyncDisposable
-    /// <summary>
     ///     Stops the timer and disposes the underlying <see cref="PeriodicTimer" />.
     /// </summary>
     public async ValueTask DisposeAsync()
@@ -74,5 +73,4 @@ public sealed class TimedTask : IAsyncDisposable
         _timerTask?.Dispose();
         _cts.Dispose();
     }
-    #endregion
 }
