@@ -1,7 +1,8 @@
-namespace Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
+
+namespace Listen2MeRefined.Infrastructure.Data;
 
 public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     where T : Settings, new()
@@ -24,11 +25,8 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
             .FirstOrDefault() as T ?? new T();
     }
 
-    #region Implementation of ISettingsManager<out T>
-    /// <inheritdoc />
     public T Settings => _settings ??= LoadSettings();
 
-    /// <inheritdoc />
     public void SaveSettings(Action<T>? settings = null)
     {
         var oldSettings = LoadSettings();
@@ -55,13 +53,11 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
                     }
                     else
                     {
-                        var message = "Don't know how to handle concurrency conflicts for " + entry.Metadata.Name;
-                        _logger.Fatal(message);
-                        throw new NotSupportedException(message);
+                        _logger.Fatal("[DatabaseSettingsManager] Don't know how to handle concurrency conflicts for {name}", entry.Metadata.Name);
+                        throw new NotSupportedException("Concurrency conflicts are not supported.");
                     }
                 }
             }
         }
     }
-    #endregion
 }

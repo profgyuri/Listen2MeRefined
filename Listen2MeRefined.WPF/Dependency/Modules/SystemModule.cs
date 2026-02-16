@@ -1,3 +1,5 @@
+using Listen2MeRefined.Infrastructure.Media;
+
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Linq;
 using System.Windows.Media;
@@ -35,6 +37,11 @@ public class SystemModule : Module
         builder
             .RegisterType<FileScannerService>()
             .As<IFileScanner>()
+            .SingleInstance();
+        
+        builder
+            .RegisterType<NAudioOutputDevices>()
+            .As<IOutputDevice>()
             .SingleInstance();
     }
 }

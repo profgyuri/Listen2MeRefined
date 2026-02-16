@@ -9,11 +9,6 @@ public class WrappersModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder
-            .RegisterType<WindowsMusicPlayer>()
-            .AsImplementedInterfaces()
-            .SingleInstance();
-
-        builder
             .RegisterType<SharpHookHandler>()
             .As<IGlobalHook>()
             .SingleInstance();

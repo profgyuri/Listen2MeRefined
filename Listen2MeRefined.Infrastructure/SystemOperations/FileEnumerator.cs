@@ -1,6 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
+﻿using System.IO.Enumeration;
 
-using System.IO.Enumeration;
+namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
 public sealed class FileEnumerator : IFileEnumerator
 {
@@ -11,6 +11,20 @@ public sealed class FileEnumerator : IFileEnumerator
         _logger = logger;
     }
 
+    public IEnumerable<string> EnumerateFiles(string path)
+    {
+        ThrowIfNotDirectory(path);
+
+        return GetSupportedFiles(path);
+    }
+
+    public async Task<IEnumerable<string>> EnumerateFilesAsync(string path)
+    {
+        ThrowIfNotDirectory(path);
+
+        return await Task.Run(() => GetSupportedFiles(path));
+    }
+    
     private static void ThrowIfNotDirectory(string path)
     {
         if (!Directory.Exists(path))
@@ -46,21 +60,5 @@ public sealed class FileEnumerator : IFileEnumerator
         }
 
         return result;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<string> EnumerateFiles(string path)
-    {
-        ThrowIfNotDirectory(path);
-
-        return GetSupportedFiles(path);
-    }
-
-    /// <inheritdoc />
-    public async Task<IEnumerable<string>> EnumerateFilesAsync(string path)
-    {
-        ThrowIfNotDirectory(path);
-
-        return await Task.Run(() => GetSupportedFiles(path));
     }
 }

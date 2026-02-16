@@ -1,26 +1,23 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using Listen2MeRefined.Infrastructure.Data;
+﻿using System.Collections.ObjectModel;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
-using MediatR;
-using System.Collections.ObjectModel;
-using System.Threading;
-using System.Threading.Tasks;
-using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Media;
+using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public partial class ListsViewModel :
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
     INotificationHandler<QuickSearchResultsNotification>
 {
     private readonly ILogger _logger;
-    private readonly IAdvancedDataReader<ParameterizedQuery, AudioModel> _advancedAudioReader;
+    private readonly IAdvancedDataReader<AdvancedFilter, AudioModel> _advancedAudioReader;
     private readonly IFileScanner _fileScanner;
-    private readonly IMediaController _mediaController;
+    private readonly IMusicPlayerController _musicPlayerController;
+    private readonly IPlaylist _playList;
 
     private int _currentSongIndex = -1;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
@@ -30,64 +27,33 @@ public partial class ListsViewModel :
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
-    [ObservableProperty] private ObservableCollection<AudioModel> _playList = new();
     [ObservableProperty] private bool _isSearchResultsTabVisible = true;
     [ObservableProperty] private bool _isSongMenuTabVisible;
+    
+    public ObservableCollection<AudioModel> PlayList => 
+        _playList.Items as ObservableCollection<AudioModel> ??
+        throw new InvalidOperationException("PlayList is not an ObservableCollection");
 
     public ListsViewModel(
         ILogger logger,
-        IPlaylistReference playlistReference,
-        IAdvancedDataReader<ParameterizedQuery, AudioModel> advancedAudioReader,
+        IAdvancedDataReader<AdvancedFilter, AudioModel> advancedAudioReader,
         IFileScanner fileScanner,
-        IMediaController mediaController)
+        IMusicPlayerController musicPlayerController, IPlaylist playList)
     {
         _logger = logger;
-
-        playlistReference.PassPlaylist(ref _playList);
         _advancedAudioReader = advancedAudioReader;
         _fileScanner = fileScanner;
-        _mediaController = mediaController;
+        _musicPlayerController = musicPlayerController;
+        _playList = playList;
+
+        _logger.Debug("[ListsViewModel] Class initialized");
     }
 
-    #region Notifcation Handlers
-    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
+    public async Task JumpToSelectedSong()
     {
-        FontFamily = notification.FontFamily;
-        await Task.CompletedTask;
-    }
-
-    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        SelectedSong = notification.Audio;
-        _currentSongIndex = PlayList.IndexOf(SelectedSong);
-        await Task.CompletedTask;
-    }
-
-    public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
-    {
-        var result =
-            await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll);
-        SearchResults.Clear();
-        SearchResults.AddRange(result);
-    }
-
-    public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
-    {
-        SwitchToSearchResultsTab();
-        SearchResults.Clear();
-        SearchResults.AddRange(notification.Results);
-        await Task.CompletedTask;
-    }
-    #endregion
-
-    #region Commands
-    [RelayCommand]
-    public async Task JumpToSelecteSong()
-    {
-        if (SelectedIndex > -1)
-        {
-            await _mediaController.JumpToIndexAsync(SelectedIndex);
-        }
+        _logger.Debug<int>("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
+        await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
     }
 
     [RelayCommand]
@@ -95,12 +61,12 @@ public partial class ListsViewModel :
     {
         if (!_selectedSearchResults.Any())
         {
-            _logger.Verbose("Sending all {Count} search results to the playlist", _selectedSearchResults.Count);
+            _logger.Debug("[ListsViewModel] Sending all {Count} search results to the playlist", PlayList.Count);
             SendAllToPlaylist();
             return;
         }
 
-        _logger.Verbose("Sending {Count} selected search results to the playlist", _selectedSearchResults.Count);
+        _logger.Debug("[ListsViewModel] Sending {Count} selected search results to the playlist", _selectedSearchResults.Count);
         PlayList.AddRange(_selectedSearchResults);
 
         while (_selectedSearchResults.Count > 0)
@@ -121,25 +87,19 @@ public partial class ListsViewModel :
     [RelayCommand]
     private void RemoveSelectedFromPlaylist()
     {
-        if (_selectedSearchResults.Count == 0)
+        if (_selectedPlaylistItems.Count == 0)
         {
-            _logger.Verbose($"Removing all item from playlist");
+            _logger.Debug($"[ListsViewModel] Removing all items from playlist");
             ClearPlaylist();
             return;
         }
 
-        _logger.Verbose($"Removing selected items from playlist");
-        while (_selectedPlaylistItems.Count > 0)
+        _logger.Debug($"[ListsViewModel] Removing selected items from playlist");
+        foreach (var item in _selectedPlaylistItems)
         {
-            var toRemove = _selectedPlaylistItems.First();
-            PlayList.Remove(toRemove);
-            _selectedPlaylistItems.Remove(toRemove);
+            PlayList.Remove(item);
         }
-    }
 
-    private void ClearPlaylist()
-    {
-        PlayList.Clear();
         _selectedPlaylistItems.Clear();
     }
 
@@ -151,7 +111,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        _logger.Verbose($"Setting {SelectedSong.Title} as next song");
+        _logger.Information<string?>("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
         var selectedSongIndex = PlayList.IndexOf(SelectedSong);
         var newIndex = _currentSongIndex + 1;
 
@@ -161,6 +121,7 @@ public partial class ListsViewModel :
         }
 
         PlayList.Move(selectedSongIndex, newIndex);
+        _logger.Debug("[ListsViewModel] Moved song from index {OldIndex} to {NewIndex}", selectedSongIndex, newIndex);
     }
 
     [RelayCommand]
@@ -168,10 +129,11 @@ public partial class ListsViewModel :
     {
         if (SelectedSong is null)
         {
+            _logger.Warning("[ListsViewModel] No song selected to scan");
             return;
         }
 
-        _logger.Verbose($"Scanning {SelectedSong.Title}");
+        _logger.Information<string?>("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
         var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
         var index = PlayList.IndexOf(SelectedSong);
         PlayList[index] = scanned;
@@ -179,8 +141,9 @@ public partial class ListsViewModel :
     }
 
     [RelayCommand]
-    public void SwitchToSongMenuTab()
+    private void SwitchToSongMenuTab()
     {
+        _logger.Verbose("[ListsViewModel] Switching to Song Menu tab");
         IsSearchResultsTabVisible = false;
         IsSongMenuTabVisible = true;
     }
@@ -188,28 +151,112 @@ public partial class ListsViewModel :
     [RelayCommand]
     public void SwitchToSearchResultsTab()
     {
+        _logger.Verbose("[ListsViewModel] Switching to Search Results tab");
         IsSearchResultsTabVisible = true;
         IsSongMenuTabVisible = false;
     }
-    #endregion
-
-    public void AddSelectedSearchResult(AudioModel song)
+    public void AddSelectedSearchResults(IEnumerable<AudioModel> songs)
     {
-        _selectedSearchResults.Add(song);
+        foreach (var song in songs)
+        {
+            _selectedSearchResults.Add(song);
+        }
     }
 
-    public void RemoveSelectedSearchResult(AudioModel song)
+    public void RemoveSelectedSearchResults(IEnumerable<AudioModel> songs)
     {
-        _selectedSearchResults?.Remove(song);
+        foreach (var song in songs)
+        {
+            _selectedSearchResults.Remove(song);
+        }
     }
 
-    public void AddSelectedPlaylistItems(AudioModel song)
+    public void AddSelectedPlaylistItems(IEnumerable<AudioModel> songs)
     {
-        _selectedPlaylistItems.Add(song);
+        foreach (var song in songs)
+        {
+            _selectedPlaylistItems.Add(song);
+        }
     }
 
-    public void RemoveSelectedPlaylistItems(AudioModel song)
+    public void RemoveSelectedPlaylistItems(IEnumerable<AudioModel> songs)
     {
-        _selectedPlaylistItems.Remove(song);
+        foreach (var song in songs)
+        {
+            _selectedPlaylistItems.Remove(song);
+        }
+    }
+    
+    private bool CanJumpToSelectedSong() => SelectedIndex > -1;
+    
+    private void ClearPlaylist()
+    {
+        PlayList.Clear();
+        _selectedPlaylistItems.Clear();
+    }
+
+    partial void OnSelectedIndexChanged(int value)
+    {
+        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
+    {
+        _logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
+    }
+    
+    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
+        FontFamily = notification.FontFamily;
+        await Task.CompletedTask;
+    }
+
+    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
+        SelectedSong = notification.Audio;
+        _currentSongIndex = PlayList.IndexOf(SelectedSong);
+        await Task.CompletedTask;
+    }
+
+    public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchAll: {MatchAll})",
+            notification.Filters, notification.MatchAll);
+        var result =
+            (await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll)).ToArray();
+
+        _logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
+        if (result.Length > 0)
+        {
+            _logger.Verbose(
+                "[ListsViewModel] First {Shown} results are: {@Results}",
+                Math.Min(5, result.Length),
+                result.Take(5));
+        }
+
+        SwitchToSearchResultsTab();
+        SearchResults.Clear();
+        SearchResults.AddRange(result);
+    }
+
+    public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
+    {
+        var result = notification.Results.ToArray();
+
+        _logger.Information("[ListsViewModel] Received quick search results with {Count} results", result.Length);
+        if (result.Length > 0)
+        {
+            _logger.Verbose(
+                "[ListsViewModel] First {Shown} results are: {@Results}",
+                Math.Min(5, result.Length),
+                result.Take(5));
+        }
+
+        SwitchToSearchResultsTab();
+        SearchResults.Clear();
+        Extensions.AddRange(SearchResults, notification.Results);
+        await Task.CompletedTask;
     }
 }

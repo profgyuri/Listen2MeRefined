@@ -1,3 +1,3 @@
-namespace Listen2MeRefined.Core.Models;
+namespace Listen2MeRefined.Infrastructure.Data;
 
 public record AudioOutputDevice(int Index, string Name);

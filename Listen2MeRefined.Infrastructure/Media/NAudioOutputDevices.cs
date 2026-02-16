@@ -1,16 +1,27 @@
-namespace Listen2MeRefined.Infrastructure.Media;
-
 using NAudio.CoreAudioApi;
 
-internal static class AudioDevices
+namespace Listen2MeRefined.Infrastructure.Media;
+
+public class NAudioOutputDevices : IOutputDevice
 {
-    internal static IEnumerable<AudioOutputDevice> GetOutputDevices()
+    private readonly ILogger _logger;
+    
+    public NAudioOutputDevices(ILogger logger)
+    {
+        _logger = logger;
+    }
+    
+    public IEnumerable<AudioOutputDevice> EnumerateOutputDevices()
     {
         var deviceEnumerator = new MMDeviceEnumerator();
+        
+        _logger.Debug("[NAudioOutputDevices] Starting to enumerate audio devices at {@Time}", DateTimeOffset.Now);
         var devices = deviceEnumerator
             .EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active)
             .Select(x => x.FriendlyName)
             .ToList();
+        _logger.Debug("[NAudioOutputDevices] Got the full list of audio devices at {@Time}", DateTimeOffset.Now);
+        
         var def = deviceEnumerator
             .GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia)
             .FriendlyName;
@@ -25,5 +36,7 @@ internal static class AudioDevices
             var device = devices[i];
             yield return new AudioOutputDevice(i, device);
         }
+        
+        _logger.Debug("[NAudioOutputDevices] Finished enumerating audio devices at {@Time}", DateTimeOffset.Now);
     }
 }

@@ -1,7 +1,8 @@
-namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
 using SkiaSharp;
+
+namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class WaveFormDrawer
     : IWaveFormDrawer<SKBitmap>

@@ -1,3 +1,5 @@
+using NAudio.Wave;
+
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public interface IFileReader<out TSampleProvider>
@@ -5,7 +7,7 @@ public interface IFileReader<out TSampleProvider>
     /// <summary>
     /// Object for reading the audio file.
     /// </summary>
-    TSampleProvider SampleProvider { get; }
+    ISampleProvider? SampleProvider { get; }
 
     /// <summary>
     /// Gets how many samples are used for 1 pixel in the waveform.

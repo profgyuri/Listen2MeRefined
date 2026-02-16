@@ -23,17 +23,17 @@ public sealed partial class SettingsWindow : Window
         }
     }
 
-    private void OpenFolderBrowser_Click(
+    private async void OpenFolderBrowser_Click(
         object sender,
         RoutedEventArgs e)
     {
-        WindowManager.ShowWindow<FolderBrowserWindow>(Left + Width / 2, Top + Height / 2);
+        await WindowManager.ShowWindowAsync<FolderBrowserWindow>(Left + Width / 2, Top + Height / 2);
     }
 
     private void CloseButton_Click(
         object sender,
         RoutedEventArgs e)
     {
-        Close();
+        Hide();
     }
 }

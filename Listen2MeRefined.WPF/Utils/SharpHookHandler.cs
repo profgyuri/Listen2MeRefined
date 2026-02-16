@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF.Utils;
+﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+
+namespace Listen2MeRefined.WPF.Utils;
 
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.WPF.Views;
@@ -16,7 +18,7 @@ internal sealed class SharpHookHandler
 {
     private readonly SharpHook.IGlobalHook _hook;
     private readonly ILogger _logger;
-    private readonly IMediaController _mediaController;
+    private readonly IMusicPlayerController _musicPlayerController;
     private readonly System.Threading.Timer _mouseDebounceTimer;
     private Point _lastMousePosition;
     private const int DebounceInterval = 10; // ms
@@ -35,11 +37,11 @@ internal sealed class SharpHookHandler
             KeyCode.VcMediaStop
         ];
 
-    public SharpHookHandler(ILogger logger, IMediaController mediaController)
+    public SharpHookHandler(ILogger logger, IMusicPlayerController musicPlayerController)
     {
         _hook = new TaskPoolGlobalHook();
         _logger = logger;
-        _mediaController = mediaController;
+        _musicPlayerController = musicPlayerController;
         
         _mouseDebounceTimer = new(CheckMousePosition, null, Timeout.Infinite, Timeout.Infinite);
     }
@@ -116,16 +118,16 @@ internal sealed class SharpHookHandler
         switch (e.RawEvent.Keyboard.KeyCode)
         {
             case KeyCode.VcMediaPlay:
-                _mediaController.PlayPauseAsync();
+                _musicPlayerController.PlayPauseAsync();
                 break;
             case KeyCode.VcMediaNext:
-                _mediaController.NextAsync();
+                _musicPlayerController.NextAsync();
                 break;
             case KeyCode.VcMediaPrevious:
-                _mediaController.PreviousAsync();
+                _musicPlayerController.PreviousAsync();
                 break;
             case KeyCode.VcMediaStop:
-                _mediaController.Stop();
+                _musicPlayerController.Stop();
                 break;
         }
     }

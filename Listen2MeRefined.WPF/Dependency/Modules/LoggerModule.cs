@@ -5,7 +5,7 @@ using Serilog.Core;
 
 public class LoggerModule : Module
 {
-    private const string SeqConnection = "http://localhost:5341";
+    private const string SeqConnection = "http://192.168.0.22:5341";
 
     protected override void Load(ContainerBuilder builder)
     {
@@ -17,8 +17,8 @@ public class LoggerModule : Module
     {
         var config = new LoggerConfiguration();
 
-        //config
-        //    .WriteTo.Async(conf => conf.Seq(SeqConnection));
+        config
+            .WriteTo.Async(conf => conf.Seq(SeqConnection));
         config
             .WriteTo.Async(conf => conf.File(
                 "log.txt", 

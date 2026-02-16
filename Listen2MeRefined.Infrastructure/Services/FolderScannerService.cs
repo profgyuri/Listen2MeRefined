@@ -1,7 +1,8 @@
-namespace Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
+
+namespace Listen2MeRefined.Infrastructure.Services;
 
 public sealed class FolderScannerService : IFolderScanner
 {
@@ -24,12 +25,10 @@ public sealed class FolderScannerService : IFolderScanner
         _settingsManager = settingsManager;
         _logger = logger;
     }
-    
-    #region Implementation of IFolderScanner
-    /// <inheritdoc />
+
     public async Task ScanAsync(string path)
     {
-        _logger.Information("Scanning folder for audio files: {Path}", path);
+        _logger.Information("[FolderScannerService] Scanning folder for audio files: {Path}", path);
         var files = await _fileEnumerator.EnumerateFilesAsync(path);
         var newSupportedFiles = files
             .Where(IsSupported)
@@ -64,7 +63,6 @@ public sealed class FolderScannerService : IFolderScanner
         await _audioRepository.RemoveAsync(fromDb);
     }
 
-    /// <inheritdoc />
     public async Task ScanAsync(IEnumerable<string> paths)
     {
         foreach (var path in paths)
@@ -73,7 +71,6 @@ public sealed class FolderScannerService : IFolderScanner
         }
     }
     
-    /// <inheritdoc />
     public async Task ScanAllAsync()
     {
         var paths =
@@ -81,7 +78,6 @@ public sealed class FolderScannerService : IFolderScanner
                 .Select(x => x.FullPath);
         await ScanAsync(paths);
     }
-    #endregion
 
     private static bool IsSupported(string path)
     {

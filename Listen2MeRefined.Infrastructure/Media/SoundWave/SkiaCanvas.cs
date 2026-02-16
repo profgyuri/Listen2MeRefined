@@ -1,10 +1,11 @@
-namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 using SkiaSharp;
+
+namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
 {
-    private SKBitmap _bitmap;
-    private SKCanvas _canvas;
+    private SKBitmap? _bitmap;
+    private SKCanvas? _canvas;
     private readonly SKPaint _linePaint;
     private readonly SKColor _backgroundColor;
 
@@ -19,6 +20,11 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
     
     public void DrawLine(SKPoint p1, SKPoint p2, float? stroakWidth = null)
     {
+        if (_canvas is null)
+        {
+            throw new InvalidOperationException("Canvas is not initialized");
+        }
+        
         _linePaint.IsAntialias = true;
         _linePaint.Style = SKPaintStyle.Stroke;
 
@@ -38,8 +44,8 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
     
     public SKBitmap Finish()
     {
-        _canvas.Flush();
-        return _bitmap;
+        _canvas?.Flush();
+        return _bitmap!;
     }
 
     public void Reset(int width, int height)
@@ -51,7 +57,7 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
         _canvas = new SKCanvas(_bitmap);
         _canvas.Clear(_backgroundColor);
 
-        // Dispose old objects after new ones are created successfully
+        // Dispose of old objects after new ones are created successfully
         oldCanvas?.Dispose();
         oldBitmap?.Dispose();
     }

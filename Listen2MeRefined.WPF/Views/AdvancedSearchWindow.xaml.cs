@@ -18,11 +18,11 @@ public sealed partial class AdvancedSearchWindow : Window
         Close();
     }
 
-    private void Search_Click(object sender, RoutedEventArgs e)
+    private async void Search_Click(object sender, RoutedEventArgs e)
     {
         var vm = DataContext as AdvancedSearchViewModel;
 
-        vm!.Search();
+        await vm!.SearchAsync();
 
         Close();
     }

@@ -1,4 +1,5 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Services;
+
 public interface IFileScanner
 {
     /// <summary>

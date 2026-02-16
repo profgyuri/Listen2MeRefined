@@ -1,19 +1,26 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
-using System.Diagnostics;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public sealed partial class MainWindowViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
+    private readonly ILogger _logger;
+    private readonly IUiDispatcher _ui;
     private readonly IVersionChecker _versionChecker;
     private readonly StartupManager _startupManager;
+    private readonly IMainWindowNavigationService _navigationService;
     
-    [ObservableProperty] private SearchbarViewModel _searchbarViewModel;
-    [ObservableProperty] private PlayerControlsViewModel _playerControlsViewModel;
-    [ObservableProperty] private ListsViewModel _listsViewModel;
+    public SearchbarViewModel SearchbarViewModel { get; }
+    public PlayerControlsViewModel PlayerControlsViewModel { get; }
+    public ListsViewModel ListsViewModel { get; }
+    public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
+    public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
+
     [ObservableProperty] private AudioModel _song = new()
     {
         Artist = "Artist",
@@ -21,61 +28,126 @@ public sealed partial class MainWindowViewModel :
         Genre = "Genre",
         Path = ""
     };
-
     [ObservableProperty] private string _fontFamily = "";
-    [ObservableProperty] private bool _isUpdateExclamationMarkVisible;
+    [ObservableProperty] private bool _isUpdateAvailable;
+    [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
 
     public MainWindowViewModel(
+        ILogger logger,
+        IUiDispatcher ui,
         IVersionChecker versionChecker,
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
-        StartupManager startupManager)
+        PlaylistPaneViewModel playlistPaneViewModel,
+        SearchResultsPaneViewModel searchResultsPaneViewModel,
+        StartupManager startupManager,
+        IMainWindowNavigationService navigationService)
     {
-        _versionChecker = versionChecker ?? throw new ArgumentNullException(nameof(versionChecker));
-        _startupManager = startupManager ?? throw new ArgumentNullException(nameof(startupManager));
+        _logger = logger;
+        _ui = ui;
+        _versionChecker = versionChecker;
+        _startupManager = startupManager;
+        _navigationService = navigationService;
 
-        _searchbarViewModel = searchbarViewModel;
-        _playerControlsViewModel = playerControlsViewModel;
-        _listsViewModel = listsViewModel;
+        SearchbarViewModel = searchbarViewModel;
+        PlayerControlsViewModel = playerControlsViewModel;
+        ListsViewModel = listsViewModel;
+        PlaylistPaneViewModel = playlistPaneViewModel;
+        SearchResultsPaneViewModel = searchResultsPaneViewModel;
+
+        _logger.Debug("[MainWindowViewModel] Class initialized");
     }
 
-    public async Task InitializeAsync()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
+        _logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
         try
         {
-            var isLatest = await _versionChecker.IsLatestAsync().ConfigureAwait(true);
-            IsUpdateExclamationMarkVisible = !isLatest;
+            _logger.Information("[MainWindowViewModel] Checking for latest version...");
+
+            var isLatest = await _versionChecker.IsLatestAsync();
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = !isLatest, ct);
+
+            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Version check failed: {ex}");
+            _logger.Warning($"[MainWindowViewModel] Version check failed: {ex}");
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
         }
 
         try
         {
-            await _startupManager.StartAsync().ConfigureAwait(false);
+            await _startupManager.StartAsync(ct);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            _logger.Information("[MainWindowViewModel] StartupManager.StartAsync was canceled.");
+            throw;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"StartupManager.StartAsync failed: {ex}");
+            _logger.Fatal(ex, "[MainWindowViewModel] StartupManager.StartAsync failed");
+            throw;
         }
+
+        _logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
     }
 
+    [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
+    private async Task OpenSettingsWindow()
+    {
+        await NavigateAuxiliaryAsync(async () =>
+        {
+            IsUpdateAvailable = false;
+            await _navigationService.OpenSettingsAsync();
+        });
+    }
+
+    [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
+    private async Task OpenAdvancedSearchWindow()
+    {
+        await NavigateAuxiliaryAsync(async () =>
+        {
+            await _navigationService.OpenAdvancedSearchAsync();
+            ListsViewModel.SwitchToSearchResultsTab();
+        });
+    }
+
+    partial void OnCanNavigateToAuxiliaryWindowsChanged(bool value)
+    {
+        OpenSettingsWindowCommand.NotifyCanExecuteChanged();
+        OpenAdvancedSearchWindowCommand.NotifyCanExecuteChanged();
+    }
+
+    private async Task NavigateAuxiliaryAsync(Func<Task> action)
+    {
+        if (!CanNavigateToAuxiliaryWindows)
+        {
+            return;
+        }
+
+        CanNavigateToAuxiliaryWindows = false;
+        try
+        {
+            await action();
+        }
+        finally
+        {
+            CanNavigateToAuxiliaryWindows = true;
+        }
+    }
+    
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        Song = notification.Audio;
-        return Task.CompletedTask;
+        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
+        return _ui.InvokeAsync<AudioModel>(() => Song = notification.Audio, cancellationToken);
     }
 
-    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
-    /// <inheritdoc />
-    Task INotificationHandler<FontFamilyChangedNotification>.Handle(
-        FontFamilyChangedNotification notification,
-        CancellationToken cancellationToken)
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
-        FontFamily = notification.FontFamily;
-        return Task.CompletedTask;
+        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
+        return _ui.InvokeAsync<string>(() => FontFamily = notification.FontFamily, cancellationToken);
     }
-    #endregion
 }

@@ -1,11 +1,12 @@
-namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 using NAudio.Wave;
+
+namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class PeakProvider
     : IPeakProvider<ISampleProvider>
 {
-    private ISampleProvider _sampleProvider;
-    private float[] _buffer;
+    private ISampleProvider? _sampleProvider;
+    private float[]? _buffer;
     private const int BlockSize = 200;
     
     /// <summary>
@@ -14,8 +15,13 @@ public sealed class PeakProvider
     /// <returns>Next peak value between 0 and 1.</returns>
     public float GetNextPeak()
     {
+        if (_sampleProvider is null)
+        {
+            throw new InvalidOperationException("Sample provider is not set.");
+        }
+        
         var max = 0.0f;
-        var samplesRead = _sampleProvider.Read(_buffer, 0, _buffer.Length);
+        var samplesRead = _sampleProvider.Read(_buffer, 0, _buffer?.Length ?? 0);
         for (var i = 0; i < samplesRead; i += BlockSize)
         {
             var total = 0.0;
@@ -48,14 +54,12 @@ public sealed class PeakProvider
         return peaks;
     }
 
-    /// <inheritdoc />
     public async Task<float[]> GetAllPeaksAsync(int count)
     {
         var peaks = await Task.Run(() => GetAllPeaks(count));
         return peaks;
     }
 
-    /// <inheritdoc />
     public void SetReader(IFileReader<ISampleProvider> reader)
     {
         _sampleProvider = reader.SampleProvider;

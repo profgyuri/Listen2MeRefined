@@ -1,7 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure;
-using Ardalis.GuardClauses;
+﻿using Ardalis.GuardClauses;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using System.Security.Cryptography;
+
+namespace Listen2MeRefined.Infrastructure;
 
 internal static class Extensions
 {
@@ -36,17 +37,6 @@ internal static class Extensions
         if (!context.Set<T>().Any(x => x.Equals(item)))
         {
             context.Set<T>().Add(item);
-        }
-    }
-
-    internal static void AddIfDoesNotExist<T>(
-        this DataContext context,
-        IEnumerable<T> items)
-        where T : class
-    {
-        foreach (var item in items)
-        {
-            context.AddIfDoesNotExist(item);
         }
     }
 
@@ -109,32 +99,5 @@ internal static class Extensions
         {
             list.Add(items[i]);
         }
-    }
-
-    /// <summary>
-    ///     Removes the range of items from the collection.
-    /// </summary>
-    /// <typeparam name="T">The type of the collection.</typeparam>
-    /// <param name="list">The collection to remove the items from.</param>
-    /// <param name="items">The items to remove from the collection.</param>
-    public static void RemoveRange<T>(
-        this IList<T> list,
-        IList<T> items)
-    {
-        for (var i = 0; i < items.Count; i++)
-        {
-            list.Remove(items[i]);
-        }
-    }
-
-    /// <summary>
-    ///     Gets a random item from the collection.
-    /// </summary>
-    /// <typeparam name="T">The type of the collection.</typeparam>
-    /// <param name="list">The collection to get the random item from.</param>
-    /// <returns>The random item.</returns>
-    public static T GetRandom<T>(this IList<T> list)
-    {
-        return list[RandomNumberGenerator.GetInt32(list.Count)];
     }
 }

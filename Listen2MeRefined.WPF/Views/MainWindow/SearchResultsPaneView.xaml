@@ -1,0 +1,37 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.MainWindow.SearchResultsPaneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
+    <Border Margin="0 10 0 0" Style="{StaticResource ContainerBorder}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="55"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="55"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition x:Name="ListRow" Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Column="1" Style="{StaticResource ElementContainerText}" VerticalAlignment="Center" Margin="0 6 0 20" Text="Search Results" Background="Transparent"/>
+            <Button Grid.Column="2" Style="{StaticResource InteractionButton}" Margin="10 0" BorderThickness="0" Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}" Command="{Binding SendSelectedToPlaylistCommand}" ToolTip="Add Selected / All to Playlist"/>
+
+            <DataGrid Grid.Row="1" Grid.ColumnSpan="5" Height="{Binding ElementName=ListRow, Path=Height}" Foreground="{StaticResource SecondaryBrush}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" ItemsSource="{Binding SearchResults}" utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}" utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}" Style="{StaticResource SearchResultGrid}">
+                <DataGrid.InputBindings>
+                    <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
+                </DataGrid.InputBindings>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Artist" Binding="{Binding Artist}" Width="Auto" MinWidth="80"/>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto" MinWidth="80"/>
+                    <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="Auto" MinWidth="80"/>
+                    <DataGridTextColumn Header="BPM" Binding="{Binding BPM}" Width="Auto" MinWidth="50"/>
+                    <DataGridTextColumn Header="Bitrate" Binding="{Binding Bitrate}" Width="Auto" MinWidth="50"/>
+                    <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="Auto" MinWidth="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Border>
+</UserControl>

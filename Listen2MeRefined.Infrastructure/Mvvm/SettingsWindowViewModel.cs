@@ -1,13 +1,14 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
 
+namespace Listen2MeRefined.Infrastructure.Mvvm;
+
 public sealed partial class SettingsWindowViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FolderBrowserNotification>
 {
     private readonly ILogger _logger;
@@ -20,6 +21,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly FontFamilies _installedFontFamilies;
     private readonly IVersionChecker _versionChecker;
     private readonly IFromFolderRemover _fromFolderRemover;
+    private readonly IOutputDevice _outputDevice;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -52,16 +54,17 @@ public sealed partial class SettingsWindowViewModel :
     public bool DontScanOnStartup => !ScanOnStartup;
 
     public SettingsWindowViewModel(
-     ILogger logger,
-     ISettingsManager<AppSettings> settingsManager,
-     IRepository<AudioModel> audioRepository,
-     IMediator mediator,
-     FontFamilies installedFontFamilies,
-     IRepository<MusicFolderModel> musicFolderRepository,
-     IRepository<PlaylistModel> playlistRepository,
-     IFolderScanner folderScanner,
-     IVersionChecker versionChecker,
-     IFromFolderRemover fromFolderRemover)
+        ILogger logger,
+        ISettingsManager<AppSettings> settingsManager,
+        IRepository<AudioModel> audioRepository,
+        IMediator mediator,
+        FontFamilies installedFontFamilies,
+        IRepository<MusicFolderModel> musicFolderRepository,
+        IRepository<PlaylistModel> playlistRepository,
+        IFolderScanner folderScanner,
+        IVersionChecker versionChecker,
+        IFromFolderRemover fromFolderRemover, 
+        IOutputDevice outputDevice)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -73,9 +76,12 @@ public sealed partial class SettingsWindowViewModel :
         _folderScanner = folderScanner;
         _versionChecker = versionChecker;
         _fromFolderRemover = fromFolderRemover;
+        _outputDevice = outputDevice;
+
+        _logger.Debug("[SettingsWindowViewModel] initialized");
     }
 
-    public async Task InitializeAsync()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         FontFamilies = new(_installedFontFamilies.FontFamilyNames);
 
@@ -105,10 +111,12 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         await GetAudioOutputDevices();
+        _logger.Debug("[SettingsWindowViewModel] Finished InitializeCoreAsync");
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
     {
+        _logger.Information("[SettingsWindowViewModel] Font family changed to: {FontFamily}", value);
         OnPropertyChanged(nameof(SelectedFontFamily));
         _settingsManager.SaveSettings(s => s.FontFamily = value);
         _mediator.Publish(new FontFamilyChangedNotification(value));
@@ -118,9 +126,11 @@ public sealed partial class SettingsWindowViewModel :
     {
         if (value is null)
         {
+            _logger.Error("[SettingsWindowViewModel] Selected audio output device is null. This should not happen.");
             return;
         }
 
+        _logger.Information("[SettingsWindowViewModel] Audio output device changed to: {DeviceName}", value.Name);
         OnPropertyChanged(nameof(SelectedAudioOutputDevice));
         _settingsManager.SaveSettings(x => x.AudioOutputDeviceName = value.Name);
         _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
@@ -130,63 +140,43 @@ public sealed partial class SettingsWindowViewModel :
     {
         if (value is null)
         {
+            _logger.Error("[SettingsWindowViewModel] Selected new song window position is null. This should not happen.");
             return;
         }
 
+        _logger.Information("[SettingsWindowViewModel] New song window position changed to: {Position}", value);
         OnPropertyChanged(nameof(SelectedNewSongWindowPosition));
         _settingsManager.SaveSettings(x => x.NewSongWindowPosition = value);
         _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
     }
-
-    #region Notification Handlers
-    public async Task Handle(
-        FolderBrowserNotification notification,
-        CancellationToken cancellationToken)
-    {
-        var path = notification.Path;
-
-        if (Folders.Contains(path))
-        {
-            return;
-        }
-
-        _logger.Debug("Adding path to music folders: {Path}", path);
-
-        Folders.Add(path);
-
-        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
-
-        await _folderScanner.ScanAsync(path);
-    }
-    #endregion
-
-    #region Commands
+    
     [RelayCommand]
     private async Task RemoveFolder()
     {
-        _logger.Debug("Removing folder: {Folder}", SelectedFolder);
+        _logger.Information("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
 
         Folders.Remove(SelectedFolder!);
         await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder!);
 
         _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
+        _logger.Verbose("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
     }
 
     [RelayCommand]
     private void ClearMetadata()
     {
-        _logger.Information("Clearing metadata...");
+        _logger.Information("[SettingsWindowViewModel] Clearing metadata...");
 
         _timedTask = new();
         _timedTask.Start(TimeSpan.FromSeconds(1), async () =>
         {
             if (_secondsToCancelClear == 0)
             {
-                _logger.Verbose("Removing entries from database");
+                _logger.Verbose("[SettingsWindowViewModel] Removing entries from database...");
                 await _audioRepository.RemoveAllAsync();
                 await _musicFolderRepository.RemoveAllAsync();
                 await _playlistRepository.RemoveAllAsync();
-                _logger.Debug("Database was successfully cleared");
+                _logger.Debug("[SettingsWindowViewModel] Database was successfully cleared");
                 
                 Folders = new();
 
@@ -198,7 +188,7 @@ public sealed partial class SettingsWindowViewModel :
 
                 _settingsManager.SaveSettings(x => x.MusicFolders = new());
 
-                _logger.Debug("Metadata cleared");
+                _logger.Debug("[SettingsWindowViewModel] Metadata cleared");
             }
 
             _secondsToCancelClear--;
@@ -211,7 +201,7 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task CancelClearMetadataAsync()
     {
-        _logger.Information("Clearing metadata canceled");
+        _logger.Information("[SettingsWindowViewModel] Clearing metadata canceled");
 
         await _timedTask?.StopAsync()!;
         IsClearMetadataButtonVisible = true;
@@ -223,7 +213,7 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task ForceScanAsync()
     {
-        _logger.Information("Force scanning folders...");
+        _logger.Information("[SettingsWindowViewModel] Force scanning folders...");
 
         await _folderScanner.ScanAllAsync();
     }
@@ -231,9 +221,9 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task OpenBrowserForUpdate()
     {
+        _logger.Information("[SettingsWindowViewModel] Opening browser to get update...");
         await Task.Run(_versionChecker.OpenUpdateLink);
     }
-    #endregion
 
     private async Task GetAudioOutputDevices()
     {
@@ -242,15 +232,11 @@ public sealed partial class SettingsWindowViewModel :
             var result = Enumerable.Empty<AudioOutputDevice>();
             try
             {
-                result = AudioDevices.GetOutputDevices();
+                result = _outputDevice.EnumerateOutputDevices();
             }
             catch (Exception ex)
             {
-                _logger.Error("Could not enumerate output devices. " + ex.Message);
-                if (ex.StackTrace is not null)
-                {
-                    _logger.Verbose(ex.StackTrace);
-                }
+                _logger.Error(ex, "[SettingsWindowViewModel] Could not enumerate output devices");
             }
 
             return result;
@@ -273,5 +259,30 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
+    }
+    
+    public async Task Handle(
+        FolderBrowserNotification notification,
+        CancellationToken cancellationToken)
+    {
+        _logger.Information("[SettingsWindowViewModel] Received FolderBrowserNotification with path: {Path}", notification.Path);
+        var path = notification.Path;
+
+        if (Folders.Contains(path))
+        {
+            _logger.Debug("[SettingsWindowViewModel] Path is already in music folders: {Path}", path);
+            return;
+        }
+
+        _logger.Information("[SettingsWindowViewModel] Adding path to music folders: {Path}", path);
+
+        Folders.Add(path);
+
+        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
+
+        _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
+        await _folderScanner.ScanAsync(path);
+
+        _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
     }
 }

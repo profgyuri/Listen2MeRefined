@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 /// This class is used to represent software versions. It can be used to compare versions and to create
 /// versions from a string or from three numbers.<para/> The version is represented by three numbers: major, minor
 /// and patch. The major number is used to indicate breaking changes, the minor number is used to indicate
-/// new features or changes that are not breaking and the patch number is used to indicate bug fixes.
+/// new features or changes that are not breaking, and the patch number is used to indicate bug fixes.
 /// </summary>
 public partial class Version : IComparable<Version>
 {

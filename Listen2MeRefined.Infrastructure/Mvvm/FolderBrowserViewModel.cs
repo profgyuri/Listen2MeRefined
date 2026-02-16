@@ -1,12 +1,13 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using MediatR;
 
+namespace Listen2MeRefined.Infrastructure.Mvvm;
+
 public sealed partial class FolderBrowserViewModel : 
-    ObservableObject,
+    ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
@@ -14,7 +15,7 @@ public sealed partial class FolderBrowserViewModel :
     private readonly IFolderBrowser _folderBrowser;
     private readonly ISettingsManager<AppSettings> _settingsManager;
 
-    [ObservableProperty] private string _fontFamily;
+    [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _fullPath = "";
     [ObservableProperty] private string _selectedFolder = "";
     [ObservableProperty] private ObservableCollection<string> _folders = new();
@@ -29,18 +30,20 @@ public sealed partial class FolderBrowserViewModel :
         _folderBrowser = folderBrowser;
         _mediator = mediator;
         _settingsManager = settingsManager;
-        
-        Initialize().ConfigureAwait(false);
+
+        _logger.Debug("[FolderBrowserViewModel] initialized");
     }
 
-    private async Task Initialize()
+    protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         await Task.Run(() =>
         {
             FontFamily = _settingsManager.Settings.FontFamily;
 
             ChangeDirectory();
-        });
+        }, ct);
+
+        _logger.Debug("[FolderBrowserViewModel] Finished InitializeCoreAsync");
     }
 
     [RelayCommand]
@@ -51,6 +54,8 @@ public sealed partial class FolderBrowserViewModel :
             GlobalConstants.ParentPathItem => Path.GetDirectoryName(FullPath) ?? "",
             _ => Path.Combine(FullPath, SelectedFolder)
         };
+
+        _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
 
         Folders.Clear();
 
@@ -67,8 +72,7 @@ public sealed partial class FolderBrowserViewModel :
     }
 
     /// <summary>
-    ///     This method should be called when the browsing is done,
-    ///     and we have a selected path.
+    /// This method should be called when the browsing is done, and we have a selected path.
     /// </summary>
     [RelayCommand]
     private async Task HandleSelectedPath()
@@ -83,10 +87,11 @@ public sealed partial class FolderBrowserViewModel :
         var isFullPathInvalid = string.IsNullOrEmpty(FullPath) || !new DirectoryInfo(FullPath).Exists;
         if (isFullPathInvalid)
         {
+            _logger.Warning("[FolderBrowserViewModel] Full path is invalid or does not exist: {FullPath}", FullPath);
             return;
         }
 
-        _logger.Debug("Publishing {FullPath} from the folder browser dialog", FullPath);
+        _logger.Debug("[FolderBrowserViewModel] Publishing full path: {FullPath}", FullPath);
 
         var notification = new FolderBrowserNotification(FullPath);
         await _mediator.Publish(notification);
@@ -110,14 +115,12 @@ public sealed partial class FolderBrowserViewModel :
         }
     }
 
-    #region Implementation of INotificationHandler<in FontFamilyChangedNotification>
-    /// <inheritdoc />
     public async Task Handle(
         FontFamilyChangedNotification notification,
         CancellationToken cancellationToken)
     {
+        _logger.Information("[FolderBrowserViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         FontFamily = notification.FontFamily;
         await Task.CompletedTask;
     }
-    #endregion
 }

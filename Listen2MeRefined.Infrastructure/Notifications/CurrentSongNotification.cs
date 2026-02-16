@@ -1,5 +1,4 @@
 ﻿namespace Listen2MeRefined.Infrastructure.Notifications;
-using MediatR;
 
 /// <summary>
 ///     Should be raised when the current song changes in the player.

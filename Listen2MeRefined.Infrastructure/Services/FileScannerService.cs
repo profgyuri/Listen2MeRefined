@@ -1,6 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Services;
+﻿using Listen2MeRefined.Infrastructure.SystemOperations;
 
-using Listen2MeRefined.Infrastructure.SystemOperations;
+namespace Listen2MeRefined.Infrastructure.Services;
 
 public class FileScannerService : IFileScanner
 {
