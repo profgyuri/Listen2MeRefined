@@ -1,10 +1,10 @@
-namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public partial class ListsViewModel :
     ViewModelBase,
@@ -52,11 +52,9 @@ public partial class ListsViewModel :
     [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
     public async Task JumpToSelectedSong()
     {
-        _logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
+        _logger.Debug<int>("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
         await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
     }
-
-    private bool CanJumpToSelectedSong() => SelectedIndex > -1;
 
     [RelayCommand]
     private void SendSelectedToPlaylist()
@@ -105,12 +103,6 @@ public partial class ListsViewModel :
         _selectedPlaylistItems.Clear();
     }
 
-    private void ClearPlaylist()
-    {
-        PlayList.Clear();
-        _selectedPlaylistItems.Clear();
-    }
-
     [RelayCommand]
     private void SetSelectedSongAsNext()
     {
@@ -119,7 +111,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        _logger.Information("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
+        _logger.Information<string?>("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
         var selectedSongIndex = PlayList.IndexOf(SelectedSong);
         var newIndex = _currentSongIndex + 1;
 
@@ -141,7 +133,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        _logger.Information("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
+        _logger.Information<string?>("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
         var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
         var index = PlayList.IndexOf(SelectedSong);
         PlayList[index] = scanned;
@@ -149,7 +141,7 @@ public partial class ListsViewModel :
     }
 
     [RelayCommand]
-    public void SwitchToSongMenuTab()
+    private void SwitchToSongMenuTab()
     {
         _logger.Verbose("[ListsViewModel] Switching to Song Menu tab");
         IsSearchResultsTabVisible = false;
@@ -195,6 +187,24 @@ public partial class ListsViewModel :
         }
     }
     
+    private bool CanJumpToSelectedSong() => SelectedIndex > -1;
+    
+    private void ClearPlaylist()
+    {
+        PlayList.Clear();
+        _selectedPlaylistItems.Clear();
+    }
+
+    partial void OnSelectedIndexChanged(int value)
+    {
+        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
+    {
+        _logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
+    }
+    
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
@@ -231,17 +241,6 @@ public partial class ListsViewModel :
         SearchResults.AddRange(result);
     }
 
-
-    partial void OnSelectedIndexChanged(int value)
-    {
-        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
-    }
-
-    partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
-    {
-        _logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
-    }
-
     public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
     {
         var result = notification.Results.ToArray();
@@ -257,7 +256,7 @@ public partial class ListsViewModel :
 
         SwitchToSearchResultsTab();
         SearchResults.Clear();
-        SearchResults.AddRange(notification.Results);
+        Extensions.AddRange(SearchResults, notification.Results);
         await Task.CompletedTask;
     }
 }

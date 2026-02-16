@@ -1,11 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-
-using System.Threading;
-using System.Threading.Tasks;
-using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class NewSongWindowViewModel :
     ViewModelBase,

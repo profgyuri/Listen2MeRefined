@@ -1,9 +1,8 @@
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public sealed partial class MainWindowViewModel : 
     ViewModelBase,
@@ -68,14 +67,14 @@ public sealed partial class MainWindowViewModel :
             _logger.Information("[MainWindowViewModel] Checking for latest version...");
 
             var isLatest = await _versionChecker.IsLatestAsync();
-            await _ui.InvokeAsync(() => IsUpdateAvailable = !isLatest, ct);
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = !isLatest, ct);
 
-            _logger.Information("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
+            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
         }
         catch (Exception ex)
         {
             _logger.Warning($"[MainWindowViewModel] Version check failed: {ex}");
-            await _ui.InvokeAsync(() => IsUpdateAvailable = false, ct);
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
         }
 
         try
@@ -94,18 +93,6 @@ public sealed partial class MainWindowViewModel :
         }
 
         _logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
-    }
-
-    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
-        return _ui.InvokeAsync(() => Song = notification.Audio, cancellationToken);
-    }
-
-    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        return _ui.InvokeAsync(() => FontFamily = notification.FontFamily, cancellationToken);
     }
 
     [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
@@ -150,5 +137,17 @@ public sealed partial class MainWindowViewModel :
         {
             CanNavigateToAuxiliaryWindows = true;
         }
+    }
+    
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
+        return _ui.InvokeAsync<AudioModel>(() => Song = notification.Audio, cancellationToken);
+    }
+
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
+        return _ui.InvokeAsync<string>(() => FontFamily = notification.FontFamily, cancellationToken);
     }
 }

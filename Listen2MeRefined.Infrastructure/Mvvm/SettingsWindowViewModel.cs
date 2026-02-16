@@ -1,10 +1,11 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
+
+namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class SettingsWindowViewModel : 
     ViewModelBase,
@@ -53,17 +54,17 @@ public sealed partial class SettingsWindowViewModel :
     public bool DontScanOnStartup => !ScanOnStartup;
 
     public SettingsWindowViewModel(
-     ILogger logger,
-     ISettingsManager<AppSettings> settingsManager,
-     IRepository<AudioModel> audioRepository,
-     IMediator mediator,
-     FontFamilies installedFontFamilies,
-     IRepository<MusicFolderModel> musicFolderRepository,
-     IRepository<PlaylistModel> playlistRepository,
-     IFolderScanner folderScanner,
-     IVersionChecker versionChecker,
-     IFromFolderRemover fromFolderRemover, 
-     IOutputDevice outputDevice)
+        ILogger logger,
+        ISettingsManager<AppSettings> settingsManager,
+        IRepository<AudioModel> audioRepository,
+        IMediator mediator,
+        FontFamilies installedFontFamilies,
+        IRepository<MusicFolderModel> musicFolderRepository,
+        IRepository<PlaylistModel> playlistRepository,
+        IFolderScanner folderScanner,
+        IVersionChecker versionChecker,
+        IFromFolderRemover fromFolderRemover, 
+        IOutputDevice outputDevice)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -148,31 +149,7 @@ public sealed partial class SettingsWindowViewModel :
         _settingsManager.SaveSettings(x => x.NewSongWindowPosition = value);
         _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
     }
-
-    public async Task Handle(
-        FolderBrowserNotification notification,
-        CancellationToken cancellationToken)
-    {
-        _logger.Information("[SettingsWindowViewModel] Received FolderBrowserNotification with path: {Path}", notification.Path);
-        var path = notification.Path;
-
-        if (Folders.Contains(path))
-        {
-            _logger.Debug("[SettingsWindowViewModel] Path is already in music folders: {Path}", path);
-            return;
-        }
-
-        _logger.Information("[SettingsWindowViewModel] Adding path to music folders: {Path}", path);
-
-        Folders.Add(path);
-
-        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
-
-        _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
-        await _folderScanner.ScanAsync(path);
-
-        _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
-    }
+    
     [RelayCommand]
     private async Task RemoveFolder()
     {
@@ -282,5 +259,30 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
+    }
+    
+    public async Task Handle(
+        FolderBrowserNotification notification,
+        CancellationToken cancellationToken)
+    {
+        _logger.Information("[SettingsWindowViewModel] Received FolderBrowserNotification with path: {Path}", notification.Path);
+        var path = notification.Path;
+
+        if (Folders.Contains(path))
+        {
+            _logger.Debug("[SettingsWindowViewModel] Path is already in music folders: {Path}", path);
+            return;
+        }
+
+        _logger.Information("[SettingsWindowViewModel] Adding path to music folders: {Path}", path);
+
+        Folders.Add(path);
+
+        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
+
+        _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
+        await _folderScanner.ScanAsync(path);
+
+        _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
     }
 }

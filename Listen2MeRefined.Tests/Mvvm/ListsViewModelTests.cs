@@ -6,6 +6,7 @@ using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Services;
 using Moq;
 using Serilog;
+using ListsViewModel = Listen2MeRefined.Infrastructure.Mvvm.MainWindow.ListsViewModel;
 
 namespace Listen2MeRefined.Tests.Mvvm;
 

@@ -17,24 +17,22 @@ public partial class AdvancedSearchViewModel :
     private readonly List<string> _stringRelations = new() { "Is", "Is not", "Contains", "Does not contain" };
     private readonly List<AdvancedFilter> _filters = new();
 
-    [ObservableProperty] private string _fontFamily;
-    [ObservableProperty] private List<string> _columnName;
-    [ObservableProperty] private List<string> _relation;
+    [ObservableProperty] private string _fontFamily = string.Empty;
+    [ObservableProperty] private List<string> _columnName = new();
+    [ObservableProperty] private List<string> _relation = new();
     [ObservableProperty] private string _selectedRelation = "";
-    [ObservableProperty] private ObservableCollection<string> _criterias;
-    [ObservableProperty] private string _selectedCriteria;
+    [ObservableProperty] private ObservableCollection<string> _criterias = new();
+    [ObservableProperty] private string _selectedCriteria = string.Empty;
     [ObservableProperty] private string _rangeSuffixText = "";
     [ObservableProperty] private string _inputText = "";
-    [ObservableProperty] private bool _matchAll;
-    
-    private string _selectedColumnName;
+    [ObservableProperty] private bool _matchAll = false;
 
     public string SelectedColumnName
     {
-        get => _selectedColumnName;
+        get;
         set
         {
-            _selectedColumnName = value;
+            field = value;
             switch (value)
             {
                 case nameof(AudioModel.Length):
@@ -67,6 +65,7 @@ public partial class AdvancedSearchViewModel :
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
+        SelectedColumnName = string.Empty;
 
         _logger.Debug("[AdvancedSearchViewModel] initialized");
     }
@@ -133,8 +132,6 @@ public partial class AdvancedSearchViewModel :
         
         _logger.Information("[AdvancedSearchViewModel] Search executed and criteria cleared.");
     }
-
-
     
     private static AdvancedFilterOperator MapOperator(string relation)
     {

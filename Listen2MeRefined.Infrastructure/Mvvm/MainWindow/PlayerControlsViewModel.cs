@@ -4,7 +4,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
 using SkiaSharp;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public partial class PlayerControlsViewModel :
     ViewModelBase,
@@ -50,28 +50,15 @@ public partial class PlayerControlsViewModel :
             TimeSpan.FromMilliseconds(100),
             () => OnPropertyChanged(nameof(CurrentTime)));
 
-        await Task.Run(async () =>
+        await Task.Run((Func<Task?>)(async () =>
         {
             WaveFormWidth = 480;
             WaveFormHeight = 70;
             _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
             await DrawPlaceholderLineAsync();
-        }, ct);
+        }), ct);
 
            _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
-    }
-
-    private async Task DrawPlaceholderLineAsync()
-    {
-        WaveForm = await _waveFormDrawer.LineAsync();
-    }
-
-    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
-        await DrawPlaceholderLineAsync();
-        WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
-        TotalTime = notification.Audio.Length.TotalMilliseconds;
     }
 
     [RelayCommand]
@@ -107,5 +94,18 @@ public partial class PlayerControlsViewModel :
     {
         _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
         await _musicPlayerController.Shuffle();
+    }
+    
+    private async Task DrawPlaceholderLineAsync()
+    {
+        WaveForm = await _waveFormDrawer.LineAsync();
+    }
+    
+    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
+        await DrawPlaceholderLineAsync();
+        WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
+        TotalTime = notification.Audio.Length.TotalMilliseconds;
     }
 }
