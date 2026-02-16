@@ -1,22 +1,19 @@
 ﻿namespace Listen2MeRefined.WPF;
-using System;
-using System.Collections.Generic;
+
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using Listen2MeRefined.Infrastructure;
-using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.WPF.Views;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
 /// </summary>
 public sealed partial class MainWindow : Window
 {
-    private readonly KeySpline _easeOutKeySpline = new(0.5, 0, 0.5, 1);
-    private readonly Dictionary<string, Storyboard> _storyboards = new();
     private readonly IGlobalHook _globalHook;
+
+    public ICommand CloseWindowCommand { get; }
+    public ICommand MinimizeWindowCommand { get; }
+    public ICommand ToggleWindowStateCommand { get; }
 
     public MainWindow(
         MainWindowViewModel viewModel,
@@ -26,211 +23,42 @@ public sealed partial class MainWindow : Window
 
         DataContext = viewModel;
         _globalHook = globalHook;
+
+        // View-only commands for native window chrome operations.
+        CloseWindowCommand = new RelayCommand(_ => CloseWindow());
+        MinimizeWindowCommand = new RelayCommand(_ => WindowState = WindowState.Minimized);
+        ToggleWindowStateCommand = new RelayCommand(_ =>
+            WindowState = WindowState == WindowState.Maximized
+                ? WindowState.Normal
+                : WindowState.Maximized);
     }
 
-    private void CloseWindow_Click(
-        object sender,
-        RoutedEventArgs e)
+    private void CloseWindow()
     {
         _globalHook.Unregister();
         Application.Current.Shutdown();
     }
 
-    private void MaximizeWindow_Click(
-        object sender,
-        RoutedEventArgs e)
+    private sealed class RelayCommand : ICommand
     {
-        WindowState =
-            WindowState == WindowState.Maximized
-                ? WindowState.Normal
-                : WindowState.Maximized;
-    }
+        private readonly Action<object?> _execute;
 
-    private void MinimizeWindow_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        WindowState = WindowState.Minimized;
-    }
-
-    private async void SettingsWindow_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        UpdateNotification.Visibility = Visibility.Collapsed;
-        await WindowManager.ShowWindowAsync<SettingsWindow>(Left + Width / 2, Top + Height / 2);
-    }
-
-    private async void AdvancedSearchWindow_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        await WindowManager.ShowWindowAsync<AdvancedSearchWindow>(Left + Width / 2, Top + Height / 2);
-        var vm = (MainWindowViewModel)DataContext;
-        vm.ListsViewModel.SwitchToSearchResultsTab();
-    }
-
-    #region Flowing text animation
-    private void DisplayText_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        var flowingTextBlock = (sender as StoryboardTextBlock)!;
-        var container = flowingTextBlock.Parent as FrameworkElement;
-
-        //if the storyboard is already playing, just return
-        if (_storyboards.ContainsKey(flowingTextBlock.StoryboardName))
+        public RelayCommand(Action<object?> execute)
         {
-            return;
+            _execute = execute;
         }
 
-        double swipeAmount = flowingTextBlock.ActualWidth - container.ActualWidth + 0;
+        public bool CanExecute(object? parameter) => true;
 
-        //getting a smooth amount of swipe duration for longer texts
-        var swipeSeconds = swipeAmount / 100 * 3.5d;
-
-        //setting a minimum animation duration, so short texts dont just "jump" around
-        swipeSeconds = swipeSeconds >= 3 ? swipeSeconds : 3;
-
-        if (swipeAmount <= 0)
+        public void Execute(object? parameter)
         {
-            return;
+            _execute(parameter);
         }
 
-        var thicknessAnimation = new ThicknessAnimationUsingKeyFrames()
+        public event EventHandler? CanExecuteChanged
         {
-            RepeatBehavior = new RepeatBehavior(1),
-            AutoReverse = true
-        };
-        thicknessAnimation.KeyFrames.Add(
-            new SplineThicknessKeyFrame(
-                new Thickness(0, 0, 0, 10),
-                KeyTime.FromTimeSpan(TimeSpan.FromSeconds(.5))));
-
-        if (swipeAmount > 0)
-        {
-            thicknessAnimation.KeyFrames.Add(
-                new SplineThicknessKeyFrame(
-                    new Thickness(-swipeAmount, 0, 0, 10),
-                    KeyTime.FromTimeSpan(TimeSpan.FromSeconds(swipeSeconds)),
-                    _easeOutKeySpline));
-
-            thicknessAnimation.KeyFrames.Add(
-                new SplineThicknessKeyFrame(
-                    new Thickness(-swipeAmount, 0, 0, 10),
-                    KeyTime.FromTimeSpan(TimeSpan.FromSeconds(swipeSeconds + .5)),
-                    _easeOutKeySpline));
-        }
-
-        Storyboard.SetTarget(thicknessAnimation, flowingTextBlock);
-        Storyboard.SetTargetProperty(thicknessAnimation, new PropertyPath("(TextBlock.Margin)"));
-
-        var storyboard = new Storyboard();
-        var name = $"a{Guid.NewGuid():N}";
-        storyboard.Name = name;
-        flowingTextBlock.StoryboardName = name;
-        storyboard.Children.Add(thicknessAnimation);
-        storyboard.Begin();
-        _storyboards.Add(storyboard.Name, storyboard);
-    }
-
-    private void DisplayText_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-    {
-        var FlowingTetxBlock = (sender as StoryboardTextBlock)!;
-
-        if (!_storyboards.ContainsKey(FlowingTetxBlock.StoryboardName))
-        {
-            return;
-        }
-
-        double swipeAmount = FlowingTetxBlock.Margin.Left;
-
-        //getting a smooth amount of swipe duration for longer texts
-        var swipeSeconds = Math.Abs(swipeAmount / 100 * 1.33d);
-        swipeSeconds = swipeSeconds >= 1 ? swipeSeconds : 1;
-
-        var thicknessAnimation = new ThicknessAnimationUsingKeyFrames()
-        {
-            RepeatBehavior = new RepeatBehavior(1)
-        };
-
-        if (Math.Abs(swipeAmount) > 0)
-        {
-            thicknessAnimation.KeyFrames.Add(
-                new SplineThicknessKeyFrame(
-                    new Thickness(swipeAmount, 0, 0, 10),
-                    KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0)),
-                    _easeOutKeySpline));
-
-            thicknessAnimation.KeyFrames.Add(
-               new SplineThicknessKeyFrame(
-                   new Thickness(0, 0, 0, 10),
-                   KeyTime.FromTimeSpan(TimeSpan.FromSeconds(swipeSeconds)),
-                   _easeOutKeySpline));
-        }
-
-        Storyboard.SetTarget(thicknessAnimation, FlowingTetxBlock);
-        Storyboard.SetTargetProperty(thicknessAnimation, new PropertyPath("(TextBlock.Margin)"));
-
-        var name = FlowingTetxBlock.StoryboardName;
-        var storyboard = _storyboards[name];
-        storyboard.Stop();
-        storyboard = new();
-        storyboard.Name = name;
-        storyboard.Children.Add(thicknessAnimation);
-        storyboard.Completed += (s, e) => _storyboards.Remove(storyboard.Name);
-        storyboard.Begin();
-    }
-    #endregion
-
-    private void Playlist_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (sender is ListView listView && listView.SelectedItem != null)
-        {
-            listView.ScrollIntoView(listView.SelectedItem);
-        }
-
-        var vm = (MainWindowViewModel)DataContext;
-
-        foreach (var audio in e.AddedItems)
-        {
-            vm.ListsViewModel.AddSelectedPlaylistItems((AudioModel)audio);
-        }
-
-        foreach (var audio in e.RemovedItems)
-        {
-            vm.ListsViewModel.RemoveSelectedPlaylistItems((AudioModel)audio);
-        }
-    }
-
-    private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var vm = (MainWindowViewModel)DataContext;
-
-        foreach (var audio in e.AddedItems)
-        {
-            vm.ListsViewModel.AddSelectedSearchResult((AudioModel)audio);
-        }
-        
-        foreach (var audio in e.RemovedItems)
-        {
-            vm.ListsViewModel.RemoveSelectedSearchResult((AudioModel)audio);
-        }
-    }
-
-    private void Playlist_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (e.ChangedButton == MouseButton.Left)
-        {
-            var vm = (MainWindowViewModel)DataContext;
-            vm.ListsViewModel.JumpToSelectedSong().ConfigureAwait(false);
-        }
-    }
-
-    private void Playlist_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (e.ChangedButton == MouseButton.Right)
-        {
-            var vm = (MainWindowViewModel)DataContext;
-            vm.ListsViewModel.SwitchToSongMenuTab();
+            add { }
+            remove { }
         }
     }
 }
