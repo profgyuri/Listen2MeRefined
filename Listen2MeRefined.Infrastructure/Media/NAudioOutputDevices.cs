@@ -1,6 +1,6 @@
-namespace Listen2MeRefined.Infrastructure.Media;
-
 using NAudio.CoreAudioApi;
+
+namespace Listen2MeRefined.Infrastructure.Media;
 
 public class NAudioOutputDevices : IOutputDevice
 {

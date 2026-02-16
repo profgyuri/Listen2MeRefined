@@ -1,25 +1,22 @@
-namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 using NAudio.Wave;
+
+namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class FileReader
     : IFileReader<ISampleProvider>
 {
-    private AudioFileReader _audioFileReader;
+    private AudioFileReader? _audioFileReader;
     
-    /// <inheritdoc/>
-    public ISampleProvider SampleProvider { get; private set; }
+    public ISampleProvider? SampleProvider { get; private set; }
     
-    /// <inheritdoc/>
     public int SamplesPerPeak { get; private set; }
 
-    /// <inheritdoc/>
     public void Open(string fileName)
     {
         _audioFileReader = new AudioFileReader(fileName);
         SampleProvider = _audioFileReader.ToSampleProvider();
     }
 
-    /// <inheritdoc/>
     public void SetSampleCount(int sampleCount)
     {
         if (_audioFileReader is null)
