@@ -2,13 +2,13 @@
 
 /// <summary>
 ///     Wrapper class for <see cref="PeriodicTimer" />.
-///     Accepts an action wich will be executed on each timer tick
+///     Accepts an action which will be executed on each timer tick
 ///     until the timer is stopped.
 /// </summary>
 public sealed class TimedTask : IAsyncDisposable
 {
     private Task? _timerTask;
-    private PeriodicTimer _timer;
+    private PeriodicTimer? _timer;
     private readonly CancellationTokenSource _cts;
 
     public TimedTask()
@@ -45,12 +45,17 @@ public sealed class TimedTask : IAsyncDisposable
             return;
         }
 
-        _cts.Cancel();
+        await _cts.CancelAsync();
         await _timerTask;
     }
     
     private async Task DoWorkAsync(Action action)
     {
+        if (_timer is null)
+        {
+            return;
+        }
+        
         try
         {
             while (await _timer.WaitForNextTickAsync(_cts.Token))
@@ -71,6 +76,7 @@ public sealed class TimedTask : IAsyncDisposable
     {
         await StopAsync();
         _timerTask?.Dispose();
-        _cts.Dispose();
+        _timer?.Dispose();
+        _cts?.Dispose();
     }
 }
