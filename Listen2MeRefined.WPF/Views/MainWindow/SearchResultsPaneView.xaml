@@ -4,22 +4,106 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <Border Margin="0 10 0 0" Style="{StaticResource ContainerBorder}">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="BorderAccentBrush" Color="{StaticResource TertiaryColor}" />
+        <Style x:Key="ToolbarLabelText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#A8A8A8" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="ToolbarValueText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="QuickActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+            <Setter Property="Width" Value="38" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+            <Setter Property="Background" Value="#2E2E2E" />
+            <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        </Style>
+
+        <Style x:Key="ModernSearchGridV2" TargetType="DataGrid" BasedOn="{StaticResource SearchResultGrid}">
+            <Setter Property="Background" Value="#232323" />
+            <Setter Property="BorderBrush" Value="#3A3A3A" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="GridLinesVisibility" Value="Horizontal" />
+            <Setter Property="HorizontalGridLinesBrush" Value="#343434" />
+            <Setter Property="RowHeaderWidth" Value="0" />
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#2D2D2D" />
+                        <Setter Property="Foreground" Value="#D8D8D8" />
+                        <Setter Property="BorderBrush" Value="#3B3B3B" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Setter Property="Padding" Value="10,8" />
+                        <Setter Property="FontWeight" Value="SemiBold" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Margin="0,8,0,0"
+            Background="#272727"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="10">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="55"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="55"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition x:Name="ListRow" Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition x:Name="ListRow" Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Column="1" Style="{StaticResource ElementContainerText}" VerticalAlignment="Center" Margin="0 6 0 20" Text="Search Results" Background="Transparent"/>
-            <Button Grid.Column="2" Style="{StaticResource InteractionButton}" Margin="10 0" BorderThickness="0" Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}" Command="{Binding SendSelectedToPlaylistCommand}" ToolTip="Add Selected / All to Playlist"/>
+            <Border Grid.Row="0"
+                    Background="#222222"
+                    BorderBrush="#393939"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="10,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <DataGrid Grid.Row="1" Grid.ColumnSpan="5" Height="{Binding ElementName=ListRow, Path=Height}" Foreground="{StaticResource SecondaryBrush}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" ItemsSource="{Binding SearchResults}" utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}" utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}" Style="{StaticResource SearchResultGrid}">
+                    <Border Width="24" Height="24" Background="{StaticResource BorderAccentBrush}" CornerRadius="12" VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="MusicNote" Width="14" Height="14" Foreground="#1F1F1F" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource ToolbarLabelText}" Text="PANEL" Margin="0,0,6,0" />
+                        <TextBlock Style="{StaticResource ToolbarValueText}" Text="Search Results" />
+                    </StackPanel>
+
+                    <Button Grid.Column="3"
+                            Style="{StaticResource QuickActionButton}"
+                            Command="{Binding SendSelectedToPlaylistCommand}"
+                            ToolTip="Add Selected / All to Playlist"
+                            Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=20}" />
+                </Grid>
+            </Border>
+
+            <DataGrid Grid.Row="2"
+                      Height="{Binding ElementName=ListRow, Path=Height}"
+                      Foreground="{StaticResource SecondaryBrush}"
+                      dd:DragDrop.IsDragSource="True"
+                      dd:DragDrop.IsDropTarget="True"
+                      ItemsSource="{Binding SearchResults}"
+                      utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}"
+                      utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}"
+                      Style="{StaticResource ModernSearchGridV2}">
                 <DataGrid.InputBindings>
                     <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
                 </DataGrid.InputBindings>
