@@ -4,25 +4,190 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <Border DataContext="{Binding PlayerControlsViewModel}" utils:ViewModelInitialization.AutoInitialize="True" Style="{StaticResource ContainerBorder}">
+    <UserControl.Resources>
+        <Style x:Key="TransportButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#4A4A4A" />
+            <Setter Property="Background" Value="#2F2F2F" />
+            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+            <Setter Property="Margin" Value="3,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="18">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#353535" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryTransportButton" TargetType="Button" BasedOn="{StaticResource TransportButton}">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+            <Setter Property="Background" Value="#313131" />
+            <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        </Style>
+
+        <Style x:Key="TimeText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#BDBDBD" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="2,1" />
+        </Style>
+
+        <Style x:Key="VolumeIconButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#4A4A4A" />
+            <Setter Property="Background" Value="#2F2F2F" />
+            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="BtnBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="15">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#353535" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border DataContext="{Binding PlayerControlsViewModel}"
+            utils:ViewModelInitialization.AutoInitialize="True"
+            Background="#272727"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="10"
+            Padding="8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
-            <Button Grid.Column="1" Command="{Binding StopCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
-            <Button Grid.Column="2" Command="{Binding PlayPauseCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
-            <Button Grid.Column="3" Command="{Binding NextCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
-            <Button Grid.Column="4" Command="{Binding ShuffleCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
-            <wpf:WaveSlider Style="{StaticResource NoHaloSlider}" Foreground="{StaticResource TertiaryBrush}" WaveBitmap="{Binding WaveForm}" Grid.Row="1" Minimum="0" Maximum="{Binding TotalTime}" Value="{Binding CurrentTime}" Grid.ColumnSpan="5" Width="{Binding WaveFormWidth}" Height="{Binding WaveFormHeight}"/>
+
+            <Border Grid.Row="0"
+                    Background="#222222"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="4">
+                <Grid x:Name="WaveAreaGrid">
+                    <wpf:WaveSlider Style="{StaticResource NoHaloSlider}"
+                                    Foreground="{StaticResource TertiaryBrush}"
+                                    WaveBitmap="{Binding WaveForm}"
+                                    Minimum="0"
+                                    Maximum="{Binding TotalTime}"
+                                    Value="{Binding CurrentTime}"
+                                    Width="{Binding WaveFormWidth}"
+                                    Height="{Binding WaveFormHeight}"
+                                    Margin="6,0" />
+
+                    <TextBlock x:Name="ElapsedTimeText"
+                               Text="{Binding CurrentTime, StringFormat={}{0:mm\\:ss}}"
+                               Background="#232323"
+                               HorizontalAlignment="Left"
+                               Margin="8,0,0,0"
+                               IsHitTestVisible="False"
+                               Panel.ZIndex="2">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource TimeText}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=WaveAreaGrid}" Value="True">
+                                        <Setter Property="Opacity" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <TextBlock x:Name="TotalTimeText"
+                               Text="{Binding TotalTime, StringFormat={}{0:mm\\:ss}}"
+                               HorizontalAlignment="Right"
+                               Background="#232323"
+                               Margin="0,0,8,0"
+                               IsHitTestVisible="False"
+                               Panel.ZIndex="2">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource TimeText}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=WaveAreaGrid}" Value="True">
+                                        <Setter Property="Opacity" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Background="#232323"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="6,5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Command="{Binding PreviousCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"/>
+                        <Button Command="{Binding StopCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" />
+                        <Button Command="{Binding PlayPauseCommand}" Style="{StaticResource PrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" />
+                        <Button Command="{Binding NextCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" />
+                        <Button Command="{Binding ShuffleCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <Button Style="{StaticResource VolumeIconButton}"
+                                Content="{materialDesign:PackIcon Kind=VolumeHigh,Size=14}" />
+                        <Slider Width="84"
+                                Margin="8,0,0,0"
+                                Minimum="0"
+                                Maximum="100"
+                                Value="70"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource TertiaryBrush}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </UserControl>
