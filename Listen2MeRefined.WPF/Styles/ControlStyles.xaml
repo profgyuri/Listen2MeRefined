@@ -143,7 +143,7 @@
     </Style>
 
     <Style TargetType="Border" x:Key="ContainerBorder">
-        <Setter Property="CornerRadius" Value="5" />
+        <Setter Property="CornerRadius" Value="10" />
         <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
         <Setter Property="Background" Value="{StaticResource ContainerGradientBackgroundBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -170,6 +170,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -290,7 +291,7 @@
     <!--#endregion-->
 
     <Style TargetType="{x:Type Thumb}" x:Key="ScrollBarThumbStyle">
-        <Setter Property="Background" Value="#555"/>
+        <Setter Property="Background" Value="{StaticResource TertiaryLightMidBrush}"/>
         <Setter Property="IsHitTestVisible" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
@@ -306,7 +307,7 @@
         TargetType="{x:Type ScrollBar}" 
         BasedOn="{StaticResource {x:Type ScrollBar}}"
         x:Key="{x:Type ScrollBar}">
-        <Setter Property="Background" Value="#333" />
+        <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Width" Value="10" />
         <Setter Property="Template">
@@ -343,7 +344,7 @@
 
                                 <Track x:Name="PART_Track" IsDirectionReversed="True">
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="#555" />
+                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -365,7 +366,7 @@
 
                                 <Track x:Name="PART_Track">
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="#555" />
+                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
