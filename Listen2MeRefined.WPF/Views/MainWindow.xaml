@@ -15,13 +15,13 @@
         Height="702" Width="1030">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome x:Name="WindowChrome" CaptionHeight="32" />
+        <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>
 
-    <Border BorderThickness="2" BorderBrush="{StaticResource TertiaryBrush}" Background="{StaticResource PrimaryBrush}" CornerRadius="8">
+    <Border BorderThickness="2" BorderBrush="{StaticResource TertiaryBrush}" Background="{StaticResource PrimaryBrush}" CornerRadius="0, 0, 8, 8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}" />
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=40}" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
