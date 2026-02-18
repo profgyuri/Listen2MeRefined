@@ -10,10 +10,14 @@ public partial class PlayerControlsViewModel :
     ViewModelBase,
     INotificationHandler<CurrentSongNotification>
 {
+    private const float VolumeEpsilon = 0.0001f;
+
     private readonly ILogger _logger;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly TimedTask _timedTask;
+    private bool _isMuted;
+    private float _lastNonZeroVolume = 0.7f;
 
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
     [ObservableProperty] private int _waveFormWidth;
@@ -39,15 +43,43 @@ public partial class PlayerControlsViewModel :
         get => _musicPlayerController.Volume;
         set
         {
-            if (Math.Abs(_musicPlayerController.Volume - value) < float.Epsilon)
+            var clampedValue = Math.Clamp(value, 0f, 1f);
+            var previousVolume = _musicPlayerController.Volume;
+            if (Math.Abs(previousVolume - clampedValue) < VolumeEpsilon)
             {
                 return;
             }
 
-            _musicPlayerController.Volume = value;
+            _musicPlayerController.Volume = clampedValue;
+            if (clampedValue > VolumeEpsilon)
+            {
+                _lastNonZeroVolume = clampedValue;
+            }
+
+            if (_isMuted && clampedValue > VolumeEpsilon)
+            {
+                SetMuted(false);
+            }
+            else if (!_isMuted && clampedValue <= VolumeEpsilon)
+            {
+                SetMuted(true);
+            }
+
             OnPropertyChanged();
+            OnPropertyChanged(nameof(VolumeIconKind));
         }
     }
+
+    public bool IsMuted => _isMuted;
+
+    public string VolumeIconKind =>
+        _isMuted || Volume <= VolumeEpsilon
+            ? "VolumeOff"
+            : Volume < 0.34f
+                ? "VolumeLow"
+                : Volume < 0.67f
+                    ? "VolumeMedium"
+                    : "VolumeHigh";
 
     public PlayerControlsViewModel(
         ILogger logger,
@@ -74,6 +106,14 @@ public partial class PlayerControlsViewModel :
             });
 
         OnPropertyChanged(nameof(Volume));
+        SetMuted(Volume <= VolumeEpsilon);
+        if (Volume > VolumeEpsilon)
+        {
+            _lastNonZeroVolume = Volume;
+        }
+
+        OnPropertyChanged(nameof(VolumeIconKind));
+        OnPropertyChanged(nameof(IsMuted));
         OnPropertyChanged(nameof(TotalTimeDisplay));
 
         await Task.Run((Func<Task?>)(async () =>
@@ -121,6 +161,31 @@ public partial class PlayerControlsViewModel :
         _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
         await _musicPlayerController.Shuffle();
     }
+
+    [RelayCommand]
+    private void ToggleMute()
+    {
+        if (_isMuted)
+        {
+            var restoredVolume = _lastNonZeroVolume > VolumeEpsilon ? _lastNonZeroVolume : 0.7f;
+            _musicPlayerController.Volume = restoredVolume;
+            SetMuted(false);
+            OnPropertyChanged(nameof(Volume));
+            OnPropertyChanged(nameof(VolumeIconKind));
+            return;
+        }
+
+        var currentVolume = Volume;
+        if (currentVolume > VolumeEpsilon)
+        {
+            _lastNonZeroVolume = currentVolume;
+        }
+
+        _musicPlayerController.Volume = 0f;
+        SetMuted(true);
+        OnPropertyChanged(nameof(Volume));
+        OnPropertyChanged(nameof(VolumeIconKind));
+    }
     
     private async Task DrawPlaceholderLineAsync()
     {
@@ -134,5 +199,17 @@ public partial class PlayerControlsViewModel :
         WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
         TotalTime = notification.Audio.Length.TotalMilliseconds;
         OnPropertyChanged(nameof(TotalTimeDisplay));
+    }
+
+    private void SetMuted(bool isMuted)
+    {
+        if (_isMuted == isMuted)
+        {
+            return;
+        }
+
+        _isMuted = isMuted;
+        OnPropertyChanged(nameof(IsMuted));
+        OnPropertyChanged(nameof(VolumeIconKind));
     }
 }

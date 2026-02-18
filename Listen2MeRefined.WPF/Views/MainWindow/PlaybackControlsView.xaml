@@ -153,14 +153,26 @@
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Button Style="{StaticResource VolumeIconButton}"
-                                Content="{materialDesign:PackIcon Kind=VolumeHigh,Size=14}" />
+                                Command="{Binding ToggleMuteCommand}">
+                            <materialDesign:PackIcon Kind="{Binding VolumeIconKind}" Width="14" Height="14" />
+                        </Button>
                         <Slider Width="84"
                                 Margin="8,0"
                                 Minimum="0"
                                 Maximum="1"
                                 Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                VerticalAlignment="Center"
-                                Foreground="{StaticResource TertiaryBrush}" />
+                                VerticalAlignment="Center">
+                            <Slider.Style>
+                                <Style TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
+                                    <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                            <Setter Property="Foreground" Value="#888888" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Slider.Style>
+                        </Slider>
                     </StackPanel>
                 </Grid>
             </Border>
