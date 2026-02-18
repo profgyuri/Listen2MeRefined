@@ -25,7 +25,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="{StaticResource TertiaryBrush}" />
+                                <Setter TargetName="TabBorder" Property="Background" Value="#353535" />
                                 <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
                             </Trigger>
