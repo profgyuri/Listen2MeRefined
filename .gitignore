@@ -365,3 +365,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /favorites.json
 /Listen2MeRefined.Tests/coveragereport
+/.dotnet-cli/.dotnet

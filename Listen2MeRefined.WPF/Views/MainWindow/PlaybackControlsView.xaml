@@ -181,8 +181,8 @@
                         <Slider Width="84"
                                 Margin="8,0,0,0"
                                 Minimum="0"
-                                Maximum="100"
-                                Value="70"
+                                Maximum="1"
+                                Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 VerticalAlignment="Center"
                                 Foreground="{StaticResource TertiaryBrush}" />
                     </StackPanel>

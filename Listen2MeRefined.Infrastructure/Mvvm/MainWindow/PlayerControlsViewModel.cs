@@ -30,6 +30,21 @@ public partial class PlayerControlsViewModel :
         }
     }
 
+    public float Volume
+    {
+        get => _musicPlayerController.Volume;
+        set
+        {
+            if (Math.Abs(_musicPlayerController.Volume - value) < float.Epsilon)
+            {
+                return;
+            }
+
+            _musicPlayerController.Volume = value;
+            OnPropertyChanged();
+        }
+    }
+
     public PlayerControlsViewModel(
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
@@ -49,6 +64,8 @@ public partial class PlayerControlsViewModel :
         _timedTask.Start(
             TimeSpan.FromMilliseconds(100),
             () => OnPropertyChanged(nameof(CurrentTime)));
+
+        OnPropertyChanged(nameof(Volume));
 
         await Task.Run((Func<Task?>)(async () =>
         {
