@@ -117,41 +117,6 @@
                                     Height="{Binding WaveFormHeight}"
                                     Margin="6,0" />
 
-                    <TextBlock x:Name="ElapsedTimeText"
-                               Text="{Binding CurrentTime, StringFormat={}{0:mm\\:ss}}"
-                               Background="#232323"
-                               HorizontalAlignment="Left"
-                               Margin="8,0,0,0"
-                               IsHitTestVisible="False"
-                               Panel.ZIndex="2">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource TimeText}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=WaveAreaGrid}" Value="True">
-                                        <Setter Property="Opacity" Value="0" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-
-                    <TextBlock x:Name="TotalTimeText"
-                               Text="{Binding TotalTime, StringFormat={}{0:mm\\:ss}}"
-                               HorizontalAlignment="Right"
-                               Background="#232323"
-                               Margin="0,0,8,0"
-                               IsHitTestVisible="False"
-                               Panel.ZIndex="2">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock" BasedOn="{StaticResource TimeText}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsMouseOver, ElementName=WaveAreaGrid}" Value="True">
-                                        <Setter Property="Opacity" Value="0" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                 </Grid>
             </Border>
 
@@ -163,6 +128,7 @@
                     Padding="6,5">
                 <Grid>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
@@ -174,12 +140,22 @@
                         <Button Command="{Binding NextCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" />
                         <Button Command="{Binding ShuffleCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" />
                     </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0">
+                        <TextBlock x:Name="ElapsedTimeText"
+                                   Style="{StaticResource TimeText}"
+                                   Text="{Binding CurrentTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
+                        <TextBlock Style="{StaticResource TimeText}" Text="/" Margin="4,0" />
+                        <TextBlock x:Name="TotalTimeText"
+                                   Style="{StaticResource TimeText}"
+                                   Text="{Binding TotalTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
+                    </StackPanel>
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Button Style="{StaticResource VolumeIconButton}"
                                 Content="{materialDesign:PackIcon Kind=VolumeHigh,Size=14}" />
                         <Slider Width="84"
-                                Margin="8,0,0,0"
+                                Margin="8,0"
                                 Minimum="0"
                                 Maximum="1"
                                 Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

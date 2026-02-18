@@ -27,8 +27,12 @@ public partial class PlayerControlsViewModel :
         {
             _musicPlayerController.CurrentTime = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(CurrentTimeDisplay));
         }
     }
+
+    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
+    public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
     public float Volume
     {
@@ -63,9 +67,14 @@ public partial class PlayerControlsViewModel :
     {
         _timedTask.Start(
             TimeSpan.FromMilliseconds(100),
-            () => OnPropertyChanged(nameof(CurrentTime)));
+            () =>
+            {
+                OnPropertyChanged(nameof(CurrentTime));
+                OnPropertyChanged(nameof(CurrentTimeDisplay));
+            });
 
         OnPropertyChanged(nameof(Volume));
+        OnPropertyChanged(nameof(TotalTimeDisplay));
 
         await Task.Run((Func<Task?>)(async () =>
         {
@@ -124,5 +133,6 @@ public partial class PlayerControlsViewModel :
         await DrawPlaceholderLineAsync();
         WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
         TotalTime = notification.Audio.Length.TotalMilliseconds;
+        OnPropertyChanged(nameof(TotalTimeDisplay));
     }
 }
