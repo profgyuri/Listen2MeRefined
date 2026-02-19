@@ -8,12 +8,10 @@
         <Style x:Key="TransportButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
             <Setter Property="Width" Value="36" />
             <Setter Property="Height" Value="36" />
-            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="BorderBrush" Value="#4A4A4A" />
             <Setter Property="Background" Value="#2F2F2F" />
             <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
             <Setter Property="Margin" Value="3,0" />
-            <Setter Property="Padding" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -56,11 +54,9 @@
         <Style x:Key="VolumeIconButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
             <Setter Property="Width" Value="30" />
             <Setter Property="Height" Value="30" />
-            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="BorderBrush" Value="#4A4A4A" />
             <Setter Property="Background" Value="#2F2F2F" />
             <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="Padding" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -164,7 +160,68 @@
                                 VerticalAlignment="Center">
                             <Slider.Style>
                                 <Style TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                    <Setter Property="materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
+                                    <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
                                     <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+                                    <Setter Property="Height" Value="20" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Slider">
+                                                <Grid VerticalAlignment="Center">
+                                                    <Border Height="4"
+                                                            Background="#4A4A4A"
+                                                            CornerRadius="2"
+                                                            VerticalAlignment="Center" />
+                                                    <Track x:Name="PART_Track"
+                                                           VerticalAlignment="Center">
+                                                        <Track.DecreaseRepeatButton>
+                                                            <RepeatButton Background="{TemplateBinding Foreground}"
+                                                                          BorderThickness="0"
+                                                                          Height="4"
+                                                                          Focusable="False">
+                                                                <RepeatButton.Template>
+                                                                    <ControlTemplate TargetType="RepeatButton">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2" />
+                                                                    </ControlTemplate>
+                                                                </RepeatButton.Template>
+                                                            </RepeatButton>
+                                                        </Track.DecreaseRepeatButton>
+                                                        <Track.Thumb>
+                                                            <Thumb Width="10"
+                                                                   Height="10"
+                                                                   Background="{StaticResource TertiaryBrush}"
+                                                                   BorderBrush="#D55F16"
+                                                                   BorderThickness="1"
+                                                                   Focusable="False">
+                                                                <Thumb.Template>
+                                                                    <ControlTemplate TargetType="Thumb">
+                                                                        <Ellipse Fill="{TemplateBinding Background}"
+                                                                                 Stroke="{TemplateBinding BorderBrush}"
+                                                                                 StrokeThickness="{TemplateBinding BorderThickness}" />
+                                                                    </ControlTemplate>
+                                                                </Thumb.Template>
+                                                            </Thumb>
+                                                        </Track.Thumb>
+                                                        <Track.IncreaseRepeatButton>
+                                                            <RepeatButton Background="Transparent"
+                                                                          BorderThickness="0"
+                                                                          Height="4"
+                                                                          Focusable="False">
+                                                                <RepeatButton.Template>
+                                                                    <ControlTemplate TargetType="RepeatButton">
+                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2" />
+                                                                    </ControlTemplate>
+                                                                </RepeatButton.Template>
+                                                            </RepeatButton>
+                                                        </Track.IncreaseRepeatButton>
+                                                    </Track>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Resources>
+                                    </Style.Resources>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsMuted}" Value="True">
                                             <Setter Property="Foreground" Value="#888888" />
