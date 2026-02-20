@@ -14,6 +14,7 @@ public partial class ListsViewModel :
     INotificationHandler<QuickSearchResultsNotification>
 {
     private readonly ILogger _logger;
+    private readonly IMediator _mediator;
     private readonly IAdvancedDataReader<AdvancedFilter, AudioModel> _advancedAudioReader;
     private readonly IFileScanner _fileScanner;
     private readonly IMusicPlayerController _musicPlayerController;
@@ -36,11 +37,13 @@ public partial class ListsViewModel :
 
     public ListsViewModel(
         ILogger logger,
+        IMediator mediator,
         IAdvancedDataReader<AdvancedFilter, AudioModel> advancedAudioReader,
         IFileScanner fileScanner,
         IMusicPlayerController musicPlayerController, IPlaylist playList)
     {
         _logger = logger;
+        _mediator = mediator;
         _advancedAudioReader = advancedAudioReader;
         _fileScanner = fileScanner;
         _musicPlayerController = musicPlayerController;
@@ -222,10 +225,11 @@ public partial class ListsViewModel :
 
     public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchAll: {MatchAll})",
-            notification.Filters, notification.MatchAll);
+        var matchAll = notification.MatchMode == SearchMatchMode.All;
+        _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchMode: {MatchMode})",
+            notification.Filters, notification.MatchMode);
         var result =
-            (await _advancedAudioReader.ReadAsync(notification.Filters, notification.MatchAll)).ToArray();
+            (await _advancedAudioReader.ReadAsync(notification.Filters, matchAll)).ToArray();
 
         _logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
         if (result.Length > 0)
@@ -239,6 +243,7 @@ public partial class ListsViewModel :
         SwitchToSearchResultsTab();
         SearchResults.Clear();
         SearchResults.AddRange(result);
+        await _mediator.Publish(new AdvancedSearchCompletedNotification(result.Length), cancellationToken);
     }
 
     public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)

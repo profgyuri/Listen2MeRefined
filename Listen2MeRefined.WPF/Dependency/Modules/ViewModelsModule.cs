@@ -14,7 +14,11 @@ public class ViewModelsModule : Module
             .AsImplementedInterfaces()
             .SingleInstance();
         builder.RegisterType<FolderBrowserViewModel>();
-        builder.RegisterType<AdvancedSearchViewModel>();
+        builder
+            .RegisterType<AdvancedSearchViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .InstancePerLifetimeScope();
         builder.RegisterType<NewSongWindowViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()

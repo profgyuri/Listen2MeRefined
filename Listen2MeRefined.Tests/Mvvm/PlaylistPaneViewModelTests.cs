@@ -5,6 +5,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
+using MediatR;
 using Moq;
 using Serilog;
 
@@ -38,6 +39,7 @@ public class PlaylistPaneViewModelTests
     private static ListsViewModel CreateListsViewModel()
     {
         var logger = new Mock<ILogger>();
+        var mediator = new Mock<IMediator>();
         var advancedReader = new Mock<IAdvancedDataReader<AdvancedFilter, AudioModel>>();
         var scanner = new Mock<IFileScanner>();
         var playerController = new Mock<IMusicPlayerController>();
@@ -45,6 +47,7 @@ public class PlaylistPaneViewModelTests
 
         return new ListsViewModel(
             logger.Object,
+            mediator.Object,
             advancedReader.Object,
             scanner.Object,
             playerController.Object,

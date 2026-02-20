@@ -1,5 +1,6 @@
-﻿namespace Listen2MeRefined.WPF.Views;
+namespace Listen2MeRefined.WPF.Views;
 using System.Windows;
+using System.Windows.Input;
 
 /// <summary>
 ///     Interaction logic for AdvancedSearchWindow.xaml
@@ -9,21 +10,44 @@ public sealed partial class AdvancedSearchWindow : Window
     public AdvancedSearchWindow(AdvancedSearchViewModel viewModel)
     {
         InitializeComponent();
-
         DataContext = viewModel;
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
     }
 
-    private async void Search_Click(object sender, RoutedEventArgs e)
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
     {
-        var vm = DataContext as AdvancedSearchViewModel;
+        WindowState = WindowState.Minimized;
+    }
 
-        await vm!.SearchAsync();
+    private void ToggleWindowStateButton_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
+    }
 
-        Close();
+    private void AddCriteriaButton_Click(object sender, RoutedEventArgs e)
+    {
+        GeneralInput.Focus();
+        GeneralInput.SelectAll();
+    }
+
+    private void EditCriteriaButton_Click(object sender, RoutedEventArgs e)
+    {
+        GeneralInput.Focus();
+        GeneralInput.SelectAll();
+    }
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
+        {
+            Close();
+            e.Handled = true;
+        }
     }
 }
