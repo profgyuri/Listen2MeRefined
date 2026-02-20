@@ -28,103 +28,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style TargetType="ListView" x:Key="SongsListView" BasedOn="{StaticResource VirtualizedListView}">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-        <Setter Property="ItemContainerStyle">
-            <Setter.Value>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                </Style>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style TargetType="ListView" x:Key="CustomHighlightSongsListView" BasedOn="{StaticResource SongsListView}">
-        <Setter Property="ItemContainerStyle">
-            <Setter.Value>
-                <Style TargetType="{x:Type ListViewItem}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                <Border 
-                                    x:Name="Border"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="10 0 10 0"
-                                    CornerRadius="2">
-                                    <ContentPresenter />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource TertiaryDarkBrush}"/>
-                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
-                                        <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
-                                    </Trigger>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Border" Property="Background" Value="{StaticResource TertiaryMidBrush}"/>
-                                        <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
-                                        <Setter TargetName="Border" Property="BorderThickness" Value="1"/>
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style TargetType="DataGrid" x:Key="SearchResultGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
-        <Setter Property="AutoGenerateColumns" Value="False" />
-        <Setter Property="SelectionMode" Value="Extended" />
-        <Setter Property="SelectionUnit" Value="FullRow" />
-        <Setter Property="CanUserAddRows" Value="False" />
-        <Setter Property="CanUserResizeRows" Value="False" />
-        <Setter Property="CanUserReorderColumns" Value="True" />
-        <Setter Property="CanUserResizeColumns" Value="True" />
-        <Setter Property="CanUserDeleteRows" Value="True" />
-        <Setter Property="CanUserSortColumns" Value="True" />
-        <Setter Property="IsReadOnly" Value="True" />
-        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
-        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-        <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
-        <Setter Property="RowStyle">
-            <Setter.Value>
-                <Style TargetType="DataGridRow">
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource TertiaryDarkBrush}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource TertiaryMidBrush}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="False"/>
-                                <Condition Property="IsSelected" Value="False"/>
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="False"/>
-                                <Condition Property="IsSelected" Value="True"/>
-                            </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{StaticResource TertiaryMidBrush}"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                        </MultiTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Setter.Value>
-        </Setter>
-    </Style>
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
@@ -140,13 +43,6 @@
                 </ItemsPanelTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
-
-    <Style TargetType="Border" x:Key="ContainerBorder">
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
-        <Setter Property="Background" Value="{StaticResource ContainerGradientBackgroundBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
     </Style>
     
     <!--#region Element Container -->
@@ -195,10 +91,6 @@
                 <Setter Property="Background" Value="#6f0000" />
             </Trigger>
         </Style.Triggers>
-    </Style>
-    <Style TargetType="Button" x:Key="PlayerButton" BasedOn="{StaticResource InteractionButton}">
-        <Setter Property="Width" Value="40" />
-        <Setter Property="BorderThickness" Value="0" />
     </Style>
     <!--#endregion-->
 
@@ -307,7 +199,7 @@
         TargetType="{x:Type ScrollBar}" 
         BasedOn="{StaticResource {x:Type ScrollBar}}"
         x:Key="{x:Type ScrollBar}">
-        <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Width" Value="10" />
         <Setter Property="Template">
@@ -344,7 +236,7 @@
 
                                 <Track x:Name="PART_Track" IsDirectionReversed="True">
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" />
+                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" Width="4" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -366,7 +258,7 @@
 
                                 <Track x:Name="PART_Track">
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" />
+                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" Height="4" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
