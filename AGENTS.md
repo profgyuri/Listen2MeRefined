@@ -49,3 +49,18 @@ Use `-c Release` for production-like validation.
 - Do not commit secrets, API keys, or machine-local paths.
 - Keep environment-specific settings out of source control.
 - Review changes in system-level hooks and input handling carefully; these areas are high impact.
+
+## Recent Validation Findings (2026-02-20)
+- `dotnet restore` can fail with `NU1301` SSL/credential errors against `api.nuget.org`; clearing NuGet locals resolved it in this environment: `dotnet nuget locals all --clear`.
+- Using these env vars helped avoid first-run/permission noise during CLI validation:
+  - `DOTNET_CLI_HOME=<repo>\\.dotnet-cli`
+  - `DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1`
+- `dotnet build` at solution-level may fail in this environment due existing `NU1701` package compatibility warnings being treated as fatal.
+- Project-level validation succeeded with `-p:NoWarn=NU1701`:
+  - `Listen2MeRefined.Infrastructure`
+  - `Listen2MeRefined.WPF`
+  - `Listen2MeRefined.Tests`
+- Tests passed after the settings overhaul:
+  - Full suite: `31/31` passed.
+  - New targeted tests (`GlobalHookStartupTaskTests`, `PlayerControlsViewModelTests`): `5/5` passed.
+- Pre-existing warnings remain (not introduced by the settings overhaul), including `PresentationCore` reference warning and nullability warnings in legacy files.

@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /favorites.json
 /Listen2MeRefined.Tests/coveragereport
 /.dotnet-cli/.dotnet
+/Listen2MeRefined.Infrastructure/.dotnet-cli/.dotnet
+/Listen2MeRefined.Infrastructure/listentome.db

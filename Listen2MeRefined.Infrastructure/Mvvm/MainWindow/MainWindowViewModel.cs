@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
 
@@ -12,6 +13,7 @@ public sealed partial class MainWindowViewModel :
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
     private readonly IVersionChecker _versionChecker;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly StartupManager _startupManager;
     private readonly IMainWindowNavigationService _navigationService;
     
@@ -36,6 +38,7 @@ public sealed partial class MainWindowViewModel :
         ILogger logger,
         IUiDispatcher ui,
         IVersionChecker versionChecker,
+        ISettingsManager<AppSettings> settingsManager,
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
@@ -47,6 +50,7 @@ public sealed partial class MainWindowViewModel :
         _logger = logger;
         _ui = ui;
         _versionChecker = versionChecker;
+        _settingsManager = settingsManager;
         _startupManager = startupManager;
         _navigationService = navigationService;
 
@@ -62,19 +66,27 @@ public sealed partial class MainWindowViewModel :
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         _logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
-        try
+        if (_settingsManager.Settings.AutoCheckUpdatesOnStartup)
         {
-            _logger.Information("[MainWindowViewModel] Checking for latest version...");
+            try
+            {
+                _logger.Information("[MainWindowViewModel] Checking for latest version...");
 
-            var isLatest = await _versionChecker.IsLatestAsync();
-            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = !isLatest, ct);
+                var isLatest = await _versionChecker.IsLatestAsync();
+                await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = !isLatest, ct);
 
-            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
+                _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning($"[MainWindowViewModel] Version check failed: {ex}");
+                await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
+            }
         }
-        catch (Exception ex)
+        else
         {
-            _logger.Warning($"[MainWindowViewModel] Version check failed: {ex}");
             await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
+            _logger.Information("[MainWindowViewModel] Automatic update checks are disabled.");
         }
 
         try

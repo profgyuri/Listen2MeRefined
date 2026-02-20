@@ -1,116 +1,158 @@
-﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+using System.Collections.Generic;
+using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.WPF.Views;
+using SharpHook;
+using SharpHook.Data;
+using System.Threading;
+using System.Windows.Forms;
+using Serilog;
+using IGlobalHook = Listen2MeRefined.Infrastructure.IGlobalHook;
+using Timer = System.Threading.Timer;
 
 namespace Listen2MeRefined.WPF.Utils;
 
-using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.WPF.Views;
-using Serilog;
-using SharpHook;
-using SharpHook.Data;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-internal sealed class SharpHookHandler
-    : Listen2MeRefined.Infrastructure.IGlobalHook
+internal sealed class SharpHookHandler : IGlobalHook
 {
-    private readonly SharpHook.IGlobalHook _hook;
+    private const int DefaultTriggerAreaSize = 10;
+    private const int MinTriggerAreaSize = 4;
+    private const int MaxTriggerAreaSize = 64;
+    private const int DefaultDebounceMs = 10;
+    private const int MinDebounceMs = 5;
+    private const int MaxDebounceMs = 200;
+
+    private static readonly HashSet<KeyCode> LowLevelKeys =
+    [
+        KeyCode.VcMediaPlay,
+        KeyCode.VcMediaNext,
+        KeyCode.VcMediaPrevious,
+        KeyCode.VcMediaStop
+    ];
+
     private readonly ILogger _logger;
     private readonly IMusicPlayerController _musicPlayerController;
-    private readonly System.Threading.Timer _mouseDebounceTimer;
-    private Point _lastMousePosition;
-    private const int DebounceInterval = 10; // ms
-    private NewSongWindow? _window;
-
+    private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly Timer _mouseDebounceTimer;
+    private readonly object _registrationGate = new();
     private readonly int _width = Screen.PrimaryScreen!.Bounds.Width;
     private readonly int _height = Screen.PrimaryScreen.Bounds.Height;
 
-    private const int TriggerNotificationWindowAreaSize = 10;
+    private readonly SharpHook.IGlobalHook _hook;
+    private bool _handlersAttached;
+    private bool _runLoopStarted;
+    private Point _lastMousePosition;
+    private NewSongWindow? _window;
 
-    private static readonly HashSet<KeyCode> _lowLevelKeys =
-        [
-            KeyCode.VcMediaPlay,
-            KeyCode.VcMediaNext,
-            KeyCode.VcMediaPrevious,
-            KeyCode.VcMediaStop
-        ];
-
-    public SharpHookHandler(ILogger logger, IMusicPlayerController musicPlayerController)
+    public SharpHookHandler(
+        ILogger logger,
+        IMusicPlayerController musicPlayerController,
+        ISettingsManager<AppSettings> settingsManager)
     {
         _hook = new TaskPoolGlobalHook();
         _logger = logger;
         _musicPlayerController = musicPlayerController;
-        
-        _mouseDebounceTimer = new(CheckMousePosition, null, Timeout.Infinite, Timeout.Infinite);
+        _settingsManager = settingsManager;
+        _mouseDebounceTimer = new Timer(CheckMousePosition, null, Timeout.Infinite, Timeout.Infinite);
     }
 
-    public async Task RegisterAsync()
+    public Task RegisterAsync()
     {
-        try 
+        var shouldStartRunLoop = false;
+        lock (_registrationGate)
         {
+            if (_handlersAttached)
+            {
+                return Task.CompletedTask;
+            }
+
             _hook.KeyPressed += OnKeyDown;
             _hook.MouseMoved += OnMouseMove;
-            
-            // Run hook on background thread
-            await Task.Run(() => _hook.Run());
+            _handlersAttached = true;
+            shouldStartRunLoop = !_runLoopStarted;
+            _runLoopStarted = true;
         }
-        catch (Exception ex)
+
+        if (!shouldStartRunLoop)
         {
-            _logger.Error(ex, "Failed to initialize global hooks");
+            return Task.CompletedTask;
         }
+
+        _ = Task.Run(() => _hook.Run()).ContinueWith(task =>
+        {
+            _logger.Error(task.Exception, "Failed to initialize global hooks");
+            lock (_registrationGate)
+            {
+                _runLoopStarted = false;
+            }
+        }, TaskContinuationOptions.OnlyOnFaulted);
+
+        return Task.CompletedTask;
+    }
+
+    public void Unregister()
+    {
+        lock (_registrationGate)
+        {
+            if (!_handlersAttached)
+            {
+                return;
+            }
+
+            _hook.KeyPressed -= OnKeyDown;
+            _hook.MouseMoved -= OnMouseMove;
+            _handlersAttached = false;
+        }
+
+        HideNowPlayingWindow();
     }
 
     private void OnMouseMove(object? sender, MouseHookEventArgs e)
     {
+        if (!IsCornerNowPlayingPopupEnabled())
+        {
+            HideNowPlayingWindow();
+            return;
+        }
+
         var mouse = e.RawEvent.Mouse;
         _lastMousePosition = new Point(mouse.X, mouse.Y);
-        
-        // Debounce the mouse move handling
-        _mouseDebounceTimer.Change(DebounceInterval, Timeout.Infinite);
+        _mouseDebounceTimer.Change(GetDebounceIntervalMs(), Timeout.Infinite);
     }
 
     private void CheckMousePosition(object? state)
     {
-        var pos = _lastMousePosition;
-        if (IsMouseInCorner(pos.X, pos.Y))
+        if (!IsCornerNowPlayingPopupEnabled())
         {
-            System.Windows.Application.Current?.Dispatcher.BeginInvoke(() => 
+            HideNowPlayingWindow();
+            return;
+        }
+
+        var pos = _lastMousePosition;
+        var triggerSize = GetTriggerAreaSizePx();
+        if (IsMouseInCorner(pos.X, pos.Y, triggerSize))
+        {
+            System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
             {
                 try
                 {
-                    _window = WindowManager.ShowNewSongWindow(pos.X, pos.Y);
+                    _window = WindowManager.ShowNewSongWindow(pos.X, pos.Y, triggerSize);
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex, "Failed to show new song window");
                 }
             });
+            return;
         }
-        else
-        {
-            System.Windows.Application.Current?.Dispatcher.BeginInvoke(() => 
-            {
-                try
-                {
-                    WindowManager.CloseNewSongWindow(_window);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Failed to close new song window");
-                }
-            });
-        }
-    }
 
-    private bool IsMouseInCorner(int x, int y) =>
-        (x <= TriggerNotificationWindowAreaSize || x >= _width - TriggerNotificationWindowAreaSize) &&
-        (y <= TriggerNotificationWindowAreaSize || y >= _height - TriggerNotificationWindowAreaSize);
+        HideNowPlayingWindow();
+    }
 
     private void OnKeyDown(object? sender, KeyboardHookEventArgs e)
     {
-        if (!_lowLevelKeys.Contains(e.RawEvent.Keyboard.KeyCode))
+        if (!IsGlobalMediaKeysEnabled() ||
+            !LowLevelKeys.Contains(e.RawEvent.Keyboard.KeyCode))
         {
             return;
         }
@@ -132,10 +174,44 @@ internal sealed class SharpHookHandler
         }
     }
 
-    public void Unregister()
+    private bool IsMouseInCorner(int x, int y, int triggerAreaSize) =>
+        (x <= triggerAreaSize || x >= _width - triggerAreaSize) &&
+        (y <= triggerAreaSize || y >= _height - triggerAreaSize);
+
+    private bool IsGlobalMediaKeysEnabled()
     {
-        _hook.KeyPressed -= OnKeyDown;
-        _hook.MouseMoved -= OnMouseMove;
-        _hook.Dispose();
+        return _settingsManager.Settings.EnableGlobalMediaKeys;
+    }
+
+    private bool IsCornerNowPlayingPopupEnabled()
+    {
+        return _settingsManager.Settings.EnableCornerNowPlayingPopup;
+    }
+
+    private int GetTriggerAreaSizePx()
+    {
+        var saved = _settingsManager.Settings.CornerTriggerSizePx;
+        return Math.Clamp(saved == 0 ? DefaultTriggerAreaSize : saved, MinTriggerAreaSize, MaxTriggerAreaSize);
+    }
+
+    private int GetDebounceIntervalMs()
+    {
+        var saved = _settingsManager.Settings.CornerTriggerDebounceMs;
+        return Math.Clamp(saved == 0 ? DefaultDebounceMs : saved, MinDebounceMs, MaxDebounceMs);
+    }
+
+    private void HideNowPlayingWindow()
+    {
+        System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+        {
+            try
+            {
+                WindowManager.CloseNewSongWindow(_window);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to close new song window");
+            }
+        });
     }
 }

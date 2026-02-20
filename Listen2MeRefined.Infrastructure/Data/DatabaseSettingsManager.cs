@@ -11,6 +11,7 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     private readonly ILogger _logger;
 
     private T? _settings;
+    private bool _isDatabaseMigrated;
 
     public DatabaseSettingsManager(DataContext dataContext, ILogger logger)
     {
@@ -20,6 +21,7 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
 
     private T LoadSettings()
     {
+        EnsureDatabaseMigrated();
         return _dataContext.Settings
             .Include(x => x.MusicFolders)
             .FirstOrDefault() as T ?? new T();
@@ -59,5 +61,16 @@ public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
                 }
             }
         }
+    }
+
+    private void EnsureDatabaseMigrated()
+    {
+        if (_isDatabaseMigrated)
+        {
+            return;
+        }
+
+        _dataContext.Database.Migrate();
+        _isDatabaseMigrated = true;
     }
 }

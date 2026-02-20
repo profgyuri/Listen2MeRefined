@@ -1,16 +1,22 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
-using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
-public sealed partial class SettingsWindowViewModel : 
+public sealed partial class SettingsWindowViewModel :
     ViewModelBase,
     INotificationHandler<FolderBrowserNotification>
 {
+    private const int MinCornerTriggerSizePx = 4;
+    private const int MaxCornerTriggerSizePx = 64;
+    private const int MinCornerDebounceMs = 5;
+    private const int MaxCornerDebounceMs = 200;
+    private const int MinStartupVolumePercent = 0;
+    private const int MaxStartupVolumePercent = 100;
+
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IRepository<AudioModel> _audioRepository;
@@ -22,9 +28,12 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IVersionChecker _versionChecker;
     private readonly IFromFolderRemover _fromFolderRemover;
     private readonly IOutputDevice _outputDevice;
+    private readonly IGlobalHook _globalHook;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
+    private bool _isLoadingSettings;
+    private bool _isSyncingGlobalHookState;
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string? _selectedFolder = "";
@@ -37,10 +46,18 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private ObservableCollection<AudioOutputDevice> _audioOutputDevices = new();
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
-    [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel(5)";
+    [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel (5)";
     [ObservableProperty] private string _updateAvailableText = "";
     [ObservableProperty] private bool _isUpdateButtonVisible;
-    
+    [ObservableProperty] private bool _enableGlobalMediaKeys;
+    [ObservableProperty] private bool _enableCornerNowPlayingPopup;
+    [ObservableProperty] private int _cornerTriggerSizePx = 10;
+    [ObservableProperty] private int _cornerTriggerDebounceMs = 10;
+    [ObservableProperty] private int _startupVolumePercent = 70;
+    [ObservableProperty] private bool _startMuted;
+    [ObservableProperty] private bool _autoCheckUpdatesOnStartup = true;
+    [ObservableProperty] private bool _autoScanOnFolderAdd = true;
+
     public bool ScanOnStartup
     {
         get => _settingsManager.Settings.ScanOnStartup;
@@ -48,6 +65,7 @@ public sealed partial class SettingsWindowViewModel :
         {
             _settingsManager.SaveSettings(s => s.ScanOnStartup = value);
             OnPropertyChanged();
+            OnPropertyChanged(nameof(DontScanOnStartup));
         }
     }
 
@@ -63,8 +81,9 @@ public sealed partial class SettingsWindowViewModel :
         IRepository<PlaylistModel> playlistRepository,
         IFolderScanner folderScanner,
         IVersionChecker versionChecker,
-        IFromFolderRemover fromFolderRemover, 
-        IOutputDevice outputDevice)
+        IFromFolderRemover fromFolderRemover,
+        IOutputDevice outputDevice,
+        IGlobalHook globalHook)
     {
         _logger = logger;
         _settingsManager = settingsManager;
@@ -77,87 +96,221 @@ public sealed partial class SettingsWindowViewModel :
         _versionChecker = versionChecker;
         _fromFolderRemover = fromFolderRemover;
         _outputDevice = outputDevice;
+        _globalHook = globalHook;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
     }
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
+        _isLoadingSettings = true;
+
         FontFamilies = new(_installedFontFamilies.FontFamilyNames);
+        NewSongWindowPositions = new()
+        {
+            "Default",
+            "Always on top"
+        };
 
         var settings = _settingsManager.Settings;
         Folders = new(settings.MusicFolders.Select(x => x.FullPath));
         FontFamily = settings.FontFamily;
-        SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily)
-            ? "Segoe UI"
-            : settings.FontFamily;
+        SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
+        SelectedNewSongWindowPosition = string.IsNullOrWhiteSpace(settings.NewSongWindowPosition)
+            ? "Default"
+            : settings.NewSongWindowPosition;
+        EnableGlobalMediaKeys = settings.EnableGlobalMediaKeys;
+        EnableCornerNowPlayingPopup = settings.EnableCornerNowPlayingPopup;
+        CornerTriggerSizePx = Math.Clamp((int)settings.CornerTriggerSizePx, MinCornerTriggerSizePx, MaxCornerTriggerSizePx);
+        CornerTriggerDebounceMs = Math.Clamp((int)settings.CornerTriggerDebounceMs, MinCornerDebounceMs, MaxCornerDebounceMs);
+        StartupVolumePercent = (int)Math.Round(Math.Clamp(settings.StartupVolume, 0f, 1f) * 100);
+        StartMuted = settings.StartMuted;
+        AutoCheckUpdatesOnStartup = settings.AutoCheckUpdatesOnStartup;
+        AutoScanOnFolderAdd = settings.AutoScanOnFolderAdd;
 
-        NewSongWindowPositions = new()
-        {
-            "Default",
-            "Always on top",
-        };
-        SelectedNewSongWindowPosition = settings.NewSongWindowPosition;
+        await GetAudioOutputDevices();
+        _isLoadingSettings = false;
 
-        if (await _versionChecker.IsLatestAsync())
+        if (AutoCheckUpdatesOnStartup)
         {
-            UpdateAvailableText = "You are using the latest version!";
-            IsUpdateButtonVisible = false;
+            await CheckForUpdatesAsync();
         }
         else
         {
-            UpdateAvailableText = "Newer version is available!";
-            IsUpdateButtonVisible = true;
+            UpdateAvailableText = "Automatic update checks are disabled.";
+            IsUpdateButtonVisible = false;
         }
 
-        await GetAudioOutputDevices();
         _logger.Debug("[SettingsWindowViewModel] Finished InitializeCoreAsync");
     }
 
     partial void OnSelectedFontFamilyChanged(string value)
     {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
         _logger.Information("[SettingsWindowViewModel] Font family changed to: {FontFamily}", value);
-        OnPropertyChanged(nameof(SelectedFontFamily));
         _settingsManager.SaveSettings(s => s.FontFamily = value);
-        _mediator.Publish(new FontFamilyChangedNotification(value));
+        _ = _mediator.Publish(new FontFamilyChangedNotification(value));
     }
 
     partial void OnSelectedAudioOutputDeviceChanged(AudioOutputDevice? value)
     {
-        if (value is null)
+        if (_isLoadingSettings || value is null)
         {
-            _logger.Error("[SettingsWindowViewModel] Selected audio output device is null. This should not happen.");
             return;
         }
 
         _logger.Information("[SettingsWindowViewModel] Audio output device changed to: {DeviceName}", value.Name);
-        OnPropertyChanged(nameof(SelectedAudioOutputDevice));
         _settingsManager.SaveSettings(x => x.AudioOutputDeviceName = value.Name);
-        _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
+        _ = _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
 
     partial void OnSelectedNewSongWindowPositionChanged(string value)
     {
-        if (value is null)
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
         {
-            _logger.Error("[SettingsWindowViewModel] Selected new song window position is null. This should not happen.");
             return;
         }
 
         _logger.Information("[SettingsWindowViewModel] New song window position changed to: {Position}", value);
-        OnPropertyChanged(nameof(SelectedNewSongWindowPosition));
         _settingsManager.SaveSettings(x => x.NewSongWindowPosition = value);
-        _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
+        _ = _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
     }
-    
+
+    partial void OnEnableGlobalMediaKeysChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.EnableGlobalMediaKeys = value);
+        _ = SyncGlobalHookRegistrationAsync();
+    }
+
+    partial void OnEnableCornerNowPlayingPopupChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.EnableCornerNowPlayingPopup = value);
+        _ = SyncGlobalHookRegistrationAsync();
+    }
+
+    partial void OnCornerTriggerSizePxChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinCornerTriggerSizePx, MaxCornerTriggerSizePx);
+        if (clamped != value)
+        {
+            CornerTriggerSizePx = clamped;
+            return;
+        }
+
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.CornerTriggerSizePx = (short)clamped);
+    }
+
+    partial void OnCornerTriggerDebounceMsChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinCornerDebounceMs, MaxCornerDebounceMs);
+        if (clamped != value)
+        {
+            CornerTriggerDebounceMs = clamped;
+            return;
+        }
+
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.CornerTriggerDebounceMs = (short)clamped);
+    }
+
+    partial void OnStartupVolumePercentChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinStartupVolumePercent, MaxStartupVolumePercent);
+        if (clamped != value)
+        {
+            StartupVolumePercent = clamped;
+            return;
+        }
+
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings =>
+        {
+            settings.StartupVolume = clamped / 100f;
+            if (clamped > 0)
+            {
+                settings.StartMuted = false;
+            }
+        });
+
+        if (clamped > 0 && StartMuted)
+        {
+            StartMuted = false;
+        }
+    }
+
+    partial void OnStartMutedChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.StartMuted = value);
+    }
+
+    partial void OnAutoCheckUpdatesOnStartupChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.AutoCheckUpdatesOnStartup = value);
+        if (!value)
+        {
+            UpdateAvailableText = "Automatic update checks are disabled.";
+            IsUpdateButtonVisible = false;
+        }
+    }
+
+    partial void OnAutoScanOnFolderAddChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.AutoScanOnFolderAdd = value);
+    }
+
     [RelayCommand]
     private async Task RemoveFolder()
     {
+        if (string.IsNullOrWhiteSpace(SelectedFolder))
+        {
+            return;
+        }
+
         _logger.Information("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
-
-        Folders.Remove(SelectedFolder!);
-        await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder!);
-
+        Folders.Remove(SelectedFolder);
+        await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
         _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
         _logger.Verbose("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
     }
@@ -177,7 +330,7 @@ public sealed partial class SettingsWindowViewModel :
                 await _musicFolderRepository.RemoveAllAsync();
                 await _playlistRepository.RemoveAllAsync();
                 _logger.Debug("[SettingsWindowViewModel] Database was successfully cleared");
-                
+
                 Folders = new();
 
                 await _timedTask?.StopAsync()!;
@@ -187,13 +340,13 @@ public sealed partial class SettingsWindowViewModel :
                 CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
                 _settingsManager.SaveSettings(x => x.MusicFolders = new());
-
                 _logger.Debug("[SettingsWindowViewModel] Metadata cleared");
             }
 
             _secondsToCancelClear--;
             CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
         });
+
         IsClearMetadataButtonVisible = false;
         IsCancelClearMetadataButtonVisible = true;
     }
@@ -202,20 +355,24 @@ public sealed partial class SettingsWindowViewModel :
     private async Task CancelClearMetadataAsync()
     {
         _logger.Information("[SettingsWindowViewModel] Clearing metadata canceled");
-
         await _timedTask?.StopAsync()!;
         IsClearMetadataButtonVisible = true;
         IsCancelClearMetadataButtonVisible = false;
         _secondsToCancelClear = 5;
         CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
     }
-    
+
     [RelayCommand]
     private async Task ForceScanAsync()
     {
         _logger.Information("[SettingsWindowViewModel] Force scanning folders...");
-
         await _folderScanner.ScanAllAsync();
+    }
+
+    [RelayCommand]
+    private async Task CheckForUpdatesNowAsync()
+    {
+        await CheckForUpdatesAsync();
     }
 
     [RelayCommand]
@@ -225,8 +382,32 @@ public sealed partial class SettingsWindowViewModel :
         await Task.Run(_versionChecker.OpenUpdateLink);
     }
 
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            if (await _versionChecker.IsLatestAsync())
+            {
+                UpdateAvailableText = "You are using the latest version.";
+                IsUpdateButtonVisible = false;
+                return;
+            }
+
+            UpdateAvailableText = "A newer version is available.";
+            IsUpdateButtonVisible = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[SettingsWindowViewModel] Update check failed");
+            UpdateAvailableText = "Could not check for updates.";
+            IsUpdateButtonVisible = false;
+        }
+    }
+
     private async Task GetAudioOutputDevices()
     {
+        AudioOutputDevices.Clear();
+
         var devices = await Task.Run(() =>
         {
             var result = Enumerable.Empty<AudioOutputDevice>();
@@ -241,12 +422,18 @@ public sealed partial class SettingsWindowViewModel :
 
             return result;
         });
+
         foreach (var device in devices)
         {
             AudioOutputDevices.Add(device);
         }
-        
-        var selectedIndex = 0; // The first element is "Windows Default"
+
+        if (AudioOutputDevices.Count == 0)
+        {
+            return;
+        }
+
+        var selectedIndex = 0;
         var savedName = _settingsManager.Settings.AudioOutputDeviceName;
         if (!string.IsNullOrEmpty(savedName))
         {
@@ -260,7 +447,37 @@ public sealed partial class SettingsWindowViewModel :
 
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
-    
+
+    private async Task SyncGlobalHookRegistrationAsync()
+    {
+        if (_isSyncingGlobalHookState)
+        {
+            return;
+        }
+
+        _isSyncingGlobalHookState = true;
+        try
+        {
+            var shouldEnableGlobalHook = EnableGlobalMediaKeys || EnableCornerNowPlayingPopup;
+            if (shouldEnableGlobalHook)
+            {
+                await _globalHook.RegisterAsync();
+            }
+            else
+            {
+                _globalHook.Unregister();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "[SettingsWindowViewModel] Failed to synchronize global hook state");
+        }
+        finally
+        {
+            _isSyncingGlobalHookState = false;
+        }
+    }
+
     public async Task Handle(
         FolderBrowserNotification notification,
         CancellationToken cancellationToken)
@@ -275,14 +492,17 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Adding path to music folders: {Path}", path);
-
         Folders.Add(path);
-
         _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
+
+        if (!AutoScanOnFolderAdd)
+        {
+            _logger.Information("[SettingsWindowViewModel] Auto-scan on folder add is disabled.");
+            return;
+        }
 
         _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
         await _folderScanner.ScanAsync(path);
-
         _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
     }
 }

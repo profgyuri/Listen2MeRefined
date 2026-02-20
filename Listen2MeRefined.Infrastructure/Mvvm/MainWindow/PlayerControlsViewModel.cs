@@ -1,7 +1,7 @@
 ﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
-using MediatR;
+using Listen2MeRefined.Infrastructure.Storage;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
@@ -15,6 +15,7 @@ public partial class PlayerControlsViewModel :
     private readonly ILogger _logger;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IMusicPlayerController _musicPlayerController;
+    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly TimedTask _timedTask;
     private bool _isMuted;
     private float _lastNonZeroVolume = 0.7f;
@@ -65,6 +66,7 @@ public partial class PlayerControlsViewModel :
                 SetMuted(true);
             }
 
+            PersistPlaybackDefaults(clampedValue, _isMuted);
             OnPropertyChanged();
             OnPropertyChanged(nameof(VolumeIconKind));
         }
@@ -85,11 +87,13 @@ public partial class PlayerControlsViewModel :
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IMusicPlayerController musicPlayerController,
+        ISettingsManager<AppSettings> settingsManager,
         TimedTask timedTask)
     {
         _logger = logger;
         _waveFormDrawer = waveFormDrawer;
         _musicPlayerController = musicPlayerController;
+        _settingsManager = settingsManager;
         _timedTask = timedTask;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
@@ -97,6 +101,8 @@ public partial class PlayerControlsViewModel :
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
+        ApplyStartupPlaybackDefaults();
+
         _timedTask.Start(
             TimeSpan.FromMilliseconds(100),
             () =>
@@ -170,6 +176,7 @@ public partial class PlayerControlsViewModel :
             var restoredVolume = _lastNonZeroVolume > VolumeEpsilon ? _lastNonZeroVolume : 0.7f;
             _musicPlayerController.Volume = restoredVolume;
             SetMuted(false);
+            PersistPlaybackDefaults(restoredVolume, isMuted: false);
             OnPropertyChanged(nameof(Volume));
             OnPropertyChanged(nameof(VolumeIconKind));
             return;
@@ -183,6 +190,7 @@ public partial class PlayerControlsViewModel :
 
         _musicPlayerController.Volume = 0f;
         SetMuted(true);
+        PersistPlaybackDefaults(0f, isMuted: true);
         OnPropertyChanged(nameof(Volume));
         OnPropertyChanged(nameof(VolumeIconKind));
     }
@@ -211,5 +219,31 @@ public partial class PlayerControlsViewModel :
         _isMuted = isMuted;
         OnPropertyChanged(nameof(IsMuted));
         OnPropertyChanged(nameof(VolumeIconKind));
+    }
+
+    private void ApplyStartupPlaybackDefaults()
+    {
+        var settings = _settingsManager.Settings;
+        var startupVolume = Math.Clamp(settings.StartupVolume, 0f, 1f);
+        if (startupVolume > VolumeEpsilon)
+        {
+            _lastNonZeroVolume = startupVolume;
+        }
+
+        var startsMuted = settings.StartMuted;
+        _musicPlayerController.Volume = startsMuted ? 0f : startupVolume;
+        SetMuted(startsMuted || startupVolume <= VolumeEpsilon);
+    }
+
+    private void PersistPlaybackDefaults(float currentVolume, bool isMuted)
+    {
+        _settingsManager.SaveSettings(settings =>
+        {
+            settings.StartMuted = isMuted;
+            if (currentVolume > VolumeEpsilon)
+            {
+                settings.StartupVolume = currentVolume;
+            }
+        });
     }
 }

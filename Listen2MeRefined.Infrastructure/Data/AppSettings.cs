@@ -12,4 +12,12 @@ public sealed class AppSettings : Settings
     public string AudioOutputDeviceName { get; set; } = "";
     public List<MusicFolderModel> MusicFolders { get; set; } = new();
     public bool ScanOnStartup { get; set; } = true;
+    public bool EnableGlobalMediaKeys { get; set; } = true;
+    public bool EnableCornerNowPlayingPopup { get; set; } = true;
+    public short CornerTriggerSizePx { get; set; } = 10;
+    public short CornerTriggerDebounceMs { get; set; } = 10;
+    public float StartupVolume { get; set; } = 0.7f;
+    public bool StartMuted { get; set; }
+    public bool AutoCheckUpdatesOnStartup { get; set; } = true;
+    public bool AutoScanOnFolderAdd { get; set; } = true;
 }
