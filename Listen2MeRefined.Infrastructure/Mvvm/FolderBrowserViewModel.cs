@@ -14,6 +14,7 @@ public sealed partial class FolderBrowserViewModel :
     private readonly IMediator _mediator;
     private readonly IFolderBrowser _folderBrowser;
     private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IUiDispatcher _ui;
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _fullPath = "";
@@ -24,12 +25,14 @@ public sealed partial class FolderBrowserViewModel :
         ILogger logger,
         IFolderBrowser folderBrowser,
         IMediator mediator,
-        ISettingsManager<AppSettings> settingsManager)
+        ISettingsManager<AppSettings> settingsManager, 
+        IUiDispatcher ui)
     {
         _logger = logger;
         _folderBrowser = folderBrowser;
         _mediator = mediator;
         _settingsManager = settingsManager;
+        _ui = ui;
 
         _logger.Debug("[FolderBrowserViewModel] initialized");
     }
@@ -57,7 +60,7 @@ public sealed partial class FolderBrowserViewModel :
 
         _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
 
-        Folders.Clear();
+        _ui.InvokeAsync(() => Folders.Clear());
 
         if (string.IsNullOrEmpty(FullPath))
         {
@@ -101,17 +104,17 @@ public sealed partial class FolderBrowserViewModel :
     {
         foreach (var drive in _folderBrowser.GetDrives())
         {
-            Folders.Add(drive);
+            _ui.InvokeAsync(() => Folders.Add(drive));
         }
     }
 
     private void GetFolderNames()
     {
-        Folders.Add(GlobalConstants.ParentPathItem);
+        _ui.InvokeAsync(() => Folders.Add(GlobalConstants.ParentPathItem));
 
         foreach (var folder in _folderBrowser.GetSubFolders(FullPath))
         {
-            Folders.Add(folder);
+            _ui.InvokeAsync(() => Folders.Add(folder));
         }
     }
 
