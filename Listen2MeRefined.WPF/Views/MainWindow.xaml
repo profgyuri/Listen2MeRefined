@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow"
+        xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
         xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm.MainWindow;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
@@ -25,7 +25,15 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <views:TitleBarView />
+            <components:TitleBar CenterText="Desktop Player"
+                                 ShowSettingsButton="True"
+                                 ShowMinimizeButton="True"
+                                 ShowMaximizeButton="True"
+                                 ShowCloseButton="True"
+                                 SettingsCommand="{Binding OpenSettingsWindowCommand}"
+                                 MinimizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MinimizeWindowCommand}"
+                                 ToggleMaximizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ToggleWindowStateCommand}"
+                                 CloseCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CloseWindowCommand}" />
 
             <Grid Grid.Row="1" Margin="10">
                 <Grid.RowDefinitions>

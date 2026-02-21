@@ -89,12 +89,14 @@ public class AdvancedSearchViewModelTests
         var mediator = new Mock<IMediator>();
         var logger = new Mock<ILogger>();
         var settings = new Mock<ISettingsManager<AppSettings>>();
+        var ui = new Mock<IUiDispatcher>();
         settings.SetupGet(s => s.Settings).Returns(new AppSettings { FontFamily = "Segoe UI" });
 
         var vm = new AdvancedSearchViewModel(
             mediator.Object,
             logger.Object,
-            settings.Object);
+            settings.Object,
+            ui.Object);
         await vm.InitializeAsync();
         return (vm, mediator);
     }

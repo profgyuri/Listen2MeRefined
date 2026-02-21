@@ -18,18 +18,6 @@ public sealed partial class AdvancedSearchWindow : Window
         Close();
     }
 
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        WindowState = WindowState.Minimized;
-    }
-
-    private void ToggleWindowStateButton_Click(object sender, RoutedEventArgs e)
-    {
-        WindowState = WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
-    }
-
     private void AddCriteriaButton_Click(object sender, RoutedEventArgs e)
     {
         GeneralInput.Focus();

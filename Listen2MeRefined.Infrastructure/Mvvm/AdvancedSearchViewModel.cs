@@ -15,6 +15,7 @@ public partial class AdvancedSearchViewModel :
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
     private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IUiDispatcher _ui;
     private readonly List<string> _numericRelations = ["Is", "Is not", "Bigger than", "Less than"];
     private readonly List<string> _timeRelations = ["Is", "Is not", "More than", "Less than"];
     private readonly List<string> _stringRelations = ["Is", "Is not", "Contains", "Does not contain"];
@@ -65,7 +66,7 @@ public partial class AdvancedSearchViewModel :
             }
 
             OnPropertyChanged();
-            AddCriteriaCommand.NotifyCanExecuteChanged();
+            _ui.InvokeAsync(() => AddCriteriaCommand.NotifyCanExecuteChanged());
         }
     }
 
@@ -96,11 +97,12 @@ public partial class AdvancedSearchViewModel :
     public AdvancedSearchViewModel(
         IMediator mediator,
         ILogger logger,
-        ISettingsManager<AppSettings> settingsManager)
+        ISettingsManager<AppSettings> settingsManager, IUiDispatcher ui)
     {
         _mediator = mediator;
         _logger = logger;
         _settingsManager = settingsManager;
+        _ui = ui;
         SelectedColumnName = string.Empty;
         Criterias.CollectionChanged += OnCriteriasChanged;
 
@@ -109,10 +111,11 @@ public partial class AdvancedSearchViewModel :
 
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
+        await _ui.InvokeAsync(() => Criterias.Clear(), ct);
+        
         await Task.Run(() =>
         {
             FontFamily = _settingsManager.Settings.FontFamily;
-            Criterias.Clear();
             ColumnName = GetAudioModelProperties();
             SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
             MatchMode = SearchMatchMode.All;
@@ -442,11 +445,14 @@ public partial class AdvancedSearchViewModel :
 
     private void OnCriteriasChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        SearchCommand.NotifyCanExecuteChanged();
-        ClearAllCommand.NotifyCanExecuteChanged();
-        DeleteItemCommand.NotifyCanExecuteChanged();
-        EditCriteriaCommand.NotifyCanExecuteChanged();
-        DuplicateCriteriaCommand.NotifyCanExecuteChanged();
+        _ui.InvokeAsync(() =>
+        {
+            SearchCommand.NotifyCanExecuteChanged();
+            ClearAllCommand.NotifyCanExecuteChanged();
+            DeleteItemCommand.NotifyCanExecuteChanged();
+            EditCriteriaCommand.NotifyCanExecuteChanged();
+            DuplicateCriteriaCommand.NotifyCanExecuteChanged();
+        });
     }
 
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)

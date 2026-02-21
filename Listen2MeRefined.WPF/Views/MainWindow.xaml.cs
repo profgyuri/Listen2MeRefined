@@ -20,9 +20,6 @@ public sealed partial class MainWindow : Window
         MainWindowViewModel viewModel,
         IGlobalHook globalHook)
     {
-        InitializeComponent();
-
-        DataContext = viewModel;
         _globalHook = globalHook;
 
         // View-only commands for native window chrome operations.
@@ -32,6 +29,9 @@ public sealed partial class MainWindow : Window
             WindowState = WindowState == WindowState.Maximized
                 ? WindowState.Normal
                 : WindowState.Maximized);
+
+        InitializeComponent();
+        DataContext = viewModel;
     }
 
     private void CloseWindow()
