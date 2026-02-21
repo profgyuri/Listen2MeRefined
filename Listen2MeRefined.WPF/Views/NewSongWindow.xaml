@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance vm:NewSongWindowViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -89,17 +90,11 @@
                                Style="{StaticResource NewSongTrackArtistText}"
                                Text="{Binding Song.Artist, FallbackValue=Artist}" />
 
-                    <WrapPanel Grid.Row="4" VerticalAlignment="Center">
-                        <Border Style="{StaticResource ComponentMetaBadge}">
-                            <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
-                        </Border>
-                        <Border Style="{StaticResource ComponentMetaBadge}">
-                            <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}" />
-                        </Border>
-                        <Border Style="{StaticResource ComponentMetaBadge}" Margin="0">
-                            <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Song.Genre, FallbackValue=Genre}" />
-                        </Border>
-                    </WrapPanel>
+                    <components:MetaBadgeRow Grid.Row="4"
+                                             BpmText="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}"
+                                             BitrateText="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}"
+                                             GenreText="{Binding Song.Genre, FallbackValue=Genre}"
+                                             ShowLength="False" />
                 </Grid>
             </Border>
         </Grid>

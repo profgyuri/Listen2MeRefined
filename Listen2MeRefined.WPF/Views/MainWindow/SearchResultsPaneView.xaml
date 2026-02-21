@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
     <Border Margin="0,8,0,0"
             Background="#272727"
@@ -17,32 +18,14 @@
                 <RowDefinition x:Name="ListRow" Height="*" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0"
-                    Background="#222222"
-                    BorderBrush="#393939"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    Padding="10,8">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border Width="24" Height="24" Background="{StaticResource SearchResultsBorderAccentBrush}" CornerRadius="12" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="MusicNote" Width="14" Height="14" Foreground="#1F1F1F" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-                    
-                    <TextBlock Grid.Column="1" Style="{StaticResource SearchResultsToolbarValueText}" Text="Search Results" Margin="10,0,0,0" />
-                    <Button Grid.Column="2"
-                            HorizontalAlignment="Right"
-                            Style="{StaticResource ComponentQuickActionButton}"
-                            Command="{Binding SendSelectedToPlaylistCommand}"
-                            ToolTip="Add Selected / All to Playlist"
-                            Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=20}" />
-                </Grid>
-            </Border>
+            <components:SectionHeader Grid.Row="0"
+                                      Title="Search Results"
+                                      IconKind="MusicNote"
+                                      AccentBrush="{StaticResource SearchResultsBorderAccentBrush}"
+                                      ShowActionButton="True"
+                                      ActionToolTip="Add Selected / All to Playlist"
+                                      ActionIconKind="ArrowRightCircleOutline"
+                                      ActionCommand="{Binding SendSelectedToPlaylistCommand}" />
 
             <ListView Grid.Row="2"
                       Height="{Binding ElementName=ListRow, Path=Height}"

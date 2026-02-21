@@ -243,41 +243,16 @@
                 </Grid>
             </Border>
 
-            <Border Grid.Row="2"
-                    Margin="10,10,10,10"
-                    Background="#232323"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    Padding="10,8">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Foreground="#A8A8A8"
-                               FontSize="11"
-                               VerticalAlignment="Center"
-                               Text="Enter/Right to open folder. Left to go back. Select adds folder to library." />
-
-                    <Button x:Name="SelectButton"
-                            Grid.Column="1"
-                            Content="Select"
-                            Style="{StaticResource FolderBrowserActionButton}"
-                            MinWidth="110"
-                            Click="SelectButton_Click" />
-
-                    <Button x:Name="CancelButton"
-                            Grid.Column="2"
-                            Content="Cancel"
-                            Style="{StaticResource FolderBrowserActionButton}"
-                            MinWidth="110"
-                            Margin="8,0,0,0"
-                            Click="CancelButton_Click" />
-                </Grid>
-            </Border>
+            <components:WindowFooterBar Grid.Row="2"
+                                        Margin="10,10,10,10"
+                                        InfoText="Enter/Right to open folder. Left to go back. Select adds folder to library."
+                                        PrimaryButtonText="Select"
+                                        PrimaryButtonMinWidth="110"
+                                        ShowSecondaryButton="True"
+                                        SecondaryButtonText="Cancel"
+                                        SecondaryButtonMinWidth="110"
+                                        PrimaryClick="SelectButton_Click"
+                                        SecondaryClick="CancelButton_Click" />
         </Grid>
     </Border>
 </Window>

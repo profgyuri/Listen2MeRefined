@@ -59,39 +59,12 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0"
-                            Background="#222222"
-                            BorderBrush="#393939"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            Padding="10,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <Border Width="24"
-                                    Height="24"
-                                    Background="{StaticResource TertiaryBrush}"
-                                    CornerRadius="12"
-                                    VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="Tune"
-                                                         Width="14"
-                                                         Height="14"
-                                                         Foreground="#1F1F1F"
-                                                         HorizontalAlignment="Center"
-                                                         VerticalAlignment="Center" />
-                            </Border>
-
-                            <StackPanel Grid.Column="1"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center">
-                                <TextBlock Style="{StaticResource AdvancedSearchToolbarTitleText}" Text="Advanced Search Filters" />
-                                <TextBlock Style="{StaticResource AdvancedSearchToolbarLabelText}" Text="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter." />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                    <components:SectionHeader Grid.Row="0"
+                                              Title="Advanced Search Filters"
+                                              Subtitle="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter."
+                                              ShowSubtitle="True"
+                                              IconKind="Tune"
+                                              AccentBrush="{StaticResource TertiaryBrush}" />
 
                     <Border Grid.Row="2"
                             Background="#232323"

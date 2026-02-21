@@ -4,6 +4,7 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
     <Border Margin="0,20,0,14"
@@ -19,32 +20,14 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0"
-                    Background="#222222"
-                    BorderBrush="#393939"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    Padding="10,8">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border Width="24" Height="24" Background="{StaticResource TertiaryBrush}" CornerRadius="12" VerticalAlignment="Center">
-                        <materialDesign:PackIcon Kind="PlaylistMusic" Width="14" Height="14" Foreground="#1F1F1F" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
-
-                    <TextBlock Grid.Column="1" Style="{StaticResource PlaylistTitleText}" Text="Playlist" Margin="10,0,0,0" />
-
-                    <Button Grid.Column="2"
-                            Style="{StaticResource PlaylistRemoveButton}"
-                            Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=20}"
-                            Command="{Binding RemoveSelectedFromPlaylistCommand}"
-                            ToolTip="Remove Selected / All from Playlist" />
-                </Grid>
-            </Border>
+            <components:SectionHeader Grid.Row="0"
+                                      Title="Playlist"
+                                      IconKind="PlaylistMusic"
+                                      AccentBrush="{StaticResource TertiaryBrush}"
+                                      ShowActionButton="True"
+                                      ActionToolTip="Remove Selected / All from Playlist"
+                                      ActionIconKind="CloseBoxOutline"
+                                      ActionCommand="{Binding RemoveSelectedFromPlaylistCommand}" />
 
             <ListView Grid.Row="2"
                       dd:DragDrop.IsDragSource="True"
@@ -86,20 +69,11 @@
                                                            ClipToBounds="True"
                                                            utils:FlowingTextBehavior.IsEnabled="True" />
 
-                            <WrapPanel Grid.Row="2" VerticalAlignment="Center">
-                                <Border Style="{StaticResource ComponentMetaBadge}">
-                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}" />
-                                </Border>
-                                <Border Style="{StaticResource ComponentMetaBadge}">
-                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}" />
-                                </Border>
-                                <Border Style="{StaticResource ComponentMetaBadge}">
-                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}" />
-                                </Border>
-                                <Border Style="{StaticResource ComponentMetaBadge}" Margin="0">
-                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Genre, FallbackValue=Genre}" />
-                                </Border>
-                            </WrapPanel>
+                            <components:MetaBadgeRow Grid.Row="2"
+                                                     BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"
+                                                     BitrateText="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}"
+                                                     LengthText="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                                     GenreText="{Binding Genre, FallbackValue=Genre}" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

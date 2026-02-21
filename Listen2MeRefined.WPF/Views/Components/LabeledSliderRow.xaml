@@ -1,0 +1,31 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Components.LabeledSliderRow"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0"
+                   Style="{StaticResource SettingsFieldLabelText}"
+                   Width="{Binding LabelWidth, ElementName=Root}"
+                   VerticalAlignment="Center"
+                   Text="{Binding Label, ElementName=Root}" />
+
+        <Slider Grid.Column="1"
+                Width="{Binding SliderWidth, ElementName=Root}"
+                Minimum="{Binding Minimum, ElementName=Root}"
+                Maximum="{Binding Maximum, ElementName=Root}"
+                TickFrequency="{Binding TickFrequency, ElementName=Root}"
+                IsSnapToTickEnabled="{Binding IsSnapToTickEnabled, ElementName=Root}"
+                Value="{Binding Value, ElementName=Root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <TextBlock Grid.Column="2"
+                   Margin="8,0,0,0"
+                   VerticalAlignment="Center"
+                   Text="{Binding ValueDisplay, ElementName=Root}" />
+    </Grid>
+</UserControl>
