@@ -19,113 +19,6 @@
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>
 
-    <Window.Resources>
-        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
-        </Style>
-
-        <Style x:Key="SettingsNavTabItem" TargetType="TabItem">
-            <Setter Property="Foreground" Value="#AFAFAF" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Padding" Value="14,10" />
-            <Setter Property="Margin" Value="0,0,0,8" />
-            <Setter Property="Width" Value="188" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="TabBorder"
-                                Background="#2D2D2D"
-                                BorderBrush="Transparent"
-                                BorderThickness="1"
-                                CornerRadius="10">
-                            <ContentPresenter HorizontalAlignment="Left"
-                                              VerticalAlignment="Center"
-                                              ContentSource="Header"
-                                              Margin="{TemplateBinding Padding}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="#353535" />
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                                <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="#383838" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SectionCard" TargetType="Border">
-            <Setter Property="Background" Value="#232323" />
-            <Setter Property="BorderBrush" Value="#393939" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="12" />
-            <Setter Property="Margin" Value="0,0,0,10" />
-        </Style>
-
-        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0,0,0,3" />
-        </Style>
-
-        <Style x:Key="SectionDescriptionStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#A8A8A8" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="TextWrapping" Value="Wrap" />
-        </Style>
-
-        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#BFBFBF" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="ActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Width" Value="Auto" />
-            <Setter Property="Padding" Value="14,0" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="Background" Value="#303030" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="BtnBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#383838" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="IconActionButton" TargetType="Button" BasedOn="{StaticResource ActionButton}">
-            <Setter Property="Width" Value="38" />
-            <Setter Property="Padding" Value="0" />
-        </Style>
-    </Window.Resources>
-
     <Border BorderThickness="2"
             BorderBrush="{StaticResource TertiaryBrush}"
             Background="{StaticResource PrimaryBrush}"
@@ -154,10 +47,8 @@
                     Padding="10">
                 <TabControl Background="Transparent"
                             BorderThickness="0"
-                            TabStripPlacement="Left">
-                    <TabControl.Resources>
-                        <Style TargetType="TabItem" BasedOn="{StaticResource SettingsNavTabItem}" />
-                    </TabControl.Resources>
+                            TabStripPlacement="Left"
+                            ItemContainerStyle="{StaticResource SettingsNavTabItemStyle}">
                     <TabItem Cursor="Hand">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
@@ -167,21 +58,21 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="General Preferences" />
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}" Text="Basic app behavior and update policy." />
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="General Preferences" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Basic app behavior and update policy." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
                                         <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="170" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Font family:" />
+                                        <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Font family:" />
                                         <ComboBox Grid.Column="1"
                                                   x:Name="FontFamilyComboBox"
                                                   Style="{StaticResource CustomComboBox}"
@@ -199,11 +90,11 @@
                                                   Content="Automatically check for updates on startup"
                                                   Margin="0,0,0,10" />
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                        <Button Style="{StaticResource ActionButton}"
+                                        <Button Style="{StaticResource SettingsActionButton}"
                                                 MinWidth="130"
                                                 Content="Check Now"
                                                 Command="{Binding CheckForUpdatesNowCommand}" />
-                                        <Button Style="{StaticResource ActionButton}"
+                                        <Button Style="{StaticResource SettingsActionButton}"
                                                 MinWidth="130"
                                                 Margin="10,0,0,0"
                                                 Content="{materialDesign:PackIcon Kind=Download, Size=16}"
@@ -211,7 +102,7 @@
                                                 Command="{Binding OpenBrowserForUpdateCommand}"
                                                 Visibility="{Binding IsUpdateButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                                         </StackPanel>
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}" Text="{Binding UpdateAvailableText}" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="{Binding UpdateAvailableText}" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -227,14 +118,14 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Playback" />
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}" Text="Audio output and startup playback defaults." />
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Playback" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Audio output and startup playback defaults." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -246,7 +137,7 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Audio output:" />
+                                        <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Audio output:" />
                                         <ComboBox Grid.Column="1"
                                                   x:Name="AudioOutputComboBox"
                                                   Style="{StaticResource CustomComboBox}"
@@ -259,7 +150,7 @@
                                             </ComboBox.ItemTemplate>
                                         </ComboBox>
 
-                                        <TextBlock Grid.Row="1" Style="{StaticResource FieldLabelStyle}" Text="Startup volume:" />
+                                        <TextBlock Grid.Row="1" Style="{StaticResource SettingsFieldLabelText}" Text="Startup volume:" />
                                         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <Slider Width="240"
                                                     Minimum="0"
@@ -291,14 +182,14 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Library" />
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}" Text="Folders and scan behavior for your local library." />
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Library" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Folders and scan behavior for your local library." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
                                         <Grid Margin="0,0,0,10">
                                         <Grid.RowDefinitions>
@@ -334,7 +225,7 @@
 
                                         <Button x:Name="OpenFolderBrowser"
                                                 Grid.Column="1"
-                                                Style="{StaticResource IconActionButton}"
+                                                Style="{StaticResource SettingsIconActionButton}"
                                                 Click="OpenFolderBrowser_Click"
                                                 Content="{materialDesign:PackIcon Kind=FolderAddOutline, Size=18}"
                                                 ToolTip="Browse and add folder"
@@ -342,7 +233,7 @@
                                         <Button x:Name="RemoveFolder"
                                                 Grid.Row="1"
                                                 Grid.Column="1"
-                                                Style="{StaticResource IconActionButton}"
+                                                Style="{StaticResource SettingsIconActionButton}"
                                                 Command="{Binding RemoveFolderCommand}"
                                                 IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
                                                 Content="{materialDesign:PackIcon Kind=FolderRemoveOutline, Size=18}"
@@ -351,7 +242,7 @@
 
                                         <CheckBox IsChecked="{Binding ScanOnStartup}" Content="Scan folders on startup" Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding AutoScanOnFolderAdd}" Content="Scan newly added folders immediately" Margin="0,0,0,10" />
-                                        <Button Style="{StaticResource ActionButton}"
+                                        <Button Style="{StaticResource SettingsActionButton}"
                                                 HorizontalAlignment="Left"
                                                 MinWidth="130"
                                                 Content="Rescan Now"
@@ -360,10 +251,10 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Folder Browser Speed" />
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}"
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Folder Browser Speed" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
                                                    Margin="0,0,0,10"
                                                    Text="Tune how quickly the folder browser returns to common locations." />
 
@@ -376,7 +267,7 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
 
-                                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Start location:" />
+                                            <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Start location:" />
                                             <CheckBox Grid.Column="1"
                                                       IsChecked="{Binding FolderBrowserStartAtLastLocation}"
                                                       Content="Open browser at the last browsed folder when possible" />
@@ -392,7 +283,7 @@
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
 
-                                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Pinned folders" />
+                                            <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Pinned folders" />
                                             <ListView Grid.Row="1"
                                                       Height="120"
                                                       Margin="0,6,0,8"
@@ -408,11 +299,11 @@
                                                 </ListView.ItemTemplate>
                                             </ListView>
                                             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                                <Button Style="{StaticResource ActionButton}"
+                                                <Button Style="{StaticResource SettingsActionButton}"
                                                         MinWidth="110"
                                                         Content="Remove Pin"
                                                         Command="{Binding RemovePinnedFolderCommand}" />
-                                                <Button Style="{StaticResource ActionButton}"
+                                                <Button Style="{StaticResource SettingsActionButton}"
                                                         MinWidth="130"
                                                         Margin="8,0,0,0"
                                                         Content="Clear Invalid Pins"
@@ -434,14 +325,14 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Notifications and Hooks" />
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}" Text="Global key hooks and corner popup behavior." />
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Notifications and Hooks" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Global key hooks and corner popup behavior." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -453,10 +344,10 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Global media keys:" />
+                                        <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Global media keys:" />
                                         <CheckBox Grid.Column="1" IsChecked="{Binding EnableGlobalMediaKeys}" Content="Enable global media key shortcuts" />
 
-                                        <TextBlock Grid.Row="1" Style="{StaticResource FieldLabelStyle}" Text="Corner popup:" />
+                                        <TextBlock Grid.Row="1" Style="{StaticResource SettingsFieldLabelText}" Text="Corner popup:" />
                                         <StackPanel Grid.Row="1" Grid.Column="1">
                                             <CheckBox IsChecked="{Binding EnableCornerNowPlayingPopup}" Content="Enable corner now-playing popup" Margin="0,0,0,8" />
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -485,7 +376,7 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <TextBlock Grid.Row="2" Style="{StaticResource FieldLabelStyle}" Margin="0,10,0,0" Text="Notification window:" />
+                                        <TextBlock Grid.Row="2" Style="{StaticResource SettingsFieldLabelText}" Margin="0,10,0,0" Text="Notification window:" />
                                         <ComboBox Grid.Row="2"
                                                   Grid.Column="1"
                                                   Margin="0,10,0,0"
@@ -507,28 +398,28 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SectionCard}">
+                                <Border Style="{StaticResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Advanced" />
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}" Text="Danger zone. Clearing metadata removes songs, playlists, and folder registrations from the local database." />
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Advanced" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Danger zone. Clearing metadata removes songs, playlists, and folder registrations from the local database." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SectionCard}" BorderBrush="#6B3D3D" Background="#2A2121">
+                                <Border Style="{StaticResource SettingsSectionCard}" BorderBrush="#6B3D3D" Background="#2A2121">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}"
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
                                                    Foreground="#E2A4A4"
                                                    Text="This action cannot be undone. Use it only when you want a full local reset."
                                                    Margin="0,0,0,10" />
                                         <StackPanel Orientation="Horizontal">
                                         <Button x:Name="ClearMetadataButton"
-                                                Style="{StaticResource ActionButton}"
+                                                Style="{StaticResource SettingsActionButton}"
                                                 MinWidth="150"
                                                 Content="Clear Metadata"
                                                 Command="{Binding ClearMetadataCommand}"
                                                 Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                                             <Button x:Name="CancelClearMetadataButton"
-                                                    Style="{StaticResource ActionButton}"
+                                                    Style="{StaticResource SettingsActionButton}"
                                                     MinWidth="150"
                                                     Margin="10,0,0,0"
                                                     Content="{Binding CancelClearMetadataButtonContent}"
@@ -556,13 +447,13 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Style="{StaticResource SectionDescriptionStyle}"
+                    <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
                                VerticalAlignment="Center"
                                Text="Changes are applied immediately." />
 
                     <Button x:Name="CloseButton"
                             Grid.Column="1"
-                            Style="{StaticResource ActionButton}"
+                            Style="{StaticResource SettingsActionButton}"
                             MinWidth="140"
                             Content="Done"
                             Click="CloseButton_Click" />
@@ -571,3 +462,4 @@
         </Grid>
     </Border>
 </Window>
+

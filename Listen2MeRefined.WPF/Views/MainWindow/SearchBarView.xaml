@@ -3,40 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <UserControl.Resources>
-        <Style x:Key="SearchActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="38" />
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Margin" Value="10,0,0,0" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="Background" Value="#313131" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="BtnBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#383838" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
     <Border utils:ViewModelInitialization.AutoInitialize="True"
             Margin="0,12,0,0"
             Padding="12,10"
@@ -88,14 +54,15 @@
 
             <Button Grid.Column="1"
                     Command="{Binding QuickSearchCommand}"
-                    Style="{StaticResource SearchActionButton}"
+                    Style="{StaticResource SearchBarActionButton}"
                     ToolTip="Quick Search"
                     Content="{materialDesign:PackIcon Kind=Search,Size=18}" />
             <Button Grid.Column="2"
                     Command="{Binding DataContext.OpenAdvancedSearchWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Style="{StaticResource SearchActionButton}"
+                    Style="{StaticResource SearchBarActionButton}"
                     ToolTip="Advanced Search"
                     Content="{materialDesign:PackIcon Kind=Tune,Size=18}" />
         </Grid>
     </Border>
 </UserControl>
+

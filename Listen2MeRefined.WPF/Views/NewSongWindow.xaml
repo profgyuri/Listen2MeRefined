@@ -15,43 +15,6 @@
         Height="180"
         Width="500">
 
-    <Window.Resources>
-        <Style x:Key="HeaderText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-
-        <Style x:Key="TrackTitleText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="24" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        </Style>
-
-        <Style x:Key="TrackArtistText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#D2D2D2" />
-            <Setter Property="FontSize" Value="17" />
-            <Setter Property="FontStyle" Value="Italic" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        </Style>
-
-        <Style x:Key="MetaBadge" TargetType="Border">
-            <Setter Property="Background" Value="#2E2E2E" />
-            <Setter Property="BorderBrush" Value="#404040" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="8,4" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-        </Style>
-
-        <Style x:Key="MetaText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#D7D7D7" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        </Style>
-    </Window.Resources>
-
     <Border BorderBrush="{StaticResource TertiaryBrush}"
             Background="{StaticResource HoloBackground}"
             BorderThickness="2"
@@ -90,13 +53,13 @@
                                 Margin="8,0,0,0"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource HeaderText}" Text="Now Playing" />
+                        <TextBlock Style="{StaticResource NewSongHeaderText}" Text="Now Playing" />
                         <Ellipse Width="5"
                                  Height="5"
                                  Fill="{StaticResource TertiaryBrush}"
                                  Margin="8,0,8,0"
                                  VerticalAlignment="Center" />
-                        <TextBlock Style="{StaticResource HeaderText}"
+                        <TextBlock Style="{StaticResource NewSongHeaderText}"
                                    Foreground="#A8A8A8"
                                    Text="{Binding Song.Length, StringFormat={}{0:mm\\:ss}, FallbackValue=00:00}" />
                     </StackPanel>
@@ -120,21 +83,21 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
-                               Style="{StaticResource TrackTitleText}"
+                               Style="{StaticResource NewSongTrackTitleText}"
                                Text="{Binding Song.Title, FallbackValue=Title}" />
                     <TextBlock Grid.Row="2"
-                               Style="{StaticResource TrackArtistText}"
+                               Style="{StaticResource NewSongTrackArtistText}"
                                Text="{Binding Song.Artist, FallbackValue=Artist}" />
 
                     <WrapPanel Grid.Row="4" VerticalAlignment="Center">
-                        <Border Style="{StaticResource MetaBadge}">
-                            <TextBlock Style="{StaticResource MetaText}" Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
+                        <Border Style="{StaticResource ComponentMetaBadge}">
+                            <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
                         </Border>
-                        <Border Style="{StaticResource MetaBadge}">
-                            <TextBlock Style="{StaticResource MetaText}" Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}" />
+                        <Border Style="{StaticResource ComponentMetaBadge}">
+                            <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}" />
                         </Border>
-                        <Border Style="{StaticResource MetaBadge}" Margin="0">
-                            <TextBlock Style="{StaticResource MetaText}" Text="{Binding Song.Genre, FallbackValue=Genre}" />
+                        <Border Style="{StaticResource ComponentMetaBadge}" Margin="0">
+                            <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Song.Genre, FallbackValue=Genre}" />
                         </Border>
                     </WrapPanel>
                 </Grid>
@@ -142,3 +105,4 @@
         </Grid>
     </Border>
 </Window>
+

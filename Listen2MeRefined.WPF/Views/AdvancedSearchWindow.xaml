@@ -24,88 +24,6 @@
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>
 
-    <Window.Resources>
-        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
-        </Style>
-
-        <Style x:Key="ToolbarTitleText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="ToolbarLabelText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#A8A8A8" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="QuickActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="38" />
-            <Setter Property="Height" Value="38" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-            <Setter Property="Background" Value="#2E2E2E" />
-            <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
-        </Style>
-
-        <Style x:Key="CriteriaListView" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
-            <Setter Property="Background" Value="#232323" />
-            <Setter Property="BorderBrush" Value="#3A3A3A" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="6" />
-        </Style>
-
-        <Style x:Key="CriteriaListItem" TargetType="ListViewItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Margin" Value="0,0,0,6" />
-            <Setter Property="Background" Value="#2C2C2C" />
-            <Setter Property="BorderBrush" Value="#3B3B3B" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-                        <Border x:Name="ItemBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8"
-                                Padding="8,6">
-                            <ContentPresenter />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="ItemBorder" Property="Background" Value="#313131" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
-                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="MiniActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="24" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="4,0,0,0" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="#5A5A5A" />
-            <Setter Property="Background" Value="#343434" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-        </Style>
-
-    </Window.Resources>
-
     <Border BorderThickness="2"
             BorderBrush="{StaticResource TertiaryBrush}"
             Background="{StaticResource PrimaryBrush}"
@@ -169,8 +87,8 @@
                             <StackPanel Grid.Column="1"
                                         Margin="10,0,0,0"
                                         VerticalAlignment="Center">
-                                <TextBlock Style="{StaticResource ToolbarTitleText}" Text="Advanced Search Filters" />
-                                <TextBlock Style="{StaticResource ToolbarLabelText}" Text="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter." />
+                                <TextBlock Style="{StaticResource AdvancedSearchToolbarTitleText}" Text="Advanced Search Filters" />
+                                <TextBlock Style="{StaticResource AdvancedSearchToolbarLabelText}" Text="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter." />
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -194,7 +112,7 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.ColumnSpan="4"
-                                       Style="{StaticResource ToolbarLabelText}"
+                                       Style="{StaticResource AdvancedSearchToolbarLabelText}"
                                        Text="New Filter" />
 
                             <ComboBox x:Name="TableColumnName"
@@ -222,6 +140,7 @@
                                     CornerRadius="8"
                                     Padding="8,0">
                                 <TextBox x:Name="GeneralInput"
+                                         Style="{StaticResource AdvancedSearchTextBoxStyle}"
                                          BorderThickness="0"
                                          Background="Transparent"
                                          Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
@@ -237,7 +156,7 @@
                                     Grid.Row="1"
                                     Grid.Column="3"
                                     Margin="0,6,0,0"
-                                    Style="{StaticResource QuickActionButton}"
+                                    Style="{StaticResource ComponentQuickActionButton}"
                                     ToolTip="Add Filter"
                                     Command="{Binding AddCriteriaCommand}"
                                     Content="{materialDesign:PackIcon Kind=Plus, Size=20}"
@@ -264,11 +183,11 @@
 
                             <TextBlock Grid.Row="0"
                                        Grid.Column="0"
-                                       Style="{StaticResource ToolbarTitleText}"
+                                       Style="{StaticResource AdvancedSearchToolbarTitleText}"
                                        Text="Filters" />
                             <TextBlock Grid.Row="0"
                                        Grid.Column="1"
-                                       Style="{StaticResource ToolbarLabelText}"
+                                       Style="{StaticResource AdvancedSearchToolbarLabelText}"
                                        Text="{Binding Criterias.Count, StringFormat={}{0} total}" />
 
                             <ListView x:Name="SearchCriterias"
@@ -276,8 +195,8 @@
                                       Grid.ColumnSpan="2"
                                       ItemsSource="{Binding Criterias}"
                                       SelectedItem="{Binding SelectedCriteria}"
-                                      ItemContainerStyle="{StaticResource CriteriaListItem}"
-                                      Style="{StaticResource CriteriaListView}">
+                                      ItemContainerStyle="{StaticResource AdvancedSearchCriteriaListItem}"
+                                      Style="{StaticResource AdvancedSearchCriteriaListView}">
                                 <ListView.InputBindings>
                                     <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}" />
                                 </ListView.InputBindings>
@@ -297,18 +216,18 @@
                                             <StackPanel Grid.Column="1"
                                                         Orientation="Horizontal"
                                                         VerticalAlignment="Center">
-                                                <Button Style="{StaticResource MiniActionButton}"
+                                                <Button Style="{StaticResource AdvancedSearchMiniActionButton}"
                                                         ToolTip="Edit"
                                                         Command="{Binding DataContext.EditCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
                                                         Click="EditCriteriaButton_Click"
                                                         Content="{materialDesign:PackIcon Kind=Pencil, Size=14}" />
-                                                <Button Style="{StaticResource MiniActionButton}"
+                                                <Button Style="{StaticResource AdvancedSearchMiniActionButton}"
                                                         ToolTip="Duplicate"
                                                         Command="{Binding DataContext.DuplicateCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
                                                         Content="{materialDesign:PackIcon Kind=ContentCopy, Size=14}" />
-                                                <Button Style="{StaticResource MiniActionButton}"
+                                                <Button Style="{StaticResource AdvancedSearchMiniActionButton}"
                                                         ToolTip="Remove"
                                                         Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
@@ -388,3 +307,4 @@
         </Grid>
     </Border>
 </Window>
+

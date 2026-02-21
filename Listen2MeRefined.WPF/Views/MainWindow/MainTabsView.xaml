@@ -3,80 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow">
-    <UserControl.Resources>
-        <Style x:Key="SegmentTabItem" TargetType="TabItem">
-            <Setter Property="Foreground" Value="#AFAFAF" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Padding" Value="16,9" />
-            <Setter Property="Margin" Value="0,0,6,0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="TabBorder"
-                                Background="#2D2D2D"
-                                BorderBrush="Transparent"
-                                BorderThickness="1"
-                                CornerRadius="16">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              ContentSource="Header"
-                                              Margin="{TemplateBinding Padding}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="#353535" />
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                                <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TabBorder" Property="Background" Value="#383838" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Width" Value="Auto" />
-            <Setter Property="Padding" Value="14,0" />
-            <Setter Property="Margin" Value="0,0,0,10" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="Background" Value="#303030" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-
-        <Style x:Key="CardTitleText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0,0,0,10" />
-        </Style>
-
-        <Style x:Key="MetaLabelText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#A1A1A1" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="TextWrapping" Value="NoWrap" />
-        </Style>
-
-        <Style x:Key="MetaValueText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-        </Style>
-    </UserControl.Resources>
-
     <TabControl Margin="0,20,10,14"
                 Background="Transparent"
                 BorderThickness="0"
-                materialDesign:ColorZoneAssist.Mode="Custom">
-        <TabControl.Resources>
-            <Style TargetType="TabItem" BasedOn="{StaticResource SegmentTabItem}" />
-        </TabControl.Resources>
+                materialDesign:ColorZoneAssist.Mode="Custom"
+                ItemContainerStyle="{StaticResource MainTabsSegmentTabItemStyle}">
 
         <TabItem Header="Search Results" IsSelected="{Binding IsSearchResultsTabVisible}" Cursor="Hand">
             <views:SearchResultsPaneView DataContext="{Binding DataContext.SearchResultsPaneViewModel, RelativeSource={RelativeSource AncestorType=Window}}" />
@@ -101,9 +32,9 @@
 
                         <Border Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource CardTitleText}" Text="Playback Actions" />
-                                <Button Style="{StaticResource ActionButton}" Command="{Binding JumpToSelectedSongCommand}" Content="Jump To This Song" />
-                                <Button Style="{StaticResource ActionButton}" Command="{Binding SetSelectedSongAsNextCommand}" Content="Set As Next Song" Margin="0" />
+                                <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Playback Actions" />
+                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding JumpToSelectedSongCommand}" Content="Jump To This Song" />
+                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding SetSelectedSongAsNextCommand}" Content="Set As Next Song" Margin="0" />
                             </StackPanel>
                         </Border>
 
@@ -115,27 +46,27 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                    <TextBlock Style="{StaticResource CardTitleText}" Text="Song Details" />
+                                    <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Song Details" />
                                     <TextBox Text="{Binding SelectedSong.Artist}" Margin="0,0,0,10" materialDesign:HintAssist.Hint="Artist" />
                                     <TextBox Text="{Binding SelectedSong.Title}" Margin="0,0,0,10" materialDesign:HintAssist.Hint="Title" />
                                     <TextBox Text="{Binding SelectedSong.Genre}" materialDesign:HintAssist.Hint="Genre" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Style="{StaticResource CardTitleText}" Text="Audio Meta" />
+                                    <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Audio Meta" />
                                     <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
                                         <StackPanel>
-                                            <TextBlock Style="{StaticResource MetaLabelText}" Text="BITRATE" />
-                                            <TextBlock Style="{StaticResource MetaValueText}" Text="{Binding SelectedSong.Bitrate}" />
+                                            <TextBlock Style="{StaticResource MainTabsMetaLabelText}" Text="BITRATE" />
+                                            <TextBlock Style="{StaticResource MainTabsMetaValueText}" Text="{Binding SelectedSong.Bitrate}" />
                                         </StackPanel>
                                     </Border>
                                     <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10">
                                         <StackPanel>
-                                            <TextBlock Style="{StaticResource MetaLabelText}" Text="BPM" />
-                                            <TextBlock Style="{StaticResource MetaValueText}" Text="{Binding SelectedSong.BPM}" />
+                                            <TextBlock Style="{StaticResource MainTabsMetaLabelText}" Text="BPM" />
+                                            <TextBlock Style="{StaticResource MainTabsMetaValueText}" Text="{Binding SelectedSong.BPM}" />
                                         </StackPanel>
                                     </Border>
-                                    <Button Style="{StaticResource ActionButton}" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song" Margin="0,10,0,0" />
+                                    <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song" Margin="0,10,0,0" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -143,7 +74,7 @@
                         <Border Grid.Row="4" Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="DeleteOutline" Width="18" Height="18" Foreground="{StaticResource TertiaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                <Button Style="{StaticResource ActionButton}" Command="{Binding RemoveSelectedFromPlaylistCommand}" Content="Remove From Playlist" Margin="0" />
+                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding RemoveSelectedFromPlaylistCommand}" Content="Remove From Playlist" Margin="0" />
                             </StackPanel>
                         </Border>
                     </Grid>
@@ -152,3 +83,4 @@
         </TabItem>
     </TabControl>
 </UserControl>
+

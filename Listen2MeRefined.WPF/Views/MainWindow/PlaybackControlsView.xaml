@@ -4,84 +4,6 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <UserControl.Resources>
-        <Style x:Key="TransportButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="36" />
-            <Setter Property="Height" Value="36" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="Background" Value="#2F2F2F" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="Margin" Value="3,0" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="BtnBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="18">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#353535" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="PrimaryTransportButton" TargetType="Button" BasedOn="{StaticResource TransportButton}">
-            <Setter Property="Width" Value="42" />
-            <Setter Property="Height" Value="42" />
-            <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-            <Setter Property="Background" Value="#313131" />
-            <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
-        </Style>
-
-        <Style x:Key="TimeText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#BDBDBD" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Padding" Value="2,1" />
-        </Style>
-
-        <Style x:Key="VolumeIconButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="Background" Value="#2F2F2F" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="BtnBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="15">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#353535" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
     <Border DataContext="{Binding PlayerControlsViewModel}"
             utils:ViewModelInitialization.AutoInitialize="True"
             Background="#272727"
@@ -130,25 +52,25 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Command="{Binding PreviousCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"/>
-                        <Button Command="{Binding StopCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" />
-                        <Button Command="{Binding PlayPauseCommand}" Style="{StaticResource PrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" />
-                        <Button Command="{Binding NextCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" />
-                        <Button Command="{Binding ShuffleCommand}" Style="{StaticResource TransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" />
+                        <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"/>
+                        <Button Command="{Binding StopCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" />
+                        <Button Command="{Binding PlayPauseCommand}" Style="{StaticResource PlaybackPrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" />
+                        <Button Command="{Binding NextCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" />
+                        <Button Command="{Binding ShuffleCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" />
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0">
                         <TextBlock x:Name="ElapsedTimeText"
-                                   Style="{StaticResource TimeText}"
+                                   Style="{StaticResource PlaybackTimeText}"
                                    Text="{Binding CurrentTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
-                        <TextBlock Style="{StaticResource TimeText}" Text="/" Margin="4,0" />
+                        <TextBlock Style="{StaticResource PlaybackTimeText}" Text="/" Margin="4,0" />
                         <TextBlock x:Name="TotalTimeText"
-                                   Style="{StaticResource TimeText}"
+                                   Style="{StaticResource PlaybackTimeText}"
                                    Text="{Binding TotalTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Button Style="{StaticResource VolumeIconButton}"
+                        <Button Style="{StaticResource PlaybackVolumeIconButton}"
                                 Command="{Binding ToggleMuteCommand}">
                             <materialDesign:PackIcon Kind="{Binding VolumeIconKind}" Width="14" Height="14" />
                         </Button>
@@ -157,82 +79,12 @@
                                 Minimum="0"
                                 Maximum="1"
                                 Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                VerticalAlignment="Center">
-                            <Slider.Style>
-                                <Style TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
-                                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-                                    <Setter Property="materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
-                                    <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
-                                    <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
-                                    <Setter Property="Height" Value="20" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Slider">
-                                                <Grid VerticalAlignment="Center">
-                                                    <Border Height="4"
-                                                            Background="#4A4A4A"
-                                                            CornerRadius="2"
-                                                            VerticalAlignment="Center" />
-                                                    <Track x:Name="PART_Track"
-                                                           VerticalAlignment="Center">
-                                                        <Track.DecreaseRepeatButton>
-                                                            <RepeatButton Background="{TemplateBinding Foreground}"
-                                                                          BorderThickness="0"
-                                                                          Height="4"
-                                                                          Focusable="False">
-                                                                <RepeatButton.Template>
-                                                                    <ControlTemplate TargetType="RepeatButton">
-                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2" />
-                                                                    </ControlTemplate>
-                                                                </RepeatButton.Template>
-                                                            </RepeatButton>
-                                                        </Track.DecreaseRepeatButton>
-                                                        <Track.Thumb>
-                                                            <Thumb Width="10"
-                                                                   Height="10"
-                                                                   Background="{StaticResource TertiaryBrush}"
-                                                                   BorderBrush="#D55F16"
-                                                                   BorderThickness="1"
-                                                                   Focusable="False">
-                                                                <Thumb.Template>
-                                                                    <ControlTemplate TargetType="Thumb">
-                                                                        <Ellipse Fill="{TemplateBinding Background}"
-                                                                                 Stroke="{TemplateBinding BorderBrush}"
-                                                                                 StrokeThickness="{TemplateBinding BorderThickness}" />
-                                                                    </ControlTemplate>
-                                                                </Thumb.Template>
-                                                            </Thumb>
-                                                        </Track.Thumb>
-                                                        <Track.IncreaseRepeatButton>
-                                                            <RepeatButton Background="Transparent"
-                                                                          BorderThickness="0"
-                                                                          Height="4"
-                                                                          Focusable="False">
-                                                                <RepeatButton.Template>
-                                                                    <ControlTemplate TargetType="RepeatButton">
-                                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2" />
-                                                                    </ControlTemplate>
-                                                                </RepeatButton.Template>
-                                                            </RepeatButton>
-                                                        </Track.IncreaseRepeatButton>
-                                                    </Track>
-                                                </Grid>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Resources>
-                                    </Style.Resources>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsMuted}" Value="True">
-                                            <Setter Property="Foreground" Value="#888888" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Slider.Style>
-                        </Slider>
+                                VerticalAlignment="Center"
+                                Style="{StaticResource PlaybackVolumeSliderStyle}" />
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
     </Border>
 </UserControl>
+

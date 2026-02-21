@@ -4,111 +4,6 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <UserControl.Resources>
-        <SolidColorBrush x:Key="BorderAccentBrush" Color="{StaticResource TertiaryColor}" />
-        <Style x:Key="ToolbarLabelText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#A8A8A8" />
-            <Setter Property="FontSize" Value="11" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="ToolbarValueText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="QuickActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="38" />
-            <Setter Property="Height" Value="38" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-            <Setter Property="Background" Value="#2E2E2E" />
-            <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
-        </Style>
-
-        <Style x:Key="SearchResultsListView" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
-            <Setter Property="Background" Value="#232323" />
-            <Setter Property="BorderBrush" Value="#3A3A3A" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="6" />
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-        </Style>
-
-        <Style x:Key="SearchResultsListItem" TargetType="ListViewItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="Margin" Value="0,0,0,6" />
-            <Setter Property="Background" Value="#2C2C2C" />
-            <Setter Property="BorderBrush" Value="#3B3B3B" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-                        <Border x:Name="ItemBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="8"
-                                Padding="8,6">
-                            <ContentPresenter />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="ItemBorder" Property="Background" Value="#313131" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
-                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="RowExpandToggleButton" TargetType="ToggleButton">
-            <Setter Property="Width" Value="24" />
-            <Setter Property="Height" Value="24" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Border x:Name="ToggleBorder"
-                                Width="{TemplateBinding Width}"
-                                Height="{TemplateBinding Height}"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="12">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="ToggleBorder" Property="Background" Value="#363636" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                                <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
     <Border Margin="0,8,0,0"
             Background="#272727"
             BorderBrush="#3A3A3A"
@@ -135,14 +30,14 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Border Width="24" Height="24" Background="{StaticResource BorderAccentBrush}" CornerRadius="12" VerticalAlignment="Center">
+                    <Border Width="24" Height="24" Background="{StaticResource SearchResultsBorderAccentBrush}" CornerRadius="12" VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="MusicNote" Width="14" Height="14" Foreground="#1F1F1F" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     
-                    <TextBlock Grid.Column="1" Style="{StaticResource ToolbarValueText}" Text="Search Results" Margin="10,0,0,0" />
+                    <TextBlock Grid.Column="1" Style="{StaticResource SearchResultsToolbarValueText}" Text="Search Results" Margin="10,0,0,0" />
                     <Button Grid.Column="2"
                             HorizontalAlignment="Right"
-                            Style="{StaticResource QuickActionButton}"
+                            Style="{StaticResource ComponentQuickActionButton}"
                             Command="{Binding SendSelectedToPlaylistCommand}"
                             ToolTip="Add Selected / All to Playlist"
                             Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=20}" />
@@ -156,8 +51,8 @@
                       dd:DragDrop.IsDropTarget="True"
                       ItemsSource="{Binding SearchResults}"
                       SelectionMode="Extended"
-                      ItemContainerStyle="{StaticResource SearchResultsListItem}"
-                      Style="{StaticResource SearchResultsListView}"
+                      ItemContainerStyle="{StaticResource SearchResultsListItemStyle}"
+                      Style="{StaticResource SearchResultsListViewStyle}"
                       utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}"
                       utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}">
                 <ListView.InputBindings>
@@ -178,7 +73,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <ToggleButton x:Name="RowExpandToggle"
-                                              Style="{StaticResource RowExpandToggleButton}"
+                                              Style="{StaticResource SearchResultsRowExpandToggleButtonStyle}"
                                               ToolTip="Show details">
                                     <Grid>
                                         <materialDesign:PackIcon x:Name="RowExpandIconDown"
@@ -213,28 +108,28 @@
                                     Visibility="{Binding IsChecked, ElementName=RowExpandToggle, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <UniformGrid Columns="3">
                                     <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Artist" Style="{StaticResource ToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Artist}" Style="{StaticResource ToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Artist" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Artist}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Title" Style="{StaticResource ToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Title}" Style="{StaticResource ToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Title" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Title}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <StackPanel>
-                                        <TextBlock Text="Genre" Style="{StaticResource ToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Genre}" Style="{StaticResource ToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Genre" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Genre}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <StackPanel Margin="0,8,12,0">
-                                        <TextBlock Text="BPM" Style="{StaticResource ToolbarLabelText}" />
-                                        <TextBlock Text="{Binding BPM}" Style="{StaticResource ToolbarValueText}" />
+                                        <TextBlock Text="BPM" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding BPM}" Style="{StaticResource SearchResultsToolbarValueText}" />
                                     </StackPanel>
                                     <StackPanel Margin="0,8,12,0">
-                                        <TextBlock Text="Bitrate" Style="{StaticResource ToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{StaticResource ToolbarValueText}" />
+                                        <TextBlock Text="Bitrate" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{StaticResource SearchResultsToolbarValueText}" />
                                     </StackPanel>
                                     <StackPanel Margin="0,8,0,0">
-                                        <TextBlock Text="Path" Style="{StaticResource ToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Path}" Style="{StaticResource ToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Path" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Path}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                 </UniformGrid>
                             </Border>

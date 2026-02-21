@@ -21,89 +21,6 @@
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>
 
-    <Window.Resources>
-        <Style x:Key="ActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Height" Value="38" />
-            <Setter Property="Width" Value="Auto" />
-            <Setter Property="Padding" Value="14,0" />
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="BorderBrush" Value="#4A4A4A" />
-            <Setter Property="Background" Value="#303030" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="BtnBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#383838" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="BtnBorder" Property="Background" Value="#262626" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SectionTitleText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0,0,0,6" />
-        </Style>
-
-        <Style x:Key="FolderList" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="Margin" Value="0" />
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="Background" Value="#252525" />
-                        <Setter Property="BorderBrush" Value="#353535" />
-                        <Setter Property="BorderThickness" Value="0,0,0,1" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListViewItem">
-                                    <Border x:Name="ItemBorder"
-                                            Background="{TemplateBinding Background}"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            Padding="8,5">
-                                        <ContentPresenter />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="ItemBorder" Property="Background" Value="#2C2C2C" />
-                                        </Trigger>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                                            <Setter TargetName="ItemBorder" Property="Background" Value="#323232" />
-                                            <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1" />
-                                            <Setter Property="Margin" Value="0,1,0,1" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
     <Border BorderThickness="2"
             BorderBrush="{StaticResource TertiaryBrush}"
             Background="{StaticResource PrimaryBrush}"
@@ -144,11 +61,11 @@
                             Padding="8">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource SectionTitleText}" Text="Pinned" />
+                                <TextBlock Style="{StaticResource FolderBrowserSectionTitleText}" Text="Pinned" />
                                 <ListView Height="180"
                                           ItemsSource="{Binding PinnedFolders}"
                                           SelectedItem="{Binding SelectedPinnedFolder}"
-                                          Style="{StaticResource FolderList}">
+                                          Style="{StaticResource FolderBrowserListView}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding}"
@@ -163,11 +80,11 @@
                                     </i:Interaction.Triggers>
                                 </ListView>
 
-                                <TextBlock Style="{StaticResource SectionTitleText}" Margin="0,10,0,6" Text="Drives" />
+                                <TextBlock Style="{StaticResource FolderBrowserSectionTitleText}" Margin="0,10,0,6" Text="Drives" />
                                 <ListView Height="130"
                                           ItemsSource="{Binding Drives}"
                                           SelectedItem="{Binding SelectedDrive}"
-                                          Style="{StaticResource FolderList}">
+                                          Style="{StaticResource FolderBrowserListView}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding}" Foreground="{StaticResource SecondaryBrush}" />
@@ -239,7 +156,7 @@
                                 <ListView x:Name="FolderList"
                                           ItemsSource="{Binding Folders}"
                                           SelectedItem="{Binding SelectedFolder, Mode=TwoWay}"
-                                          Style="{StaticResource FolderList}">
+                                          Style="{StaticResource FolderBrowserListView}">
                                     <ListView.InputBindings>
                                         <KeyBinding Key="Return" Command="{Binding NavigateIntoSelectedCommand}" />
                                         <KeyBinding Key="Right" Command="{Binding NavigateIntoSelectedCommand}" />
@@ -305,13 +222,13 @@
                                         Margin="8,0,0,0"
                                         Content="Go"
                                         Command="{Binding GoToPathCommand}"
-                                        Style="{StaticResource ActionButton}"
+                                        Style="{StaticResource FolderBrowserActionButton}"
                                         MinWidth="78" />
                                 <Button Grid.Column="2"
                                         Margin="8,0,0,0"
                                         Content="Pin Current"
                                         Command="{Binding TogglePinCommand}"
-                                        Style="{StaticResource ActionButton}"
+                                        Style="{StaticResource FolderBrowserActionButton}"
                                         MinWidth="108" />
                             </Grid>
 
@@ -348,14 +265,14 @@
                     <Button x:Name="SelectButton"
                             Grid.Column="1"
                             Content="Select"
-                            Style="{StaticResource ActionButton}"
+                            Style="{StaticResource FolderBrowserActionButton}"
                             MinWidth="110"
                             Click="SelectButton_Click" />
 
                     <Button x:Name="CancelButton"
                             Grid.Column="2"
                             Content="Cancel"
-                            Style="{StaticResource ActionButton}"
+                            Style="{StaticResource FolderBrowserActionButton}"
                             MinWidth="110"
                             Margin="8,0,0,0"
                             Click="CancelButton_Click" />
@@ -364,3 +281,4 @@
         </Grid>
     </Border>
 </Window>
+

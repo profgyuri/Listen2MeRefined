@@ -6,81 +6,6 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <UserControl.Resources>
-        <Style x:Key="PlaylistTitleText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-
-        <Style x:Key="RemovePlaylistButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-            <Setter Property="Width" Value="38" />
-            <Setter Property="Height" Value="38" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-            <Setter Property="Background" Value="#2E2E2E" />
-            <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
-        </Style>
-
-        <Style x:Key="PlaylistList" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="ItemContainerStyle">
-                <Setter.Value>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="Margin" Value="0,0,0,8" />
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="Background" Value="#242424" />
-                        <Setter Property="BorderBrush" Value="#383838" />
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListViewItem">
-                                    <Border x:Name="ItemBorder"
-                                            Background="{TemplateBinding Background}"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            CornerRadius="10"
-                                            Padding="10,8">
-                                        <ContentPresenter />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                                            <Setter TargetName="ItemBorder" Property="Background" Value="#2C2C2C" />
-                                        </Trigger>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                                            <Setter TargetName="ItemBorder" Property="Background" Value="#323232" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="MetaBadge" TargetType="Border">
-            <Setter Property="Background" Value="#2E2E2E" />
-            <Setter Property="BorderBrush" Value="#404040" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Padding" Value="8,4" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-        </Style>
-
-        <Style x:Key="MetaText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#D7D7D7" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        </Style>
-    </UserControl.Resources>
-
     <Border Margin="0,20,0,14"
             Background="#272727"
             BorderBrush="#3A3A3A"
@@ -114,7 +39,7 @@
                     <TextBlock Grid.Column="1" Style="{StaticResource PlaylistTitleText}" Text="Playlist" Margin="10,0,0,0" />
 
                     <Button Grid.Column="2"
-                            Style="{StaticResource RemovePlaylistButton}"
+                            Style="{StaticResource PlaylistRemoveButton}"
                             Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=20}"
                             Command="{Binding RemoveSelectedFromPlaylistCommand}"
                             ToolTip="Remove Selected / All from Playlist" />
@@ -125,7 +50,7 @@
                       dd:DragDrop.IsDragSource="True"
                       dd:DragDrop.IsDropTarget="True"
                       ItemsSource="{Binding PlayList}"
-                      Style="{StaticResource PlaylistList}"
+                      Style="{StaticResource PlaylistListView}"
                       SelectedIndex="{Binding SelectedIndex}"
                       SelectedItem="{Binding SelectedSong}"
                       utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding PlaylistSelectionAddedCommand}"
@@ -162,17 +87,17 @@
                                                            utils:FlowingTextBehavior.IsEnabled="True" />
 
                             <WrapPanel Grid.Row="2" VerticalAlignment="Center">
-                                <Border Style="{StaticResource MetaBadge}">
-                                    <TextBlock Style="{StaticResource MetaText}" Text="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}" />
+                                <Border Style="{StaticResource ComponentMetaBadge}">
+                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}" />
                                 </Border>
-                                <Border Style="{StaticResource MetaBadge}">
-                                    <TextBlock Style="{StaticResource MetaText}" Text="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}" />
+                                <Border Style="{StaticResource ComponentMetaBadge}">
+                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}" />
                                 </Border>
-                                <Border Style="{StaticResource MetaBadge}">
-                                    <TextBlock Style="{StaticResource MetaText}" Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}" />
+                                <Border Style="{StaticResource ComponentMetaBadge}">
+                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}" />
                                 </Border>
-                                <Border Style="{StaticResource MetaBadge}" Margin="0">
-                                    <TextBlock Style="{StaticResource MetaText}" Text="{Binding Genre, FallbackValue=Genre}" />
+                                <Border Style="{StaticResource ComponentMetaBadge}" Margin="0">
+                                    <TextBlock Style="{StaticResource ComponentMetaText}" Text="{Binding Genre, FallbackValue=Genre}" />
                                 </Border>
                             </WrapPanel>
                         </Grid>
