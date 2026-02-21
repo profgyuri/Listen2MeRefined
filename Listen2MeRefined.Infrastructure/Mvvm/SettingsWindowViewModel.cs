@@ -8,7 +8,8 @@ namespace Listen2MeRefined.Infrastructure.Mvvm;
 
 public sealed partial class SettingsWindowViewModel :
     ViewModelBase,
-    INotificationHandler<FolderBrowserNotification>
+    INotificationHandler<FolderBrowserNotification>,
+    INotificationHandler<PinnedFoldersChangedNotification>
 {
     private const int MinCornerTriggerSizePx = 4;
     private const int MaxCornerTriggerSizePx = 64;
@@ -57,6 +58,9 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _startMuted;
     [ObservableProperty] private bool _autoCheckUpdatesOnStartup = true;
     [ObservableProperty] private bool _autoScanOnFolderAdd = true;
+    [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
+    [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
+    [ObservableProperty] private string? _selectedPinnedFolder = "";
 
     public bool ScanOnStartup
     {
@@ -127,6 +131,8 @@ public sealed partial class SettingsWindowViewModel :
         StartMuted = settings.StartMuted;
         AutoCheckUpdatesOnStartup = settings.AutoCheckUpdatesOnStartup;
         AutoScanOnFolderAdd = settings.AutoScanOnFolderAdd;
+        FolderBrowserStartAtLastLocation = settings.FolderBrowserStartAtLastLocation;
+        ReloadPinnedFolders();
 
         await GetAudioOutputDevices();
         _isLoadingSettings = false;
@@ -300,6 +306,16 @@ public sealed partial class SettingsWindowViewModel :
         _settingsManager.SaveSettings(settings => settings.AutoScanOnFolderAdd = value);
     }
 
+    partial void OnFolderBrowserStartAtLastLocationChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsManager.SaveSettings(settings => settings.FolderBrowserStartAtLastLocation = value);
+    }
+
     [RelayCommand]
     private async Task RemoveFolder()
     {
@@ -313,6 +329,35 @@ public sealed partial class SettingsWindowViewModel :
         await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
         _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
         _logger.Verbose("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
+    }
+
+    [RelayCommand]
+    private void RemovePinnedFolder()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedPinnedFolder))
+        {
+            return;
+        }
+
+        PinnedFolders.Remove(SelectedPinnedFolder);
+        PersistPinnedFolders();
+    }
+
+    [RelayCommand]
+    private void ClearInvalidPins()
+    {
+        var cleanedPinnedFolders = PinnedFolders
+            .Where(Directory.Exists)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        PinnedFolders.Clear();
+        foreach (var pinnedFolder in cleanedPinnedFolders)
+        {
+            PinnedFolders.Add(pinnedFolder);
+        }
+
+        PersistPinnedFolders();
     }
 
     [RelayCommand]
@@ -448,6 +493,30 @@ public sealed partial class SettingsWindowViewModel :
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
 
+    private void PersistPinnedFolders()
+    {
+        var pinnedFolders = PinnedFolders
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        _settingsManager.SaveSettings(settings => settings.PinnedFolders = pinnedFolders);
+    }
+
+    private void ReloadPinnedFolders()
+    {
+        var pinnedFolders = _settingsManager.Settings.PinnedFolders
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        PinnedFolders.Clear();
+        foreach (var pinnedFolder in pinnedFolders)
+        {
+            PinnedFolders.Add(pinnedFolder);
+        }
+    }
+
     private async Task SyncGlobalHookRegistrationAsync()
     {
         if (_isSyncingGlobalHookState)
@@ -504,5 +573,14 @@ public sealed partial class SettingsWindowViewModel :
         _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
         await _folderScanner.ScanAsync(path);
         _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
+    }
+
+    public async Task Handle(
+        PinnedFoldersChangedNotification notification,
+        CancellationToken cancellationToken)
+    {
+        ReloadPinnedFolders();
+
+        await Task.CompletedTask;
     }
 }

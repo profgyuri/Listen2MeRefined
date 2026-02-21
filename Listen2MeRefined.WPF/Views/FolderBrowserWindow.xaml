@@ -10,10 +10,11 @@
         d:DataContext="{d:DesignInstance vm:FolderBrowserViewModel}"
         Style="{StaticResource BasicWindow}"
         Title="Folder Browser"
-        Height="440"
-        Width="640"
-        MinHeight="400"
-        MinWidth="580">
+        Height="520"
+        Width="860"
+        MinHeight="470"
+        MinWidth="760"
+        PreviewKeyDown="Window_PreviewKeyDown">
 
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
@@ -97,6 +98,13 @@
             </Setter>
         </Style>
 
+        <Style x:Key="SectionTitleText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+
         <Style x:Key="FolderList" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
@@ -117,7 +125,6 @@
                                             Background="{TemplateBinding Background}"
                                             BorderBrush="{TemplateBinding BorderBrush}"
                                             BorderThickness="{TemplateBinding BorderThickness}"
-                                            CornerRadius="0"
                                             Padding="8,5">
                                         <ContentPresenter />
                                     </Border>
@@ -129,7 +136,6 @@
                                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
                                             <Setter TargetName="ItemBorder" Property="Background" Value="#323232" />
                                             <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1" />
-                                            <Setter TargetName="ItemBorder" Property="CornerRadius" Value="4" />
                                             <Setter Property="Margin" Value="0,1,0,1" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
@@ -188,8 +194,7 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="0"
-                            Grid.ColumnSpan="3"
+                    <Border Grid.Column="1"
                             WindowChrome.IsHitTestVisibleInChrome="False"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -211,16 +216,13 @@
                         </StackPanel>
                     </Border>
 
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center">
-                        <Button Style="{StaticResource CloseTitleActionButton}"
-                                Content="{materialDesign:PackIcon Kind=Close,Size=15}"
-                                Click="CancelButton_Click" />
-                    </StackPanel>
+                    <Button Grid.Column="2"
+                            Style="{StaticResource CloseTitleActionButton}"
+                            Content="{materialDesign:PackIcon Kind=Close,Size=15}"
+                            Click="CancelButton_Click" />
                 </Grid>
             </Border>
+
             <Border Grid.Row="1"
                     Margin="10,10,10,0"
                     Background="#272727"
@@ -229,112 +231,198 @@
                     CornerRadius="12"
                     Padding="10">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="10" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="10" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                    <Border Grid.Row="0"
+                    <Border Grid.Column="0"
                             Background="#232323"
                             BorderBrush="#393939"
                             BorderThickness="1"
                             CornerRadius="10"
-                            Padding="10,8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                            Padding="8">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SectionTitleText}" Text="Pinned" />
+                                <ListView Height="180"
+                                          ItemsSource="{Binding PinnedFolders}"
+                                          SelectedItem="{Binding SelectedPinnedFolder}"
+                                          Style="{StaticResource FolderList}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                       Foreground="{StaticResource SecondaryBrush}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDoubleClick">
+                                            <i:InvokeCommandAction Command="{Binding SelectPinnedFolderCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ListView>
 
-                            <Border Width="24"
-                                    Height="24"
-                                    Background="{StaticResource TertiaryBrush}"
-                                    CornerRadius="12"
-                                    VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="FolderSearchOutline"
-                                                         Width="14"
-                                                         Height="14"
-                                                         Foreground="#1F1F1F"
-                                                         HorizontalAlignment="Center"
-                                                         VerticalAlignment="Center" />
+                                <TextBlock Style="{StaticResource SectionTitleText}" Margin="0,10,0,6" Text="Drives" />
+                                <ListView Height="130"
+                                          ItemsSource="{Binding Drives}"
+                                          SelectedItem="{Binding SelectedDrive}"
+                                          Style="{StaticResource FolderList}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="{StaticResource SecondaryBrush}" />
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDoubleClick">
+                                            <i:InvokeCommandAction Command="{Binding SelectDriveCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ListView>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            Background="#232323"
+                            BorderBrush="#393939"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Foreground="{StaticResource SecondaryBrush}" FontSize="14" FontWeight="SemiBold" Text="Navigate To Folder" />
+                                    <TextBlock Foreground="#A8A8A8" FontSize="11" Text="Right/Enter opens, Left goes parent, Ctrl+L focuses path." />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                           VerticalAlignment="Center"
+                                           Foreground="#A8A8A8"
+                                           FontSize="11"
+                                           Text="{Binding Folders.Count, StringFormat={}{0} items}" />
+                            </Grid>
+
+                            <TextBox x:Name="FilterTextBox"
+                                     Grid.Row="2"
+                                     materialDesign:HintAssist.Hint="Filter current view..."
+                                     materialDesign:HintAssist.Foreground="#9A9A9A"
+                                     Foreground="{StaticResource SecondaryBrush}"
+                                     Background="#2A2A2A"
+                                     BorderBrush="#3D3D3D"
+                                     BorderThickness="1"
+                                     Padding="10,0"
+                                     Height="34"
+                                     VerticalContentAlignment="Center"
+                                     Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <Border Grid.Row="4"
+                                    Background="#262626"
+                                    BorderBrush="#3D3D3D"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="4">
+                                <ListView x:Name="FolderList"
+                                          ItemsSource="{Binding Folders}"
+                                          SelectedItem="{Binding SelectedFolder, Mode=TwoWay}"
+                                          Style="{StaticResource FolderList}">
+                                    <ListView.InputBindings>
+                                        <KeyBinding Key="Return" Command="{Binding NavigateIntoSelectedCommand}" />
+                                        <KeyBinding Key="Right" Command="{Binding NavigateIntoSelectedCommand}" />
+                                        <KeyBinding Key="Left" Command="{Binding NavigateParentCommand}" />
+                                        <KeyBinding Key="Back" Command="{Binding NavigateParentCommand}" />
+                                    </ListView.InputBindings>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <materialDesign:PackIcon Kind="FolderOutline"
+                                                                         Width="14"
+                                                                         Height="14"
+                                                                         Margin="0,0,8,0"
+                                                                         VerticalAlignment="Center"
+                                                                         Foreground="#AAAAAA" />
+                                                <TextBlock Grid.Column="1"
+                                                           Text="{Binding}"
+                                                           Foreground="{StaticResource SecondaryBrush}"
+                                                           VerticalAlignment="Center"
+                                                           TextTrimming="CharacterEllipsis" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseDoubleClick">
+                                            <i:InvokeCommandAction Command="{Binding NavigateIntoSelectedCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ListView>
                             </Border>
 
-                            <StackPanel Grid.Column="1"
-                                        Margin="10,0,0,0"
-                                        VerticalAlignment="Center">
-                                <TextBlock Foreground="{StaticResource SecondaryBrush}" FontSize="14" FontWeight="SemiBold" Text="Select Music Folder" />
-                                <TextBlock Foreground="#A8A8A8" FontSize="11" Text="Double-click to open directories, Enter to navigate." />
-                            </StackPanel>
+                            <Grid Grid.Row="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0"
+                                        Background="#2A2A2A"
+                                        BorderBrush="#3D3D3D"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="10,0">
+                                    <TextBox x:Name="PathTextBox"
+                                             materialDesign:HintAssist.Hint="Full path"
+                                             materialDesign:HintAssist.Foreground="#9A9A9A"
+                                             Foreground="{StaticResource SecondaryBrush}"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             Height="36"
+                                             VerticalContentAlignment="Center"
+                                             Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding GoToPathCommand}" />
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                </Border>
+                                <Button Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        Content="Go"
+                                        Command="{Binding GoToPathCommand}"
+                                        Style="{StaticResource ActionButton}"
+                                        MinWidth="78" />
+                                <Button Grid.Column="2"
+                                        Margin="8,0,0,0"
+                                        Content="Pin Current"
+                                        Command="{Binding TogglePinCommand}"
+                                        Style="{StaticResource ActionButton}"
+                                        MinWidth="108" />
+                            </Grid>
 
-                            <TextBlock Grid.Column="2"
-                                       Foreground="#A8A8A8"
+                            <TextBlock Grid.Row="7"
+                                       Margin="4,6,0,0"
+                                       Foreground="#E2A4A4"
                                        FontSize="11"
-                                       VerticalAlignment="Center"
-                                       Text="{Binding Folders.Count, StringFormat={}{0} items}" />
+                                       Text="{Binding ValidationMessage}"
+                                       Visibility="{Binding HasValidationError, Converter={StaticResource BoolToVisibilityConverter}}" />
                         </Grid>
-                    </Border>
-
-                    <Border Grid.Row="2"
-                            Background="#232323"
-                            BorderBrush="#393939"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            Padding="4">
-                        <ListView x:Name="FolderList"
-                                  ItemsSource="{Binding Folders}"
-                                  SelectedItem="{Binding SelectedFolder}"
-                                  Style="{StaticResource FolderList}">
-                            <ListView.InputBindings>
-                                <KeyBinding Key="Return" Command="{Binding ChangeDirectoryCommand}" />
-                            </ListView.InputBindings>
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-
-                                        <materialDesign:PackIcon Kind="FolderOutline"
-                                                                 Width="14"
-                                                                 Height="14"
-                                                                 Margin="0,0,8,0"
-                                                                 VerticalAlignment="Center"
-                                                                 Foreground="#AAAAAA" />
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding}"
-                                                   Foreground="{StaticResource SecondaryBrush}"
-                                                   VerticalAlignment="Center"
-                                                   TextTrimming="CharacterEllipsis" />
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="MouseDoubleClick">
-                                    <i:InvokeCommandAction Command="{Binding ChangeDirectoryCommand}" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ListView>
-                    </Border>
-
-                    <Border Grid.Row="4"
-                            Background="#232323"
-                            BorderBrush="#3D3D3D"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            Padding="10,0">
-                        <TextBox materialDesign:HintAssist.Hint="Full path:"
-                                 materialDesign:HintAssist.Foreground="#9A9A9A"
-                                 Foreground="{StaticResource SecondaryBrush}"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 Height="36"
-                                 VerticalContentAlignment="Center"
-                                 Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Border>
                 </Grid>
             </Border>
@@ -356,20 +444,14 @@
                     <TextBlock Foreground="#A8A8A8"
                                FontSize="11"
                                VerticalAlignment="Center"
-                               Text="Select confirms and saves the selection." />
+                               Text="Enter/Right to open folder. Left to go back. Select adds folder to library." />
 
-                    <Button Grid.Column="1"
+                    <Button x:Name="SelectButton"
+                            Grid.Column="1"
                             Content="Select"
-                            Command="{Binding HandleSelectedPathCommand}"
                             Style="{StaticResource ActionButton}"
-                            MinWidth="110">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <i:CallMethodAction MethodName="Close"
-                                                    TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </Button>
+                            MinWidth="110"
+                            Click="SelectButton_Click" />
 
                     <Button x:Name="CancelButton"
                             Grid.Column="2"

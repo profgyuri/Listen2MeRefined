@@ -463,6 +463,68 @@
                                                 ToolTip="Scan all configured folders now" />
                                     </StackPanel>
                                 </Border>
+
+                                <Border Style="{StaticResource SectionCard}">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource SectionHeaderStyle}" Text="Folder Browser Speed" />
+                                        <TextBlock Style="{StaticResource SectionDescriptionStyle}"
+                                                   Margin="0,0,0,10"
+                                                   Text="Tune how quickly the folder browser returns to common locations." />
+
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="220" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Start location:" />
+                                            <CheckBox Grid.Column="1"
+                                                      IsChecked="{Binding FolderBrowserStartAtLastLocation}"
+                                                      Content="Open browser at the last browsed folder when possible" />
+                                        </Grid>
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="120" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Style="{StaticResource FieldLabelStyle}" Text="Pinned folders" />
+                                            <ListView Grid.Row="1"
+                                                      Height="120"
+                                                      Margin="0,6,0,8"
+                                                      Style="{StaticResource VirtualizedListView}"
+                                                      ItemsSource="{Binding PinnedFolders}"
+                                                      SelectedItem="{Binding SelectedPinnedFolder}">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}"
+                                                                   Foreground="{StaticResource SecondaryBrush}"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                                <Button Style="{StaticResource ActionButton}"
+                                                        MinWidth="110"
+                                                        Content="Remove Pin"
+                                                        Command="{Binding RemovePinnedFolderCommand}" />
+                                                <Button Style="{StaticResource ActionButton}"
+                                                        MinWidth="130"
+                                                        Margin="8,0,0,0"
+                                                        Content="Clear Invalid Pins"
+                                                        Command="{Binding ClearInvalidPinsCommand}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using Listen2MeRefined.Infrastructure.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Data;
@@ -20,4 +22,29 @@ public sealed class AppSettings : Settings
     public bool StartMuted { get; set; }
     public bool AutoCheckUpdatesOnStartup { get; set; } = true;
     public bool AutoScanOnFolderAdd { get; set; } = true;
+    public string LastBrowsedFolder { get; set; } = "";
+    public bool FolderBrowserStartAtLastLocation { get; set; } = true;
+    public string PinnedFoldersJson { get; set; } = "[]";
+
+    [NotMapped]
+    public List<string> PinnedFolders
+    {
+        get => Deserialize(PinnedFoldersJson);
+        set => PinnedFoldersJson = Serialize(value);
+    }
+
+    private static string Serialize(List<string>? paths)
+    {
+        return JsonSerializer.Serialize(paths ?? new List<string>());
+    }
+
+    private static List<string> Deserialize(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return new List<string>();
+        }
+
+        return JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
+    }
 }

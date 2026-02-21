@@ -12,4 +12,39 @@ public sealed class FolderBrowser : IFolderBrowser
         return Directory.GetDirectories(path)
             .Select(x => new DirectoryInfo(x).Name);
     }
+
+    public IEnumerable<string> GetSubFoldersSafe(string path)
+    {
+        try
+        {
+            return GetSubFolders(path);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Enumerable.Empty<string>();
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return Enumerable.Empty<string>();
+        }
+        catch (IOException)
+        {
+            return Enumerable.Empty<string>();
+        }
+    }
+
+    public bool DirectoryExists(string path)
+    {
+        return !string.IsNullOrWhiteSpace(path) && Directory.Exists(path);
+    }
+
+    public string? GetParent(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return null;
+        }
+
+        return Directory.GetParent(path)?.FullName;
+    }
 }
