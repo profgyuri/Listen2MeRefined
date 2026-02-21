@@ -29,6 +29,19 @@ Use `-c Release` for production-like validation.
 - Keep classes focused; one primary responsibility per class.
 - Run formatter before PRs: `dotnet format`.
 
+## ViewModel Contract Reuse Rules
+- For ViewModel logic, prefer reusable contracts from `Listen2MeRefined.Infrastructure/Services/Contracts/` before adding new VM-local logic.
+- Keep UI-bound state/properties in ViewModels, but delegate reusable/non-UI behavior to contract-backed services.
+- Reuse existing contracts whenever applicable across multiple ViewModels or services; only add new contracts when no existing contract fits cleanly.
+- When introducing behavior in a ViewModel, first check these contracts and implementations:
+  - `IAppSettingsReadService`, `IAppSettingsWriteService`
+  - `IAppUpdateCheckService`
+  - `IGlobalHookSettingsSyncService`
+  - `IFolderNavigationService`, `IPinnedFoldersService`
+  - `IAdvancedSearchCriteriaService`, `IAudioSearchExecutionService`
+  - `IPlaybackDefaultsService`, `IWindowPositionPolicyService`
+- Register any new contract implementations through DI modules (currently `Listen2MeRefined.WPF/Dependency/Modules/UtilsModule.cs`) and inject interfaces, not concrete types.
+
 ## UI Reuse Rules (WPF)
 - Prefer reusable components from `Listen2MeRefined.WPF/Views/Components/` when building or updating UI.
 - Use existing components first: `TitleBar`, `SectionHeader`, `WindowFooterBar`, `LabeledSliderRow`, `MetaBadgeRow`, `FormFieldRow`.
