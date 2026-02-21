@@ -139,6 +139,7 @@
                                                                  LabelWidth="200">
                                             <components:FormFieldRow.FieldContent>
                                                 <ComboBox Style="{StaticResource CustomComboBox}"
+                                                          Foreground="{StaticResource SecondaryBrush}"
                                                           SelectedItem="{Binding SelectedAudioOutputDevice}"
                                                           ItemsSource="{Binding AudioOutputDevices}">
                                                     <ComboBox.ItemTemplate>

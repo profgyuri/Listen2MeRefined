@@ -34,6 +34,7 @@
         <Setter Property="Padding" Value="5" />
         <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="ItemContainerStyle" Value="{DynamicResource CustomComboBoxItem}" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
@@ -41,6 +42,113 @@
                         VirtualizingPanel.ScrollUnit="Item"
                         VirtualizingPanel.VirtualizationMode="Recycling" />
                 </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="CustomComboBoxItem" TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Background" Value="#2E2E2E" />
+        <Setter Property="BorderBrush" Value="#3C3C3C" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border x:Name="ItemBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="Left"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#353535" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#353535" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#3A2F27" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#3A2F27" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="18" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="CheckBorder"
+                                Grid.Column="0"
+                                Width="18"
+                                Height="18"
+                                CornerRadius="3"
+                                BorderThickness="1"
+                                BorderBrush="#5A5A5A"
+                                Background="#2A2A2A"
+                                VerticalAlignment="Center" />
+                        <Path x:Name="CheckGlyph"
+                              Grid.Column="0"
+                              Width="10"
+                              Height="8"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"
+                              Data="M 0 4 L 3 7 L 10 0"
+                              Stroke="{StaticResource SecondaryBrush}"
+                              StrokeThickness="1.8"
+                              StrokeEndLineCap="Round"
+                              StrokeStartLineCap="Round"
+                              StrokeLineJoin="Round"
+                              Visibility="Collapsed" />
+                        <ContentPresenter Grid.Column="2"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="CheckBorder" Property="Background" Value="#313131" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="CheckBorder" Property="Background" Value="#272727" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                            <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="CheckBorder" Property="Opacity" Value="0.5" />
+                            <Setter TargetName="CheckGlyph" Property="Opacity" Value="0.55" />
+                            <Setter Property="Foreground" Value="#8A8A8A" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
