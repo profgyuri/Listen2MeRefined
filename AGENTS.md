@@ -29,6 +29,14 @@ Use `-c Release` for production-like validation.
 - Keep classes focused; one primary responsibility per class.
 - Run formatter before PRs: `dotnet format`.
 
+## UI Reuse Rules (WPF)
+- Prefer reusable components from `Listen2MeRefined.WPF/Views/Components/` when building or updating UI.
+- Use existing components first: `TitleBar`, `SectionHeader`, `WindowFooterBar`, `LabeledSliderRow`, `MetaBadgeRow`, `FormFieldRow`.
+- Do not add local `<Style>`, `<ControlTemplate>`, or local resource dictionaries in view/component XAML files.
+- Keep shared styles in `Listen2MeRefined.WPF/Styles/ComponentStyles.xaml` or `Listen2MeRefined.WPF/Styles/ControlStyles.xaml`.
+- In view XAML, keep only structure/layout and bindings (for example grid placement, row/column definitions, commands, and data bindings).
+- If a visual property is VM-bound and there is no clear/simple style-based alternative, it may remain local.
+
 ## Testing Guidelines
 - Use the existing .NET test framework in this repo (commonly xUnit/NUnit/MSTest).
 - Mirror production namespaces in test folders.
