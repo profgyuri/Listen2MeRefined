@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /.dotnet-cli/.dotnet
 /Listen2MeRefined.Infrastructure/.dotnet-cli/.dotnet
 /Listen2MeRefined.Infrastructure/listentome.db
+/coveragereport

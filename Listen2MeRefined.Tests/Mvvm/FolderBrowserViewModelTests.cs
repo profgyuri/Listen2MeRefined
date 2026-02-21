@@ -1,6 +1,7 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using MediatR;
@@ -146,11 +147,18 @@ public sealed class FolderBrowserViewModelTests
         mediator.Setup(x => x.Publish(It.IsAny<PinnedFoldersChangedNotification>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
+        var settingsReadService = new AppSettingsReadService(settingsManager.Object);
+        var settingsWriteService = new AppSettingsWriteService(settingsManager.Object);
+        var folderNavigationService = new FolderNavigationService(folderBrowser);
+        var pinnedFoldersService = new PinnedFoldersService(folderBrowser);
+
         return new FolderBrowserViewModel(
             Mock.Of<ILogger>(),
-            folderBrowser,
             mediator.Object,
-            settingsManager.Object);
+            folderNavigationService,
+            pinnedFoldersService,
+            settingsReadService,
+            settingsWriteService);
     }
 
     private sealed class FakeFolderBrowser(

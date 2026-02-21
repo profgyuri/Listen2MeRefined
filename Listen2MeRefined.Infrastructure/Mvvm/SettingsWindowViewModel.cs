@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -19,17 +19,21 @@ public sealed partial class SettingsWindowViewModel :
     private const int MaxStartupVolumePercent = 100;
 
     private readonly ILogger _logger;
-    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IRepository<AudioModel> _audioRepository;
     private readonly IRepository<MusicFolderModel> _musicFolderRepository;
     private readonly IRepository<PlaylistModel> _playlistRepository;
     private readonly IFolderScanner _folderScanner;
     private readonly IMediator _mediator;
     private readonly FontFamilies _installedFontFamilies;
-    private readonly IVersionChecker _versionChecker;
     private readonly IFromFolderRemover _fromFolderRemover;
     private readonly IOutputDevice _outputDevice;
-    private readonly IGlobalHook _globalHook;
+    private readonly IVersionChecker _versionChecker;
+    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAppSettingsWriteService _settingsWriteService;
+    private readonly IAppUpdateCheckService _appUpdateCheckService;
+    private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
+    private readonly IPinnedFoldersService _pinnedFoldersService;
+    private readonly IPlaybackDefaultsService _playbackDefaultsService;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -64,10 +68,10 @@ public sealed partial class SettingsWindowViewModel :
 
     public bool ScanOnStartup
     {
-        get => _settingsManager.Settings.ScanOnStartup;
+        get => _settingsReadService.GetScanOnStartup();
         set
         {
-            _settingsManager.SaveSettings(s => s.ScanOnStartup = value);
+            _settingsWriteService.SetScanOnStartup(value);
             OnPropertyChanged();
             OnPropertyChanged(nameof(DontScanOnStartup));
         }
@@ -77,30 +81,38 @@ public sealed partial class SettingsWindowViewModel :
 
     public SettingsWindowViewModel(
         ILogger logger,
-        ISettingsManager<AppSettings> settingsManager,
         IRepository<AudioModel> audioRepository,
         IMediator mediator,
         FontFamilies installedFontFamilies,
         IRepository<MusicFolderModel> musicFolderRepository,
         IRepository<PlaylistModel> playlistRepository,
         IFolderScanner folderScanner,
-        IVersionChecker versionChecker,
         IFromFolderRemover fromFolderRemover,
         IOutputDevice outputDevice,
-        IGlobalHook globalHook)
+        IVersionChecker versionChecker,
+        IAppSettingsReadService settingsReadService,
+        IAppSettingsWriteService settingsWriteService,
+        IAppUpdateCheckService appUpdateCheckService,
+        IGlobalHookSettingsSyncService globalHookSettingsSyncService,
+        IPinnedFoldersService pinnedFoldersService,
+        IPlaybackDefaultsService playbackDefaultsService)
     {
         _logger = logger;
-        _settingsManager = settingsManager;
         _audioRepository = audioRepository;
         _mediator = mediator;
         _installedFontFamilies = installedFontFamilies;
         _musicFolderRepository = musicFolderRepository;
         _playlistRepository = playlistRepository;
         _folderScanner = folderScanner;
-        _versionChecker = versionChecker;
         _fromFolderRemover = fromFolderRemover;
         _outputDevice = outputDevice;
-        _globalHook = globalHook;
+        _versionChecker = versionChecker;
+        _settingsReadService = settingsReadService;
+        _settingsWriteService = settingsWriteService;
+        _appUpdateCheckService = appUpdateCheckService;
+        _globalHookSettingsSyncService = globalHookSettingsSyncService;
+        _pinnedFoldersService = pinnedFoldersService;
+        _playbackDefaultsService = playbackDefaultsService;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
     }
@@ -116,22 +128,24 @@ public sealed partial class SettingsWindowViewModel :
             "Always on top"
         };
 
-        var settings = _settingsManager.Settings;
-        Folders = new(settings.MusicFolders.Select(x => x.FullPath));
-        FontFamily = settings.FontFamily;
-        SelectedFontFamily = string.IsNullOrEmpty(settings.FontFamily) ? "Segoe UI" : settings.FontFamily;
-        SelectedNewSongWindowPosition = string.IsNullOrWhiteSpace(settings.NewSongWindowPosition)
+        Folders = new(_settingsReadService.GetMusicFolders());
+        var selectedFont = _settingsReadService.GetFontFamily();
+        FontFamily = selectedFont;
+        SelectedFontFamily = string.IsNullOrEmpty(selectedFont) ? "Segoe UI" : selectedFont;
+
+        var selectedWindowPosition = _settingsReadService.GetNewSongWindowPosition();
+        SelectedNewSongWindowPosition = string.IsNullOrWhiteSpace(selectedWindowPosition)
             ? "Default"
-            : settings.NewSongWindowPosition;
-        EnableGlobalMediaKeys = settings.EnableGlobalMediaKeys;
-        EnableCornerNowPlayingPopup = settings.EnableCornerNowPlayingPopup;
-        CornerTriggerSizePx = Math.Clamp((int)settings.CornerTriggerSizePx, MinCornerTriggerSizePx, MaxCornerTriggerSizePx);
-        CornerTriggerDebounceMs = Math.Clamp((int)settings.CornerTriggerDebounceMs, MinCornerDebounceMs, MaxCornerDebounceMs);
-        StartupVolumePercent = (int)Math.Round(Math.Clamp(settings.StartupVolume, 0f, 1f) * 100);
-        StartMuted = settings.StartMuted;
-        AutoCheckUpdatesOnStartup = settings.AutoCheckUpdatesOnStartup;
-        AutoScanOnFolderAdd = settings.AutoScanOnFolderAdd;
-        FolderBrowserStartAtLastLocation = settings.FolderBrowserStartAtLastLocation;
+            : selectedWindowPosition;
+        EnableGlobalMediaKeys = _settingsReadService.GetEnableGlobalMediaKeys();
+        EnableCornerNowPlayingPopup = _settingsReadService.GetEnableCornerNowPlayingPopup();
+        CornerTriggerSizePx = Math.Clamp((int)_settingsReadService.GetCornerTriggerSizePx(), MinCornerTriggerSizePx, MaxCornerTriggerSizePx);
+        CornerTriggerDebounceMs = Math.Clamp((int)_settingsReadService.GetCornerTriggerDebounceMs(), MinCornerDebounceMs, MaxCornerDebounceMs);
+        StartupVolumePercent = _playbackDefaultsService.ToVolumePercent(_settingsReadService.GetStartupVolume());
+        StartMuted = _settingsReadService.GetStartMuted();
+        AutoCheckUpdatesOnStartup = _settingsReadService.GetAutoCheckUpdatesOnStartup();
+        AutoScanOnFolderAdd = _settingsReadService.GetAutoScanOnFolderAdd();
+        FolderBrowserStartAtLastLocation = _settingsReadService.GetFolderBrowserStartAtLastLocation();
         ReloadPinnedFolders();
 
         await GetAudioOutputDevices();
@@ -158,7 +172,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Font family changed to: {FontFamily}", value);
-        _settingsManager.SaveSettings(s => s.FontFamily = value);
+        _settingsWriteService.SetFontFamily(value);
         _ = _mediator.Publish(new FontFamilyChangedNotification(value));
     }
 
@@ -170,7 +184,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Audio output device changed to: {DeviceName}", value.Name);
-        _settingsManager.SaveSettings(x => x.AudioOutputDeviceName = value.Name);
+        _settingsWriteService.SetAudioOutputDeviceName(value.Name);
         _ = _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
 
@@ -182,7 +196,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] New song window position changed to: {Position}", value);
-        _settingsManager.SaveSettings(x => x.NewSongWindowPosition = value);
+        _settingsWriteService.SetNewSongWindowPosition(value);
         _ = _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
     }
 
@@ -193,7 +207,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.EnableGlobalMediaKeys = value);
+        _settingsWriteService.SetEnableGlobalMediaKeys(value);
         _ = SyncGlobalHookRegistrationAsync();
     }
 
@@ -204,7 +218,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.EnableCornerNowPlayingPopup = value);
+        _settingsWriteService.SetEnableCornerNowPlayingPopup(value);
         _ = SyncGlobalHookRegistrationAsync();
     }
 
@@ -222,7 +236,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.CornerTriggerSizePx = (short)clamped);
+        _settingsWriteService.SetCornerTriggerSizePx((short)clamped);
     }
 
     partial void OnCornerTriggerDebounceMsChanged(int value)
@@ -239,7 +253,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.CornerTriggerDebounceMs = (short)clamped);
+        _settingsWriteService.SetCornerTriggerDebounceMs((short)clamped);
     }
 
     partial void OnStartupVolumePercentChanged(int value)
@@ -256,15 +270,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings =>
-        {
-            settings.StartupVolume = clamped / 100f;
-            if (clamped > 0)
-            {
-                settings.StartMuted = false;
-            }
-        });
-
+        _settingsWriteService.SetStartupVolume(_playbackDefaultsService.FromVolumePercent(clamped));
         if (clamped > 0 && StartMuted)
         {
             StartMuted = false;
@@ -278,7 +284,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.StartMuted = value);
+        _settingsWriteService.SetStartMuted(value);
     }
 
     partial void OnAutoCheckUpdatesOnStartupChanged(bool value)
@@ -288,7 +294,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.AutoCheckUpdatesOnStartup = value);
+        _settingsWriteService.SetAutoCheckUpdatesOnStartup(value);
         if (!value)
         {
             UpdateAvailableText = "Automatic update checks are disabled.";
@@ -303,7 +309,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.AutoScanOnFolderAdd = value);
+        _settingsWriteService.SetAutoScanOnFolderAdd(value);
     }
 
     partial void OnFolderBrowserStartAtLastLocationChanged(bool value)
@@ -313,7 +319,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsManager.SaveSettings(settings => settings.FolderBrowserStartAtLastLocation = value);
+        _settingsWriteService.SetFolderBrowserStartAtLastLocation(value);
     }
 
     [RelayCommand]
@@ -327,7 +333,7 @@ public sealed partial class SettingsWindowViewModel :
         _logger.Information("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
         Folders.Remove(SelectedFolder);
         await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
-        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
+        _settingsWriteService.SetMusicFolders(Folders);
         _logger.Verbose("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
     }
 
@@ -346,10 +352,7 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private void ClearInvalidPins()
     {
-        var cleanedPinnedFolders = PinnedFolders
-            .Where(Directory.Exists)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var cleanedPinnedFolders = _pinnedFoldersService.NormalizeExisting(PinnedFolders);
 
         PinnedFolders.Clear();
         foreach (var pinnedFolder in cleanedPinnedFolders)
@@ -384,7 +387,7 @@ public sealed partial class SettingsWindowViewModel :
                 _secondsToCancelClear = 5;
                 CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
-                _settingsManager.SaveSettings(x => x.MusicFolders = new());
+                _settingsWriteService.SetMusicFolders([]);
                 _logger.Debug("[SettingsWindowViewModel] Metadata cleared");
             }
 
@@ -429,24 +432,9 @@ public sealed partial class SettingsWindowViewModel :
 
     private async Task CheckForUpdatesAsync()
     {
-        try
-        {
-            if (await _versionChecker.IsLatestAsync())
-            {
-                UpdateAvailableText = "You are using the latest version.";
-                IsUpdateButtonVisible = false;
-                return;
-            }
-
-            UpdateAvailableText = "A newer version is available.";
-            IsUpdateButtonVisible = true;
-        }
-        catch (Exception ex)
-        {
-            _logger.Warning(ex, "[SettingsWindowViewModel] Update check failed");
-            UpdateAvailableText = "Could not check for updates.";
-            IsUpdateButtonVisible = false;
-        }
+        var status = await _appUpdateCheckService.CheckForUpdatesAsync();
+        UpdateAvailableText = status.Message;
+        IsUpdateButtonVisible = status.CanOpenUpdateLink;
     }
 
     private async Task GetAudioOutputDevices()
@@ -479,7 +467,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         var selectedIndex = 0;
-        var savedName = _settingsManager.Settings.AudioOutputDeviceName;
+        var savedName = _settingsReadService.GetAudioOutputDeviceName();
         if (!string.IsNullOrEmpty(savedName))
         {
             var audioOutputDevice = AudioOutputDevices
@@ -495,20 +483,12 @@ public sealed partial class SettingsWindowViewModel :
 
     private void PersistPinnedFolders()
     {
-        var pinnedFolders = PinnedFolders
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        _settingsManager.SaveSettings(settings => settings.PinnedFolders = pinnedFolders);
+        _settingsWriteService.SetPinnedFolders(_pinnedFoldersService.Normalize(PinnedFolders));
     }
 
     private void ReloadPinnedFolders()
     {
-        var pinnedFolders = _settingsManager.Settings.PinnedFolders
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        var pinnedFolders = _pinnedFoldersService.Normalize(_settingsReadService.GetPinnedFolders());
 
         PinnedFolders.Clear();
         foreach (var pinnedFolder in pinnedFolders)
@@ -527,19 +507,7 @@ public sealed partial class SettingsWindowViewModel :
         _isSyncingGlobalHookState = true;
         try
         {
-            var shouldEnableGlobalHook = EnableGlobalMediaKeys || EnableCornerNowPlayingPopup;
-            if (shouldEnableGlobalHook)
-            {
-                await _globalHook.RegisterAsync();
-            }
-            else
-            {
-                _globalHook.Unregister();
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "[SettingsWindowViewModel] Failed to synchronize global hook state");
+            await _globalHookSettingsSyncService.SyncAsync(EnableGlobalMediaKeys, EnableCornerNowPlayingPopup);
         }
         finally
         {
@@ -562,7 +530,7 @@ public sealed partial class SettingsWindowViewModel :
 
         _logger.Information("[SettingsWindowViewModel] Adding path to music folders: {Path}", path);
         Folders.Add(path);
-        _settingsManager.SaveSettings(s => s.MusicFolders = Folders.Select(x => new MusicFolderModel(x)).ToList());
+        _settingsWriteService.SetMusicFolders(Folders);
 
         if (!AutoScanOnFolderAdd)
         {
@@ -579,7 +547,9 @@ public sealed partial class SettingsWindowViewModel :
         PinnedFoldersChangedNotification notification,
         CancellationToken cancellationToken)
     {
-        ReloadPinnedFolders();
+        var pinnedFolders = _pinnedFoldersService.Normalize(notification.PinnedFolders);
+        PinnedFolders = new ObservableCollection<string>(pinnedFolders);
+        _settingsWriteService.SetPinnedFolders(pinnedFolders);
 
         await Task.CompletedTask;
     }

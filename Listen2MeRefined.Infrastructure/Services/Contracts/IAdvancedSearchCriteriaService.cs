@@ -1,0 +1,21 @@
+using Listen2MeRefined.Infrastructure.Services.Models;
+using Listen2MeRefined.Infrastructure.Mvvm;
+
+namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+
+/// <summary>
+/// Provides metadata and validation logic for advanced-search criteria.
+/// </summary>
+public interface IAdvancedSearchCriteriaService
+{
+    /// <summary>Gets searchable column names for advanced search.</summary>
+    IReadOnlyList<string> GetColumnNames();
+    /// <summary>Gets relation options and suffix text for a selected column.</summary>
+    SearchRelationDefinition GetRelationDefinition(string columnName);
+    /// <summary>Builds and validates a criterion from raw UI selections and input.</summary>
+    AdvancedCriteriaBuildResult BuildCriterion(string selectedColumnName, string selectedRelation, string inputText);
+    /// <summary>Determines whether the current raw values can form a valid criterion.</summary>
+    bool CanBuildCriterion(string selectedColumnName, string selectedRelation, string inputText);
+    /// <summary>Converts criteria records into executable advanced filters.</summary>
+    IReadOnlyList<AdvancedFilter> BuildFilters(IEnumerable<AdvancedSearchCriterion> criterias);
+}

@@ -5,6 +5,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using MediatR;
 using Moq;
 using Serilog;
@@ -84,7 +85,7 @@ public class ListsViewModelTests
     {
         var logger = new Mock<ILogger>();
         var mediator = new Mock<IMediator>();
-        var advancedReader = new Mock<IAdvancedDataReader<AdvancedFilter, AudioModel>>();
+        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
@@ -92,15 +93,15 @@ public class ListsViewModelTests
         var vm = new ListsViewModel(
             logger.Object,
             mediator.Object,
-            advancedReader.Object,
+            audioSearchExecutionService.Object,
             scanner.Object,
             playerController.Object,
             playlist);
 
-        bool? capturedMatchAll = null;
-        advancedReader
-            .Setup(x => x.ReadAsync(It.IsAny<IEnumerable<AdvancedFilter>>(), It.IsAny<bool>()))
-            .Callback<IEnumerable<AdvancedFilter>, bool>((_, matchAll) => capturedMatchAll = matchAll)
+        SearchMatchMode? capturedMatchMode = null;
+        audioSearchExecutionService
+            .Setup(x => x.ExecuteAdvancedSearchAsync(It.IsAny<IEnumerable<AdvancedFilter>>(), It.IsAny<SearchMatchMode>()))
+            .Callback<IEnumerable<AdvancedFilter>, SearchMatchMode>((_, mode) => capturedMatchMode = mode)
             .ReturnsAsync([]);
         mediator
             .Setup(x => x.Publish(It.IsAny<AdvancedSearchCompletedNotification>(), It.IsAny<CancellationToken>()))
@@ -112,7 +113,7 @@ public class ListsViewModelTests
                 SearchMatchMode.Any),
             CancellationToken.None);
 
-        Assert.False(capturedMatchAll);
+        Assert.Equal(SearchMatchMode.Any, capturedMatchMode);
         mediator.Verify(
             x => x.Publish(It.Is<AdvancedSearchCompletedNotification>(n => n.ResultCount == 0), It.IsAny<CancellationToken>()),
             Times.Once);
@@ -122,7 +123,7 @@ public class ListsViewModelTests
     {
         var logger = new Mock<ILogger>();
         var mediator = new Mock<IMediator>();
-        var advancedReader = new Mock<IAdvancedDataReader<AdvancedFilter, AudioModel>>();
+        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
         playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
@@ -130,7 +131,7 @@ public class ListsViewModelTests
         return new ListsViewModel(
             logger.Object,
             mediator.Object,
-            advancedReader.Object,
+            audioSearchExecutionService.Object,
             scanner.Object,
             playerController.Object,
             playlist);

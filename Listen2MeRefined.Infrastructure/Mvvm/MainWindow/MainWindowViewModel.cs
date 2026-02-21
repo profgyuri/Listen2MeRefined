@@ -1,22 +1,22 @@
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
-public sealed partial class MainWindowViewModel : 
+public sealed partial class MainWindowViewModel :
     ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<CurrentSongNotification>
 {
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
-    private readonly IVersionChecker _versionChecker;
-    private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IAppUpdateCheckService _appUpdateCheckService;
+    private readonly IAppSettingsReadService _settingsReadService;
     private readonly StartupManager _startupManager;
     private readonly IMainWindowNavigationService _navigationService;
-    
+
     public SearchbarViewModel SearchbarViewModel { get; }
     public PlayerControlsViewModel PlayerControlsViewModel { get; }
     public ListsViewModel ListsViewModel { get; }
@@ -30,6 +30,7 @@ public sealed partial class MainWindowViewModel :
         Genre = "Genre",
         Path = ""
     };
+
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
@@ -37,8 +38,8 @@ public sealed partial class MainWindowViewModel :
     public MainWindowViewModel(
         ILogger logger,
         IUiDispatcher ui,
-        IVersionChecker versionChecker,
-        ISettingsManager<AppSettings> settingsManager,
+        IAppUpdateCheckService appUpdateCheckService,
+        IAppSettingsReadService settingsReadService,
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
@@ -49,8 +50,8 @@ public sealed partial class MainWindowViewModel :
     {
         _logger = logger;
         _ui = ui;
-        _versionChecker = versionChecker;
-        _settingsManager = settingsManager;
+        _appUpdateCheckService = appUpdateCheckService;
+        _settingsReadService = settingsReadService;
         _startupManager = startupManager;
         _navigationService = navigationService;
 
@@ -66,22 +67,13 @@ public sealed partial class MainWindowViewModel :
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         _logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
-        if (_settingsManager.Settings.AutoCheckUpdatesOnStartup)
+        if (_settingsReadService.GetAutoCheckUpdatesOnStartup())
         {
-            try
-            {
-                _logger.Information("[MainWindowViewModel] Checking for latest version...");
+            _logger.Information("[MainWindowViewModel] Checking for latest version...");
+            var status = await _appUpdateCheckService.CheckForUpdatesAsync();
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
 
-                var isLatest = await _versionChecker.IsLatestAsync();
-                await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = !isLatest, ct);
-
-                _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
-            }
-            catch (Exception ex)
-            {
-                _logger.Warning($"[MainWindowViewModel] Version check failed: {ex}");
-                await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
-            }
+            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
         }
         else
         {
@@ -150,7 +142,7 @@ public sealed partial class MainWindowViewModel :
             CanNavigateToAuxiliaryWindows = true;
         }
     }
-    
+
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);

@@ -6,7 +6,9 @@ using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.Infrastructure.Versioning;
 using MediatR;
 using Moq;
@@ -76,24 +78,46 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             .Setup(x => x.SaveSettings(It.IsAny<Action<AppSettings>>()))
             .Callback<Action<AppSettings>>(apply => apply(settings));
 
+        var settingsReadService = new AppSettingsReadService(settingsManager.Object);
+        var settingsWriteService = new AppSettingsWriteService(settingsManager.Object);
+        var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
+
         var outputDevice = new Mock<IOutputDevice>();
         outputDevice.Setup(x => x.EnumerateOutputDevices()).Returns([]);
 
         var versionChecker = new Mock<IVersionChecker>();
         versionChecker.Setup(x => x.IsLatestAsync()).ReturnsAsync(true);
 
+        var updateCheckService = new Mock<IAppUpdateCheckService>();
+        updateCheckService
+            .Setup(x => x.CheckForUpdatesAsync())
+            .ReturnsAsync(new Listen2MeRefined.Infrastructure.Services.Models.AppUpdateCheckResult(
+                false,
+                "You are using the latest version.",
+                false));
+
+        var folderBrowser = new Mock<IFolderBrowser>();
+        folderBrowser
+            .Setup(x => x.DirectoryExists(It.IsAny<string>()))
+            .Returns<string>(Directory.Exists);
+        var pinnedFoldersService = new PinnedFoldersService(folderBrowser.Object);
+
         return new SettingsWindowViewModel(
             Mock.Of<ILogger>(),
-            settingsManager.Object,
             Mock.Of<IRepository<AudioModel>>(),
             Mock.Of<IMediator>(),
             new FontFamilies(["Segoe UI"]),
             Mock.Of<IRepository<MusicFolderModel>>(),
             Mock.Of<IRepository<PlaylistModel>>(),
             Mock.Of<IFolderScanner>(),
-            versionChecker.Object,
             Mock.Of<IFromFolderRemover>(),
             outputDevice.Object,
-            Mock.Of<IGlobalHook>());
+            versionChecker.Object,
+            settingsReadService,
+            settingsWriteService,
+            updateCheckService.Object,
+            Mock.Of<IGlobalHookSettingsSyncService>(),
+            pinnedFoldersService,
+            playbackDefaultsService);
     }
 }

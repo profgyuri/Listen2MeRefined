@@ -3,6 +3,7 @@ using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using Moq;
 using Serilog;
@@ -81,11 +82,12 @@ public class PlayerControlsViewModelTests
             .Callback<Action<AppSettings>>(action => action(settings));
 
         var timedTask = new TimedTask();
+        var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
         var viewModel = new PlayerControlsViewModel(
             logger,
             waveFormDrawer.Object,
             musicPlayer.Object,
-            settingsManager.Object,
+            playbackDefaultsService,
             timedTask);
 
         await viewModel.InitializeAsync();

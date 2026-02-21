@@ -1,6 +1,8 @@
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Versioning;
@@ -18,6 +20,37 @@ public class UtilsModule : Module
         builder
             .RegisterType<VersionChecker>()
             .As<IVersionChecker>();
+        
+        builder
+            .RegisterType<AppSettingsReadService>()
+            .As<IAppSettingsReadService>();
+        builder
+            .RegisterType<AppSettingsWriteService>()
+            .As<IAppSettingsWriteService>();
+        builder
+            .RegisterType<AppUpdateCheckService>()
+            .As<IAppUpdateCheckService>();
+        builder
+            .RegisterType<GlobalHookSettingsSyncService>()
+            .As<IGlobalHookSettingsSyncService>();
+        builder
+            .RegisterType<FolderNavigationService>()
+            .As<IFolderNavigationService>();
+        builder
+            .RegisterType<PinnedFoldersService>()
+            .As<IPinnedFoldersService>();
+        builder
+            .RegisterType<AdvancedSearchCriteriaService>()
+            .As<IAdvancedSearchCriteriaService>();
+        builder
+            .RegisterType<AudioSearchExecutionService>()
+            .As<IAudioSearchExecutionService>();
+        builder
+            .RegisterType<PlaybackDefaultsService>()
+            .As<IPlaybackDefaultsService>();
+        builder
+            .RegisterType<WindowPositionPolicyService>()
+            .As<IWindowPositionPolicyService>();
 
         builder
             .RegisterType<MainWindowNavigationService>()

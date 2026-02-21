@@ -1,7 +1,7 @@
-﻿using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
@@ -15,7 +15,7 @@ public partial class PlayerControlsViewModel :
     private readonly ILogger _logger;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IMusicPlayerController _musicPlayerController;
-    private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IPlaybackDefaultsService _playbackDefaultsService;
     private readonly TimedTask _timedTask;
     private bool _isMuted;
     private float _lastNonZeroVolume = 0.7f;
@@ -66,7 +66,7 @@ public partial class PlayerControlsViewModel :
                 SetMuted(true);
             }
 
-            PersistPlaybackDefaults(clampedValue, _isMuted);
+            _playbackDefaultsService.PersistPlaybackDefaults(clampedValue, _isMuted);
             OnPropertyChanged();
             OnPropertyChanged(nameof(VolumeIconKind));
         }
@@ -87,13 +87,13 @@ public partial class PlayerControlsViewModel :
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IMusicPlayerController musicPlayerController,
-        ISettingsManager<AppSettings> settingsManager,
+        IPlaybackDefaultsService playbackDefaultsService,
         TimedTask timedTask)
     {
         _logger = logger;
         _waveFormDrawer = waveFormDrawer;
         _musicPlayerController = musicPlayerController;
-        _settingsManager = settingsManager;
+        _playbackDefaultsService = playbackDefaultsService;
         _timedTask = timedTask;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
@@ -130,7 +130,7 @@ public partial class PlayerControlsViewModel :
             await DrawPlaceholderLineAsync();
         }), ct);
 
-           _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
+        _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
     }
 
     [RelayCommand]
@@ -176,7 +176,7 @@ public partial class PlayerControlsViewModel :
             var restoredVolume = _lastNonZeroVolume > VolumeEpsilon ? _lastNonZeroVolume : 0.7f;
             _musicPlayerController.Volume = restoredVolume;
             SetMuted(false);
-            PersistPlaybackDefaults(restoredVolume, isMuted: false);
+            _playbackDefaultsService.PersistPlaybackDefaults(restoredVolume, isMuted: false);
             OnPropertyChanged(nameof(Volume));
             OnPropertyChanged(nameof(VolumeIconKind));
             return;
@@ -190,16 +190,16 @@ public partial class PlayerControlsViewModel :
 
         _musicPlayerController.Volume = 0f;
         SetMuted(true);
-        PersistPlaybackDefaults(0f, isMuted: true);
+        _playbackDefaultsService.PersistPlaybackDefaults(0f, isMuted: true);
         OnPropertyChanged(nameof(Volume));
         OnPropertyChanged(nameof(VolumeIconKind));
     }
-    
+
     private async Task DrawPlaceholderLineAsync()
     {
         WaveForm = await _waveFormDrawer.LineAsync();
     }
-    
+
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
@@ -223,27 +223,15 @@ public partial class PlayerControlsViewModel :
 
     private void ApplyStartupPlaybackDefaults()
     {
-        var settings = _settingsManager.Settings;
-        var startupVolume = Math.Clamp(settings.StartupVolume, 0f, 1f);
+        var defaults = _playbackDefaultsService.LoadStartupDefaults();
+        var startupVolume = defaults.StartupVolume;
         if (startupVolume > VolumeEpsilon)
         {
             _lastNonZeroVolume = startupVolume;
         }
 
-        var startsMuted = settings.StartMuted;
+        var startsMuted = defaults.StartMuted;
         _musicPlayerController.Volume = startsMuted ? 0f : startupVolume;
         SetMuted(startsMuted || startupVolume <= VolumeEpsilon);
-    }
-
-    private void PersistPlaybackDefaults(float currentVolume, bool isMuted)
-    {
-        _settingsManager.SaveSettings(settings =>
-        {
-            settings.StartMuted = isMuted;
-            if (currentVolume > VolumeEpsilon)
-            {
-                settings.StartupVolume = currentVolume;
-            }
-        });
     }
 }

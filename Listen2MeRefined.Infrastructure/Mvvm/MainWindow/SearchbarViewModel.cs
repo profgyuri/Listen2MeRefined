@@ -1,14 +1,14 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
-using MediatR;
+using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
-public partial class SearchbarViewModel : 
+public partial class SearchbarViewModel :
     ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ILogger _logger;
-    private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IMediator _mediator;
 
     [ObservableProperty] private string _fontFamily = "";
@@ -16,11 +16,11 @@ public partial class SearchbarViewModel :
 
     public SearchbarViewModel(
         ILogger logger,
-        IRepository<AudioModel> audioRepository,
+        IAudioSearchExecutionService audioSearchExecutionService,
         IMediator mediator)
     {
         _logger = logger;
-        _audioRepository = audioRepository;
+        _audioSearchExecutionService = audioSearchExecutionService;
         _mediator = mediator;
 
         _logger.Debug("[SearchbarViewModel] initialized");
@@ -30,16 +30,7 @@ public partial class SearchbarViewModel :
     private async Task QuickSearch()
     {
         _logger.Information<string>("[SearchbarViewModel] Searching for \'{SearchTerm}\'", SearchTerm);
-        var results = string.IsNullOrEmpty(SearchTerm)
-                ? await _audioRepository.ReadAsync()
-                : await _audioRepository.ReadAsync(SearchTerm);
-
-        if (results is null)
-        {
-            return;
-        }
-
-        var result = results.ToArray();
+        var result = (await _audioSearchExecutionService.ExecuteQuickSearchAsync(SearchTerm)).ToArray();
         _logger.Information("[SearchbarViewModel] Found {ResultCount} results", result.Length);
         if (result.Length > 0)
         {

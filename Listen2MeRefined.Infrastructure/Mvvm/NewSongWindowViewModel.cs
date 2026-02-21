@@ -1,5 +1,5 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
@@ -17,14 +17,19 @@ public sealed partial class NewSongWindowViewModel :
         Path = ""
     };
 
-    private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IWindowPositionPolicyService _windowPositionPolicyService;
     private readonly ILogger _logger;
 
     public bool IsTopmost { get; set; }
 
-    public NewSongWindowViewModel(ISettingsManager<AppSettings> settingsManager, ILogger logger)
+    public NewSongWindowViewModel(
+        IAppSettingsReadService settingsReadService,
+        IWindowPositionPolicyService windowPositionPolicyService,
+        ILogger logger)
     {
-        _settingsManager = settingsManager;
+        _settingsReadService = settingsReadService;
+        _windowPositionPolicyService = windowPositionPolicyService;
         _logger = logger;
 
         _logger.Debug("[NewSongWindowViewModel] initialized");
@@ -32,7 +37,7 @@ public sealed partial class NewSongWindowViewModel :
 
     protected override Task InitializeCoreAsync(CancellationToken ct)
     {
-        IsTopmost = _settingsManager.Settings.NewSongWindowPosition == "Always on top";
+        IsTopmost = _windowPositionPolicyService.IsTopmost(_settingsReadService.GetNewSongWindowPosition());
 
         _logger.Debug("[NewSongWindowViewModel] Finished InitializeCoreAsync");
 
@@ -42,7 +47,7 @@ public sealed partial class NewSongWindowViewModel :
     public Task Handle(NewSongWindowPositionChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[NewSongWindowViewModel] Received NewSongWindowPositionChangedNotification: {Position}", notification.Position);
-        IsTopmost = notification.Position == "Always on top";
+        IsTopmost = _windowPositionPolicyService.IsTopmost(notification.Position);
         OnPropertyChanged(nameof(IsTopmost));
         return Task.CompletedTask;
     }

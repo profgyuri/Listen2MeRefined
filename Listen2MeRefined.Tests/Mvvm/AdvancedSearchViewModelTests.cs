@@ -2,6 +2,7 @@ using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Storage;
 using MediatR;
 using Moq;
@@ -91,12 +92,15 @@ public class AdvancedSearchViewModelTests
         var settings = new Mock<ISettingsManager<AppSettings>>();
         var ui = new Mock<IUiDispatcher>();
         settings.SetupGet(s => s.Settings).Returns(new AppSettings { FontFamily = "Segoe UI" });
+        var settingsReadService = new AppSettingsReadService(settings.Object);
+        var criteriaService = new AdvancedSearchCriteriaService();
 
         var vm = new AdvancedSearchViewModel(
             mediator.Object,
             logger.Object,
-            settings.Object,
-            ui.Object);
+            ui.Object,
+            settingsReadService,
+            criteriaService);
         await vm.InitializeAsync();
         return (vm, mediator);
     }

@@ -1,9 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Globalization;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
-using MediatR;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -14,11 +12,9 @@ public partial class AdvancedSearchViewModel :
 {
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
-    private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IUiDispatcher _ui;
-    private readonly List<string> _numericRelations = ["Is", "Is not", "Bigger than", "Less than"];
-    private readonly List<string> _timeRelations = ["Is", "Is not", "More than", "Less than"];
-    private readonly List<string> _stringRelations = ["Is", "Is not", "Contains", "Does not contain"];
+    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAdvancedSearchCriteriaService _criteriaService;
 
     [ObservableProperty] private string _fontFamily = string.Empty;
     [ObservableProperty] private List<string> _columnName = [];
@@ -40,25 +36,9 @@ public partial class AdvancedSearchViewModel :
         set
         {
             field = value;
-            switch (value)
-            {
-                case nameof(AudioModel.Length):
-                    Relation = _timeRelations;
-                    RangeSuffixText = "mm:ss or sec";
-                    break;
-                case nameof(AudioModel.Bitrate):
-                    Relation = _numericRelations;
-                    RangeSuffixText = "kbps";
-                    break;
-                case nameof(AudioModel.BPM):
-                    Relation = _numericRelations;
-                    RangeSuffixText = "bpm";
-                    break;
-                default:
-                    Relation = _stringRelations;
-                    RangeSuffixText = string.Empty;
-                    break;
-            }
+            var relationDefinition = _criteriaService.GetRelationDefinition(value);
+            Relation = relationDefinition.Relations.ToList();
+            RangeSuffixText = relationDefinition.RangeSuffixText;
 
             if (Relation.Count > 0)
             {
@@ -97,12 +77,15 @@ public partial class AdvancedSearchViewModel :
     public AdvancedSearchViewModel(
         IMediator mediator,
         ILogger logger,
-        ISettingsManager<AppSettings> settingsManager, IUiDispatcher ui)
+        IUiDispatcher ui,
+        IAppSettingsReadService settingsReadService,
+        IAdvancedSearchCriteriaService criteriaService)
     {
         _mediator = mediator;
         _logger = logger;
-        _settingsManager = settingsManager;
         _ui = ui;
+        _settingsReadService = settingsReadService;
+        _criteriaService = criteriaService;
         SelectedColumnName = string.Empty;
         Criterias.CollectionChanged += OnCriteriasChanged;
 
@@ -112,11 +95,11 @@ public partial class AdvancedSearchViewModel :
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         await _ui.InvokeAsync(() => Criterias.Clear(), ct);
-        
+
         await Task.Run(() =>
         {
-            FontFamily = _settingsManager.Settings.FontFamily;
-            ColumnName = GetAudioModelProperties();
+            FontFamily = _settingsReadService.GetFontFamily();
+            ColumnName = _criteriaService.GetColumnNames().ToList();
             SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
             MatchMode = SearchMatchMode.All;
             ValidationMessage = string.Empty;
@@ -131,19 +114,20 @@ public partial class AdvancedSearchViewModel :
     [RelayCommand(CanExecute = nameof(CanAddCriteria))]
     private void AddCriteria()
     {
-        if (!TryCreateCriterion(out var criterion, out var error))
+        var result = _criteriaService.BuildCriterion(SelectedColumnName, SelectedRelation, InputText);
+        if (!result.Success || result.Criterion is null)
         {
-            ValidationMessage = error;
-            _logger.Warning("[AdvancedSearchViewModel] Cannot add criteria. {Error}", error);
+            ValidationMessage = result.ErrorMessage;
+            _logger.Warning("[AdvancedSearchViewModel] Cannot add criteria. {Error}", result.ErrorMessage);
             return;
         }
 
-        Criterias.Add(criterion);
-        SelectedCriteria = criterion;
+        Criterias.Add(result.Criterion);
+        SelectedCriteria = result.Criterion;
         ValidationMessage = string.Empty;
         SearchStatusMessage = $"{Criterias.Count} filter(s) ready.";
 
-        _logger.Debug("[AdvancedSearchViewModel] Added criteria: {@Filter}", criterion);
+        _logger.Debug("[AdvancedSearchViewModel] Added criteria: {@Filter}", result.Criterion);
         InputText = string.Empty;
     }
 
@@ -227,14 +211,11 @@ public partial class AdvancedSearchViewModel :
 
         ValidationMessage = string.Empty;
         SearchStatusMessage = "Searching...";
-        var filters = Criterias
-            .Select(c => new AdvancedFilter(c.Field, c.Operator, c.NormalizedValue))
-            .ToList();
+        var filters = _criteriaService.BuildFilters(Criterias).ToList();
 
         _logger.Information("Starting advanced search with these filters: {@Filters}", filters);
         await _mediator.Publish(new AdvancedSearchNotification(filters, MatchMode));
 
-        // Fallback in case no completion notification is received in this scope.
         if (SearchStatusMessage == "Searching...")
         {
             SearchStatusMessage = "Search completed. Check Search Results.";
@@ -246,153 +227,9 @@ public partial class AdvancedSearchViewModel :
         return SearchCommand.ExecuteAsync(null);
     }
 
-    private static AdvancedFilterOperator MapOperator(string relation)
-    {
-        return relation switch
-        {
-            "Is" => AdvancedFilterOperator.Equal,
-            "Is not" => AdvancedFilterOperator.NotEqual,
-            "Contains" => AdvancedFilterOperator.Contains,
-            "Does not contain" => AdvancedFilterOperator.NotContains,
-            "Bigger than" or "More than" => AdvancedFilterOperator.GreaterThan,
-            "Less than" => AdvancedFilterOperator.LessThan,
-            _ => throw new IndexOutOfRangeException($"This relation is not handled: {relation}")
-        };
-    }
-
-    private static List<string> GetAudioModelProperties()
-    {
-        return typeof(AudioModel)
-            .GetProperties()
-            .Where(p =>
-                p.Name != nameof(AudioModel.Display) &&
-                p.Name != nameof(AudioModel.Id))
-            .Select(p => p.Name)
-            .ToList();
-    }
-
-    private bool TryCreateCriterion(out AdvancedSearchCriterion criterion, out string error)
-    {
-        criterion = default!;
-        if (string.IsNullOrWhiteSpace(SelectedColumnName) ||
-            string.IsNullOrWhiteSpace(SelectedRelation) ||
-            string.IsNullOrWhiteSpace(InputText))
-        {
-            error = "Please select field, relation, and value.";
-            return false;
-        }
-
-        if (!TryNormalizeInput(InputText, SelectedColumnName, out var normalizedValue, out error))
-        {
-            return false;
-        }
-
-        AdvancedFilterOperator filterOperator;
-        try
-        {
-            filterOperator = MapOperator(SelectedRelation);
-        }
-        catch (IndexOutOfRangeException)
-        {
-            error = "Selected relation is invalid for this field.";
-            return false;
-        }
-
-        criterion = new AdvancedSearchCriterion(
-            SelectedColumnName,
-            SelectedRelation,
-            InputText.Trim(),
-            normalizedValue,
-            filterOperator);
-        return true;
-    }
-
-    private static bool TryNormalizeInput(
-        string inputText,
-        string selectedColumnName,
-        out string normalized,
-        out string error)
-    {
-        var trimmed = inputText.Trim();
-        if (string.IsNullOrWhiteSpace(trimmed))
-        {
-            normalized = string.Empty;
-            error = "Value cannot be empty.";
-            return false;
-        }
-
-        if (selectedColumnName is nameof(AudioModel.BPM) or nameof(AudioModel.Bitrate))
-        {
-            if (!short.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
-            {
-                normalized = string.Empty;
-                error = $"{selectedColumnName} must be a whole number.";
-                return false;
-            }
-
-            normalized = number.ToString(CultureInfo.InvariantCulture);
-            error = string.Empty;
-            return true;
-        }
-
-        if (selectedColumnName == nameof(AudioModel.Length))
-        {
-            if (!TryParseLength(trimmed, out var length))
-            {
-                normalized = string.Empty;
-                error = "Length must be mm:ss or total seconds.";
-                return false;
-            }
-
-            normalized = length.ToString("c", CultureInfo.InvariantCulture);
-            error = string.Empty;
-            return true;
-        }
-
-        normalized = trimmed;
-        error = string.Empty;
-        return true;
-    }
-
-    private static bool TryParseLength(string value, out TimeSpan length)
-    {
-        if (int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var seconds) && seconds >= 0)
-        {
-            length = TimeSpan.FromSeconds(seconds);
-            return true;
-        }
-
-        if (TimeSpan.TryParseExact(
-                value,
-                ["m\\:ss", "mm\\:ss", "h\\:mm\\:ss", "hh\\:mm\\:ss", "c"],
-                CultureInfo.InvariantCulture,
-                out var parsed) &&
-            parsed >= TimeSpan.Zero)
-        {
-            length = parsed;
-            return true;
-        }
-
-        if (TimeSpan.TryParse(value, CultureInfo.InvariantCulture, out parsed) && parsed >= TimeSpan.Zero)
-        {
-            length = parsed;
-            return true;
-        }
-
-        length = TimeSpan.Zero;
-        return false;
-    }
-
     private bool CanAddCriteria()
     {
-        if (string.IsNullOrWhiteSpace(SelectedColumnName) ||
-            string.IsNullOrWhiteSpace(SelectedRelation) ||
-            string.IsNullOrWhiteSpace(InputText))
-        {
-            return false;
-        }
-
-        return TryNormalizeInput(InputText, SelectedColumnName, out _, out _);
+        return _criteriaService.CanBuildCriterion(SelectedColumnName, SelectedRelation, InputText);
     }
 
     private bool CanDeleteItem(AdvancedSearchCriterion? criterion)

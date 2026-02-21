@@ -2,6 +2,7 @@
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
@@ -15,7 +16,7 @@ public partial class ListsViewModel :
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
-    private readonly IAdvancedDataReader<AdvancedFilter, AudioModel> _advancedAudioReader;
+    private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IFileScanner _fileScanner;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
@@ -38,13 +39,13 @@ public partial class ListsViewModel :
     public ListsViewModel(
         ILogger logger,
         IMediator mediator,
-        IAdvancedDataReader<AdvancedFilter, AudioModel> advancedAudioReader,
+        IAudioSearchExecutionService audioSearchExecutionService,
         IFileScanner fileScanner,
         IMusicPlayerController musicPlayerController, IPlaylist playList)
     {
         _logger = logger;
         _mediator = mediator;
-        _advancedAudioReader = advancedAudioReader;
+        _audioSearchExecutionService = audioSearchExecutionService;
         _fileScanner = fileScanner;
         _musicPlayerController = musicPlayerController;
         _playList = playList;
@@ -225,11 +226,10 @@ public partial class ListsViewModel :
 
     public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
     {
-        var matchAll = notification.MatchMode == SearchMatchMode.All;
         _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchMode: {MatchMode})",
             notification.Filters, notification.MatchMode);
         var result =
-            (await _advancedAudioReader.ReadAsync(notification.Filters, matchAll)).ToArray();
+            (await _audioSearchExecutionService.ExecuteAdvancedSearchAsync(notification.Filters, notification.MatchMode)).ToArray();
 
         _logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
         if (result.Length > 0)

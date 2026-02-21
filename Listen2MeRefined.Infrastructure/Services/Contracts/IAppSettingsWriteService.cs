@@ -1,0 +1,40 @@
+namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+
+/// <summary>
+/// Provides typed write operations for persisted application settings.
+/// </summary>
+public interface IAppSettingsWriteService
+{
+    /// <summary>Sets whether startup folder scan is enabled.</summary>
+    void SetScanOnStartup(bool value);
+    /// <summary>Sets the application font family.</summary>
+    void SetFontFamily(string value);
+    /// <summary>Sets the new-song window position mode.</summary>
+    void SetNewSongWindowPosition(string value);
+    /// <summary>Sets the audio output device name.</summary>
+    void SetAudioOutputDeviceName(string value);
+    /// <summary>Sets whether global media keys are enabled.</summary>
+    void SetEnableGlobalMediaKeys(bool value);
+    /// <summary>Sets whether corner now-playing popup is enabled.</summary>
+    void SetEnableCornerNowPlayingPopup(bool value);
+    /// <summary>Sets the corner trigger size in pixels.</summary>
+    void SetCornerTriggerSizePx(short value);
+    /// <summary>Sets the corner trigger debounce in milliseconds.</summary>
+    void SetCornerTriggerDebounceMs(short value);
+    /// <summary>Sets the startup playback volume value between 0 and 1.</summary>
+    void SetStartupVolume(float value);
+    /// <summary>Sets whether playback should start muted.</summary>
+    void SetStartMuted(bool value);
+    /// <summary>Sets whether automatic update checks on startup are enabled.</summary>
+    void SetAutoCheckUpdatesOnStartup(bool value);
+    /// <summary>Sets whether a folder should be auto-scanned when added.</summary>
+    void SetAutoScanOnFolderAdd(bool value);
+    /// <summary>Sets whether folder browser should start at last location.</summary>
+    void SetFolderBrowserStartAtLastLocation(bool value);
+    /// <summary>Sets the last browsed folder path.</summary>
+    void SetLastBrowsedFolder(string path);
+    /// <summary>Sets configured music folder paths.</summary>
+    void SetMusicFolders(IEnumerable<string> folders);
+    /// <summary>Sets configured pinned folder paths.</summary>
+    void SetPinnedFolders(IEnumerable<string> folders);
+}

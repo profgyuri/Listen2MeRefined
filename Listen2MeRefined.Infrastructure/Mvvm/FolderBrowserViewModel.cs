@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
-using Listen2MeRefined.Infrastructure.SystemOperations;
-using MediatR;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -12,8 +10,10 @@ public sealed partial class FolderBrowserViewModel :
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
-    private readonly IFolderBrowser _folderBrowser;
-    private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IFolderNavigationService _folderNavigationService;
+    private readonly IPinnedFoldersService _pinnedFoldersService;
+    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAppSettingsWriteService _settingsWriteService;
     private readonly List<string> _allFolders = new();
 
     [ObservableProperty] private string _fontFamily = "";
@@ -30,24 +30,31 @@ public sealed partial class FolderBrowserViewModel :
 
     public FolderBrowserViewModel(
         ILogger logger,
-        IFolderBrowser folderBrowser,
         IMediator mediator,
-        ISettingsManager<AppSettings> settingsManager)
+        IFolderNavigationService folderNavigationService,
+        IPinnedFoldersService pinnedFoldersService,
+        IAppSettingsReadService settingsReadService,
+        IAppSettingsWriteService settingsWriteService)
     {
         _logger = logger;
-        _folderBrowser = folderBrowser;
         _mediator = mediator;
-        _settingsManager = settingsManager;
+        _folderNavigationService = folderNavigationService;
+        _pinnedFoldersService = pinnedFoldersService;
+        _settingsReadService = settingsReadService;
+        _settingsWriteService = settingsWriteService;
 
         _logger.Debug("[FolderBrowserViewModel] initialized");
     }
 
     protected override Task InitializeCoreAsync(CancellationToken ct)
     {
-        FontFamily = _settingsManager.Settings.FontFamily;
+        FontFamily = _settingsReadService.GetFontFamily();
         LoadQuickAccessCollections();
 
-        var initialPath = GetInitialPath();
+        var initialPath = _folderNavigationService.ResolveInitialPath(
+            _settingsReadService.GetFolderBrowserStartAtLastLocation(),
+            _settingsReadService.GetLastBrowsedFolder(),
+            PinnedFolders);
         if (string.IsNullOrWhiteSpace(initialPath))
         {
             LoadDrivesView();
@@ -80,29 +87,21 @@ public sealed partial class FolderBrowserViewModel :
             return;
         }
 
-        var newPath = string.IsNullOrWhiteSpace(FullPath)
-            ? SelectedFolder
-            : Path.Combine(FullPath, SelectedFolder);
+        var newPath = _folderNavigationService.BuildChildPath(FullPath, SelectedFolder);
         NavigateToPathInternal(newPath);
     }
 
     [RelayCommand]
     private void NavigateParent()
     {
-        if (string.IsNullOrWhiteSpace(FullPath))
+        var result = _folderNavigationService.NavigateParent(FullPath);
+        if (!result.Success)
         {
-            LoadDrivesView();
+            SetValidationError(result.ErrorMessage);
             return;
         }
 
-        var parentPath = _folderBrowser.GetParent(FullPath);
-        if (string.IsNullOrWhiteSpace(parentPath))
-        {
-            LoadDrivesView();
-            return;
-        }
-
-        NavigateToPathInternal(parentPath);
+        ApplyNavigationResult(result);
     }
 
     [RelayCommand]
@@ -143,19 +142,13 @@ public sealed partial class FolderBrowserViewModel :
     [RelayCommand]
     private async Task TogglePinAsync()
     {
-        if (string.IsNullOrWhiteSpace(FullPath) || !_folderBrowser.DirectoryExists(FullPath))
+        if (string.IsNullOrWhiteSpace(FullPath) || !_folderNavigationService.DirectoryExists(FullPath))
         {
             return;
         }
 
-        if (PinnedFolders.Contains(FullPath))
-        {
-            PinnedFolders.Remove(FullPath);
-        }
-        else
-        {
-            PinnedFolders.Insert(0, FullPath);
-        }
+        var updatedPins = _pinnedFoldersService.TogglePinnedFolder(PinnedFolders, FullPath);
+        PinnedFolders = new ObservableCollection<string>(updatedPins);
 
         await SavePinnedFoldersAsync();
     }
@@ -173,12 +166,10 @@ public sealed partial class FolderBrowserViewModel :
                                    SelectedFolder != GlobalConstants.ParentPathItem;
         if (hasSelectedChildPath)
         {
-            candidatePath = string.IsNullOrWhiteSpace(FullPath)
-                ? SelectedFolder
-                : Path.Combine(FullPath, SelectedFolder);
+            candidatePath = _folderNavigationService.BuildChildPath(FullPath, SelectedFolder);
         }
 
-        var isFullPathInvalid = string.IsNullOrWhiteSpace(candidatePath) || !_folderBrowser.DirectoryExists(candidatePath);
+        var isFullPathInvalid = string.IsNullOrWhiteSpace(candidatePath) || !_folderNavigationService.DirectoryExists(candidatePath);
         if (isFullPathInvalid)
         {
             SetValidationError("Please select a valid folder before confirming.");
@@ -188,7 +179,7 @@ public sealed partial class FolderBrowserViewModel :
 
         ClearValidationError();
         FullPath = candidatePath;
-        _settingsManager.SaveSettings(s => s.LastBrowsedFolder = candidatePath);
+        _settingsWriteService.SetLastBrowsedFolder(candidatePath);
 
         _logger.Debug("[FolderBrowserViewModel] Publishing full path: {FullPath}", candidatePath);
         var notification = new FolderBrowserNotification(candidatePath);
@@ -196,32 +187,16 @@ public sealed partial class FolderBrowserViewModel :
         return true;
     }
 
-    private string GetInitialPath()
-    {
-        var settings = _settingsManager.Settings;
-        if (settings.FolderBrowserStartAtLastLocation &&
-            _folderBrowser.DirectoryExists(settings.LastBrowsedFolder))
-        {
-            return settings.LastBrowsedFolder;
-        }
-
-        return settings.PinnedFolders.FirstOrDefault(_folderBrowser.DirectoryExists) ?? "";
-    }
-
     private void LoadQuickAccessCollections()
     {
-        var settings = _settingsManager.Settings;
+        Drives = new(_folderNavigationService.GetDrives());
 
-        Drives = new(_folderBrowser.GetDrives().Distinct(StringComparer.OrdinalIgnoreCase));
+        var sourcePinnedFolders = _settingsReadService.GetPinnedFolders();
+        var pinnedFolders = _pinnedFoldersService.NormalizeExisting(sourcePinnedFolders);
 
-        var pinnedFolders = settings.PinnedFolders
-            .Where(_folderBrowser.DirectoryExists)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (!pinnedFolders.SequenceEqual(settings.PinnedFolders, StringComparer.OrdinalIgnoreCase))
+        if (!pinnedFolders.SequenceEqual(sourcePinnedFolders, StringComparer.OrdinalIgnoreCase))
         {
-            _settingsManager.SaveSettings(x => x.PinnedFolders = pinnedFolders);
+            _settingsWriteService.SetPinnedFolders(pinnedFolders);
         }
 
         PinnedFolders = new(pinnedFolders);
@@ -229,44 +204,46 @@ public sealed partial class FolderBrowserViewModel :
 
     private bool TryNavigateToPath(string path)
     {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            LoadDrivesView();
-            return true;
-        }
-
-        if (!_folderBrowser.DirectoryExists(path))
+        var result = _folderNavigationService.NavigateToPath(path);
+        if (!result.Success)
         {
             return false;
         }
 
-        NavigateToPathInternal(path);
+        ApplyNavigationResult(result);
         return true;
     }
 
     private void NavigateToPathInternal(string path)
     {
-        ClearValidationError();
-        FullPath = path;
+        var result = _folderNavigationService.NavigateToPath(path);
+        if (!result.Success)
+        {
+            SetValidationError(result.ErrorMessage);
+            return;
+        }
 
-        _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
-        _settingsManager.SaveSettings(s => s.LastBrowsedFolder = path);
-
-        _allFolders.Clear();
-        _allFolders.Add(GlobalConstants.ParentPathItem);
-        _allFolders.AddRange(_folderBrowser.GetSubFoldersSafe(path));
-        ApplyFilter();
-
-        SelectedFolder = "";
+        ApplyNavigationResult(result);
     }
 
     private void LoadDrivesView()
     {
+        ApplyNavigationResult(_folderNavigationService.LoadDrivesView());
+    }
+
+    private void ApplyNavigationResult(Listen2MeRefined.Infrastructure.Services.Models.FolderNavigationResult result)
+    {
         ClearValidationError();
-        FullPath = "";
+        FullPath = result.FullPath;
+
+        if (!string.IsNullOrWhiteSpace(FullPath))
+        {
+            _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
+            _settingsWriteService.SetLastBrowsedFolder(FullPath);
+        }
 
         _allFolders.Clear();
-        _allFolders.AddRange(Drives);
+        _allFolders.AddRange(result.Entries);
         ApplyFilter();
 
         SelectedFolder = "";
@@ -274,10 +251,7 @@ public sealed partial class FolderBrowserViewModel :
 
     private void ApplyFilter()
     {
-        var filter = FilterText?.Trim() ?? "";
-        var filteredFolders = string.IsNullOrWhiteSpace(filter)
-            ? _allFolders
-            : _allFolders.Where(x => x.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+        var filteredFolders = _folderNavigationService.ApplyFilter(_allFolders, FilterText);
 
         Folders.Clear();
         foreach (var folder in filteredFolders)
@@ -288,11 +262,8 @@ public sealed partial class FolderBrowserViewModel :
 
     private async Task SavePinnedFoldersAsync()
     {
-        var pinnedFolders = PinnedFolders
-            .Where(_folderBrowser.DirectoryExists)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-        _settingsManager.SaveSettings(s => s.PinnedFolders = pinnedFolders);
+        var pinnedFolders = _pinnedFoldersService.NormalizeExisting(PinnedFolders);
+        _settingsWriteService.SetPinnedFolders(pinnedFolders);
         await _mediator.Publish(new PinnedFoldersChangedNotification(pinnedFolders));
     }
 
