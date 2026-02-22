@@ -42,13 +42,9 @@ Now that you have your songs in the search results list, you can simply drag and
 
  - Implementing playlists
  - Drag 'n drop from outside the application
- - Reworking the UI to make it similar to Steam's UI (~75% done)
  - UX/QOL improvements like:
-   - Adding remaining and total time displays
-   - "Running text" where the title or artist name is too long (90% done but laggy experience)
    - Individually choosable colors OR color themes
  - Adding context menu to list items (to "jump here", scan individually, etc.)
- - Status report for scanning
  - Performance improvements (registering global keyboard and mouse hooks is still a problem)
 
 ## Working features
@@ -67,4 +63,3 @@ Now that you have your songs in the search results list, you can simply drag and
 
  - Multiple display setup is currently not supported in any form.
  - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
- - Removing the currently playing song from the playlist is not refreshing the index, resulting in skipping 1 song
