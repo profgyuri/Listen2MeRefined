@@ -689,8 +689,18 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
-        await _folderScanner.ScanAsync(path, ScanMode.Incremental, cancellationToken);
-        _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _folderScanner.ScanAsync(path, ScanMode.Incremental, CancellationToken.None).ConfigureAwait(false);
+                _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "[SettingsWindowViewModel] Failed to scan newly added path: {Path}", path);
+            }
+        }, CancellationToken.None);
     }
 
     public async Task Handle(
