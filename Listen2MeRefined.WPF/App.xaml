@@ -15,6 +15,11 @@
             <wpf:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <wpf:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter" />
             <wpf:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter" />
+            <Style TargetType="{x:Type FrameworkElement}">
+                <Setter Property="ToolTipService.InitialShowDelay" Value="350" />
+                <Setter Property="ToolTipService.BetweenShowDelay" Value="150" />
+                <Setter Property="ToolTipService.ShowDuration" Value="2147483647" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
