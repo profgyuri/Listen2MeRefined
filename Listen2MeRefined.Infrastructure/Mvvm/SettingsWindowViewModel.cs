@@ -17,6 +17,10 @@ public sealed partial class SettingsWindowViewModel :
     private const int MaxCornerDebounceMs = 200;
     private const int MinStartupVolumePercent = 0;
     private const int MaxStartupVolumePercent = 100;
+    private const int MinTaskPercentageStep = 1;
+    private const int MaxTaskPercentageStep = 25;
+    private const int MinScanMilestoneInterval = 5;
+    private const int MaxScanMilestoneInterval = 500;
 
     private readonly ILogger _logger;
     private readonly IRepository<AudioModel> _audioRepository;
@@ -31,6 +35,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IAppSettingsReadService _settingsReadService;
     private readonly IAppSettingsWriteService _settingsWriteService;
     private readonly IAppUpdateCheckService _appUpdateCheckService;
+    private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IPlaybackDefaultsService _playbackDefaultsService;
@@ -62,9 +67,17 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _startMuted;
     [ObservableProperty] private bool _autoCheckUpdatesOnStartup = true;
     [ObservableProperty] private bool _autoScanOnFolderAdd = true;
+    [ObservableProperty] private bool _showTaskPercentage = true;
+    [ObservableProperty] private int _taskPercentageReportInterval = 1;
+    [ObservableProperty] private bool _showScanMilestoneCount;
+    [ObservableProperty] private int _scanMilestoneInterval = 25;
+    [ObservableProperty] private TaskStatusCountBasis _selectedScanMilestoneBasis = TaskStatusCountBasis.Processed;
     [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
     [ObservableProperty] private string? _selectedPinnedFolder = "";
+
+    public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
+        new(Enum.GetValues<TaskStatusCountBasis>());
 
     public bool ScanOnStartup
     {
@@ -93,6 +106,7 @@ public sealed partial class SettingsWindowViewModel :
         IAppSettingsReadService settingsReadService,
         IAppSettingsWriteService settingsWriteService,
         IAppUpdateCheckService appUpdateCheckService,
+        IBackgroundTaskStatusService backgroundTaskStatusService,
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
         IPinnedFoldersService pinnedFoldersService,
         IPlaybackDefaultsService playbackDefaultsService)
@@ -110,6 +124,7 @@ public sealed partial class SettingsWindowViewModel :
         _settingsReadService = settingsReadService;
         _settingsWriteService = settingsWriteService;
         _appUpdateCheckService = appUpdateCheckService;
+        _backgroundTaskStatusService = backgroundTaskStatusService;
         _globalHookSettingsSyncService = globalHookSettingsSyncService;
         _pinnedFoldersService = pinnedFoldersService;
         _playbackDefaultsService = playbackDefaultsService;
@@ -145,6 +160,17 @@ public sealed partial class SettingsWindowViewModel :
         StartMuted = _settingsReadService.GetStartMuted();
         AutoCheckUpdatesOnStartup = _settingsReadService.GetAutoCheckUpdatesOnStartup();
         AutoScanOnFolderAdd = _settingsReadService.GetAutoScanOnFolderAdd();
+        ShowTaskPercentage = _settingsReadService.GetShowTaskPercentage();
+        TaskPercentageReportInterval = Math.Clamp(
+            (int)_settingsReadService.GetTaskPercentageReportInterval(),
+            MinTaskPercentageStep,
+            MaxTaskPercentageStep);
+        ShowScanMilestoneCount = _settingsReadService.GetShowScanMilestoneCount();
+        ScanMilestoneInterval = Math.Clamp(
+            (int)_settingsReadService.GetScanMilestoneInterval(),
+            MinScanMilestoneInterval,
+            MaxScanMilestoneInterval);
+        SelectedScanMilestoneBasis = _settingsReadService.GetScanMilestoneBasis();
         FolderBrowserStartAtLastLocation = _settingsReadService.GetFolderBrowserStartAtLastLocation();
         ReloadPinnedFolders();
 
@@ -310,6 +336,75 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _settingsWriteService.SetAutoScanOnFolderAdd(value);
+    }
+
+    partial void OnShowTaskPercentageChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriteService.SetShowTaskPercentage(value);
+        _backgroundTaskStatusService.RefreshSnapshot();
+    }
+
+    partial void OnTaskPercentageReportIntervalChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinTaskPercentageStep, MaxTaskPercentageStep);
+        if (clamped != value)
+        {
+            TaskPercentageReportInterval = clamped;
+            return;
+        }
+
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriteService.SetTaskPercentageReportInterval((short)clamped);
+        _backgroundTaskStatusService.RefreshSnapshot();
+    }
+
+    partial void OnShowScanMilestoneCountChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriteService.SetShowScanMilestoneCount(value);
+        _backgroundTaskStatusService.RefreshSnapshot();
+    }
+
+    partial void OnScanMilestoneIntervalChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinScanMilestoneInterval, MaxScanMilestoneInterval);
+        if (clamped != value)
+        {
+            ScanMilestoneInterval = clamped;
+            return;
+        }
+
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriteService.SetScanMilestoneInterval((short)clamped);
+        _backgroundTaskStatusService.RefreshSnapshot();
+    }
+
+    partial void OnSelectedScanMilestoneBasisChanged(TaskStatusCountBasis value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriteService.SetScanMilestoneBasis(value);
+        _backgroundTaskStatusService.RefreshSnapshot();
     }
 
     partial void OnFolderBrowserStartAtLastLocationChanged(bool value)

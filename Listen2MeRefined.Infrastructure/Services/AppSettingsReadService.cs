@@ -26,6 +26,11 @@ public sealed class AppSettingsReadService : IAppSettingsReadService
     public bool GetStartMuted() => _settingsManager.Settings.StartMuted;
     public bool GetAutoCheckUpdatesOnStartup() => _settingsManager.Settings.AutoCheckUpdatesOnStartup;
     public bool GetAutoScanOnFolderAdd() => _settingsManager.Settings.AutoScanOnFolderAdd;
+    public bool GetShowTaskPercentage() => _settingsManager.Settings.ShowTaskPercentage;
+    public short GetTaskPercentageReportInterval() => _settingsManager.Settings.TaskPercentageReportInterval;
+    public bool GetShowScanMilestoneCount() => _settingsManager.Settings.ShowScanMilestoneCount;
+    public short GetScanMilestoneInterval() => _settingsManager.Settings.ScanMilestoneInterval;
+    public TaskStatusCountBasis GetScanMilestoneBasis() => _settingsManager.Settings.ScanMilestoneBasis;
     public bool GetFolderBrowserStartAtLastLocation() => _settingsManager.Settings.FolderBrowserStartAtLastLocation;
     public string GetLastBrowsedFolder() => _settingsManager.Settings.LastBrowsedFolder;
     public IReadOnlyList<string> GetPinnedFolders() => _settingsManager.Settings.PinnedFolders.ToList();

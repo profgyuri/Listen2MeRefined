@@ -30,6 +30,8 @@
                                  ShowMinimizeButton="True"
                                  ShowMaximizeButton="True"
                                  ShowCloseButton="True"
+                                 ShowTaskStatus="{Binding IsTaskStatusVisible}"
+                                 TaskStatusText="{Binding TaskStatusText}"
                                  SettingsCommand="{Binding OpenSettingsWindowCommand}"
                                  MinimizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MinimizeWindowCommand}"
                                  ToggleMaximizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ToggleWindowStateCommand}"

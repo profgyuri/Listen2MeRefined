@@ -42,6 +42,20 @@ public partial class TitleBar : UserControl
             typeof(TitleBar),
             new PropertyMetadata(true));
 
+    public static readonly DependencyProperty ShowTaskStatusProperty =
+        DependencyProperty.Register(
+            nameof(ShowTaskStatus),
+            typeof(bool),
+            typeof(TitleBar),
+            new PropertyMetadata(false));
+
+    public static readonly DependencyProperty TaskStatusTextProperty =
+        DependencyProperty.Register(
+            nameof(TaskStatusText),
+            typeof(string),
+            typeof(TitleBar),
+            new PropertyMetadata(string.Empty));
+
     public static readonly DependencyProperty SettingsCommandProperty =
         DependencyProperty.Register(
             nameof(SettingsCommand),
@@ -154,6 +168,18 @@ public partial class TitleBar : UserControl
     {
         get => (bool)GetValue(ShowCloseButtonProperty);
         set => SetValue(ShowCloseButtonProperty, value);
+    }
+
+    public bool ShowTaskStatus
+    {
+        get => (bool)GetValue(ShowTaskStatusProperty);
+        set => SetValue(ShowTaskStatusProperty, value);
+    }
+
+    public string TaskStatusText
+    {
+        get => (string)GetValue(TaskStatusTextProperty);
+        set => SetValue(TaskStatusTextProperty, value);
     }
 
     public ICommand? SettingsCommand

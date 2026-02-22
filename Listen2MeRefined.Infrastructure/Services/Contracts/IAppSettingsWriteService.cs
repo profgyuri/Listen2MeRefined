@@ -29,6 +29,16 @@ public interface IAppSettingsWriteService
     void SetAutoCheckUpdatesOnStartup(bool value);
     /// <summary>Sets whether a folder should be auto-scanned when added.</summary>
     void SetAutoScanOnFolderAdd(bool value);
+    /// <summary>Sets whether background task percentage should be shown in the title bar.</summary>
+    void SetShowTaskPercentage(bool value);
+    /// <summary>Sets title-bar percentage reporting interval in percent points.</summary>
+    void SetTaskPercentageReportInterval(short value);
+    /// <summary>Sets whether scan milestone count text is shown in the title bar.</summary>
+    void SetShowScanMilestoneCount(bool value);
+    /// <summary>Sets scan milestone count interval in files.</summary>
+    void SetScanMilestoneInterval(short value);
+    /// <summary>Sets whether milestone counts are based on processed or remaining file counts.</summary>
+    void SetScanMilestoneBasis(TaskStatusCountBasis value);
     /// <summary>Sets whether folder browser should start at last location.</summary>
     void SetFolderBrowserStartAtLastLocation(bool value);
     /// <summary>Sets the last browsed folder path.</summary>

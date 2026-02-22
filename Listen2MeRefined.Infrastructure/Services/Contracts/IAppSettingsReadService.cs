@@ -31,6 +31,16 @@ public interface IAppSettingsReadService
     bool GetAutoCheckUpdatesOnStartup();
     /// <summary>Gets whether a folder should be auto-scanned when added.</summary>
     bool GetAutoScanOnFolderAdd();
+    /// <summary>Gets whether background task percentage should be shown in the title bar.</summary>
+    bool GetShowTaskPercentage();
+    /// <summary>Gets title-bar percentage reporting interval in percent points.</summary>
+    short GetTaskPercentageReportInterval();
+    /// <summary>Gets whether scan milestone count text is shown in the title bar.</summary>
+    bool GetShowScanMilestoneCount();
+    /// <summary>Gets scan milestone count interval in files.</summary>
+    short GetScanMilestoneInterval();
+    /// <summary>Gets whether milestone counts are based on processed or remaining file counts.</summary>
+    TaskStatusCountBasis GetScanMilestoneBasis();
     /// <summary>Gets whether folder browser should start at last location.</summary>
     bool GetFolderBrowserStartAtLastLocation();
     /// <summary>Gets the last browsed folder path.</summary>

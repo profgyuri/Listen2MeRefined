@@ -22,6 +22,11 @@ public sealed class AppSettings : Settings
     public bool StartMuted { get; set; }
     public bool AutoCheckUpdatesOnStartup { get; set; } = true;
     public bool AutoScanOnFolderAdd { get; set; } = true;
+    public bool ShowTaskPercentage { get; set; } = true;
+    public short TaskPercentageReportInterval { get; set; } = 1;
+    public bool ShowScanMilestoneCount { get; set; }
+    public short ScanMilestoneInterval { get; set; } = 25;
+    public TaskStatusCountBasis ScanMilestoneBasis { get; set; } = TaskStatusCountBasis.Processed;
     public string LastBrowsedFolder { get; set; } = "";
     public bool FolderBrowserStartAtLastLocation { get; set; } = true;
     public string PinnedFoldersJson { get; set; } = "[]";

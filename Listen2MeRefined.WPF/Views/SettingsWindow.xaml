@@ -248,6 +248,55 @@
                                                 Content="Rescan Now"
                                                 Command="{Binding ForceScanCommand}"
                                                 ToolTip="Scan all configured folders now" />
+
+                                        <Border Margin="0,12,0,0"
+                                                Padding="10"
+                                                Background="#202020"
+                                                BorderBrush="#363636"
+                                                BorderThickness="1"
+                                                CornerRadius="8">
+                                            <StackPanel>
+                                                <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
+                                                           Text="Background task status in title bar" />
+                                                <CheckBox Margin="0,8,0,0"
+                                                          IsChecked="{Binding ShowTaskPercentage}"
+                                                          Content="Show progress percentage" />
+                                                <components:LabeledSliderRow Margin="0,8,0,0"
+                                                                             Label="Percent step:"
+                                                                             LabelWidth="170"
+                                                                             SliderWidth="180"
+                                                                             Minimum="1"
+                                                                             Maximum="25"
+                                                                             TickFrequency="1"
+                                                                             IsSnapToTickEnabled="True"
+                                                                             Value="{Binding TaskPercentageReportInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                             ValueSuffix=" %" />
+
+                                                <CheckBox Margin="0,10,0,0"
+                                                          IsChecked="{Binding ShowScanMilestoneCount}"
+                                                          Content="Show file-count milestones" />
+                                                <components:FormFieldRow Margin="0,8,0,0"
+                                                                         Label="Count basis:"
+                                                                         LabelWidth="170">
+                                                    <components:FormFieldRow.FieldContent>
+                                                        <ComboBox Style="{StaticResource CustomComboBox}"
+                                                                  SelectedItem="{Binding SelectedScanMilestoneBasis}"
+                                                                  ItemsSource="{Binding ScanMilestoneBases}" />
+                                                    </components:FormFieldRow.FieldContent>
+                                                </components:FormFieldRow>
+                                                <components:LabeledSliderRow Margin="0,8,0,0"
+                                                                             Label="Milestone every:"
+                                                                             LabelWidth="170"
+                                                                             SliderWidth="180"
+                                                                             Minimum="5"
+                                                                             Maximum="500"
+                                                                             TickFrequency="5"
+                                                                             IsSnapToTickEnabled="True"
+                                                                             Value="{Binding ScanMilestoneInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                             ValueSuffix=" files"
+                                                                             IsEnabled="{Binding ShowScanMilestoneCount}" />
+                                            </StackPanel>
+                                        </Border>
                                     </StackPanel>
                                 </Border>
 
@@ -441,4 +490,3 @@
         </Grid>
     </Border>
 </Window>
-

@@ -64,10 +64,25 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ScanMilestoneBasis")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("ScanMilestoneInterval")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("ScanOnStartup")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("ShowScanMilestoneCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ShowTaskPercentage")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("StartMuted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("TaskPercentageReportInterval")
                         .HasColumnType("INTEGER");
 
                     b.Property<float>("StartupVolume")

@@ -31,6 +31,10 @@ public class UtilsModule : Module
             .RegisterType<AppUpdateCheckService>()
             .As<IAppUpdateCheckService>();
         builder
+            .RegisterType<BackgroundTaskStatusService>()
+            .As<IBackgroundTaskStatusService>()
+            .SingleInstance();
+        builder
             .RegisterType<GlobalHookSettingsSyncService>()
             .As<IGlobalHookSettingsSyncService>();
         builder

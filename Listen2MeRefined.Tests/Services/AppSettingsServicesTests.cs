@@ -26,6 +26,11 @@ public sealed class AppSettingsServicesTests
             StartMuted = false,
             AutoCheckUpdatesOnStartup = true,
             AutoScanOnFolderAdd = false,
+            ShowTaskPercentage = true,
+            TaskPercentageReportInterval = 5,
+            ShowScanMilestoneCount = true,
+            ScanMilestoneInterval = 50,
+            ScanMilestoneBasis = TaskStatusCountBasis.Remaining,
             FolderBrowserStartAtLastLocation = true,
             LastBrowsedFolder = @"C:\Music",
             PinnedFolders = [@"C:\Pinned"]
@@ -47,6 +52,11 @@ public sealed class AppSettingsServicesTests
         Assert.False(sut.GetStartMuted());
         Assert.True(sut.GetAutoCheckUpdatesOnStartup());
         Assert.False(sut.GetAutoScanOnFolderAdd());
+        Assert.True(sut.GetShowTaskPercentage());
+        Assert.Equal((short)5, sut.GetTaskPercentageReportInterval());
+        Assert.True(sut.GetShowScanMilestoneCount());
+        Assert.Equal((short)50, sut.GetScanMilestoneInterval());
+        Assert.Equal(TaskStatusCountBasis.Remaining, sut.GetScanMilestoneBasis());
         Assert.True(sut.GetFolderBrowserStartAtLastLocation());
         Assert.Equal(@"C:\Music", sut.GetLastBrowsedFolder());
         Assert.Equal(@"C:\Pinned", Assert.Single(sut.GetPinnedFolders()));
@@ -90,6 +100,26 @@ public sealed class AppSettingsServicesTests
         sut.SetScanOnStartup(false);
 
         Assert.False(settings.ScanOnStartup);
+    }
+
+    [Fact]
+    public void AppSettingsWriteService_SetTaskStatusProgressSettings_PersistsValues()
+    {
+        var settings = new AppSettings();
+        var manager = CreateSettingsManager(settings);
+        var sut = new AppSettingsWriteService(manager.Object);
+
+        sut.SetShowTaskPercentage(false);
+        sut.SetTaskPercentageReportInterval(7);
+        sut.SetShowScanMilestoneCount(true);
+        sut.SetScanMilestoneInterval(40);
+        sut.SetScanMilestoneBasis(TaskStatusCountBasis.Remaining);
+
+        Assert.False(settings.ShowTaskPercentage);
+        Assert.Equal((short)7, settings.TaskPercentageReportInterval);
+        Assert.True(settings.ShowScanMilestoneCount);
+        Assert.Equal((short)40, settings.ScanMilestoneInterval);
+        Assert.Equal(TaskStatusCountBasis.Remaining, settings.ScanMilestoneBasis);
     }
 
     private static Mock<ISettingsManager<AppSettings>> CreateSettingsManager(AppSettings settings)

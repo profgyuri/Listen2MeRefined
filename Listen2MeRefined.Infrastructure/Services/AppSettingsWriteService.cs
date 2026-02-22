@@ -73,6 +73,31 @@ public sealed class AppSettingsWriteService : IAppSettingsWriteService
         _settingsManager.SaveSettings(s => s.AutoScanOnFolderAdd = value);
     }
 
+    public void SetShowTaskPercentage(bool value)
+    {
+        _settingsManager.SaveSettings(s => s.ShowTaskPercentage = value);
+    }
+
+    public void SetTaskPercentageReportInterval(short value)
+    {
+        _settingsManager.SaveSettings(s => s.TaskPercentageReportInterval = value);
+    }
+
+    public void SetShowScanMilestoneCount(bool value)
+    {
+        _settingsManager.SaveSettings(s => s.ShowScanMilestoneCount = value);
+    }
+
+    public void SetScanMilestoneInterval(short value)
+    {
+        _settingsManager.SaveSettings(s => s.ScanMilestoneInterval = value);
+    }
+
+    public void SetScanMilestoneBasis(TaskStatusCountBasis value)
+    {
+        _settingsManager.SaveSettings(s => s.ScanMilestoneBasis = value);
+    }
+
     public void SetFolderBrowserStartAtLastLocation(bool value)
     {
         _settingsManager.SaveSettings(s => s.FolderBrowserStartAtLastLocation = value);

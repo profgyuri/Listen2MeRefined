@@ -1,5 +1,6 @@
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
+using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Startup;
 using MediatR;
 
@@ -14,6 +15,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IUiDispatcher _ui;
     private readonly IAppUpdateCheckService _appUpdateCheckService;
     private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly StartupManager _startupManager;
     private readonly IMainWindowNavigationService _navigationService;
 
@@ -34,12 +36,15 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
+    [ObservableProperty] private bool _isTaskStatusVisible;
+    [ObservableProperty] private string _taskStatusText = "";
 
     public MainWindowViewModel(
         ILogger logger,
         IUiDispatcher ui,
         IAppUpdateCheckService appUpdateCheckService,
         IAppSettingsReadService settingsReadService,
+        IBackgroundTaskStatusService backgroundTaskStatusService,
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
         ListsViewModel listsViewModel,
@@ -52,6 +57,7 @@ public sealed partial class MainWindowViewModel :
         _ui = ui;
         _appUpdateCheckService = appUpdateCheckService;
         _settingsReadService = settingsReadService;
+        _backgroundTaskStatusService = backgroundTaskStatusService;
         _startupManager = startupManager;
         _navigationService = navigationService;
 
@@ -60,6 +66,8 @@ public sealed partial class MainWindowViewModel :
         ListsViewModel = listsViewModel;
         PlaylistPaneViewModel = playlistPaneViewModel;
         SearchResultsPaneViewModel = searchResultsPaneViewModel;
+        _backgroundTaskStatusService.SnapshotChanged += BackgroundTaskStatusServiceOnSnapshotChanged;
+        ApplyTaskSnapshot(_backgroundTaskStatusService.GetSnapshot());
 
         _logger.Debug("[MainWindowViewModel] Class initialized");
     }
@@ -153,5 +161,56 @@ public sealed partial class MainWindowViewModel :
     {
         _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         return _ui.InvokeAsync<string>(() => FontFamily = notification.FontFamily, cancellationToken);
+    }
+
+    private void BackgroundTaskStatusServiceOnSnapshotChanged(object? sender, BackgroundTaskSnapshot snapshot)
+    {
+        _ = _ui.InvokeAsync(() => ApplyTaskSnapshot(snapshot));
+    }
+
+    private void ApplyTaskSnapshot(BackgroundTaskSnapshot snapshot)
+    {
+        IsTaskStatusVisible = snapshot.IsVisible && snapshot.PrimaryTask is not null;
+        TaskStatusText = IsTaskStatusVisible
+            ? FormatTaskStatusText(snapshot.PrimaryTask!, snapshot.QueuedCount)
+            : string.Empty;
+    }
+
+    private static string FormatTaskStatusText(BackgroundTaskItem task, int queuedCount)
+    {
+        var parts = new List<string>();
+
+        if (task.State == BackgroundTaskState.Completed)
+        {
+            parts.Add("Done");
+        }
+        else if (task.State == BackgroundTaskState.Failed)
+        {
+            parts.Add("Error");
+        }
+
+        parts.Add(task.DisplayName);
+
+        if (task.Percent is not null)
+        {
+            parts.Add($"{task.Percent}%");
+        }
+
+        if (!string.IsNullOrWhiteSpace(task.CountText))
+        {
+            parts.Add(task.CountText!);
+        }
+
+        if (!string.IsNullOrWhiteSpace(task.Message) && task.State is not BackgroundTaskState.Running)
+        {
+            parts.Add(task.Message!);
+        }
+
+        if (queuedCount > 0)
+        {
+            parts.Add($"+{queuedCount}");
+        }
+
+        return string.Join(" | ", parts);
     }
 }

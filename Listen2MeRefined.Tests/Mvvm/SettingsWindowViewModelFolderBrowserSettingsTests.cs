@@ -116,6 +116,7 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             settingsReadService,
             settingsWriteService,
             updateCheckService.Object,
+            Mock.Of<IBackgroundTaskStatusService>(),
             Mock.Of<IGlobalHookSettingsSyncService>(),
             pinnedFoldersService,
             playbackDefaultsService);
