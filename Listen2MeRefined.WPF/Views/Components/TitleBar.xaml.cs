@@ -56,6 +56,13 @@ public partial class TitleBar : UserControl
             typeof(TitleBar),
             new PropertyMetadata(string.Empty));
 
+    public static readonly DependencyProperty TaskStatusTooltipProperty =
+        DependencyProperty.Register(
+            nameof(TaskStatusTooltip),
+            typeof(string),
+            typeof(TitleBar),
+            new PropertyMetadata(string.Empty));
+
     public static readonly DependencyProperty SettingsCommandProperty =
         DependencyProperty.Register(
             nameof(SettingsCommand),
@@ -180,6 +187,12 @@ public partial class TitleBar : UserControl
     {
         get => (string)GetValue(TaskStatusTextProperty);
         set => SetValue(TaskStatusTextProperty, value);
+    }
+
+    public string TaskStatusTooltip
+    {
+        get => (string)GetValue(TaskStatusTooltipProperty);
+        set => SetValue(TaskStatusTooltipProperty, value);
     }
 
     public ICommand? SettingsCommand

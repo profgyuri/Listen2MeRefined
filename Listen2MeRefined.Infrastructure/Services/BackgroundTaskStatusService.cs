@@ -178,6 +178,11 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
     {
         lock (_sync)
         {
+            if (_tasks.Count == 0 && _terminalTask is null)
+            {
+                return new BackgroundTaskSnapshot(false, null, 0);
+            }
+
             ApplyPresentationSettingChanges();
             return BuildSnapshot();
         }
@@ -195,8 +200,16 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
 
         lock (_sync)
         {
-            ApplyPresentationSettingChanges();
-            snapshot = BuildSnapshot();
+            if (_tasks.Count == 0 && _terminalTask is null)
+            {
+                snapshot = new BackgroundTaskSnapshot(false, null, 0);
+            }
+            else
+            {
+                ApplyPresentationSettingChanges();
+                snapshot = BuildSnapshot();
+            }
+
             if (snapshot == _lastSnapshot)
             {
                 return;

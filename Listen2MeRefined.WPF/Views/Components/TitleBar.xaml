@@ -39,6 +39,7 @@
                     <TextBlock Text="{Binding CenterText, ElementName=Root}"
                                Style="{StaticResource ComponentTitleBarCenterText}" />
                     <Border Style="{StaticResource ComponentTitleBarStatusBadgeBorder}"
+                            ToolTip="{Binding TaskStatusTooltip, ElementName=Root}"
                             Visibility="{Binding ShowTaskStatus, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
                         <TextBlock Text="{Binding TaskStatusText, ElementName=Root}"
                                    Style="{StaticResource ComponentTitleBarStatusBadgeText}" />

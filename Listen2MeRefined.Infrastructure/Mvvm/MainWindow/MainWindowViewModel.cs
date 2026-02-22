@@ -37,6 +37,7 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
     [ObservableProperty] private bool _isTaskStatusVisible;
     [ObservableProperty] private string _taskStatusText = "";
+    [ObservableProperty] private string _taskStatusTooltip = "";
 
     public MainWindowViewModel(
         ILogger logger,
@@ -91,6 +92,7 @@ public sealed partial class MainWindowViewModel :
         try
         {
             await _startupManager.StartAsync(ct);
+            await PlayerControlsViewModel.InitializeAsync(ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -170,9 +172,15 @@ public sealed partial class MainWindowViewModel :
     private void ApplyTaskSnapshot(BackgroundTaskSnapshot snapshot)
     {
         IsTaskStatusVisible = snapshot.IsVisible && snapshot.PrimaryTask is not null;
-        TaskStatusText = IsTaskStatusVisible
-            ? FormatTaskStatusText(snapshot.PrimaryTask!, snapshot.QueuedCount)
-            : string.Empty;
+        if (!IsTaskStatusVisible)
+        {
+            TaskStatusText = string.Empty;
+            TaskStatusTooltip = string.Empty;
+            return;
+        }
+
+        TaskStatusText = FormatTaskStatusText(snapshot.PrimaryTask!, snapshot.QueuedCount);
+        TaskStatusTooltip = FormatTaskStatusTooltip(snapshot.PrimaryTask!);
     }
 
     private static string FormatTaskStatusText(BackgroundTaskItem task, int queuedCount)
@@ -195,21 +203,18 @@ public sealed partial class MainWindowViewModel :
             parts.Add($"{task.Percent}%");
         }
 
-        if (!string.IsNullOrWhiteSpace(task.CountText))
-        {
-            parts.Add(task.CountText!);
-        }
-
-        if (!string.IsNullOrWhiteSpace(task.Message) && task.State is not BackgroundTaskState.Running)
-        {
-            parts.Add(task.Message!);
-        }
-
         if (queuedCount > 0)
         {
             parts.Add($"+{queuedCount}");
         }
 
         return string.Join(" | ", parts);
+    }
+
+    private static string FormatTaskStatusTooltip(BackgroundTaskItem task)
+    {
+        return string.IsNullOrWhiteSpace(task.Message)
+            ? string.Empty
+            : task.Message!;
     }
 }

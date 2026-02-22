@@ -1,5 +1,6 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Storage;
 using Moq;
@@ -115,6 +116,19 @@ public sealed class BackgroundTaskStatusServiceTests
         await Task.Delay(90);
 
         Assert.False(sut.GetSnapshot().IsVisible);
+    }
+
+    [Fact]
+    public void GetSnapshot_NoTasks_DoesNotReadSettings()
+    {
+        var readService = new Mock<IAppSettingsReadService>(MockBehavior.Strict);
+        var sut = new BackgroundTaskStatusService(readService.Object, Mock.Of<Serilog.ILogger>());
+
+        var snapshot = sut.GetSnapshot();
+
+        Assert.False(snapshot.IsVisible);
+        Assert.Null(snapshot.PrimaryTask);
+        Assert.Equal(0, snapshot.QueuedCount);
     }
 
     private static BackgroundTaskStatusService CreateSut(AppSettings settings, TimeSpan? terminalVisibility = null)
