@@ -111,6 +111,12 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("Genre")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("LastWriteUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("LengthBytes")
+                        .HasColumnType("INTEGER");
+
                     b.Property<TimeSpan>("Length")
                         .HasColumnType("TEXT");
 
@@ -127,6 +133,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
 
                     b.HasIndex("PlaylistModelId");
 
+                    b.HasIndex("Path")
+                        .IsUnique();
+
                     b.ToTable("Songs");
                 });
 
@@ -142,6 +151,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("FullPath")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IncludeSubdirectories")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

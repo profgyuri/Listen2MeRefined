@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Services.Models;
 
 namespace Listen2MeRefined.Infrastructure.Services;
 
@@ -111,9 +112,35 @@ public sealed class AppSettingsWriteService : IAppSettingsWriteService
     public void SetMusicFolders(IEnumerable<string> folders)
     {
         var normalized = Normalize(folders)
-            .Select(x => new MusicFolderModel(x))
+            .Select(x => new FolderScanRequest(x, false));
+        SetMusicFolders(normalized);
+    }
+
+    public void SetMusicFolders(IEnumerable<FolderScanRequest> folders)
+    {
+        var normalized = NormalizeFolderRequests(folders)
+            .Select(x => new MusicFolderModel(x.Path, x.IncludeSubdirectories))
             .ToList();
         _settingsManager.SaveSettings(s => s.MusicFolders = normalized);
+    }
+
+    public void SetFolderIncludeSubdirectories(string path, bool includeSubdirectories)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        var normalizedPath = path.Trim();
+        _settingsManager.SaveSettings(s =>
+        {
+            var folder = s.MusicFolders
+                .FirstOrDefault(x => x.FullPath.Equals(normalizedPath, StringComparison.OrdinalIgnoreCase));
+            if (folder is not null)
+            {
+                folder.IncludeSubdirectories = includeSubdirectories;
+            }
+        });
     }
 
     public void SetPinnedFolders(IEnumerable<string> folders)
@@ -128,6 +155,32 @@ public sealed class AppSettingsWriteService : IAppSettingsWriteService
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Select(x => x.Trim())
             .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private static List<FolderScanRequest> NormalizeFolderRequests(IEnumerable<FolderScanRequest> folders)
+    {
+        var map = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        foreach (var folder in folders)
+        {
+            if (string.IsNullOrWhiteSpace(folder.Path))
+            {
+                continue;
+            }
+
+            var path = folder.Path.Trim();
+            if (map.TryGetValue(path, out var include))
+            {
+                map[path] = include || folder.IncludeSubdirectories;
+            }
+            else
+            {
+                map[path] = folder.IncludeSubdirectories;
+            }
+        }
+
+        return map
+            .Select(x => new FolderScanRequest(x.Key, x.Value))
             .ToList();
     }
 }

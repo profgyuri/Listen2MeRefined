@@ -1,6 +1,7 @@
-using Listen2MeRefined.Infrastructure.Storage;
+using System.Collections.Concurrent;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Services.Models;
+using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
 
@@ -10,15 +11,16 @@ public sealed class FolderScannerService : IFolderScanner
 {
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
-    private readonly IRepository<AudioModel> _audioRepository;
+    private readonly IAudioRepository _audioRepository;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly ILogger _logger;
+    private readonly int _maxWorkers;
 
     public FolderScannerService(
         IFileEnumerator fileEnumerator,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IRepository<AudioModel> audioRepository,
+        IAudioRepository audioRepository,
         ISettingsManager<AppSettings> settingsManager,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         ILogger logger)
@@ -29,33 +31,51 @@ public sealed class FolderScannerService : IFolderScanner
         _settingsManager = settingsManager;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _logger = logger;
+        _maxWorkers = Math.Max(1, Math.Min(Environment.ProcessorCount - 1, 8));
     }
 
-    public async Task ScanAsync(string path)
+    public Task ScanAsync(string path, ScanMode mode = ScanMode.Incremental, CancellationToken ct = default)
     {
-        await ScanAsync([path]);
+        return ScanAsync([new FolderScanRequest(path, false)], mode, ct);
     }
 
-    public async Task ScanAsync(IEnumerable<string> paths)
+    public async Task ScanAsync(
+        IEnumerable<FolderScanRequest> requests,
+        ScanMode mode = ScanMode.Incremental,
+        CancellationToken ct = default)
     {
-        var pathList = paths
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
+        var requestList = NormalizeRequests(requests);
         var taskHandle = _backgroundTaskStatusService.StartTask(
             "folder-scan",
             "Scanning library",
             TaskProgressKind.Determinate);
 
+        using var analyzerLimiter = new SemaphoreSlim(_maxWorkers, _maxWorkers);
+        using var repositoryLimiter = new SemaphoreSlim(1, 1);
         try
         {
-            foreach (var path in pathList)
-            {
-                await ScanSinglePathAsync(path, taskHandle);
-            }
+            var folderTasks = requestList
+                .Select(x => ScanSinglePathAsync(x, mode, taskHandle, analyzerLimiter, repositoryLimiter, ct))
+                .ToArray();
 
-            _backgroundTaskStatusService.CompleteTask(taskHandle, "Scan completed.");
+            var folderResults = await Task.WhenAll(folderTasks);
+            var totalAdded = folderResults.Sum(x => x.Added);
+            var totalUpdated = folderResults.Sum(x => x.Updated);
+            var totalRemoved = folderResults.Sum(x => x.Removed);
+            var totalSkipped = folderResults.Sum(x => x.Skipped);
+            var totalFailed = folderResults.Sum(x => x.Failed);
+
+            var summary =
+                $"Scan completed. Added {totalAdded}, updated {totalUpdated}, removed {totalRemoved}, skipped {totalSkipped}, failed {totalFailed}.";
+            _backgroundTaskStatusService.CompleteTask(taskHandle, summary);
+            _logger.Information("[FolderScannerService] {Summary}", summary);
+        }
+        catch (OperationCanceledException)
+        {
+            const string canceled = "Scan canceled.";
+            _backgroundTaskStatusService.FailTask(taskHandle, canceled);
+            _logger.Warning("[FolderScannerService] {Message}", canceled);
+            throw;
         }
         catch (Exception ex)
         {
@@ -63,84 +83,263 @@ public sealed class FolderScannerService : IFolderScanner
             throw;
         }
     }
-    
-    public async Task ScanAllAsync()
+
+    public async Task ScanAllAsync(ScanMode mode = ScanMode.Incremental, CancellationToken ct = default)
     {
-        var paths =
-            _settingsManager.Settings.MusicFolders
-                .Select(x => x.FullPath);
-        await ScanAsync(paths);
+        var requests = _settingsManager.Settings.MusicFolders
+            .Select(x => new FolderScanRequest(x.FullPath, x.IncludeSubdirectories));
+        await ScanAsync(requests, mode, ct);
     }
 
-    private async Task ScanSinglePathAsync(string path, TaskHandle taskHandle)
+    private async Task<FolderScanResult> ScanSinglePathAsync(
+        FolderScanRequest request,
+        ScanMode mode,
+        TaskHandle taskHandle,
+        SemaphoreSlim analyzerLimiter,
+        SemaphoreSlim repositoryLimiter,
+        CancellationToken ct)
     {
-        _logger.Information("[FolderScannerService] Scanning folder for audio files: {Path}", path);
+        var path = request.Path;
+        _logger.Information(
+            "[FolderScannerService] Scanning folder {Path} (recursive: {Recursive}, mode: {Mode})",
+            path,
+            request.IncludeSubdirectories,
+            mode);
 
-        var files = await _fileEnumerator.EnumerateFilesAsync(path);
-        var newSupportedFiles = files
-            .Where(IsSupported)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var files = new List<string>();
+        await foreach (var file in _fileEnumerator.EnumerateFilesAsync(path, request.IncludeSubdirectories, ct))
+        {
+            files.Add(file);
+        }
 
-        var fromDb = (await _audioRepository.ReadAsync())
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path)
-                        && x.Path.StartsWith(path, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
+        files.Sort(StringComparer.OrdinalIgnoreCase);
+        var discoveredFileSet = new HashSet<string>(files, StringComparer.OrdinalIgnoreCase);
+        IReadOnlyList<AudioModel> fromDb;
+        await repositoryLimiter.WaitAsync(ct);
+        try
+        {
+            fromDb = await _audioRepository.ReadByFolderScopeAsync(path, request.IncludeSubdirectories);
+        }
+        finally
+        {
+            repositoryLimiter.Release();
+        }
         var existingByPath = fromDb
             .Where(x => !string.IsNullOrWhiteSpace(x.Path))
             .GroupBy(x => x.Path!, StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
-
-        var existingToAnalyzePaths = new HashSet<string>(
-            newSupportedFiles.Where(existingByPath.ContainsKey),
-            StringComparer.OrdinalIgnoreCase);
-
-        newSupportedFiles.ExceptWith(existingToAnalyzePaths);
-
+            .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
         var removedFromDisk = fromDb
-            .Where(x => string.IsNullOrWhiteSpace(x.Path) || !existingToAnalyzePaths.Contains(x.Path!))
+            .Where(x => string.IsNullOrWhiteSpace(x.Path) || !discoveredFileSet.Contains(x.Path!))
             .ToList();
 
-        var totalUnits = existingToAnalyzePaths.Count + newSupportedFiles.Count;
-        var workerHandle = _backgroundTaskStatusService.RegisterWorker(taskHandle, path, totalUnits);
+        var workerHandle = _backgroundTaskStatusService.RegisterWorker(taskHandle, path, files.Count);
+        var toUpdate = new ConcurrentBag<AudioModel>();
+        var newSongs = new ConcurrentBag<AudioModel>();
+        var failedPaths = new ConcurrentQueue<string>();
+        var analyzed = 0;
+        var skipped = 0;
+        var failed = 0;
 
         try
         {
-            var toUpdate = new HashSet<AudioModel>();
-            foreach (var existingPath in existingToAnalyzePaths)
-            {
-                var current = existingByPath[existingPath];
-                var updated = await _audioFileAnalyzer.AnalyzeAsync(existingPath);
-                current.Update(updated);
-                toUpdate.Add(current);
-                _backgroundTaskStatusService.ReportWorker(workerHandle, 1, totalUnits);
-            }
+            var processTasks = files
+                .Select(filePath => ProcessFileAsync(
+                    filePath,
+                    mode,
+                    existingByPath,
+                    toUpdate,
+                    newSongs,
+                    failedPaths,
+                    workerHandle,
+                    files.Count,
+                    analyzerLimiter,
+                    onAnalyzed: () => Interlocked.Increment(ref analyzed),
+                    onSkipped: () => Interlocked.Increment(ref skipped),
+                    onFailed: () => Interlocked.Increment(ref failed),
+                    ct))
+                .ToArray();
 
-            var newSongs = new List<AudioModel>();
-            foreach (var newPath in newSupportedFiles)
-            {
-                var analyzed = await _audioFileAnalyzer.AnalyzeAsync(newPath);
-                newSongs.Add(analyzed);
-                _backgroundTaskStatusService.ReportWorker(workerHandle, 1, totalUnits);
-            }
+            await Task.WhenAll(processTasks);
 
-            await _audioRepository.UpdateAsync(toUpdate);
-            await _audioRepository.SaveAsync(newSongs);
-            await _audioRepository.RemoveAsync(removedFromDisk);
+            var updates = toUpdate.ToArray();
+            var inserts = newSongs.ToArray();
+
+            await repositoryLimiter.WaitAsync(ct);
+            try
+            {
+                _logger.Debug(
+                    "[FolderScannerService] Persisting folder {Path}: insert {InsertCount}, update {UpdateCount}, remove {RemoveCount}",
+                    path,
+                    inserts.Length,
+                    updates.Length,
+                    removedFromDisk.Count);
+                await _audioRepository.PersistScanChangesAsync(inserts, updates, removedFromDisk);
+            }
+            finally
+            {
+                repositoryLimiter.Release();
+            }
 
             _backgroundTaskStatusService.CompleteWorker(workerHandle);
+
+            if (!failedPaths.IsEmpty)
+            {
+                _logger.Warning(
+                    "[FolderScannerService] Folder {Path} had {Failed} file analysis failures.",
+                    path,
+                    failed);
+            }
+
+            return new FolderScanResult(
+                inserts.Length,
+                updates.Length,
+                removedFromDisk.Count,
+                skipped,
+                failed);
+        }
+        catch (OperationCanceledException)
+        {
+            _backgroundTaskStatusService.FailWorker(workerHandle, $"Scan canceled for '{Path.GetFileName(path)}'.");
+            throw;
         }
         catch (Exception ex)
         {
             _backgroundTaskStatusService.FailWorker(
                 workerHandle,
                 $"Failed scanning '{Path.GetFileName(path)}': {ex.Message}");
-            throw;
+            _logger.Error(ex, "[FolderScannerService] Failed to scan folder {Path}", path);
+            return new FolderScanResult(0, 0, 0, skipped, failed + Math.Max(1, files.Count - analyzed - skipped));
         }
     }
 
-    private static bool IsSupported(string path)
+    private async Task ProcessFileAsync(
+        string filePath,
+        ScanMode mode,
+        IReadOnlyDictionary<string, AudioModel> existingByPath,
+        ConcurrentBag<AudioModel> toUpdate,
+        ConcurrentBag<AudioModel> newSongs,
+        ConcurrentQueue<string> failedPaths,
+        WorkerHandle workerHandle,
+        int totalUnits,
+        SemaphoreSlim analyzerLimiter,
+        Action onAnalyzed,
+        Action onSkipped,
+        Action onFailed,
+        CancellationToken ct)
     {
-        return !path.EndsWith(".wav") || new WaveFileReader(path).WaveFormat.Encoding is not WaveFormatEncoding.Extensible;
+        try
+        {
+            ct.ThrowIfCancellationRequested();
+
+            if (IsUnsupportedForNow(filePath))
+            {
+                onSkipped();
+                return;
+            }
+
+            var hasExisting = existingByPath.TryGetValue(filePath, out var existing);
+            var shouldAnalyze = mode == ScanMode.FullRefresh
+                                || !hasExisting
+                                || HasFileChanged(filePath, existing!);
+            if (!shouldAnalyze)
+            {
+                onSkipped();
+                return;
+            }
+
+            await analyzerLimiter.WaitAsync(ct);
+            try
+            {
+                var analyzed = await _audioFileAnalyzer.AnalyzeAsync(filePath, ct);
+                if (hasExisting)
+                {
+                    existing!.Update(analyzed);
+                    toUpdate.Add(existing);
+                }
+                else
+                {
+                    newSongs.Add(analyzed);
+                }
+            }
+            finally
+            {
+                analyzerLimiter.Release();
+            }
+
+            onAnalyzed();
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            failedPaths.Enqueue(filePath);
+            _logger.Error(ex, "[FolderScannerService] Failed to analyze {Path}", filePath);
+            onFailed();
+        }
+        finally
+        {
+            _backgroundTaskStatusService.ReportWorker(workerHandle, 1, totalUnits);
+        }
     }
+
+    private static bool HasFileChanged(string path, AudioModel existing)
+    {
+        var info = new FileInfo(path);
+        return existing.LastWriteUtc != info.LastWriteTimeUtc || existing.LengthBytes != info.Length;
+    }
+
+    private bool IsUnsupportedForNow(string path)
+    {
+        if (!path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var reader = new WaveFileReader(path);
+            return reader.WaveFormat.Encoding == WaveFormatEncoding.Extensible;
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug(ex, "[FolderScannerService] Could not pre-check wav format for {Path}", path);
+            return false;
+        }
+    }
+
+    private static IReadOnlyList<FolderScanRequest> NormalizeRequests(IEnumerable<FolderScanRequest> requests)
+    {
+        var byPath = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        foreach (var request in requests)
+        {
+            if (string.IsNullOrWhiteSpace(request.Path))
+            {
+                continue;
+            }
+
+            var normalizedPath = request.Path.Trim();
+            if (byPath.TryGetValue(normalizedPath, out var current))
+            {
+                byPath[normalizedPath] = current || request.IncludeSubdirectories;
+            }
+            else
+            {
+                byPath[normalizedPath] = request.IncludeSubdirectories;
+            }
+        }
+
+        return byPath
+            .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(x => new FolderScanRequest(x.Key, x.Value))
+            .ToArray();
+    }
+
+    private readonly record struct FolderScanResult(
+        int Added,
+        int Updated,
+        int Removed,
+        int Skipped,
+        int Failed);
 }

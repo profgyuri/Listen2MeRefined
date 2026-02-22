@@ -240,6 +240,10 @@
                                                 ToolTip="Remove selected folder" />
                                         </Grid>
 
+                                        <CheckBox IsChecked="{Binding SelectedFolderIncludeSubdirectories}"
+                                                  IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
+                                                  Content="Scan selected folder recursively"
+                                                  Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding ScanOnStartup}" Content="Scan folders on startup" Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding AutoScanOnFolderAdd}" Content="Scan newly added folders immediately" Margin="0,0,0,10" />
                                         <Button Style="{StaticResource SettingsActionButton}"

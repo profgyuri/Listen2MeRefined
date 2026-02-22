@@ -1,64 +1,68 @@
-﻿using System.IO.Enumeration;
+using System.IO.Enumeration;
+using System.Runtime.CompilerServices;
 
 namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
 public sealed class FileEnumerator : IFileEnumerator
 {
     private readonly ILogger _logger;
+    private static readonly HashSet<string> SupportedExtensions = new(
+        GlobalConstants.SupportedExtensions,
+        StringComparer.OrdinalIgnoreCase);
 
     public FileEnumerator(ILogger logger)
     {
         _logger = logger;
     }
 
-    public IEnumerable<string> EnumerateFiles(string path)
+    public async IAsyncEnumerable<string> EnumerateFilesAsync(
+        string path,
+        bool includeSubdirectories,
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         ThrowIfNotDirectory(path);
 
-        return GetSupportedFiles(path);
+        var options = new EnumerationOptions
+        {
+            RecurseSubdirectories = includeSubdirectories,
+            IgnoreInaccessible = true
+        };
+
+        FileSystemEnumerable<string>? enumerator = null;
+        try
+        {
+            enumerator = new FileSystemEnumerable<string>(
+                path,
+                (ref FileSystemEntry entry) => entry.ToFullPath(),
+                options);
+        }
+        catch (UnauthorizedAccessException uae)
+        {
+            _logger.Error(uae, "[FileEnumerator] Access denied while enumerating files in {Path}", path);
+        }
+
+        if (enumerator is null)
+        {
+            yield break;
+        }
+
+        foreach (var file in enumerator)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (SupportedExtensions.Contains(Path.GetExtension(file)))
+            {
+                yield return file;
+            }
+        }
+
+        await Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<string>> EnumerateFilesAsync(string path)
-    {
-        ThrowIfNotDirectory(path);
-
-        return await Task.Run(() => GetSupportedFiles(path));
-    }
-    
     private static void ThrowIfNotDirectory(string path)
     {
         if (!Directory.Exists(path))
         {
-            throw new ArgumentException($"{path} is not a directory");
+            throw new ArgumentException($"{path} is not a directory", nameof(path));
         }
-    }
-
-    private IEnumerable<string> GetSupportedFiles(string path)
-    {
-        var result = new List<string>();
-        try
-        {
-            var options = new EnumerationOptions
-            {
-                RecurseSubdirectories = false,
-                IgnoreInaccessible = true
-            };
-            var enumerator = new FileSystemEnumerable<string>(path, (ref FileSystemEntry entry) => entry.ToFullPath(), options);
-            {
-                foreach (var file in enumerator)
-                {
-                    if (GlobalConstants.SupportedExtensions.Contains(Path.GetExtension(file)))
-                    {
-                        result.Add(file);
-                    }
-                }
-            }
-        }
-        catch (UnauthorizedAccessException uae)
-        {
-            _logger.Error(uae.Message);
-        }
-
-        return result;
     }
 }

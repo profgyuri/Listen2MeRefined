@@ -3,6 +3,7 @@ using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
+using Listen2MeRefined.Infrastructure.Services.Models;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
@@ -44,9 +45,12 @@ public sealed partial class SettingsWindowViewModel :
     private int _secondsToCancelClear = 5;
     private bool _isLoadingSettings;
     private bool _isSyncingGlobalHookState;
+    private bool _isUpdatingFolderSelection;
+    private readonly Dictionary<string, bool> _folderRecursionByPath = new(StringComparer.OrdinalIgnoreCase);
 
     [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string? _selectedFolder = "";
+    [ObservableProperty] private bool _selectedFolderIncludeSubdirectories;
     [ObservableProperty] private string _selectedFontFamily = "";
     [ObservableProperty] private string _selectedNewSongWindowPosition = "";
     [ObservableProperty] private AudioOutputDevice? _selectedAudioOutputDevice;
@@ -143,7 +147,14 @@ public sealed partial class SettingsWindowViewModel :
             "Always on top"
         };
 
-        Folders = new(_settingsReadService.GetMusicFolders());
+        var musicFolderRequests = _settingsReadService.GetMusicFolderRequests();
+        _folderRecursionByPath.Clear();
+        foreach (var folderRequest in musicFolderRequests)
+        {
+            _folderRecursionByPath[folderRequest.Path] = folderRequest.IncludeSubdirectories;
+        }
+
+        Folders = new(musicFolderRequests.Select(x => x.Path));
         var selectedFont = _settingsReadService.GetFontFamily();
         FontFamily = selectedFont;
         SelectedFontFamily = string.IsNullOrEmpty(selectedFont) ? "Segoe UI" : selectedFont;
@@ -224,6 +235,38 @@ public sealed partial class SettingsWindowViewModel :
         _logger.Information("[SettingsWindowViewModel] New song window position changed to: {Position}", value);
         _settingsWriteService.SetNewSongWindowPosition(value);
         _ = _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
+    }
+
+    partial void OnSelectedFolderChanged(string? value)
+    {
+        _isUpdatingFolderSelection = true;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                SelectedFolderIncludeSubdirectories = false;
+                return;
+            }
+
+            SelectedFolderIncludeSubdirectories =
+                _folderRecursionByPath.TryGetValue(value, out var includeSubdirectories)
+                && includeSubdirectories;
+        }
+        finally
+        {
+            _isUpdatingFolderSelection = false;
+        }
+    }
+
+    partial void OnSelectedFolderIncludeSubdirectoriesChanged(bool value)
+    {
+        if (_isLoadingSettings || _isUpdatingFolderSelection || string.IsNullOrWhiteSpace(SelectedFolder))
+        {
+            return;
+        }
+
+        _folderRecursionByPath[SelectedFolder] = value;
+        _settingsWriteService.SetFolderIncludeSubdirectories(SelectedFolder, value);
     }
 
     partial void OnEnableGlobalMediaKeysChanged(bool value)
@@ -427,8 +470,9 @@ public sealed partial class SettingsWindowViewModel :
 
         _logger.Information("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
         Folders.Remove(SelectedFolder);
+        _folderRecursionByPath.Remove(SelectedFolder);
         await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
-        _settingsWriteService.SetMusicFolders(Folders);
+        PersistMusicFolders();
         _logger.Verbose("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
     }
 
@@ -482,7 +526,8 @@ public sealed partial class SettingsWindowViewModel :
                 _secondsToCancelClear = 5;
                 CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
-                _settingsWriteService.SetMusicFolders([]);
+                _folderRecursionByPath.Clear();
+                _settingsWriteService.SetMusicFolders(Array.Empty<FolderScanRequest>());
                 _logger.Debug("[SettingsWindowViewModel] Metadata cleared");
             }
 
@@ -509,7 +554,7 @@ public sealed partial class SettingsWindowViewModel :
     private async Task ForceScanAsync()
     {
         _logger.Information("[SettingsWindowViewModel] Force scanning folders...");
-        await _folderScanner.ScanAllAsync();
+        await _folderScanner.ScanAllAsync(ScanMode.FullRefresh);
     }
 
     [RelayCommand]
@@ -576,6 +621,15 @@ public sealed partial class SettingsWindowViewModel :
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
 
+    private void PersistMusicFolders()
+    {
+        var folders = Folders
+            .Select(path => new FolderScanRequest(
+                path,
+                _folderRecursionByPath.TryGetValue(path, out var includeSubdirectories) && includeSubdirectories));
+        _settingsWriteService.SetMusicFolders(folders);
+    }
+
     private void PersistPinnedFolders()
     {
         _settingsWriteService.SetPinnedFolders(_pinnedFoldersService.Normalize(PinnedFolders));
@@ -625,7 +679,8 @@ public sealed partial class SettingsWindowViewModel :
 
         _logger.Information("[SettingsWindowViewModel] Adding path to music folders: {Path}", path);
         Folders.Add(path);
-        _settingsWriteService.SetMusicFolders(Folders);
+        _folderRecursionByPath[path] = false;
+        PersistMusicFolders();
 
         if (!AutoScanOnFolderAdd)
         {
@@ -634,7 +689,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Starting folder scan for path: {Path}", path);
-        await _folderScanner.ScanAsync(path);
+        await _folderScanner.ScanAsync(path, ScanMode.Incremental, cancellationToken);
         _logger.Verbose("[SettingsWindowViewModel] Path was scanned and added to music folders: {Path}", path);
     }
 

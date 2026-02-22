@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
@@ -28,19 +29,26 @@ public sealed class FolderScanStartupTask : IStartupTask
 
         _logger.Information("[FolderScanStartupTask] Starting folder scan in background...");
 
-        try
-        {
-            await _folderScanner.ScanAllAsync().ConfigureAwait(false);
-        }
-        catch (OperationCanceledException)
-        {
-            // ignored
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "[FolderScanStartupTask] Error during background folder scan on startup.");
-        }
+        _ = Task.Run(
+            async () =>
+            {
+                try
+                {
+                    await _folderScanner.ScanAllAsync(ScanMode.Incremental, ct).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    // ignored
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "[FolderScanStartupTask] Error during background folder scan on startup.");
+                }
 
-        _logger.Information("[FolderScanStartupTask] Background folder scan completed.");
+                _logger.Information("[FolderScanStartupTask] Background folder scan completed.");
+            },
+            CancellationToken.None);
+
+        await Task.CompletedTask;
     }
 }

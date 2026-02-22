@@ -1,9 +1,15 @@
-﻿namespace Listen2MeRefined.Infrastructure.SystemOperations;
+namespace Listen2MeRefined.Infrastructure.SystemOperations;
 
+/// <summary>
+/// Analyzes a file and produces a typed metadata model.
+/// </summary>
 public interface IFileAnalyzer<T>
 {
-    T Analyze(string path);
-    IEnumerable<T> Analyze(IEnumerable<string> paths);
-    Task<T> AnalyzeAsync(string path);
-    Task<IEnumerable<T>> AnalyzeAsync(IEnumerable<string> paths);
+    /// <summary>
+    /// Analyzes a single file asynchronously.
+    /// </summary>
+    /// <param name="path">Absolute path of the file to analyze.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The analyzed model for the file.</returns>
+    Task<T> AnalyzeAsync(string path, CancellationToken ct = default);
 }

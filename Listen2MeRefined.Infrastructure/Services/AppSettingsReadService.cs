@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Services.Models;
 
 namespace Listen2MeRefined.Infrastructure.Services;
 
@@ -17,6 +18,10 @@ public sealed class AppSettingsReadService : IAppSettingsReadService
     public string GetNewSongWindowPosition() => _settingsManager.Settings.NewSongWindowPosition;
     public string GetAudioOutputDeviceName() => _settingsManager.Settings.AudioOutputDeviceName;
     public IReadOnlyList<string> GetMusicFolders() => _settingsManager.Settings.MusicFolders.Select(x => x.FullPath).ToList();
+    public IReadOnlyList<FolderScanRequest> GetMusicFolderRequests() =>
+        _settingsManager.Settings.MusicFolders
+            .Select(x => new FolderScanRequest(x.FullPath, x.IncludeSubdirectories))
+            .ToList();
     public bool GetScanOnStartup() => _settingsManager.Settings.ScanOnStartup;
     public bool GetEnableGlobalMediaKeys() => _settingsManager.Settings.EnableGlobalMediaKeys;
     public bool GetEnableCornerNowPlayingPopup() => _settingsManager.Settings.EnableCornerNowPlayingPopup;

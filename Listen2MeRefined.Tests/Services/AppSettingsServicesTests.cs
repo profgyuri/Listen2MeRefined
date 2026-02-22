@@ -1,6 +1,7 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Storage;
 using Moq;
 
@@ -16,7 +17,7 @@ public sealed class AppSettingsServicesTests
             FontFamily = "Segoe UI",
             NewSongWindowPosition = "Always on top",
             AudioOutputDeviceName = "Device A",
-            MusicFolders = [new MusicFolderModel(@"C:\Music")],
+            MusicFolders = [new MusicFolderModel(@"C:\Music", true)],
             ScanOnStartup = true,
             EnableGlobalMediaKeys = true,
             EnableCornerNowPlayingPopup = false,
@@ -43,6 +44,8 @@ public sealed class AppSettingsServicesTests
         Assert.Equal("Always on top", sut.GetNewSongWindowPosition());
         Assert.Equal("Device A", sut.GetAudioOutputDeviceName());
         Assert.Single(sut.GetMusicFolders());
+        Assert.Equal(@"C:\Music", Assert.Single(sut.GetMusicFolderRequests()).Path);
+        Assert.True(Assert.Single(sut.GetMusicFolderRequests()).IncludeSubdirectories);
         Assert.True(sut.GetScanOnStartup());
         Assert.True(sut.GetEnableGlobalMediaKeys());
         Assert.False(sut.GetEnableCornerNowPlayingPopup());
@@ -91,6 +94,24 @@ public sealed class AppSettingsServicesTests
     }
 
     [Fact]
+    public void AppSettingsWriteService_SetMusicFolders_WithRequests_PersistsRecursionFlags()
+    {
+        var settings = new AppSettings();
+        var manager = CreateSettingsManager(settings);
+        var sut = new AppSettingsWriteService(manager.Object);
+
+        sut.SetMusicFolders(
+        [
+            new FolderScanRequest(@"C:\Music", true),
+            new FolderScanRequest(@"D:\Rock", false)
+        ]);
+
+        Assert.Equal(2, settings.MusicFolders.Count);
+        Assert.Contains(settings.MusicFolders, x => x.FullPath == @"C:\Music" && x.IncludeSubdirectories);
+        Assert.Contains(settings.MusicFolders, x => x.FullPath == @"D:\Rock" && !x.IncludeSubdirectories);
+    }
+
+    [Fact]
     public void AppSettingsWriteService_SetScanOnStartup_PersistsValue()
     {
         var settings = new AppSettings { ScanOnStartup = true };
@@ -100,6 +121,21 @@ public sealed class AppSettingsServicesTests
         sut.SetScanOnStartup(false);
 
         Assert.False(settings.ScanOnStartup);
+    }
+
+    [Fact]
+    public void AppSettingsWriteService_SetFolderIncludeSubdirectories_UpdatesExistingFolder()
+    {
+        var settings = new AppSettings
+        {
+            MusicFolders = [new MusicFolderModel(@"C:\Music", false)]
+        };
+        var manager = CreateSettingsManager(settings);
+        var sut = new AppSettingsWriteService(manager.Object);
+
+        sut.SetFolderIncludeSubdirectories(@"C:\Music", true);
+
+        Assert.True(settings.MusicFolders.Single().IncludeSubdirectories);
     }
 
     [Fact]

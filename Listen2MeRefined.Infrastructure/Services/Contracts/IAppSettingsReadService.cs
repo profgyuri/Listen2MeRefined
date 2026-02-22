@@ -1,3 +1,5 @@
+using Listen2MeRefined.Infrastructure.Services.Models;
+
 namespace Listen2MeRefined.Infrastructure.Services.Contracts;
 
 /// <summary>
@@ -13,6 +15,8 @@ public interface IAppSettingsReadService
     string GetAudioOutputDeviceName();
     /// <summary>Gets configured music folder paths.</summary>
     IReadOnlyList<string> GetMusicFolders();
+    /// <summary>Gets configured music folder scan requests.</summary>
+    IReadOnlyList<FolderScanRequest> GetMusicFolderRequests();
     /// <summary>Gets whether startup folder scan is enabled.</summary>
     bool GetScanOnStartup();
     /// <summary>Gets whether global media keys are enabled.</summary>

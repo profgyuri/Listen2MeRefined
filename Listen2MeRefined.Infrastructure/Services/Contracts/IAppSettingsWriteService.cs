@@ -1,3 +1,5 @@
+using Listen2MeRefined.Infrastructure.Services.Models;
+
 namespace Listen2MeRefined.Infrastructure.Services.Contracts;
 
 /// <summary>
@@ -45,6 +47,10 @@ public interface IAppSettingsWriteService
     void SetLastBrowsedFolder(string path);
     /// <summary>Sets configured music folder paths.</summary>
     void SetMusicFolders(IEnumerable<string> folders);
+    /// <summary>Sets configured music folder scan requests.</summary>
+    void SetMusicFolders(IEnumerable<FolderScanRequest> folders);
+    /// <summary>Sets recursion flag for a specific configured folder.</summary>
+    void SetFolderIncludeSubdirectories(string path, bool includeSubdirectories);
     /// <summary>Sets configured pinned folder paths.</summary>
     void SetPinnedFolders(IEnumerable<string> folders);
 }
