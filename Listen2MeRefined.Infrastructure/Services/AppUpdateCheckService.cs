@@ -1,5 +1,4 @@
 using Listen2MeRefined.Infrastructure.Services.Models;
-using Listen2MeRefined.Infrastructure.Versioning;
 
 namespace Listen2MeRefined.Infrastructure.Services;
 

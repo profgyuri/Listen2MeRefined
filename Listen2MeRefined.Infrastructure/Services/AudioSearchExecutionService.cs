@@ -1,5 +1,3 @@
-using Listen2MeRefined.Infrastructure.Data.Repositories;
-
 namespace Listen2MeRefined.Infrastructure.Services;
 
 using Contracts;

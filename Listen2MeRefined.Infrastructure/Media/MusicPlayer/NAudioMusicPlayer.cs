@@ -1,5 +1,4 @@
 ﻿using Listen2MeRefined.Infrastructure.Notifications;
-using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 

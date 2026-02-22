@@ -1,6 +1,5 @@
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
-using MediatR;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
