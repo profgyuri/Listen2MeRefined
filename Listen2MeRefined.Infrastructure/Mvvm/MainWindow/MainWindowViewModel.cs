@@ -75,20 +75,7 @@ public sealed partial class MainWindowViewModel :
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         _logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
-        if (_settingsReadService.GetAutoCheckUpdatesOnStartup())
-        {
-            _logger.Information("[MainWindowViewModel] Checking for latest version...");
-            var status = await _appUpdateCheckService.CheckForUpdatesAsync();
-            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
-
-            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
-        }
-        else
-        {
-            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
-            _logger.Information("[MainWindowViewModel] Automatic update checks are disabled.");
-        }
-
+        
         try
         {
             await _startupManager.StartAsync(ct);
@@ -103,6 +90,20 @@ public sealed partial class MainWindowViewModel :
         {
             _logger.Fatal(ex, "[MainWindowViewModel] StartupManager.StartAsync failed");
             throw;
+        }
+        
+        if (_settingsReadService.GetAutoCheckUpdatesOnStartup())
+        {
+            _logger.Information("[MainWindowViewModel] Checking for latest version...");
+            var status = await _appUpdateCheckService.CheckForUpdatesAsync();
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
+
+            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
+        }
+        else
+        {
+            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
+            _logger.Information("[MainWindowViewModel] Automatic update checks are disabled.");
         }
 
         _logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
