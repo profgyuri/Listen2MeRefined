@@ -31,6 +31,7 @@
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}"/>
         <Setter Property="Padding" Value="5" />
         <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
         <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource PrimaryBrush}" />
@@ -202,6 +203,71 @@
     </Style>
     <!--#endregion-->
 
+    <!--#region Global Slider -->
+    <Style TargetType="{x:Type Slider}" BasedOn="{StaticResource {x:Type Slider}}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="wpf:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
+        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
+        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Slider}">
+                    <Grid VerticalAlignment="Center">
+                        <Border Height="4"
+                                Background="#4A4A4A"
+                                CornerRadius="2"
+                                VerticalAlignment="Center" />
+                        <Track x:Name="PART_Track"
+                               VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Background="{TemplateBinding Foreground}"
+                                              BorderThickness="0"
+                                              Height="4"
+                                              Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="10"
+                                       Height="10"
+                                       Background="{TemplateBinding Foreground}"
+                                       BorderBrush="#D55F16"
+                                       BorderThickness="1"
+                                       Focusable="False">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="{x:Type Thumb}">
+                                            <Ellipse Fill="{TemplateBinding Background}"
+                                                     Stroke="{TemplateBinding BorderBrush}"
+                                                     StrokeThickness="{TemplateBinding BorderThickness}" />
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Background="Transparent"
+                                              BorderThickness="0"
+                                              Height="4"
+                                              Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                            <Border Background="{TemplateBinding Background}" CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--#endregion-->
+
     <!--#region No Halo Slider Style-->
     <!-- This style is needed as it is to remove the halo from the slider (and maybe to add my own style later) -->
     <Style x:Key="MaterialDesignRepeatButton" TargetType="{x:Type RepeatButton}">
@@ -270,6 +336,7 @@
     </ControlTemplate>
     <Style x:Key="NoHaloSlider" TargetType="{x:Type resources:WaveSlider}">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
         <Setter Property="Background" Value="{x:Null}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />

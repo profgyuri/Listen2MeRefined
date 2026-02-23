@@ -4,6 +4,9 @@ namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
 public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
 {
+    private static readonly SKColor WaveLineColor = new(255, 138, 61); // Matches WPF TertiaryColor (#FF8A3D).
+    private static readonly SKColor WaveBackgroundColor = new(34, 34, 34); // Matches playback wave panel background (#222222).
+
     private SKBitmap? _bitmap;
     private SKCanvas? _canvas;
     private readonly SKPaint _linePaint;
@@ -12,10 +15,10 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
     public SkiaCanvas()
     {
         _linePaint = new SKPaint{
-            Color = new SKColor(255, 252, 64),
+            Color = WaveLineColor,
             StrokeWidth = 1
         };
-        _backgroundColor = new SKColor(37, 37, 37);
+        _backgroundColor = WaveBackgroundColor;
     }
     
     public void DrawLine(SKPoint p1, SKPoint p2, float? stroakWidth = null)
