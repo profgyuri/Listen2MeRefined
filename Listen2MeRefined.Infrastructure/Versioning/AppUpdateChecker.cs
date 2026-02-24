@@ -1,15 +1,13 @@
 using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+namespace Listen2MeRefined.Infrastructure.Versioning;
 
-using Contracts;
-
-public sealed class AppUpdateCheckService : IAppUpdateCheckService
+public sealed class AppUpdateChecker : IAppUpdateChecker
 {
     private readonly IVersionChecker _versionChecker;
     private readonly ILogger _logger;
 
-    public AppUpdateCheckService(IVersionChecker versionChecker, ILogger logger)
+    public AppUpdateChecker(IVersionChecker versionChecker, ILogger logger)
     {
         _versionChecker = versionChecker;
         _logger = logger;

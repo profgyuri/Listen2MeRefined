@@ -31,8 +31,8 @@ public class UtilsModule : Module
             .RegisterType<AppSettingsWriter>()
             .As<IAppSettingsWriter>();
         builder
-            .RegisterType<AppUpdateCheckService>()
-            .As<IAppUpdateCheckService>();
+            .RegisterType<AppUpdateChecker>()
+            .As<IAppUpdateChecker>();
         builder
             .RegisterType<BackgroundTaskStatusService>()
             .As<IBackgroundTaskStatusService>()

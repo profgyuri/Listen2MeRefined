@@ -90,7 +90,7 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         var versionChecker = new Mock<IVersionChecker>();
         versionChecker.Setup(x => x.IsLatestAsync()).ReturnsAsync(true);
 
-        var updateCheckService = new Mock<IAppUpdateCheckService>();
+        var updateCheckService = new Mock<IAppUpdateChecker>();
         updateCheckService
             .Setup(x => x.CheckForUpdatesAsync())
             .ReturnsAsync(new Listen2MeRefined.Infrastructure.Services.Models.AppUpdateCheckResult(

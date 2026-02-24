@@ -1,11 +1,11 @@
 using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Versioning;
 
 /// <summary>
 /// Checks whether a newer application version is available.
 /// </summary>
-public interface IAppUpdateCheckService
+public interface IAppUpdateChecker
 {
     /// <summary>
     /// Executes an update check and returns a UI-friendly result.

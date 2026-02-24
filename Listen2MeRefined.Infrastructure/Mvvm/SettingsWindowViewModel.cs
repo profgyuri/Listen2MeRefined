@@ -37,7 +37,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IVersionChecker _versionChecker;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
-    private readonly IAppUpdateCheckService _appUpdateCheckService;
+    private readonly IAppUpdateChecker _appUpdateChecker;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
     private readonly IPinnedFoldersService _pinnedFoldersService;
@@ -111,7 +111,7 @@ public sealed partial class SettingsWindowViewModel :
         IVersionChecker versionChecker,
         IAppSettingsReader settingsReader,
         IAppSettingsWriter settingsWriter,
-        IAppUpdateCheckService appUpdateCheckService,
+        IAppUpdateChecker appUpdateChecker,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
         IPinnedFoldersService pinnedFoldersService,
@@ -129,7 +129,7 @@ public sealed partial class SettingsWindowViewModel :
         _versionChecker = versionChecker;
         _settingsReader = settingsReader;
         _settingsWriter = settingsWriter;
-        _appUpdateCheckService = appUpdateCheckService;
+        _appUpdateChecker = appUpdateChecker;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _globalHookSettingsSyncService = globalHookSettingsSyncService;
         _pinnedFoldersService = pinnedFoldersService;
@@ -574,7 +574,7 @@ public sealed partial class SettingsWindowViewModel :
 
     private async Task CheckForUpdatesAsync()
     {
-        var status = await _appUpdateCheckService.CheckForUpdatesAsync();
+        var status = await _appUpdateChecker.CheckForUpdatesAsync();
         UpdateAvailableText = status.Message;
         IsUpdateButtonVisible = status.CanOpenUpdateLink;
     }

@@ -13,7 +13,7 @@ public sealed partial class MainWindowViewModel :
 {
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
-    private readonly IAppUpdateCheckService _appUpdateCheckService;
+    private readonly IAppUpdateChecker _appUpdateChecker;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly StartupManager _startupManager;
@@ -43,7 +43,7 @@ public sealed partial class MainWindowViewModel :
     public MainWindowViewModel(
         ILogger logger,
         IUiDispatcher ui,
-        IAppUpdateCheckService appUpdateCheckService,
+        IAppUpdateChecker appUpdateChecker,
         IAppSettingsReader settingsReader,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         SearchbarViewModel searchbarViewModel,
@@ -56,7 +56,7 @@ public sealed partial class MainWindowViewModel :
     {
         _logger = logger;
         _ui = ui;
-        _appUpdateCheckService = appUpdateCheckService;
+        _appUpdateChecker = appUpdateChecker;
         _settingsReader = settingsReader;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _startupManager = startupManager;
@@ -96,7 +96,7 @@ public sealed partial class MainWindowViewModel :
         if (_settingsReader.GetAutoCheckUpdatesOnStartup())
         {
             _logger.Information("[MainWindowViewModel] Checking for latest version...");
-            var status = await _appUpdateCheckService.CheckForUpdatesAsync();
+            var status = await _appUpdateChecker.CheckForUpdatesAsync();
             await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
 
             _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);

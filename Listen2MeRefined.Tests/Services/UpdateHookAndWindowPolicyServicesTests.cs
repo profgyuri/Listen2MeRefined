@@ -14,7 +14,7 @@ public sealed class UpdateHookAndWindowPolicyServicesTests
     {
         var versionChecker = new Mock<IVersionChecker>();
         versionChecker.Setup(x => x.IsLatestAsync()).ReturnsAsync(true);
-        var sut = new AppUpdateCheckService(versionChecker.Object, Mock.Of<ILogger>());
+        var sut = new AppUpdateChecker(versionChecker.Object, Mock.Of<ILogger>());
 
         var result = await sut.CheckForUpdatesAsync();
 
@@ -28,7 +28,7 @@ public sealed class UpdateHookAndWindowPolicyServicesTests
     {
         var versionChecker = new Mock<IVersionChecker>();
         versionChecker.Setup(x => x.IsLatestAsync()).ReturnsAsync(false);
-        var sut = new AppUpdateCheckService(versionChecker.Object, Mock.Of<ILogger>());
+        var sut = new AppUpdateChecker(versionChecker.Object, Mock.Of<ILogger>());
 
         var result = await sut.CheckForUpdatesAsync();
 
