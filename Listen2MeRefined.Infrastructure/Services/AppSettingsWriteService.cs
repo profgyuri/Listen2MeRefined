@@ -1,3 +1,4 @@
+using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Services.Models;
 
 namespace Listen2MeRefined.Infrastructure.Services;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 

@@ -2,6 +2,7 @@ using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
+using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Services.Models;
@@ -12,7 +13,7 @@ using Serilog;
 
 namespace Listen2MeRefined.Tests.Services;
 
-public sealed class FolderScannerServiceTests
+public sealed class FolderScannerTests
 {
     [Fact]
     public async Task ScanAsync_Incremental_AnalyzesOnlyChangedOrNewFiles()
@@ -133,7 +134,7 @@ public sealed class FolderScannerServiceTests
             repository.Setup(x => x.ReadByFolderScopeAsync(folderPath, true)).ReturnsAsync([]);
             var taskStatus = CreateBackgroundTaskStatusMock();
 
-            var sut = new FolderScannerService(
+            var sut = new FolderScanner(
                 fileEnumerator.Object,
                 analyzer.Object,
                 repository.Object,
@@ -191,7 +192,7 @@ public sealed class FolderScannerServiceTests
         }
     }
 
-    private static FolderScannerService CreateSut(
+    private static FolderScanner CreateSut(
         IEnumerable<string> files,
         IEnumerable<AudioModel> fromDb,
         out Mock<IFileAnalyzer<AudioModel>> analyzer,
@@ -215,7 +216,7 @@ public sealed class FolderScannerServiceTests
         settingsManager.SetupGet(x => x.Settings).Returns(new AppSettings());
         backgroundTaskStatus = CreateBackgroundTaskStatusMock();
 
-        return new FolderScannerService(
+        return new FolderScanner(
             fileEnumerator.Object,
             analyzer.Object,
             repository.Object,

@@ -1,14 +1,13 @@
-using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+namespace Listen2MeRefined.Infrastructure.Scanning;
 
-public sealed class FileScannerService : IFileScanner
+public sealed class FileScanner : IFileScanner
 {
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
     private readonly IAudioRepository _audioRepository;
 
-    public FileScannerService(IFileAnalyzer<AudioModel> audioFileAnalyzer, IAudioRepository audioRepository)
+    public FileScanner(IFileAnalyzer<AudioModel> audioFileAnalyzer, IAudioRepository audioRepository)
     {
         _audioFileAnalyzer = audioFileAnalyzer;
         _audioRepository = audioRepository;

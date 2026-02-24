@@ -4,9 +4,9 @@ using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+namespace Listen2MeRefined.Infrastructure.Scanning;
 
-public sealed class FolderScannerService : IFolderScanner
+public sealed class FolderScanner : IFolderScanner
 {
     private readonly IFileEnumerator _fileEnumerator;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
@@ -16,7 +16,7 @@ public sealed class FolderScannerService : IFolderScanner
     private readonly ILogger _logger;
     private readonly int _maxWorkers;
 
-    public FolderScannerService(
+    public FolderScanner(
         IFileEnumerator fileEnumerator,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
         IAudioRepository audioRepository,

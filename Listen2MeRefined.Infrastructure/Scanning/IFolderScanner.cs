@@ -1,6 +1,6 @@
 using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+namespace Listen2MeRefined.Infrastructure.Scanning;
 
 /// <summary>
 /// Used to analyze the media files and save the metadata to the database.

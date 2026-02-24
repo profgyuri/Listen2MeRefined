@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Media;
+using Listen2MeRefined.Infrastructure.Scanning;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Linq;
@@ -30,12 +31,12 @@ public class SystemModule : Module
             .SingleInstance();
 
         builder
-            .RegisterType<FolderScannerService>()
+            .RegisterType<FolderScanner>()
             .As<IFolderScanner>()
             .SingleInstance();
 
         builder
-            .RegisterType<FileScannerService>()
+            .RegisterType<FileScanner>()
             .As<IFileScanner>()
             .SingleInstance();
         

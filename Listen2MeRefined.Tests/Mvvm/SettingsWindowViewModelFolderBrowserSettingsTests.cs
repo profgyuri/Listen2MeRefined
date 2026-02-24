@@ -6,6 +6,7 @@ using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Settings;
