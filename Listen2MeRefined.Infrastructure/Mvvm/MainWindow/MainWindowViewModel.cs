@@ -181,7 +181,7 @@ public sealed partial class MainWindowViewModel :
         }
 
         TaskStatusText = FormatTaskStatusText(snapshot.PrimaryTask!, snapshot.QueuedCount);
-        TaskStatusTooltip = FormatTaskStatusTooltip(snapshot.PrimaryTask!);
+        TaskStatusTooltip = FormatTaskStatusTooltip(snapshot.PrimaryTask!, TaskStatusText);
     }
 
     private static string FormatTaskStatusText(BackgroundTaskItem task, int queuedCount)
@@ -212,10 +212,10 @@ public sealed partial class MainWindowViewModel :
         return string.Join(" | ", parts);
     }
 
-    private static string FormatTaskStatusTooltip(BackgroundTaskItem task)
+    private static string FormatTaskStatusTooltip(BackgroundTaskItem task, string fallbackText)
     {
         return string.IsNullOrWhiteSpace(task.Message)
-            ? string.Empty
+            ? fallbackText
             : task.Message!;
     }
 }

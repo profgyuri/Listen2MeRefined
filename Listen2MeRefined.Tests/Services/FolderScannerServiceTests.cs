@@ -37,6 +37,7 @@ public sealed class FolderScannerServiceTests
                 [existingA, removedC],
                 out var analyzer,
                 out var repository,
+                out _,
                 out _);
 
             await sut.ScanAsync(
@@ -82,6 +83,7 @@ public sealed class FolderScannerServiceTests
                 [existingA],
                 out var analyzer,
                 out var repository,
+                out _,
                 out _);
 
             await sut.ScanAsync(
@@ -148,12 +150,53 @@ public sealed class FolderScannerServiceTests
         }
     }
 
+    [Fact]
+    public async Task ScanAsync_CompletesTask_WithMultilineSummaryMessage()
+    {
+        var folderPath = CreateTempFolder();
+        var fileA = Path.Combine(folderPath, "a.mp3");
+        File.WriteAllText(fileA, "a");
+
+        try
+        {
+            var sut = CreateSut(
+                [fileA],
+                [],
+                out _,
+                out _,
+                out _,
+                out var taskStatus);
+
+            await sut.ScanAsync(
+                [new FolderScanRequest(folderPath, false)],
+                ScanMode.Incremental,
+                CancellationToken.None);
+
+            taskStatus.Verify(
+                x => x.CompleteTask(
+                    It.IsAny<TaskHandle>(),
+                    It.Is<string>(message =>
+                        message.Contains(Environment.NewLine)
+                        && message.Contains("Added:")
+                        && message.Contains("Updated:")
+                        && message.Contains("Removed:")
+                        && message.Contains("Skipped:")
+                        && message.Contains("Failed:"))),
+                Times.Once);
+        }
+        finally
+        {
+            Directory.Delete(folderPath, true);
+        }
+    }
+
     private static FolderScannerService CreateSut(
         IEnumerable<string> files,
         IEnumerable<AudioModel> fromDb,
         out Mock<IFileAnalyzer<AudioModel>> analyzer,
         out Mock<IAudioRepository> repository,
-        out Mock<IFileEnumerator> fileEnumerator)
+        out Mock<IFileEnumerator> fileEnumerator,
+        out Mock<IBackgroundTaskStatusService> backgroundTaskStatus)
     {
         var folderPath = Path.GetDirectoryName(files.First())!;
         analyzer = CreateAnalyzerMock();
@@ -169,13 +212,14 @@ public sealed class FolderScannerServiceTests
 
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(new AppSettings());
+        backgroundTaskStatus = CreateBackgroundTaskStatusMock();
 
         return new FolderScannerService(
             fileEnumerator.Object,
             analyzer.Object,
             repository.Object,
             settingsManager.Object,
-            CreateBackgroundTaskStatusMock().Object,
+            backgroundTaskStatus.Object,
             Mock.Of<ILogger>());
     }
 

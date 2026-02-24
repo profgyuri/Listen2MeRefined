@@ -65,8 +65,14 @@ public sealed class FolderScannerService : IFolderScanner
             var totalSkipped = folderResults.Sum(x => x.Skipped);
             var totalFailed = folderResults.Sum(x => x.Failed);
 
-            var summary =
-                $"Scan completed. Added {totalAdded}, updated {totalUpdated}, removed {totalRemoved}, skipped {totalSkipped}, failed {totalFailed}.";
+            var summary = string.Join(
+                Environment.NewLine,
+                "Scan completed.",
+                $"Added: {totalAdded}",
+                $"Updated: {totalUpdated}",
+                $"Removed: {totalRemoved}",
+                $"Skipped: {totalSkipped}",
+                $"Failed: {totalFailed}");
             _backgroundTaskStatusService.CompleteTask(taskHandle, summary);
             _logger.Information("[FolderScannerService] {Summary}", summary);
         }
