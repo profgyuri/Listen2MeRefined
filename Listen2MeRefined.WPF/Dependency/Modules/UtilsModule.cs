@@ -1,3 +1,5 @@
+using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;

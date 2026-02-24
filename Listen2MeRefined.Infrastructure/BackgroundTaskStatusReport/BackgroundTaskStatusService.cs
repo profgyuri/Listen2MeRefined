@@ -1,7 +1,7 @@
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 
 public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
 {

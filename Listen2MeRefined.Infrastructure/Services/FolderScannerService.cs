@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Listen2MeRefined.Infrastructure.Services.Contracts;
+using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.SystemOperations;

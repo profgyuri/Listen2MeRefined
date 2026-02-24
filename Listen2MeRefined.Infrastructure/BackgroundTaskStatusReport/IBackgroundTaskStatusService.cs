@@ -1,6 +1,6 @@
 using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 
 /// <summary>
 /// Tracks and publishes status for long-running background tasks.

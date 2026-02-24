@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services.Models;
+namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 
 public sealed record BackgroundTaskSnapshot(
     bool IsVisible,
