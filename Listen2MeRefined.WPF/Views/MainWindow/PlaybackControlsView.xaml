@@ -4,25 +4,88 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <Border DataContext="{Binding PlayerControlsViewModel}" utils:ViewModelInitialization.AutoInitialize="True" Style="{StaticResource ContainerBorder}">
+    <Border DataContext="{Binding PlayerControlsViewModel}"
+            Background="#272727"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="10"
+            Padding="8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=20}"/>
-            <Button Grid.Column="1" Command="{Binding StopCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=20}" />
-            <Button Grid.Column="2" Command="{Binding PlayPauseCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=20}" />
-            <Button Grid.Column="3" Command="{Binding NextCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=20}" />
-            <Button Grid.Column="4" Command="{Binding ShuffleCommand}" Style="{StaticResource PlayerButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=20}" />
-            <wpf:WaveSlider Style="{StaticResource NoHaloSlider}" Foreground="{StaticResource TertiaryBrush}" WaveBitmap="{Binding WaveForm}" Grid.Row="1" Minimum="0" Maximum="{Binding TotalTime}" Value="{Binding CurrentTime}" Grid.ColumnSpan="5" Width="{Binding WaveFormWidth}" Height="{Binding WaveFormHeight}"/>
+
+            <Border Grid.Row="0"
+                    Background="#222222"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="4">
+                <Grid x:Name="WaveAreaGrid">
+                    <wpf:WaveSlider Style="{StaticResource NoHaloSlider}"
+                                    Foreground="{StaticResource TertiaryBrush}"
+                                    utils:WaveformViewportSyncBehavior.IsEnabled="True"
+                                    WaveBitmap="{Binding WaveForm}"
+                                    Minimum="0"
+                                    Maximum="{Binding TotalTime}"
+                                    Value="{Binding CurrentTime}"
+                                    MinHeight="24"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Margin="6,0" />
+
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="2"
+                    Background="#232323"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="6,5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"/>
+                        <Button Command="{Binding StopCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" />
+                        <Button Command="{Binding PlayPauseCommand}" Style="{StaticResource PlaybackPrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" />
+                        <Button Command="{Binding NextCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" />
+                        <Button Command="{Binding ShuffleCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" />
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0">
+                        <TextBlock x:Name="ElapsedTimeText"
+                                   Style="{StaticResource PlaybackTimeText}"
+                                   Text="{Binding CurrentTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
+                        <TextBlock Style="{StaticResource PlaybackTimeText}" Text="/" Margin="4,0" />
+                        <TextBlock x:Name="TotalTimeText"
+                                   Style="{StaticResource PlaybackTimeText}"
+                                   Text="{Binding TotalTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Button Style="{StaticResource PlaybackVolumeIconButton}"
+                                Command="{Binding ToggleMuteCommand}">
+                            <materialDesign:PackIcon Kind="{Binding VolumeIconKind}" Width="14" Height="14" />
+                        </Button>
+                        <Slider Width="84"
+                                Margin="8,0"
+                                Minimum="0"
+                                Maximum="1"
+                                Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource PlaybackVolumeSliderStyle}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </UserControl>
+

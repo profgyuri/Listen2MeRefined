@@ -1,13 +1,15 @@
+using Listen2MeRefined.Infrastructure.Searching;
+
 namespace Listen2MeRefined.Infrastructure.Notifications;
 
 public sealed class AdvancedSearchNotification : INotification
 {
     public List<AdvancedFilter> Filters { get; }
-    public bool MatchAll { get; }
+    public SearchMatchMode MatchMode { get; }
 
-    public AdvancedSearchNotification(List<AdvancedFilter> filters, bool matchAll = true)
+    public AdvancedSearchNotification(List<AdvancedFilter> filters, SearchMatchMode matchMode = SearchMatchMode.All)
     {
         Filters = filters;
-        MatchAll = matchAll;
+        MatchMode = matchMode;
     }
 }

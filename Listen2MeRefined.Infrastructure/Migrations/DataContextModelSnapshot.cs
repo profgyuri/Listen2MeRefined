@@ -23,11 +23,36 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("AutoCheckUpdatesOnStartup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoScanOnFolderAdd")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("AudioOutputDeviceName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<short>("CornerTriggerDebounceMs")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("CornerTriggerSizePx")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableCornerNowPlayingPopup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableGlobalMediaKeys")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FontFamily")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("FolderBrowserStartAtLastLocation")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastBrowsedFolder")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -35,8 +60,33 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PinnedFoldersJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ScanMilestoneBasis")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("ScanMilestoneInterval")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("ScanOnStartup")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ShowScanMilestoneCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ShowTaskPercentage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("StartMuted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("TaskPercentageReportInterval")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("StartupVolume")
+                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 
@@ -61,6 +111,12 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("Genre")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("LastWriteUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("LengthBytes")
+                        .HasColumnType("INTEGER");
+
                     b.Property<TimeSpan>("Length")
                         .HasColumnType("TEXT");
 
@@ -77,6 +133,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
 
                     b.HasIndex("PlaylistModelId");
 
+                    b.HasIndex("Path")
+                        .IsUnique();
+
                     b.ToTable("Songs");
                 });
 
@@ -92,6 +151,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("FullPath")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IncludeSubdirectories")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 

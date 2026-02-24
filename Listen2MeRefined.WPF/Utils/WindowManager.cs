@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF;
+﻿using Listen2MeRefined.Infrastructure.ViewModels;
+
+namespace Listen2MeRefined.WPF;
 using Autofac;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Views;
@@ -9,8 +11,6 @@ using System.Windows;
 
 internal static class WindowManager
 {
-    private const int TriggerNotificationWindowAreaSize = 10;
-
     /// <summary>
     ///     Shows a window registered in the dependency framework.
     /// </summary>
@@ -110,27 +110,40 @@ internal static class WindowManager
     /// <returns>The instance of the New Song Window.</returns>
     internal static NewSongWindow ShowNewSongWindow(
         int x,
-        int y)
+        int y,
+        int triggerAreaSize = 10)
     {
         using var scope = IocContainer.GetContainer().BeginLifetimeScope();
         var window = scope.Resolve<NewSongWindow>();
 
-        if (x <= TriggerNotificationWindowAreaSize)
+        if (x <= triggerAreaSize)
         {
             window.Left = 0;
         }
-        else if (x >= SystemParameters.PrimaryScreenWidth - TriggerNotificationWindowAreaSize)
+        else if (x >= SystemParameters.PrimaryScreenWidth - triggerAreaSize)
         {
             window.Left = SystemParameters.PrimaryScreenWidth - window.Width;
         }
+        else
+        {
+            window.Left = x <= SystemParameters.PrimaryScreenWidth / 2
+                ? 0
+                : SystemParameters.PrimaryScreenWidth - window.Width;
+        }
 
-        if (y <= TriggerNotificationWindowAreaSize)
+        if (y <= triggerAreaSize)
         {
             window.Top = 0;
         }
-        else if (y >= SystemParameters.PrimaryScreenHeight - TriggerNotificationWindowAreaSize)
+        else if (y >= SystemParameters.PrimaryScreenHeight - triggerAreaSize)
         {
             window.Top = SystemParameters.WorkArea.Height - window.Height;
+        }
+        else
+        {
+            window.Top = y <= SystemParameters.PrimaryScreenHeight / 2
+                ? 0
+                : SystemParameters.WorkArea.Height - window.Height;
         }
 
         window.Show();
@@ -140,7 +153,7 @@ internal static class WindowManager
     /// <summary>
     ///     Closes the new song window, when the mouse coordinates are no longer in a corner.
     /// </summary>
-    internal static void CloseNewSongWindow(NewSongWindow window)
+    internal static void CloseNewSongWindow(NewSongWindow? window)
     {
         window?.Hide();
     }

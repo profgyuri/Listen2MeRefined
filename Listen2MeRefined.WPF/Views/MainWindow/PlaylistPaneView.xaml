@@ -4,24 +4,41 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <Border Margin="10 20 0 14" Style="{StaticResource ContainerBorder}">
+    <Border Margin="0,20,0,14"
+            Background="#272727"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="10">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="55"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="55"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Column="1" Text="Playlist" Style="{StaticResource ElementContainerText}" Margin="0 6 0 20" Background="Transparent"/>
-            <Button Grid.Column="2" Style="{StaticResource InteractionButton}" Content="{materialDesign:PackIcon Kind=CloseBoxOutline, Size=32}" Command="{Binding RemoveSelectedFromPlaylistCommand}" BorderThickness="0" ToolTip="Remove Selected / All from Playlist"/>
+            <components:SectionHeader Grid.Row="0"
+                                      Title="Playlist"
+                                      IconKind="PlaylistMusic"
+                                      AccentBrush="{StaticResource TertiaryBrush}"
+                                      ShowActionButton="True"
+                                      ActionToolTip="Remove Selected / All from Playlist"
+                                      ActionIconKind="CloseBoxOutline"
+                                      ActionCommand="{Binding RemoveSelectedFromPlaylistCommand}" />
 
-            <ListView Grid.ColumnSpan="5" Grid.Row="1" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" ItemsSource="{Binding PlayList}" Style="{StaticResource CustomHighlightSongsListView}" SelectedIndex="{Binding SelectedIndex}" SelectedItem="{Binding SelectedSong}" utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding PlaylistSelectionAddedCommand}" utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding PlaylistSelectionRemovedCommand}" utils:SelectionChangedCommandBehavior.ScrollSelectedItemIntoView="True">
+            <ListView Grid.Row="2"
+                      dd:DragDrop.IsDragSource="True"
+                      dd:DragDrop.IsDropTarget="True"
+                      ItemsSource="{Binding PlayList}"
+                      Style="{StaticResource PlaylistListView}"
+                      SelectedIndex="{Binding SelectedIndex}"
+                      SelectedItem="{Binding SelectedSong}"
+                      utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding PlaylistSelectionAddedCommand}"
+                      utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding PlaylistSelectionRemovedCommand}"
+                      utils:SelectionChangedCommandBehavior.ScrollSelectedItemIntoView="True">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <i:InvokeCommandAction Command="{Binding JumpToSelectedSongCommand}" />
@@ -38,28 +55,25 @@
                     <DataTemplate>
                         <Grid MinWidth="320" ClipToBounds="True">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <Rectangle Grid.RowSpan="2" Fill="Transparent" />
-                            <resources:HorizontalSeparator Grid.Row="1" VerticalAlignment="Bottom" />
+                            <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
+                                                           Foreground="#D7D7D7"
+                                                           FontSize="16"
+                                                           FontWeight="Bold"
+                                                           TextTrimming="None"
+                                                           HorizontalAlignment="Left"
+                                                           ClipToBounds="True"
+                                                           utils:FlowingTextBehavior.IsEnabled="True" />
 
-                            <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}" Margin="0 0 0 10" FontSize="16" TextTrimming="None" HorizontalAlignment="Left" FontWeight="Bold" ClipToBounds="True" utils:FlowingTextBehavior.IsEnabled="True"/>
-
-                            <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0 0 0 5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="2*" />
-                                    <ColumnDefinition Width="3*" />
-                                    <ColumnDefinition Width="2*" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="{Binding BPM, FallbackValue=BPM, StringFormat={}{0} BPM}" TextTrimming="CharacterEllipsis" Margin="0" HorizontalAlignment="Left" />
-                                <TextBlock Grid.Column="1" Text="{Binding Bitrate, FallbackValue=Bitrate, StringFormat={}{0} Kbps}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" />
-                                <TextBlock Grid.Column="2" Text="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" />
-                                <TextBlock Grid.Column="3" Text="{Binding Genre, FallbackValue=Genre}" Margin="0 0 10 0" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left" />
-                            </Grid>
+                            <components:MetaBadgeRow Grid.Row="2"
+                                                     BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"
+                                                     BitrateText="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}"
+                                                     LengthText="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                                     GenreText="{Binding Genre, FallbackValue=Genre}" />
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>

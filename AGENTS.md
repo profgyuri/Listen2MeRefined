@@ -29,6 +29,27 @@ Use `-c Release` for production-like validation.
 - Keep classes focused; one primary responsibility per class.
 - Run formatter before PRs: `dotnet format`.
 
+## ViewModel Contract Reuse Rules
+- For ViewModel logic, prefer reusable contracts from `Listen2MeRefined.Infrastructure/Services/Contracts/` before adding new VM-local logic.
+- Keep UI-bound state/properties in ViewModels, but delegate reusable/non-UI behavior to contract-backed services.
+- Reuse existing contracts whenever applicable across multiple ViewModels or services; only add new contracts when no existing contract fits cleanly.
+- When introducing behavior in a ViewModel, first check these contracts and implementations:
+  - `IAppSettingsReadService`, `IAppSettingsWriteService`
+  - `IAppUpdateCheckService`
+  - `IGlobalHookSettingsSyncService`
+  - `IFolderNavigationService`, `IPinnedFoldersService`
+  - `IAdvancedSearchCriteriaService`, `IAudioSearchExecutionService`
+  - `IPlaybackDefaultsService`, `IWindowPositionPolicyService`
+- Register any new contract implementations through DI modules (currently `Listen2MeRefined.WPF/Dependency/Modules/UtilsModule.cs`) and inject interfaces, not concrete types.
+
+## UI Reuse Rules (WPF)
+- Prefer reusable components from `Listen2MeRefined.WPF/Views/Components/` when building or updating UI.
+- Use existing components first: `TitleBar`, `SectionHeader`, `WindowFooterBar`, `LabeledSliderRow`, `MetaBadgeRow`, `FormFieldRow`.
+- Do not add local `<Style>`, `<ControlTemplate>`, or local resource dictionaries in view/component XAML files.
+- Keep shared styles in `Listen2MeRefined.WPF/Styles/ComponentStyles.xaml` or `Listen2MeRefined.WPF/Styles/ControlStyles.xaml`.
+- In view XAML, keep only structure/layout and bindings (for example grid placement, row/column definitions, commands, and data bindings).
+- If a visual property is VM-bound and there is no clear/simple style-based alternative, it may remain local.
+
 ## Testing Guidelines
 - Use the existing .NET test framework in this repo (commonly xUnit/NUnit/MSTest).
 - Mirror production namespaces in test folders.
@@ -49,3 +70,18 @@ Use `-c Release` for production-like validation.
 - Do not commit secrets, API keys, or machine-local paths.
 - Keep environment-specific settings out of source control.
 - Review changes in system-level hooks and input handling carefully; these areas are high impact.
+
+## Recent Validation Findings (2026-02-20)
+- `dotnet restore` can fail with `NU1301` SSL/credential errors against `api.nuget.org`; clearing NuGet locals resolved it in this environment: `dotnet nuget locals all --clear`.
+- Using these env vars helped avoid first-run/permission noise during CLI validation:
+  - `DOTNET_CLI_HOME=<repo>\\.dotnet-cli`
+  - `DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1`
+- `dotnet build` at solution-level may fail in this environment due existing `NU1701` package compatibility warnings being treated as fatal.
+- Project-level validation succeeded with `-p:NoWarn=NU1701`:
+  - `Listen2MeRefined.Infrastructure`
+  - `Listen2MeRefined.WPF`
+  - `Listen2MeRefined.Tests`
+- Tests passed after the settings overhaul:
+  - Full suite: `31/31` passed.
+  - New targeted tests (`GlobalHookStartupTaskTests`, `PlayerControlsViewModelTests`): `5/5` passed.
+- Pre-existing warnings remain (not introduced by the settings overhaul), including `PresentationCore` reference warning and nullability warnings in legacy files.

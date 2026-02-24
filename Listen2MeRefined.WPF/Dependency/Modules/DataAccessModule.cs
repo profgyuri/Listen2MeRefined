@@ -7,14 +7,20 @@ using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 public class DataAccessModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
         builder
-            .RegisterType<DataContext>()
+            .RegisterType<DataContextFactory>()
+            .As<IDbContextFactory<DataContext>>()
             .SingleInstance();
+
+        builder
+            .RegisterType<DataContext>()
+            .InstancePerDependency();
 
         builder
             .RegisterType<DbConnection>()

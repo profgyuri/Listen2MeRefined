@@ -3,67 +3,101 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
+        xmlns:viewModels="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance vm:NewSongWindowViewModel}"
+        d:DataContext="{d:DesignInstance viewModels:NewSongWindowViewModel}"
         Style="{StaticResource BasicWindow}"
         Topmost="{Binding IsTopmost}"
         ResizeMode="NoResize"
-        FontSize="18"
-        Title="NewSongWindow" Height="100" Width="460">
+        FontSize="15"
+        Title="Now Playing"
+        Height="180"
+        Width="500">
 
-    <Border
-        BorderBrush="{DynamicResource TertiaryBrush}"
-        Background="{StaticResource HoloBackground}"
-        BorderThickness="1"
-        CornerRadius="3">
-        <Grid
-    VerticalAlignment="Center"
-    Margin="5 0 10 5">
+    <Border BorderBrush="{StaticResource TertiaryBrush}"
+            Background="{StaticResource HoloBackground}"
+            BorderThickness="2"
+            CornerRadius="0,0,10,10">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontWeight="Bold"
-                TextTrimming="CharacterEllipsis"
-                FontSize="26"
-                Text="{Binding Song.Title, FallbackValue=Title}" />
-            <TextBlock
-                Grid.Row="1"
-                Margin="0 5"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontWeight="SemiBold"
-                FontStyle="Italic"
-                TextTrimming="CharacterEllipsis"
-                FontSize="20"
-                Text="{Binding Song.Artist, FallbackValue=Artist}" />
+            <Border Grid.Row="0"
+                    Padding="10,5"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="0,0,0,1"
+                    Background="#232323">
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-            <UniformGrid
-                Grid.Row="2"
-                Columns="3"
-                Margin="0 0 0 5">
-                <TextBlock
-                    FontSize="14"
-                    Margin="0 0 0 -10"
-                    Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
-                <TextBlock
-                    FontSize="14"
-                    Margin="0 0 0 -10"
-                    HorizontalAlignment="Center"
-                    Text="{Binding Song.Genre, FallbackValue=Genre}" />
-                <TextBlock
-                    Margin="0 0 0 -10"
-                    HorizontalAlignment="Right"
-                    FontSize="14"
-                    Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 kbps}" />
-            </UniformGrid>
+                    <Border Width="22"
+                            Height="22"
+                            Background="{StaticResource TertiaryBrush}"
+                            CornerRadius="11"
+                            VerticalAlignment="Center">
+                        <materialDesign:PackIcon Kind="MusicNote"
+                                                 Width="13"
+                                                 Height="13"
+                                                 Foreground="#1F1F1F"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center" />
+                    </Border>
 
+                    <StackPanel Grid.Column="1"
+                                Margin="8,0,0,0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource NewSongHeaderText}" Text="Now Playing" />
+                        <Ellipse Width="5"
+                                 Height="5"
+                                 Fill="{StaticResource TertiaryBrush}"
+                                 Margin="8,0,8,0"
+                                 VerticalAlignment="Center" />
+                        <TextBlock Style="{StaticResource NewSongHeaderText}"
+                                   Foreground="#A8A8A8"
+                                   Text="{Binding Song.Length, StringFormat={}{0:mm\\:ss}, FallbackValue=00:00}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    Margin="10"
+                    Background="#272727"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="10,8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="4" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Style="{StaticResource NewSongTrackTitleText}"
+                               Text="{Binding Song.Title, FallbackValue=Title}" />
+                    <TextBlock Grid.Row="2"
+                               Style="{StaticResource NewSongTrackArtistText}"
+                               Text="{Binding Song.Artist, FallbackValue=Artist}" />
+
+                    <components:MetaBadgeRow Grid.Row="4"
+                                             BpmText="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}"
+                                             BitrateText="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}"
+                                             GenreText="{Binding Song.Genre, FallbackValue=Genre}"
+                                             ShowLength="False" />
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </Window>
+

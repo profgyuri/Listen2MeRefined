@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm;assembly=Listen2MeRefined.Infrastructure"
         xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow"
-        xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm.MainWindow;assembly=Listen2MeRefined.Infrastructure"
+        xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
+        xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"
@@ -15,17 +15,28 @@
         Height="702" Width="1030">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome x:Name="WindowChrome" CaptionHeight="32" />
+        <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>
 
-    <Border BorderThickness="2" BorderBrush="{StaticResource TertiaryBrush}" Background="{StaticResource PrimaryBrush}" CornerRadius="8">
+    <Border BorderThickness="2" BorderBrush="{StaticResource TertiaryBrush}" Background="{StaticResource PrimaryBrush}" CornerRadius="0, 0, 8, 8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=32}" />
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=40}" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <views:TitleBarView />
+            <components:TitleBar CenterText="Desktop Player"
+                                 ShowSettingsButton="True"
+                                 ShowMinimizeButton="True"
+                                 ShowMaximizeButton="True"
+                                 ShowCloseButton="True"
+                                 ShowTaskStatus="{Binding IsTaskStatusVisible}"
+                                 TaskStatusText="{Binding TaskStatusText}"
+                                 TaskStatusTooltip="{Binding TaskStatusTooltip}"
+                                 SettingsCommand="{Binding OpenSettingsWindowCommand}"
+                                 MinimizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MinimizeWindowCommand}"
+                                 ToggleMaximizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ToggleWindowStateCommand}"
+                                 CloseCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CloseWindowCommand}" />
 
             <Grid Grid.Row="1" Margin="10">
                 <Grid.RowDefinitions>

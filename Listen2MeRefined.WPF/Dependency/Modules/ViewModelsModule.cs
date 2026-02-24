@@ -1,6 +1,7 @@
 using Autofac;
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Startup;
+using Listen2MeRefined.Infrastructure.ViewModels;
+using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 
@@ -14,7 +15,11 @@ public class ViewModelsModule : Module
             .AsImplementedInterfaces()
             .SingleInstance();
         builder.RegisterType<FolderBrowserViewModel>();
-        builder.RegisterType<AdvancedSearchViewModel>();
+        builder
+            .RegisterType<AdvancedSearchViewModel>()
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .InstancePerLifetimeScope();
         builder.RegisterType<NewSongWindowViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()

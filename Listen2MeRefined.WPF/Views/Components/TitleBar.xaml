@@ -1,0 +1,78 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Components.TitleBar"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignWidth="400">
+    <Border Style="{StaticResource ComponentTitleBarContainerBorder}">
+        <Grid VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Style="{StaticResource ComponentTitleBarBrandBorder}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="pack://application:,,,/Resources/Listen2Me.ico"
+                           Width="16"
+                           Height="16"
+                           SnapsToDevicePixels="True"
+                           Margin="0,0,7,0" />
+                    <TextBlock Text="Listen2Me Refined"
+                               Style="{StaticResource ComponentTitleBarBrandText}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Style="{StaticResource ComponentTitleBarCenterBorder}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="6"
+                             Height="6"
+                             Fill="{StaticResource TertiaryBrush}"
+                             Margin="0,0,6,0" />
+                    <TextBlock Text="{Binding CenterText, ElementName=Root}"
+                               Style="{StaticResource ComponentTitleBarCenterText}" />
+                    <Border Style="{StaticResource ComponentTitleBarStatusBadgeBorder}"
+                            ToolTip="{Binding TaskStatusTooltip, ElementName=Root}"
+                            Visibility="{Binding ShowTaskStatus, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="{Binding TaskStatusText, ElementName=Root}"
+                                   Style="{StaticResource ComponentTitleBarStatusBadgeText}" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                <Button Command="{Binding SettingsCommand, ElementName=Root}"
+                        Style="{StaticResource ComponentTitleActionButton}"
+                        Content="{materialDesign:PackIcon Kind=CogOutline,Size=15}"
+                        Visibility="{Binding ShowSettingsButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                <Button Command="{Binding EffectiveMinimizeCommand, ElementName=Root}"
+                        Style="{StaticResource ComponentTitleActionButton}"
+                        Margin="6,0,0,0"
+                        Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
+                        Visibility="{Binding ShowMinimizeButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                <Button Command="{Binding EffectiveToggleMaximizeCommand, ElementName=Root}"
+                        Style="{StaticResource ComponentMaximizeTitleActionButton}">
+                    <materialDesign:PackIcon Style="{StaticResource ComponentMaximizePackIcon}" />
+                </Button>
+
+                <Button Command="{Binding EffectiveCloseCommand, ElementName=Root}"
+                        Style="{StaticResource ComponentCloseTitleActionButton}"
+                        Content="{materialDesign:PackIcon Kind=Close,Size=15}"
+                        Margin="6,0,0,0"
+                        Visibility="{Binding ShowCloseButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

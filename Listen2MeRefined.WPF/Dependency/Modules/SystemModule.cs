@@ -1,13 +1,14 @@
+using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
+using Listen2MeRefined.Infrastructure.Scanning.Files;
+using Listen2MeRefined.Infrastructure.Scanning.Folders;
+using Listen2MeRefined.Infrastructure.Utils;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Linq;
 using System.Windows.Media;
 using Autofac;
-using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.SystemOperations;
 
 public class SystemModule : Module
 {
@@ -30,12 +31,12 @@ public class SystemModule : Module
             .SingleInstance();
 
         builder
-            .RegisterType<FolderScannerService>()
+            .RegisterType<FolderScanner>()
             .As<IFolderScanner>()
             .SingleInstance();
 
         builder
-            .RegisterType<FileScannerService>()
+            .RegisterType<FileScanner>()
             .As<IFileScanner>()
             .SingleInstance();
         

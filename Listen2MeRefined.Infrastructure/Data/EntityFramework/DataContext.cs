@@ -9,6 +9,14 @@ public sealed class DataContext : DbContext
     public DbSet<AppSettings> Settings { get; set; }
     public DbSet<MusicFolderModel> MusicFolders { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<AudioModel>()
+            .HasIndex(x => x.Path)
+            .IsUnique();
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);

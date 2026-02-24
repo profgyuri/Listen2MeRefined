@@ -3,35 +3,129 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <Border Margin="0 10 0 0" Style="{StaticResource ContainerBorder}">
+    <Border Margin="0,8,0,0"
+            Background="#272727"
+            BorderBrush="#3A3A3A"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="10">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="55"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="55"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition x:Name="ListRow" Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition x:Name="ListRow" Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Column="1" Style="{StaticResource ElementContainerText}" VerticalAlignment="Center" Margin="0 6 0 20" Text="Search Results" Background="Transparent"/>
-            <Button Grid.Column="2" Style="{StaticResource InteractionButton}" Margin="10 0" BorderThickness="0" Content="{materialDesign:PackIcon Kind=ArrowRightCircleOutline, Size=32}" Command="{Binding SendSelectedToPlaylistCommand}" ToolTip="Add Selected / All to Playlist"/>
+            <components:SectionHeader Grid.Row="0"
+                                      Title="Search Results"
+                                      IconKind="MusicNote"
+                                      AccentBrush="{StaticResource SearchResultsBorderAccentBrush}"
+                                      ShowActionButton="True"
+                                      ActionToolTip="Add Selected / All to Playlist"
+                                      ActionIconKind="ArrowRightCircleOutline"
+                                      ActionCommand="{Binding SendSelectedToPlaylistCommand}" />
 
-            <DataGrid Grid.Row="1" Grid.ColumnSpan="5" Height="{Binding ElementName=ListRow, Path=Height}" Foreground="{StaticResource SecondaryBrush}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" ItemsSource="{Binding SearchResults}" utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}" utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}" Style="{StaticResource SearchResultGrid}">
-                <DataGrid.InputBindings>
+            <ListView Grid.Row="2"
+                      Height="{Binding ElementName=ListRow, Path=Height}"
+                      Foreground="{StaticResource SecondaryBrush}"
+                      dd:DragDrop.IsDragSource="True"
+                      dd:DragDrop.IsDropTarget="True"
+                      ItemsSource="{Binding SearchResults}"
+                      SelectionMode="Extended"
+                      ItemContainerStyle="{StaticResource SearchResultsListItemStyle}"
+                      Style="{StaticResource SearchResultsListViewStyle}"
+                      utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}"
+                      utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}">
+                <ListView.InputBindings>
                     <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
-                </DataGrid.InputBindings>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Artist" Binding="{Binding Artist}" Width="Auto" MinWidth="80"/>
-                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto" MinWidth="80"/>
-                    <DataGridTextColumn Header="Genre" Binding="{Binding Genre}" Width="Auto" MinWidth="80"/>
-                    <DataGridTextColumn Header="BPM" Binding="{Binding BPM}" Width="Auto" MinWidth="50"/>
-                    <DataGridTextColumn Header="Bitrate" Binding="{Binding Bitrate}" Width="Auto" MinWidth="50"/>
-                    <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="Auto" MinWidth="100"/>
-                </DataGrid.Columns>
-            </DataGrid>
+                </ListView.InputBindings>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <ToggleButton x:Name="RowExpandToggle"
+                                              Style="{StaticResource SearchResultsRowExpandToggleButtonStyle}"
+                                              ToolTip="Show details">
+                                    <Grid>
+                                        <materialDesign:PackIcon x:Name="RowExpandIconDown"
+                                                                 Kind="ChevronDown"
+                                                                 Width="16"
+                                                                 Height="16"
+                                                                 Foreground="{StaticResource SecondaryBrush}" />
+                                        <materialDesign:PackIcon x:Name="RowExpandIconUp"
+                                                                 Kind="ChevronUp"
+                                                                 Width="16"
+                                                                 Height="16"
+                                                                 Foreground="{StaticResource SecondaryBrush}"
+                                                                 Visibility="Collapsed" />
+                                    </Grid>
+                                </ToggleButton>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Display}"
+                                           FontSize="14"
+                                           Foreground="{StaticResource SecondaryBrush}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" />
+                            </Grid>
+
+                            <Border Grid.Row="1"
+                                    Margin="32,8,0,2"
+                                    Padding="10,8"
+                                    Background="#292929"
+                                    BorderBrush="#3D3D3D"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Visibility="{Binding IsChecked, ElementName=RowExpandToggle, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <UniformGrid Columns="3">
+                                    <StackPanel Margin="0,0,12,0">
+                                        <TextBlock Text="Artist" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Artist}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,12,0">
+                                        <TextBlock Text="Title" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Title}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Genre" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Genre}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,8,12,0">
+                                        <TextBlock Text="BPM" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding BPM}" Style="{StaticResource SearchResultsToolbarValueText}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,8,12,0">
+                                        <TextBlock Text="Bitrate" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{StaticResource SearchResultsToolbarValueText}" />
+                                    </StackPanel>
+                                    <StackPanel Margin="0,8,0,0">
+                                        <TextBlock Text="Path" Style="{StaticResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Path}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </UniformGrid>
+                            </Border>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <Trigger SourceName="RowExpandToggle" Property="IsChecked" Value="True">
+                                <Setter TargetName="RowExpandIconDown" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="RowExpandIconUp" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
     </Border>
 </UserControl>

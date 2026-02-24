@@ -3,77 +3,84 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow">
-    <TabControl materialDesign:ColorZoneAssist.Foreground="{StaticResource TertiaryBrush}"
+    <TabControl Margin="0,20,10,14"
+                Background="Transparent"
+                BorderThickness="0"
                 materialDesign:ColorZoneAssist.Mode="Custom"
-                Margin="0 20 10 14">
+                ItemContainerStyle="{StaticResource MainTabsSegmentTabItemStyle}">
+
         <TabItem Header="Search Results" IsSelected="{Binding IsSearchResultsTabVisible}" Cursor="Hand">
             <views:SearchResultsPaneView DataContext="{Binding DataContext.SearchResultsPaneViewModel, RelativeSource={RelativeSource AncestorType=Window}}" />
         </TabItem>
+
         <TabItem Header="Song Menu" IsSelected="{Binding IsSongMenuTabVisible}" Cursor="Hand">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <Grid Margin="0 10 0 0">
-                    <Grid.Resources>
-                        <Style TargetType="Button" BasedOn="{StaticResource InteractionButton}">
-                            <Setter Property="Margin" Value="0 5"/>
-                        </Style>
-                        <Style TargetType="Separator">
-                            <Setter Property="Margin" Value="0 10"/>
-                            <Setter Property="Grid.ColumnSpan" Value="2" />
-                            <Setter Property="Background" Value="{StaticResource DarkBorderBrush}" />
-                        </Style>
-                    </Grid.Resources>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.ColumnSpan="2" Command="{Binding JumpToSelectedSongCommand}" Width="380" Content="Jump To This Song"/>
-                    <Button Grid.Row="1" Grid.ColumnSpan="2" Command="{Binding SetSelectedSongAsNextCommand}" Width="380" Content="Set As Next Song"/>
-
-                    <Separator Grid.Row="2"/>
-
-                    <Grid Grid.Row="3" Grid.ColumnSpan="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+            <Border Background="#282828"
+                    BorderBrush="#3A3A3A"
+                    BorderThickness="1"
+                    CornerRadius="12"
+                    Margin="0,8,0,0"
+                    Padding="14">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <Label Content="Artist:"/>
-                        <TextBox Grid.Column="1" Text="{Binding SelectedSong.Artist}"/>
-                        <Label Grid.Row="1" Content="Title:"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedSong.Title}"/>
-                        <Label Grid.Row="2" Content="Genre:"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedSong.Genre}"/>
-                        <Label Grid.Row="3" Content="Bitrate:"/>
-                        <Label Grid.Row="3" Grid.Column="1" Margin="0 5" Content="{Binding SelectedSong.Bitrate}"/>
-                        <Label Grid.Row="4" Content="BPM:"/>
-                        <Label Grid.Row="4" Grid.Column="1" Margin="0 5" Content="{Binding SelectedSong.BPM}"/>
-                        <Button Grid.Row="6" Grid.ColumnSpan="2" Width="380" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song"/>
+                        <Border Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Playback Actions" />
+                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding JumpToSelectedSongCommand}" Content="Jump To This Song" />
+                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding SetSelectedSongAsNextCommand}" Content="Set As Next Song" Margin="0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Row="2" Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Song Details" />
+                                    <TextBox Text="{Binding SelectedSong.Artist}" Margin="0,0,0,10" materialDesign:HintAssist.Hint="Artist" />
+                                    <TextBox Text="{Binding SelectedSong.Title}" Margin="0,0,0,10" materialDesign:HintAssist.Hint="Title" />
+                                    <TextBox Text="{Binding SelectedSong.Genre}" materialDesign:HintAssist.Hint="Genre" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Audio Meta" />
+                                    <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource MainTabsMetaLabelText}" Text="BITRATE" />
+                                            <TextBlock Style="{StaticResource MainTabsMetaValueText}" Text="{Binding SelectedSong.Bitrate}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10">
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource MainTabsMetaLabelText}" Text="BPM" />
+                                            <TextBlock Style="{StaticResource MainTabsMetaValueText}" Text="{Binding SelectedSong.BPM}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song" Margin="0,10,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Row="4" Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="DeleteOutline" Width="18" Height="18" Foreground="{StaticResource TertiaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding RemoveSelectedFromPlaylistCommand}" Content="Remove From Playlist" Margin="0" />
+                            </StackPanel>
+                        </Border>
                     </Grid>
-
-                    <Separator Grid.Row="4"/>
-
-                    <Button Grid.ColumnSpan="2" Grid.Row="5" Command="{Binding RemoveSelectedFromPlaylistCommand}" Width="380" Content="Remove From Playlist"/>
-                </Grid>
-            </ScrollViewer>
+                </ScrollViewer>
+            </Border>
         </TabItem>
     </TabControl>
 </UserControl>
+

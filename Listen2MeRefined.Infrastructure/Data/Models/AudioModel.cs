@@ -30,6 +30,8 @@ public sealed class AudioModel : Model
 
     public TimeSpan Length { get; set; }
     public string? Path { get; init; }
+    public DateTime LastWriteUtc { get; set; }
+    public long LengthBytes { get; set; }
 
     /// <summary>
     /// Updates the properties of this instance with the properties of the given instance.
@@ -44,6 +46,8 @@ public sealed class AudioModel : Model
         BPM = from.BPM;
         Bitrate = from.Bitrate;
         Length = from.Length;
+        LastWriteUtc = from.LastWriteUtc;
+        LengthBytes = from.LengthBytes;
     }
 
     public override bool Equals(object? obj)
