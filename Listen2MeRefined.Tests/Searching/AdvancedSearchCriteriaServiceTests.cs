@@ -3,7 +3,7 @@ using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.ViewModels;
 
-namespace Listen2MeRefined.Tests.Services;
+namespace Listen2MeRefined.Tests.Searching;
 
 public sealed class AdvancedSearchCriteriaServiceTests
 {
@@ -61,3 +61,4 @@ public sealed class AdvancedSearchCriteriaServiceTests
         Assert.Equal("rock", filter.Value);
     }
 }
+

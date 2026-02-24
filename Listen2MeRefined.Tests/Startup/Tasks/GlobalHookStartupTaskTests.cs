@@ -5,7 +5,7 @@ using Listen2MeRefined.Infrastructure.Utils;
 using Moq;
 using Serilog;
 
-namespace Listen2MeRefined.Tests.Startup;
+namespace Listen2MeRefined.Tests.Startup.Tasks;
 
 public class GlobalHookStartupTaskTests
 {
@@ -53,3 +53,4 @@ public class GlobalHookStartupTaskTests
         globalHook.Verify(x => x.RegisterAsync(), Times.Once);
     }
 }
+

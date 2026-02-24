@@ -1,47 +1,12 @@
 using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Data.Repositories;
-using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Moq;
 
-namespace Listen2MeRefined.Tests.Services;
+namespace Listen2MeRefined.Tests.Settings.Playback;
 
-public sealed class SearchAndPlaybackPolicyServicesTests
+public sealed class PlaybackDefaultsServiceTests
 {
-    [Fact]
-    public async Task ExecuteQuickSearchAsync_EmptyTerm_ReadsAll()
-    {
-        var repo = new Mock<IRepository<AudioModel>>();
-        var advancedReader = new Mock<IAdvancedDataReader<AdvancedFilter, AudioModel>>();
-        repo.Setup(x => x.ReadAsync()).ReturnsAsync([new AudioModel { Title = "A", Path = "a" }]);
-
-        var sut = new AudioSearchExecutionService(repo.Object, advancedReader.Object);
-        var result = await sut.ExecuteQuickSearchAsync("");
-
-        Assert.Single(result);
-        repo.Verify(x => x.ReadAsync(), Times.Once);
-        repo.Verify(x => x.ReadAsync(It.IsAny<string>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task ExecuteAdvancedSearchAsync_AnyMode_UsesMatchAllFalse()
-    {
-        var repo = new Mock<IRepository<AudioModel>>();
-        var advancedReader = new Mock<IAdvancedDataReader<AdvancedFilter, AudioModel>>();
-        bool? capturedMatchAll = null;
-        advancedReader
-            .Setup(x => x.ReadAsync(It.IsAny<IEnumerable<AdvancedFilter>>(), It.IsAny<bool>()))
-            .Callback<IEnumerable<AdvancedFilter>, bool>((_, matchAll) => capturedMatchAll = matchAll)
-            .ReturnsAsync([]);
-
-        var sut = new AudioSearchExecutionService(repo.Object, advancedReader.Object);
-        await sut.ExecuteAdvancedSearchAsync([], SearchMatchMode.Any);
-
-        Assert.False(capturedMatchAll);
-    }
-
     [Fact]
     public void LoadStartupDefaults_ClampsVolume()
     {

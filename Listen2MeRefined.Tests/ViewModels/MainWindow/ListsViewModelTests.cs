@@ -9,7 +9,7 @@ using Moq;
 using Serilog;
 using ListsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.ListsViewModel;
 
-namespace Listen2MeRefined.Tests.Mvvm;
+namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
 public class ListsViewModelTests
 {
@@ -135,3 +135,4 @@ public class ListsViewModelTests
             playlist);
     }
 }
+

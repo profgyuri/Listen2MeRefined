@@ -1,8 +1,8 @@
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 
-namespace Listen2MeRefined.Tests.Services;
+namespace Listen2MeRefined.Tests.FolderBrowser;
 
-public sealed class FolderAndPinnedServicesTests
+public sealed class FolderNavigationServiceTests
 {
     [Fact]
     public void ResolveInitialPath_PrefersLastBrowsedWhenEnabledAndValid()
@@ -63,38 +63,6 @@ public sealed class FolderAndPinnedServicesTests
 
         var single = Assert.Single(result);
         Assert.Equal("Jazz", single);
-    }
-
-    [Fact]
-    public void NormalizeExisting_RemovesMissingAndDuplicates()
-    {
-        var folderBrowser = new FakeFolderBrowser(
-            drives: [@"C:\"],
-            existingFolders: [@"C:\A", @"D:\B"],
-            subFoldersByPath: new Dictionary<string, IReadOnlyList<string>>());
-        var sut = new PinnedFoldersService(folderBrowser);
-
-        var result = sut.NormalizeExisting([@"C:\A", @"c:\a", @"Z:\Missing", @"D:\B"]);
-
-        Assert.Equal(2, result.Count);
-        Assert.Contains(@"C:\A", result, StringComparer.OrdinalIgnoreCase);
-        Assert.Contains(@"D:\B", result, StringComparer.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public void TogglePinnedFolder_AddsAndRemovesPath()
-    {
-        var folderBrowser = new FakeFolderBrowser(
-            drives: [@"C:\"],
-            existingFolders: [@"C:\A"],
-            subFoldersByPath: new Dictionary<string, IReadOnlyList<string>>());
-        var sut = new PinnedFoldersService(folderBrowser);
-
-        var added = sut.TogglePinnedFolder([], @"C:\A");
-        Assert.Single(added);
-
-        var removed = sut.TogglePinnedFolder(added, @"C:\A");
-        Assert.Empty(removed);
     }
 
     private sealed class FakeFolderBrowser(

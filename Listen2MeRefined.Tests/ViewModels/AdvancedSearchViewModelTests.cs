@@ -9,7 +9,7 @@ using Moq;
 using Serilog;
 using AdvancedSearchViewModel = Listen2MeRefined.Infrastructure.ViewModels.AdvancedSearchViewModel;
 
-namespace Listen2MeRefined.Tests.Mvvm;
+namespace Listen2MeRefined.Tests.ViewModels;
 
 public class AdvancedSearchViewModelTests
 {

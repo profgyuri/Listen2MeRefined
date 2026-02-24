@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
-namespace Listen2MeRefined.Tests.Media;
+namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
 public class PlaylistTests
 {
@@ -49,3 +49,4 @@ public class PlaylistTests
         return playlist;
     }
 }
+

@@ -5,68 +5,12 @@ using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 
-namespace Listen2MeRefined.Tests.Services;
+namespace Listen2MeRefined.Tests.Settings;
 
-public sealed class AppSettingsServicesTests
+public sealed class AppSettingsWriterTests
 {
     [Fact]
-    public void AppSettingsReadService_ReadsTypedValuesFromSettings()
-    {
-        var settings = new AppSettings
-        {
-            FontFamily = "Segoe UI",
-            NewSongWindowPosition = "Always on top",
-            AudioOutputDeviceName = "Device A",
-            MusicFolders = [new MusicFolderModel(@"C:\Music", true)],
-            ScanOnStartup = true,
-            EnableGlobalMediaKeys = true,
-            EnableCornerNowPlayingPopup = false,
-            CornerTriggerSizePx = 16,
-            CornerTriggerDebounceMs = 20,
-            StartupVolume = 0.35f,
-            StartMuted = false,
-            AutoCheckUpdatesOnStartup = true,
-            AutoScanOnFolderAdd = false,
-            ShowTaskPercentage = true,
-            TaskPercentageReportInterval = 5,
-            ShowScanMilestoneCount = true,
-            ScanMilestoneInterval = 50,
-            ScanMilestoneBasis = TaskStatusCountBasis.Remaining,
-            FolderBrowserStartAtLastLocation = true,
-            LastBrowsedFolder = @"C:\Music",
-            PinnedFolders = [@"C:\Pinned"]
-        };
-
-        var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsReader(manager.Object);
-
-        Assert.Equal("Segoe UI", sut.GetFontFamily());
-        Assert.Equal("Always on top", sut.GetNewSongWindowPosition());
-        Assert.Equal("Device A", sut.GetAudioOutputDeviceName());
-        Assert.Single(sut.GetMusicFolders());
-        Assert.Equal(@"C:\Music", Assert.Single(sut.GetMusicFolderRequests()).Path);
-        Assert.True(Assert.Single(sut.GetMusicFolderRequests()).IncludeSubdirectories);
-        Assert.True(sut.GetScanOnStartup());
-        Assert.True(sut.GetEnableGlobalMediaKeys());
-        Assert.False(sut.GetEnableCornerNowPlayingPopup());
-        Assert.Equal((short)16, sut.GetCornerTriggerSizePx());
-        Assert.Equal((short)20, sut.GetCornerTriggerDebounceMs());
-        Assert.Equal(0.35f, sut.GetStartupVolume());
-        Assert.False(sut.GetStartMuted());
-        Assert.True(sut.GetAutoCheckUpdatesOnStartup());
-        Assert.False(sut.GetAutoScanOnFolderAdd());
-        Assert.True(sut.GetShowTaskPercentage());
-        Assert.Equal((short)5, sut.GetTaskPercentageReportInterval());
-        Assert.True(sut.GetShowScanMilestoneCount());
-        Assert.Equal((short)50, sut.GetScanMilestoneInterval());
-        Assert.Equal(TaskStatusCountBasis.Remaining, sut.GetScanMilestoneBasis());
-        Assert.True(sut.GetFolderBrowserStartAtLastLocation());
-        Assert.Equal(@"C:\Music", sut.GetLastBrowsedFolder());
-        Assert.Equal(@"C:\Pinned", Assert.Single(sut.GetPinnedFolders()));
-    }
-
-    [Fact]
-    public void AppSettingsWriteService_SetMusicFolders_NormalizesTrimsAndDeduplicates()
+    public void SetMusicFolders_NormalizesTrimsAndDeduplicates()
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
@@ -80,7 +24,7 @@ public sealed class AppSettingsServicesTests
     }
 
     [Fact]
-    public void AppSettingsWriteService_SetPinnedFolders_NormalizesTrimsAndDeduplicates()
+    public void SetPinnedFolders_NormalizesTrimsAndDeduplicates()
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
@@ -94,7 +38,7 @@ public sealed class AppSettingsServicesTests
     }
 
     [Fact]
-    public void AppSettingsWriteService_SetMusicFolders_WithRequests_PersistsRecursionFlags()
+    public void SetMusicFolders_WithRequests_PersistsRecursionFlags()
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
@@ -112,7 +56,7 @@ public sealed class AppSettingsServicesTests
     }
 
     [Fact]
-    public void AppSettingsWriteService_SetScanOnStartup_PersistsValue()
+    public void SetScanOnStartup_PersistsValue()
     {
         var settings = new AppSettings { ScanOnStartup = true };
         var manager = CreateSettingsManager(settings);
@@ -124,7 +68,7 @@ public sealed class AppSettingsServicesTests
     }
 
     [Fact]
-    public void AppSettingsWriteService_SetFolderIncludeSubdirectories_UpdatesExistingFolder()
+    public void SetFolderIncludeSubdirectories_UpdatesExistingFolder()
     {
         var settings = new AppSettings
         {
@@ -139,7 +83,7 @@ public sealed class AppSettingsServicesTests
     }
 
     [Fact]
-    public void AppSettingsWriteService_SetTaskStatusProgressSettings_PersistsValues()
+    public void SetTaskStatusProgressSettings_PersistsValues()
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);

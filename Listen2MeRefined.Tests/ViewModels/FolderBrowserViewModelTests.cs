@@ -7,7 +7,7 @@ using Moq;
 using Serilog;
 using FolderBrowserViewModel = Listen2MeRefined.Infrastructure.ViewModels.FolderBrowserViewModel;
 
-namespace Listen2MeRefined.Tests.Mvvm;
+namespace Listen2MeRefined.Tests.ViewModels;
 
 public sealed class FolderBrowserViewModelTests
 {

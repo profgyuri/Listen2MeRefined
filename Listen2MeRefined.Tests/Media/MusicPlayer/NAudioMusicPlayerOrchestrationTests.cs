@@ -8,7 +8,7 @@ using Moq;
 using NAudio.Wave;
 using Serilog;
 
-namespace Listen2MeRefined.Tests.Media;
+namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
 public class NAudioMusicPlayerOrchestrationTests
 {
@@ -215,22 +215,6 @@ public class NAudioMusicPlayerOrchestrationTests
         await timedTask.StopAsync();
     }
 
-    [Fact]
-    public void EndOfTrackMonitor_OnlyAdvancesAtBoundary()
-    {
-        var monitor = new PlaybackProgressMonitor();
-        monitor.Reset();
-
-        Assert.False(monitor.ShouldAdvance(TimeSpan.FromSeconds(9.2), TimeSpan.FromSeconds(10), true));
-        Assert.False(monitor.ShouldAdvance(TimeSpan.FromSeconds(9.2), TimeSpan.FromSeconds(10), true));
-        Assert.True(monitor.ShouldAdvance(TimeSpan.FromSeconds(9.2), TimeSpan.FromSeconds(10), true));
-
-        monitor.Reset();
-        Assert.False(monitor.ShouldAdvance(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10), true));
-        Assert.False(monitor.ShouldAdvance(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10), true));
-        Assert.False(monitor.ShouldAdvance(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10), true));
-    }
-
     private static WaveStream CreateWaveStream(int durationMs = 5_000)
     {
         var format = new WaveFormat(44100, 16, 2);
@@ -239,3 +223,4 @@ public class NAudioMusicPlayerOrchestrationTests
         return new RawSourceWaveStream(new MemoryStream(buffer), format);
     }
 }
+

@@ -9,7 +9,7 @@ using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 using Serilog;
 
-namespace Listen2MeRefined.Tests.Services;
+namespace Listen2MeRefined.Tests.Scanning.Folders;
 
 public sealed class FolderScannerTests
 {
@@ -284,3 +284,4 @@ public sealed class FolderScannerTests
         }
     }
 }
+

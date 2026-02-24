@@ -9,7 +9,7 @@ using Serilog;
 using ListsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.ListsViewModel;
 using PlaylistPaneViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.PlaylistPaneViewModel;
 
-namespace Listen2MeRefined.Tests.Mvvm;
+namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
 public class PlaylistPaneViewModelTests
 {
@@ -54,3 +54,4 @@ public class PlaylistPaneViewModelTests
             playlist);
     }
 }
+

@@ -11,7 +11,7 @@ using Serilog;
 using SkiaSharp;
 using PlayerControlsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.PlayerControlsViewModel;
 
-namespace Listen2MeRefined.Tests.Mvvm;
+namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
 public class PlayerControlsViewModelTests
 {
@@ -188,3 +188,4 @@ public class PlayerControlsViewModelTests
         return (viewModel, musicPlayer, timedTask, waveFormDrawer);
     }
 }
+

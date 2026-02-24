@@ -3,7 +3,7 @@ using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 
-namespace Listen2MeRefined.Tests.Services;
+namespace Listen2MeRefined.Tests.BackgroundTaskStatusReport;
 
 public sealed class BackgroundTaskStatusServiceTests
 {
@@ -138,3 +138,4 @@ public sealed class BackgroundTaskStatusServiceTests
         return new BackgroundTaskStatusService(readService, Mock.Of<Serilog.ILogger>(), terminalVisibility);
     }
 }
+

@@ -15,7 +15,7 @@ using Moq;
 using Serilog;
 using SettingsWindowViewModel = Listen2MeRefined.Infrastructure.ViewModels.SettingsWindowViewModel;
 
-namespace Listen2MeRefined.Tests.Mvvm;
+namespace Listen2MeRefined.Tests.ViewModels;
 
 public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
 {
