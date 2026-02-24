@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
+using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
 
