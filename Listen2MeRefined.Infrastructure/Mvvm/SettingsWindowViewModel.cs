@@ -2,12 +2,9 @@ using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
-using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;

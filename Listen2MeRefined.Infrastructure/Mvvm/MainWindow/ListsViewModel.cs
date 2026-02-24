@@ -1,10 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.Services;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 

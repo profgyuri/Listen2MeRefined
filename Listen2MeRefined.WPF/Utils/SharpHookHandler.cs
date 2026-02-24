@@ -8,7 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Listen2MeRefined.Infrastructure.Settings;
 using Serilog;
-using IGlobalHook = Listen2MeRefined.Infrastructure.IGlobalHook;
+using IGlobalHook = Listen2MeRefined.Infrastructure.Utils.IGlobalHook;
 using Timer = System.Threading.Timer;
 
 namespace Listen2MeRefined.WPF.Utils;
