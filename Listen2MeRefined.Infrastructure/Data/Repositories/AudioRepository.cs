@@ -9,8 +9,11 @@ public sealed class AudioRepository :
     RepositoryBase<AudioModel>,
     IAudioRepository
 {
-    public AudioRepository(DataContext dataContext, IDbConnection dbConnection, ILogger logger)
-        : base(logger, dataContext, dbConnection)
+    public AudioRepository(
+        IDbContextFactory<DataContext> dataContextFactory,
+        IDbConnection dbConnection,
+        ILogger logger)
+        : base(logger, dataContextFactory, dbConnection)
     { }
 
     public async Task<IEnumerable<AudioModel>> ReadAsync(IEnumerable<AdvancedFilter> criterias, bool matchAll)
@@ -49,8 +52,7 @@ public sealed class AudioRepository :
 
         var joiner = matchAll ? " AND " : " OR ";
         var whereClause = string.Join(joiner, clauses);
-        var tableName = _dataContext.Model.FindEntityType(typeof(AudioModel))!.GetTableName()!;
-        var query = new StringBuilder($"SELECT * FROM {tableName} WHERE ")
+        var query = new StringBuilder($"SELECT * FROM {_tableName} WHERE ")
             .Append(whereClause)
             .ToString();
 

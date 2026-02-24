@@ -7,52 +7,73 @@ namespace Listen2MeRefined.Infrastructure.Data;
 public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     where T : Settings, new()
 {
-    private readonly DataContext _dataContext;
+    private readonly IDbContextFactory<DataContext> _dataContextFactory;
     private readonly ILogger _logger;
+    private readonly object _settingsLock = new();
+    private T? _settings;
 
-    public DatabaseSettingsManager(DataContext dataContext, ILogger logger)
+    public DatabaseSettingsManager(IDbContextFactory<DataContext> dataContextFactory, ILogger logger)
     {
-        _dataContext = dataContext;
+        _dataContextFactory = dataContextFactory;
         _logger = logger;
     }
 
     private T LoadSettings()
     {
-        return _dataContext.Settings
+        using var dataContext = _dataContextFactory.CreateDbContext();
+        return dataContext.Settings
+            .AsNoTracking()
             .Include(x => x.MusicFolders)
             .FirstOrDefault() as T ?? new T();
     }
 
-    public T Settings => field ??= LoadSettings();
+    public T Settings
+    {
+        get
+        {
+            lock (_settingsLock)
+            {
+                return _settings ??= LoadSettings();
+            }
+        }
+    }
 
     public void SaveSettings(Action<T>? settings = null)
     {
-        var oldSettings = LoadSettings();
-
-        settings?.Invoke(oldSettings!);
-
-        _dataContext.Settings.Update((oldSettings as AppSettings)!);
-        _dataContext.MusicFolders.UpdateRange((oldSettings as AppSettings)!.MusicFolders);
-        var saved = false;
-        while (!saved)
+        lock (_settingsLock)
         {
-            try
+            using var dataContext = _dataContextFactory.CreateDbContext();
+            var persistedSettings = dataContext.Settings
+                .Include(x => x.MusicFolders)
+                .FirstOrDefault() as T ?? new T();
+
+            settings?.Invoke(persistedSettings);
+
+            var appSettings = (persistedSettings as AppSettings)!;
+            dataContext.Settings.Update(appSettings);
+            dataContext.MusicFolders.UpdateRange(appSettings.MusicFolders);
+            var saved = false;
+            while (!saved)
             {
-                _dataContext.SaveChanges();
-                saved = true;
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                foreach (var entry in ex.Entries)
+                try
                 {
-                    if (entry.Entity is MusicFolderModel)
+                    dataContext.SaveChanges();
+                    _settings = persistedSettings;
+                    saved = true;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    foreach (var entry in ex.Entries)
                     {
-                        entry.OriginalValues.SetValues(entry.CurrentValues);
-                    }
-                    else
-                    {
-                        _logger.Fatal("[DatabaseSettingsManager] Don't know how to handle concurrency conflicts for {name}", entry.Metadata.Name);
-                        throw new NotSupportedException("Concurrency conflicts are not supported.");
+                        if (entry.Entity is MusicFolderModel)
+                        {
+                            entry.OriginalValues.SetValues(entry.CurrentValues);
+                        }
+                        else
+                        {
+                            _logger.Fatal("[DatabaseSettingsManager] Don't know how to handle concurrency conflicts for {name}", entry.Metadata.Name);
+                            throw new NotSupportedException("Concurrency conflicts are not supported.");
+                        }
                     }
                 }
             }

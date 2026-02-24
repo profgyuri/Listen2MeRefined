@@ -9,30 +9,36 @@ public abstract class RepositoryBase<T> : IRepository<T>
     where T: Model
 {
     protected readonly ILogger _logger;
-    protected readonly DataContext _dataContext;
+    protected readonly IDbContextFactory<DataContext> _dataContextFactory;
     protected readonly IDbConnection _dbConnection;
 
     protected readonly string _tableName;
 
-    protected RepositoryBase(ILogger logger, DataContext dataContext, IDbConnection dbConnection)
+    protected RepositoryBase(
+        ILogger logger,
+        IDbContextFactory<DataContext> dataContextFactory,
+        IDbConnection dbConnection)
     {
         _logger = logger;
-        _dataContext = dataContext;
+        _dataContextFactory = dataContextFactory;
         _dbConnection = dbConnection;
-        
-        _tableName = _dataContext.Model.FindEntityType(typeof(T))!.GetTableName()!;
+
+        using var context = _dataContextFactory.CreateDbContext();
+        _tableName = context.Model.FindEntityType(typeof(T))!.GetTableName()!;
     }
     
     public async Task SaveAsync(T data)
     {
-        _dataContext.AddIfDoesNotExist(data);
-        await _dataContext.SaveChangesAsync();
+        using var context = _dataContextFactory.CreateDbContext();
+        context.AddIfDoesNotExist(data);
+        await context.SaveChangesAsync();
     }
 
     public async Task SaveAsync(IEnumerable<T> list)
     {
-        await _dataContext.AddIfDoesNotExistAsync(list);
-        await _dataContext.SaveChangesAsync();
+        using var context = _dataContextFactory.CreateDbContext();
+        await context.AddIfDoesNotExistAsync(list);
+        await context.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<T>> ReadAsync()
@@ -62,20 +68,20 @@ public abstract class RepositoryBase<T> : IRepository<T>
         {
             _logger.Error(e.Message);
         }
-
-        await _dataContext.SaveChangesAsync();
     }
 
     public async Task RemoveAsync(T data)
     {
-        _dataContext.Set<T>().Remove(data);
-        await _dataContext.SaveChangesAsync();
+        using var context = _dataContextFactory.CreateDbContext();
+        context.Set<T>().Remove(data);
+        await context.SaveChangesAsync();
     }
 
     public async Task RemoveAsync(IEnumerable<T> list)
     {
-        _dataContext.Set<T>().RemoveRange(list);
-        await _dataContext.SaveChangesAsync();
+        using var context = _dataContextFactory.CreateDbContext();
+        context.Set<T>().RemoveRange(list);
+        await context.SaveChangesAsync();
     }
 
     public async Task RemoveAllAsync()
