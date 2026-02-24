@@ -2,6 +2,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
+using Listen2MeRefined.Infrastructure.Settings.Playback;
 using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;

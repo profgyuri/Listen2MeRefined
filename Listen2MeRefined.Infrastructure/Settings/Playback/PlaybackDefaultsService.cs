@@ -1,6 +1,4 @@
-using Listen2MeRefined.Infrastructure.Services.Models;
-
-namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+namespace Listen2MeRefined.Infrastructure.Settings.Playback;
 
 public sealed class PlaybackDefaultsService : IPlaybackDefaultsService
 {

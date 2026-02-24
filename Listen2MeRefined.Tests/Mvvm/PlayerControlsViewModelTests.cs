@@ -7,6 +7,7 @@ using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Moq;
 using Serilog;
 using SkiaSharp;

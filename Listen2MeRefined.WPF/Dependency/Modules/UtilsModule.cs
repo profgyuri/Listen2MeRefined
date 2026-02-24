@@ -3,6 +3,7 @@ using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Settings.Playback;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;

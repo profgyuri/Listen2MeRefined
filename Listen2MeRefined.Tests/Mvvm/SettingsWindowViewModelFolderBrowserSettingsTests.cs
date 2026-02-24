@@ -13,6 +13,7 @@ using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.Infrastructure.Versioning;
 using MediatR;

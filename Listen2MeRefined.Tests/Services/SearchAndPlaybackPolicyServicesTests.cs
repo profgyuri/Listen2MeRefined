@@ -5,6 +5,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Moq;
 
 namespace Listen2MeRefined.Tests.Services;
