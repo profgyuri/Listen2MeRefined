@@ -1,6 +1,4 @@
-using Listen2MeRefined.Infrastructure.SystemOperations;
-
-namespace Listen2MeRefined.Infrastructure.Scanning;
+namespace Listen2MeRefined.Infrastructure.Scanning.Files;
 
 public sealed class FileScanner : IFileScanner
 {

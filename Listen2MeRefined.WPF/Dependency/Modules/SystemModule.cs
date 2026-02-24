@@ -1,6 +1,8 @@
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Scanning;
+using Listen2MeRefined.Infrastructure.Scanning.Files;
+using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Linq;

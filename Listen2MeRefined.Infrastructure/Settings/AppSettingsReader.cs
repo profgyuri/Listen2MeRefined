@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.Scanning;
+using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
 

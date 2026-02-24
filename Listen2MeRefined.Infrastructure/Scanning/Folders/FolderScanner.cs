@@ -1,10 +1,11 @@
 using System.Collections.Concurrent;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
 
-namespace Listen2MeRefined.Infrastructure.Scanning;
+namespace Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 public sealed class FolderScanner : IFolderScanner
 {

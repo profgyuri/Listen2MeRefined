@@ -1,7 +1,7 @@
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 
-namespace Listen2MeRefined.Infrastructure.SystemOperations;
+namespace Listen2MeRefined.Infrastructure.Scanning.Files;
 
 public sealed class FileEnumerator : IFileEnumerator
 {

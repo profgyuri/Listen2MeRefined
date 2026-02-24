@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Scanning;
+﻿namespace Listen2MeRefined.Infrastructure.Scanning.Files;
 
 public interface IFileScanner
 {
