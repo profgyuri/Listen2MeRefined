@@ -8,6 +8,8 @@ This project was initially created to accomodate my needs in a music player app.
 
 Important to note, that due to some of the used dependencies, this is a __Windows only__ app - at least for now.
 
+You can always find the **latest release** [here](https://github.com/profgyuri/Listen2MeRefined/releases)
+
 ## Features
 
 - All the necessary playback controls (previous, next, play, pause, stop, volume)
