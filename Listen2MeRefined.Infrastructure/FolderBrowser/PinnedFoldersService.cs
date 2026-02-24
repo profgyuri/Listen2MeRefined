@@ -1,8 +1,4 @@
-using Listen2MeRefined.Infrastructure.SystemOperations;
-
-namespace Listen2MeRefined.Infrastructure.Services;
-
-using Contracts;
+namespace Listen2MeRefined.Infrastructure.FolderBrowser;
 
 public sealed class PinnedFoldersService : IPinnedFoldersService
 {

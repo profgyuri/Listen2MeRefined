@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.FolderBrowser;
 
 /// <summary>
 /// Provides normalization and update operations for pinned folder collections.

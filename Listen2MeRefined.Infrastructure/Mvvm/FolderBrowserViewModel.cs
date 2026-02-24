@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 
@@ -231,7 +232,7 @@ public sealed partial class FolderBrowserViewModel :
         ApplyNavigationResult(_folderNavigationService.LoadDrivesView());
     }
 
-    private void ApplyNavigationResult(Listen2MeRefined.Infrastructure.Services.Models.FolderNavigationResult result)
+    private void ApplyNavigationResult(FolderNavigationResult result)
     {
         ClearValidationError();
         FullPath = result.FullPath;
