@@ -1,5 +1,6 @@
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Moq;
 using Serilog;

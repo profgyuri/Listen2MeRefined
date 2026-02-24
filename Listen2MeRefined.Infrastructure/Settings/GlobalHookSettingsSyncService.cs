@@ -1,6 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services;
-
-using Contracts;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
 public sealed class GlobalHookSettingsSyncService : IGlobalHookSettingsSyncService
 {

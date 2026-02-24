@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
 /// <summary>
 /// Synchronizes global hook registration based on current settings flags.
