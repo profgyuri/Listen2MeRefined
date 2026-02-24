@@ -1,6 +1,6 @@
 using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 /// <summary>
 /// Provides read/write policy for playback startup defaults and conversions.
