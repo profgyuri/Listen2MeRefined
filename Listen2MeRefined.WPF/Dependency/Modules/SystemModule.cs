@@ -11,7 +11,6 @@ using Autofac;
 using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.SystemOperations;
 
 public class SystemModule : Module
 {

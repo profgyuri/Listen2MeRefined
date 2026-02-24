@@ -1,6 +1,5 @@
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.SystemOperations;
 
 namespace Listen2MeRefined.Tests.Services;
 

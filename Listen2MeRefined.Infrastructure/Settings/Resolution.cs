@@ -1,6 +1,6 @@
 using Microsoft.Win32;
 
-namespace Listen2MeRefined.Infrastructure.SystemOperations;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
 public static class Resolution
 {

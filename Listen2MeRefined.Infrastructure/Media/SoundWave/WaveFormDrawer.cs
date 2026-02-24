@@ -1,4 +1,3 @@
-using Listen2MeRefined.Infrastructure.SystemOperations;
 using NAudio.Wave;
 using SkiaSharp;
 
