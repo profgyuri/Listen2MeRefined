@@ -5,7 +5,6 @@ using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Services.Contracts;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 

@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Settings.WindowPosition;
 
 /// <summary>
 /// Provides policy mapping for window-position related options.

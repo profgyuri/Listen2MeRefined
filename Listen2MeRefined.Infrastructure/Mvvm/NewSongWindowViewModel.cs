@@ -1,5 +1,5 @@
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Services.Contracts;
+using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
 
 namespace Listen2MeRefined.Infrastructure.Mvvm;
 
