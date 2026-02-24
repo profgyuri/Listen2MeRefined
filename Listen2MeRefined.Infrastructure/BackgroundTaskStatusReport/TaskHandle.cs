@@ -1,3 +1,3 @@
-namespace Listen2MeRefined.Infrastructure.Services.Models;
+namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 
 public readonly record struct TaskHandle(Guid TaskId);

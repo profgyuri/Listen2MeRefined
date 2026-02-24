@@ -1,5 +1,3 @@
-using Listen2MeRefined.Infrastructure.Services.Models;
-
 namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 
 /// <summary>
