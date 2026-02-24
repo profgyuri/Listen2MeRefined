@@ -33,9 +33,15 @@ By simply opening the app, nothing will happen, but here is a basic process to g
 
 You can open a new [issue](https://github.com/profgyuri/Listen2MeRefined/issues) at any time, user created issues will always be prioritized.
 
-**Report a bug**: The title should be what is not working as expected, the description should contain exact steps to reproduce, and what you expected to happen.
+**Report a bug**: The title should be starting with [BUG] and a short description about what is not working as expected, the description should contain exact steps to reproduce, and what you expected to happen. 
 
-**Request a feature**: Write down in the description in a list, what behaviour are you expecting in what scenarios. The better the description is, the faster I can get to it. Also, don't forget to add an easy-to-understand title. 
+**Request a feature**: The title should be starting with [FEATURE], and then the name of your feature. Write down in the description in a list, what behaviour are you expecting in what scenarios. The better the description is, the faster I can get to it. 
+
+Examples:
+
+[BUG] Shuffle button does not shuffle
+
+[FEATURE] Mobile companion app
 
 ## Contribution
 
