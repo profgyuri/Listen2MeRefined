@@ -8,17 +8,31 @@ namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public partial class PlayerControlsViewModel :
     ViewModelBase,
-    INotificationHandler<CurrentSongNotification>
+    INotificationHandler<CurrentSongNotification>,
+    IWaveformViewportAware
 {
     private const float VolumeEpsilon = 0.0001f;
+    private const int DefaultWaveFormWidth = 480;
+    private const int DefaultWaveFormHeight = 70;
+    private const int MinimumWaveFormWidth = 64;
+    private const int MinimumWaveFormHeight = 24;
+    private const int ResizeNoiseThreshold = 2;
+    private static readonly TimeSpan WaveformResizeDebounce = TimeSpan.FromMilliseconds(120);
 
     private readonly ILogger _logger;
     private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaybackDefaultsService _playbackDefaultsService;
     private readonly TimedTask _timedTask;
+    private readonly SemaphoreSlim _waveformRenderLock = new(1, 1);
+    private readonly Func<TimeSpan, CancellationToken, Task> _delayAsync;
+    private readonly TimeSpan _waveformResizeDebounce;
     private bool _isMuted;
     private float _lastNonZeroVolume = 0.7f;
+    private int _waveformResizeRequestId;
+    private string? _currentTrackPath;
+    private CancellationTokenSource? _waveformResizeCts;
+    private Task _pendingWaveformRedrawTask = Task.CompletedTask;
 
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
     [ObservableProperty] private int _waveFormWidth;
@@ -88,13 +102,17 @@ public partial class PlayerControlsViewModel :
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IMusicPlayerController musicPlayerController,
         IPlaybackDefaultsService playbackDefaultsService,
-        TimedTask timedTask)
+        TimedTask timedTask,
+        Func<TimeSpan, CancellationToken, Task>? delayAsync = null,
+        TimeSpan? waveformResizeDebounce = null)
     {
         _logger = logger;
         _waveFormDrawer = waveFormDrawer;
         _musicPlayerController = musicPlayerController;
         _playbackDefaultsService = playbackDefaultsService;
         _timedTask = timedTask;
+        _delayAsync = delayAsync ?? Task.Delay;
+        _waveformResizeDebounce = waveformResizeDebounce ?? WaveformResizeDebounce;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
     }
@@ -122,16 +140,40 @@ public partial class PlayerControlsViewModel :
         OnPropertyChanged(nameof(IsMuted));
         OnPropertyChanged(nameof(TotalTimeDisplay));
 
-        await Task.Run((Func<Task?>)(async () =>
+        if (WaveFormWidth <= 0 || WaveFormHeight <= 0)
         {
-            WaveFormWidth = 480;
-            WaveFormHeight = 70;
-            _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-            await DrawPlaceholderLineAsync();
-        }), ct);
+            WaveFormWidth = DefaultWaveFormWidth;
+            WaveFormHeight = DefaultWaveFormHeight;
+        }
+
+        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
+        await DrawPlaceholderLineAsync(ct);
 
         _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
     }
+
+    public void UpdateWaveformViewport(double availableWidth, double availableHeight)
+    {
+        var normalizedViewport = NormalizeViewport(availableWidth, availableHeight);
+        if (normalizedViewport is null)
+        {
+            return;
+        }
+
+        var (width, height) = normalizedViewport.Value;
+        if (HasNoMeaningfulViewportChange(width, height))
+        {
+            return;
+        }
+
+        WaveFormWidth = width;
+        WaveFormHeight = height;
+        _waveFormDrawer.SetSize(width, height);
+
+        ScheduleWaveformRedraw();
+    }
+
+    internal Task WaitForPendingWaveformRedrawAsync() => _pendingWaveformRedrawTask;
 
     [RelayCommand]
     private async Task PlayPause()
@@ -195,16 +237,107 @@ public partial class PlayerControlsViewModel :
         OnPropertyChanged(nameof(VolumeIconKind));
     }
 
-    private async Task DrawPlaceholderLineAsync()
+    private static (int Width, int Height)? NormalizeViewport(double availableWidth, double availableHeight)
     {
-        WaveForm = await _waveFormDrawer.LineAsync();
+        if (double.IsNaN(availableWidth) || double.IsInfinity(availableWidth) || availableWidth <= 0)
+        {
+            return null;
+        }
+
+        if (double.IsNaN(availableHeight) || double.IsInfinity(availableHeight) || availableHeight <= 0)
+        {
+            return null;
+        }
+
+        var width = Math.Max(MinimumWaveFormWidth, (int)Math.Round(availableWidth));
+        var height = Math.Max(MinimumWaveFormHeight, (int)Math.Round(availableHeight));
+        return (width, height);
+    }
+
+    private bool HasNoMeaningfulViewportChange(int width, int height)
+    {
+        return Math.Abs(WaveFormWidth - width) <= ResizeNoiseThreshold
+            && Math.Abs(WaveFormHeight - height) <= ResizeNoiseThreshold;
+    }
+
+    private void ScheduleWaveformRedraw()
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        var previous = Interlocked.Exchange(ref _waveformResizeCts, cancellationTokenSource);
+        previous?.Cancel();
+        previous?.Dispose();
+
+        var requestId = Interlocked.Increment(ref _waveformResizeRequestId);
+        _pendingWaveformRedrawTask = RedrawWaveformAfterDebounceAsync(requestId, cancellationTokenSource.Token);
+    }
+
+    private async Task RedrawWaveformAfterDebounceAsync(int requestId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _delayAsync(_waveformResizeDebounce, cancellationToken);
+            if (requestId != _waveformResizeRequestId || cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            var trackPath = _currentTrackPath;
+            if (string.IsNullOrWhiteSpace(trackPath))
+            {
+                await DrawPlaceholderLineAsync(cancellationToken);
+                return;
+            }
+
+            await DrawTrackWaveFormAsync(trackPath, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignore canceled resize redraws.
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "[PlayerControlsViewModel] Failed to redraw waveform after resize.");
+        }
+    }
+
+    private async Task DrawPlaceholderLineAsync(CancellationToken cancellationToken = default)
+    {
+        await _waveformRenderLock.WaitAsync(cancellationToken);
+        try
+        {
+            WaveForm = await _waveFormDrawer.LineAsync();
+        }
+        finally
+        {
+            _waveformRenderLock.Release();
+        }
+    }
+
+    private async Task DrawTrackWaveFormAsync(string trackPath, CancellationToken cancellationToken = default)
+    {
+        await _waveformRenderLock.WaitAsync(cancellationToken);
+        try
+        {
+            WaveForm = await _waveFormDrawer.WaveFormAsync(trackPath);
+        }
+        finally
+        {
+            _waveformRenderLock.Release();
+        }
     }
 
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
-        await DrawPlaceholderLineAsync();
-        WaveForm = await _waveFormDrawer.WaveFormAsync(notification.Audio.Path!);
+
+        _currentTrackPath = notification.Audio.Path;
+        await DrawPlaceholderLineAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(_currentTrackPath))
+        {
+            await DrawTrackWaveFormAsync(_currentTrackPath, cancellationToken);
+        }
+
         TotalTime = notification.Audio.Length.TotalMilliseconds;
         OnPropertyChanged(nameof(TotalTimeDisplay));
     }

@@ -297,30 +297,30 @@
             <Grid SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
+                    <RowDefinition Height="*" MinHeight="{TemplateBinding MinHeight}" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TickBar x:Name="TopTick" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,0,0,2" Placement="Top" Visibility="Collapsed" />
-                <TickBar x:Name="BottomTick" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,2,0,0" Placement="Bottom" Visibility="Collapsed" />
+                <TickBar x:Name="TopTick" Grid.Row="0" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,0,0,2" Placement="Top" Visibility="Collapsed" />
+                <TickBar x:Name="BottomTick" Grid.Row="2" Fill="{TemplateBinding Foreground}" Height="4" Margin="0,2,0,0" Placement="Bottom" Visibility="Collapsed" />
 
                 <skia:SKElement
+                    Grid.Row="1"
                     x:Name="remaining" 
-                    Height="67" 
                     Opacity=".38" 
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Stretch"
                     resources:SkiaElementHelper.Bitmap="{TemplateBinding WaveBitmap}"/>
                 <skia:SKElement
+                    Grid.Row="1"
                     x:Name="activeTrack" 
-                    Height="67"
                     Width="{Binding DecreaseRepeatButton.ActualWidth, ElementName=PART_Track}"
                     HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Stretch"
                     resources:SkiaElementHelper.Bitmap="{TemplateBinding WaveBitmap}"/>
                 
-                <Canvas Height="67" VerticalAlignment="Center">
+                <Canvas Grid.Row="1" VerticalAlignment="Stretch">
                     <Rectangle x:Name="PART_SelectionRange" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" Height="100" Visibility="Collapsed" />
                 </Canvas>
-                <Track x:Name="PART_Track" Height="67">
+                <Track Grid.Row="1" x:Name="PART_Track" VerticalAlignment="Stretch">
                     <Track.DecreaseRepeatButton>
                         <RepeatButton Command="{x:Static resources:WaveSlider.DecreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
                     </Track.DecreaseRepeatButton>
