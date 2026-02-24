@@ -1,6 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services;
-
-using Contracts;
+namespace Listen2MeRefined.Infrastructure.Searching;
 
 public sealed class AudioSearchExecutionService : IAudioSearchExecutionService
 {

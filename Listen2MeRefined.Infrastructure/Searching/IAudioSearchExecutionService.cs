@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Searching;
 
 /// <summary>
 /// Executes quick and advanced audio searches against configured data sources.

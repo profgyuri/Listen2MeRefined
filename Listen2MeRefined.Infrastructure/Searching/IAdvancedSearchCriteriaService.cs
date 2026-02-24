@@ -1,7 +1,6 @@
-using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Mvvm;
 
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Searching;
 
 /// <summary>
 /// Provides metadata and validation logic for advanced-search criteria.

@@ -1,10 +1,7 @@
 using System.Globalization;
 using Listen2MeRefined.Infrastructure.Mvvm;
-using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services;
-
-using Contracts;
+namespace Listen2MeRefined.Infrastructure.Searching;
 
 public sealed class AdvancedSearchCriteriaService : IAdvancedSearchCriteriaService
 {

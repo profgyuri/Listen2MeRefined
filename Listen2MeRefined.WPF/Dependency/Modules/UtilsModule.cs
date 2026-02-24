@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;

@@ -1,5 +1,6 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Services;
 
 namespace Listen2MeRefined.Tests.Services;
