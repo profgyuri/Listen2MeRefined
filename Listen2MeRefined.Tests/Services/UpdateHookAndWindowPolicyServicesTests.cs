@@ -1,5 +1,3 @@
-using Listen2MeRefined.Infrastructure;
-using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
 using Listen2MeRefined.Infrastructure.Utils;

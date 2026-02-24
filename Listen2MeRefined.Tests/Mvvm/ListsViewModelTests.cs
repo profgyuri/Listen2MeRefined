@@ -1,17 +1,13 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.Services;
 using MediatR;
 using Moq;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Infrastructure.Mvvm.MainWindow.ListsViewModel;
+using ListsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.ListsViewModel;
 
 namespace Listen2MeRefined.Tests.Mvvm;
 

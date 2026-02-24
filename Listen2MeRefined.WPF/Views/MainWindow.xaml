@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow"
         xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
-        xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.Mvvm.MainWindow;assembly=Listen2MeRefined.Infrastructure"
+        xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
         Style="{StaticResource BasicWindow}"

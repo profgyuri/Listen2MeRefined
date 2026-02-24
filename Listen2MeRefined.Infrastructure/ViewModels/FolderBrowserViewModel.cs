@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Notifications;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public sealed partial class FolderBrowserViewModel :
     ViewModelBase,
@@ -173,7 +173,7 @@ public sealed partial class FolderBrowserViewModel :
         if (isFullPathInvalid)
         {
             SetValidationError("Please select a valid folder before confirming.");
-            _logger.Warning("[FolderBrowserViewModel] Full path is invalid or does not exist: {FullPath}", candidatePath);
+            _logger.Warning<string>("[FolderBrowserViewModel] Full path is invalid or does not exist: {FullPath}", candidatePath);
             return false;
         }
 
@@ -181,7 +181,7 @@ public sealed partial class FolderBrowserViewModel :
         FullPath = candidatePath;
         _settingsWriter.SetLastBrowsedFolder(candidatePath);
 
-        _logger.Debug("[FolderBrowserViewModel] Publishing full path: {FullPath}", candidatePath);
+        _logger.Debug<string>("[FolderBrowserViewModel] Publishing full path: {FullPath}", candidatePath);
         var notification = new FolderBrowserNotification(candidatePath);
         await _mediator.Publish(notification);
         return true;
@@ -238,7 +238,7 @@ public sealed partial class FolderBrowserViewModel :
 
         if (!string.IsNullOrWhiteSpace(FullPath))
         {
-            _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
+            _logger.Information<string>("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
             _settingsWriter.SetLastBrowsedFolder(FullPath);
         }
 

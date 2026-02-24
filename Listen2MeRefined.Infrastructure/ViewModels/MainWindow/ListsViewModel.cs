@@ -4,7 +4,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class ListsViewModel :
     ViewModelBase,

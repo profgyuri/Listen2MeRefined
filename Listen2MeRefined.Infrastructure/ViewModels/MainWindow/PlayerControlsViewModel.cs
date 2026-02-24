@@ -4,7 +4,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using SkiaSharp;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class PlayerControlsViewModel :
     ViewModelBase,
@@ -50,7 +50,7 @@ public partial class PlayerControlsViewModel :
         }
     }
 
-    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
+    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds((double)TotalTime);
     public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
     public float Volume

@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Mvvm;
+﻿namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public interface IUiDispatcher
 {

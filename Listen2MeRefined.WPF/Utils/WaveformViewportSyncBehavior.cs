@@ -1,7 +1,8 @@
+using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+
 namespace Listen2MeRefined.WPF.Utils;
 
 using System.Windows;
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 
 public static class WaveformViewportSyncBehavior
 {

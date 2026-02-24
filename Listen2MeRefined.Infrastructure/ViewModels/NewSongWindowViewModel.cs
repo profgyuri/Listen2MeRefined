@@ -1,7 +1,7 @@
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public sealed partial class NewSongWindowViewModel :
     ViewModelBase,

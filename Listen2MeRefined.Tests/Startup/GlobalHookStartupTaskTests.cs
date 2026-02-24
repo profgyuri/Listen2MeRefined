@@ -1,4 +1,3 @@
-using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Startup.Tasks;

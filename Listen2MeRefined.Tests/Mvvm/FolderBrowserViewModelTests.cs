@@ -1,12 +1,11 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
-using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
 using Serilog;
+using FolderBrowserViewModel = Listen2MeRefined.Infrastructure.ViewModels.FolderBrowserViewModel;
 
 namespace Listen2MeRefined.Tests.Mvvm;
 

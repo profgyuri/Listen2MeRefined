@@ -1,8 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
-using Listen2MeRefined.Infrastructure;
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Utils;
+using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF;
 

@@ -1,7 +1,7 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.Services;
+using Listen2MeRefined.Infrastructure.ViewModels;
 
 namespace Listen2MeRefined.Tests.Services;
 
@@ -45,7 +45,7 @@ public sealed class AdvancedSearchCriteriaServiceTests
     {
         var criteria = new[]
         {
-            new Infrastructure.Mvvm.AdvancedSearchCriterion(
+            new AdvancedSearchCriterion(
                 nameof(AudioModel.Title),
                 "Contains",
                 "rock",

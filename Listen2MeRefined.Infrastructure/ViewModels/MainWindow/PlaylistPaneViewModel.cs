@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class PlaylistPaneViewModel : ViewModelBase
 {

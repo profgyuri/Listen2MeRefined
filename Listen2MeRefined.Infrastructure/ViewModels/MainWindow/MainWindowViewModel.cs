@@ -2,7 +2,7 @@ using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Startup;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public sealed partial class MainWindowViewModel :
     ViewModelBase,

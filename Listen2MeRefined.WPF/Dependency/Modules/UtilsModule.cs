@@ -1,16 +1,15 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
+using Listen2MeRefined.Infrastructure.ViewModels;
+using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Listen2MeRefined.WPF.Utils;
 using System.Windows;

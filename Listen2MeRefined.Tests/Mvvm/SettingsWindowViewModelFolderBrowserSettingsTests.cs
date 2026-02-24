@@ -1,16 +1,11 @@
-using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
-using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.Utils;
@@ -18,6 +13,7 @@ using Listen2MeRefined.Infrastructure.Versioning;
 using MediatR;
 using Moq;
 using Serilog;
+using SettingsWindowViewModel = Listen2MeRefined.Infrastructure.ViewModels.SettingsWindowViewModel;
 
 namespace Listen2MeRefined.Tests.Mvvm;
 

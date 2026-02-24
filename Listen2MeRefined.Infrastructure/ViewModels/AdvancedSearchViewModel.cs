@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Searching;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public partial class AdvancedSearchViewModel :
     ViewModelBase,
@@ -42,7 +42,7 @@ public partial class AdvancedSearchViewModel :
 
             if (Relation.Count > 0)
             {
-                SelectedRelation = Relation.First();
+                SelectedRelation = Enumerable.First<string>(Relation);
             }
 
             OnPropertyChanged();
@@ -100,7 +100,7 @@ public partial class AdvancedSearchViewModel :
         {
             FontFamily = _settingsReader.GetFontFamily();
             ColumnName = _criteriaService.GetColumnNames().ToList();
-            SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
+            SelectedColumnName = Enumerable.FirstOrDefault<string>(ColumnName) ?? string.Empty;
             MatchMode = SearchMatchMode.All;
             ValidationMessage = string.Empty;
             SearchStatusMessage = "Add at least one filter to search.";

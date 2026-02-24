@@ -1,7 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Services.Models;
 using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 

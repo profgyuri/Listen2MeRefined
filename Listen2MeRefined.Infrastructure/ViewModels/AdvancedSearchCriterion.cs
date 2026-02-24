@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public sealed record AdvancedSearchCriterion(
     string Field,

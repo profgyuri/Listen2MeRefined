@@ -7,7 +7,7 @@ using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm;
+namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public sealed partial class SettingsWindowViewModel :
     ViewModelBase,
@@ -470,12 +470,12 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _logger.Information("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
+        _logger.Information<string>("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
         Folders.Remove(SelectedFolder);
         _folderRecursionByPath.Remove(SelectedFolder);
         await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
         PersistMusicFolders();
-        _logger.Verbose("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
+        _logger.Verbose<string>("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
     }
 
     [RelayCommand]
@@ -612,8 +612,8 @@ public sealed partial class SettingsWindowViewModel :
         var savedName = _settingsReader.GetAudioOutputDeviceName();
         if (!string.IsNullOrEmpty(savedName))
         {
-            var audioOutputDevice = AudioOutputDevices
-                .FirstOrDefault(x => x.Name.Equals(savedName, StringComparison.OrdinalIgnoreCase));
+            var audioOutputDevice = Enumerable
+                .FirstOrDefault<AudioOutputDevice>(AudioOutputDevices, x => x.Name.Equals(savedName, StringComparison.OrdinalIgnoreCase));
             if (audioOutputDevice is not null)
             {
                 selectedIndex = AudioOutputDevices.IndexOf(audioOutputDevice);
@@ -625,8 +625,8 @@ public sealed partial class SettingsWindowViewModel :
 
     private void PersistMusicFolders()
     {
-        var folders = Folders
-            .Select(path => new FolderScanRequest(
+        var folders = Enumerable
+            .Select<string, FolderScanRequest>(Folders, path => new FolderScanRequest(
                 path,
                 _folderRecursionByPath.TryGetValue(path, out var includeSubdirectories) && includeSubdirectories));
         _settingsWriter.SetMusicFolders(folders);

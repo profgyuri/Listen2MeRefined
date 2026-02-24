@@ -1,5 +1,4 @@
 using Listen2MeRefined.Infrastructure.FolderBrowser;
-using Listen2MeRefined.Infrastructure.Services;
 
 namespace Listen2MeRefined.Tests.Services;
 

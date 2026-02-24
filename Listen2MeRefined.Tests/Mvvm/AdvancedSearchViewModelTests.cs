@@ -1,13 +1,13 @@
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.ViewModels;
 using MediatR;
 using Moq;
 using Serilog;
+using AdvancedSearchViewModel = Listen2MeRefined.Infrastructure.ViewModels.AdvancedSearchViewModel;
 
 namespace Listen2MeRefined.Tests.Mvvm;
 

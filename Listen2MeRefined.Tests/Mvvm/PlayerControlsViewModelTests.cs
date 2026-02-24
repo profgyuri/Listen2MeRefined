@@ -1,17 +1,15 @@
-using Listen2MeRefined.Infrastructure;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
-using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.Utils;
 using Moq;
 using Serilog;
 using SkiaSharp;
+using PlayerControlsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.PlayerControlsViewModel;
 
 namespace Listen2MeRefined.Tests.Mvvm;
 

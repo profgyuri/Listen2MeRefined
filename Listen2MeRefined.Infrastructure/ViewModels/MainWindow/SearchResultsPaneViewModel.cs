@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 
-namespace Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
+namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class SearchResultsPaneViewModel : ViewModelBase
 {

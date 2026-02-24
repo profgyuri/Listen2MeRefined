@@ -1,4 +1,4 @@
-using Listen2MeRefined.Infrastructure.Mvvm;
+using Listen2MeRefined.Infrastructure.ViewModels;
 
 namespace Listen2MeRefined.Infrastructure.Searching;
 
