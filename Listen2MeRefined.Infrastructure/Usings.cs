@@ -9,3 +9,4 @@ global using Listen2MeRefined.Infrastructure.Data.Repositories;
 global using Listen2MeRefined.Infrastructure.Versioning;
 global using MediatR;
 global using Serilog;
+global using Listen2MeRefined.Infrastructure.Settings;

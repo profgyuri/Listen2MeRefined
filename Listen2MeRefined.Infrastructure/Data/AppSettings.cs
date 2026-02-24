@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
-using Listen2MeRefined.Infrastructure.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Data;
 
-public sealed class AppSettings : Settings
+public sealed class AppSettings : Settings.Settings
 {
     [Key] public int Id { get; set; }
 

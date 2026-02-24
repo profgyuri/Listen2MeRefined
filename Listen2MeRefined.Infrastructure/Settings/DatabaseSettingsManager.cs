@@ -1,8 +1,7 @@
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
-using Listen2MeRefined.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 
-namespace Listen2MeRefined.Infrastructure.Data;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
 public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
     where T : Settings, new()

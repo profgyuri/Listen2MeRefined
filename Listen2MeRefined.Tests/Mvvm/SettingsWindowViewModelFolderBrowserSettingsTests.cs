@@ -8,7 +8,7 @@ using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.SystemOperations;
 using Listen2MeRefined.Infrastructure.Versioning;
 using MediatR;

@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Storage;
+﻿namespace Listen2MeRefined.Infrastructure.Settings;
 
 /// <summary>
 ///     Used as a base class for any settings object. Does not contain any properties itself.

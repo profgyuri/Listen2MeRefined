@@ -1,5 +1,4 @@
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Storage;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 

@@ -3,7 +3,7 @@ using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
 using Listen2MeRefined.Infrastructure.Services.Models;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 
 namespace Listen2MeRefined.Tests.Services;

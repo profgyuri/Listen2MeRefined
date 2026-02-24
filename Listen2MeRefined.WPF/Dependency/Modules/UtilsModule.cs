@@ -1,11 +1,11 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Settings;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Services;
 using Listen2MeRefined.Infrastructure.Services.Contracts;
-using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Listen2MeRefined.WPF.Utils;

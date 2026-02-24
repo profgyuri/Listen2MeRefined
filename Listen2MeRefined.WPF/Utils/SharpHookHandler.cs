@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Storage;
 using Listen2MeRefined.WPF.Views;
 using SharpHook;
 using SharpHook.Data;
 using System.Threading;
 using System.Windows.Forms;
+using Listen2MeRefined.Infrastructure.Settings;
 using Serilog;
 using IGlobalHook = Listen2MeRefined.Infrastructure.IGlobalHook;
 using Timer = System.Threading.Timer;

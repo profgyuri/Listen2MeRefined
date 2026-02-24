@@ -6,7 +6,7 @@ using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Mvvm.MainWindow;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 using Serilog;
 using SkiaSharp;

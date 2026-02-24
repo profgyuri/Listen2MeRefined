@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Storage;
+﻿namespace Listen2MeRefined.Infrastructure.Settings;
 
 /// <summary>
 ///     Represents a storage provider.

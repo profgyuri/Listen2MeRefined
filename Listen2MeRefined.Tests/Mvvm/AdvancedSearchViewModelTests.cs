@@ -3,7 +3,7 @@ using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Mvvm;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Services;
-using Listen2MeRefined.Infrastructure.Storage;
+using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
 using Serilog;
