@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace Listen2MeRefined.Infrastructure.Data;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
-public sealed class AppSettings : Settings.Settings
+public sealed class AppSettings : Settings
 {
     [Key] public int Id { get; set; }
 

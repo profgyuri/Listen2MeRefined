@@ -1,3 +1,5 @@
+using Listen2MeRefined.Infrastructure.Searching;
+
 namespace Listen2MeRefined.Infrastructure.Notifications;
 
 public sealed class AdvancedSearchNotification : INotification
