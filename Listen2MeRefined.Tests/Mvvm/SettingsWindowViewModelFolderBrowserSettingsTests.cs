@@ -97,7 +97,7 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         var updateCheckService = new Mock<IAppUpdateChecker>();
         updateCheckService
             .Setup(x => x.CheckForUpdatesAsync())
-            .ReturnsAsync(new Listen2MeRefined.Infrastructure.Services.Models.AppUpdateCheckResult(
+            .ReturnsAsync(new AppUpdateCheckResult(
                 false,
                 "You are using the latest version.",
                 false));
