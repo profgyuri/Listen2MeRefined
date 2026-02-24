@@ -8,7 +8,7 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
     private readonly object _sync = new();
     private readonly Dictionary<Guid, TrackedTask> _tasks = new();
     private readonly Dictionary<Guid, Guid> _workerTaskMap = new();
-    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly ILogger _logger;
     private readonly TimeSpan _terminalVisibilityDuration;
 
@@ -23,11 +23,11 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
     public event EventHandler<BackgroundTaskSnapshot>? SnapshotChanged;
 
     public BackgroundTaskStatusService(
-        IAppSettingsReadService settingsReadService,
+        IAppSettingsReader settingsReader,
         ILogger logger,
         TimeSpan? terminalVisibilityDuration = null)
     {
-        _settingsReadService = settingsReadService;
+        _settingsReader = settingsReader;
         _logger = logger;
         _terminalVisibilityDuration = terminalVisibilityDuration ?? TimeSpan.FromSeconds(5);
     }
@@ -257,15 +257,15 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
             rawPercent = 100;
         }
 
-        var showPercent = _settingsReadService.GetShowTaskPercentage();
-        var percentInterval = Math.Clamp((int)_settingsReadService.GetTaskPercentageReportInterval(), 1, 25);
+        var showPercent = _settingsReader.GetShowTaskPercentage();
+        var percentInterval = Math.Clamp((int)_settingsReader.GetTaskPercentageReportInterval(), 1, 25);
         int? displayPercent = showPercent && rawPercent is not null
             ? (state == BackgroundTaskState.Completed
                 ? 100
                 : rawPercent.Value - (rawPercent.Value % percentInterval))
             : null;
 
-        var showCount = _settingsReadService.GetShowScanMilestoneCount();
+        var showCount = _settingsReader.GetShowScanMilestoneCount();
         var countText = showCount ? task.MilestoneText : null;
 
         return new BackgroundTaskItem(
@@ -380,14 +380,14 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
         int currentProcessed,
         int? currentRemaining)
     {
-        if (!_settingsReadService.GetShowScanMilestoneCount())
+        if (!_settingsReader.GetShowScanMilestoneCount())
         {
             task.MilestoneText = null;
             return;
         }
 
-        var interval = Math.Clamp((int)_settingsReadService.GetScanMilestoneInterval(), 5, 500);
-        var basis = _settingsReadService.GetScanMilestoneBasis();
+        var interval = Math.Clamp((int)_settingsReader.GetScanMilestoneInterval(), 5, 500);
+        var basis = _settingsReader.GetScanMilestoneBasis();
 
         switch (basis)
         {
@@ -420,9 +420,9 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
 
     private void ApplyPresentationSettingChanges()
     {
-        var showMilestones = _settingsReadService.GetShowScanMilestoneCount();
-        var basis = _settingsReadService.GetScanMilestoneBasis();
-        var interval = Math.Clamp((int)_settingsReadService.GetScanMilestoneInterval(), 5, 500);
+        var showMilestones = _settingsReader.GetShowScanMilestoneCount();
+        var basis = _settingsReader.GetScanMilestoneBasis();
+        var interval = Math.Clamp((int)_settingsReader.GetScanMilestoneInterval(), 5, 500);
 
         if (_lastShowMilestones == showMilestones
             && _lastMilestoneBasis == basis

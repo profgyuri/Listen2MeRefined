@@ -16,18 +16,18 @@ public sealed partial class NewSongWindowViewModel :
         Path = ""
     };
 
-    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IWindowPositionPolicyService _windowPositionPolicyService;
     private readonly ILogger _logger;
 
     public bool IsTopmost { get; set; }
 
     public NewSongWindowViewModel(
-        IAppSettingsReadService settingsReadService,
+        IAppSettingsReader settingsReader,
         IWindowPositionPolicyService windowPositionPolicyService,
         ILogger logger)
     {
-        _settingsReadService = settingsReadService;
+        _settingsReader = settingsReader;
         _windowPositionPolicyService = windowPositionPolicyService;
         _logger = logger;
 
@@ -36,7 +36,7 @@ public sealed partial class NewSongWindowViewModel :
 
     protected override Task InitializeCoreAsync(CancellationToken ct)
     {
-        IsTopmost = _windowPositionPolicyService.IsTopmost(_settingsReadService.GetNewSongWindowPosition());
+        IsTopmost = _windowPositionPolicyService.IsTopmost(_settingsReader.GetNewSongWindowPosition());
 
         _logger.Debug("[NewSongWindowViewModel] Finished InitializeCoreAsync");
 

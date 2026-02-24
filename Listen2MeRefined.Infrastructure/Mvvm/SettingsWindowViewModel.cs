@@ -35,8 +35,8 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IFromFolderRemover _fromFolderRemover;
     private readonly IOutputDevice _outputDevice;
     private readonly IVersionChecker _versionChecker;
-    private readonly IAppSettingsReadService _settingsReadService;
-    private readonly IAppSettingsWriteService _settingsWriteService;
+    private readonly IAppSettingsReader _settingsReader;
+    private readonly IAppSettingsWriter _settingsWriter;
     private readonly IAppUpdateCheckService _appUpdateCheckService;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
@@ -87,10 +87,10 @@ public sealed partial class SettingsWindowViewModel :
 
     public bool ScanOnStartup
     {
-        get => _settingsReadService.GetScanOnStartup();
+        get => _settingsReader.GetScanOnStartup();
         set
         {
-            _settingsWriteService.SetScanOnStartup(value);
+            _settingsWriter.SetScanOnStartup(value);
             OnPropertyChanged();
             OnPropertyChanged(nameof(DontScanOnStartup));
         }
@@ -109,8 +109,8 @@ public sealed partial class SettingsWindowViewModel :
         IFromFolderRemover fromFolderRemover,
         IOutputDevice outputDevice,
         IVersionChecker versionChecker,
-        IAppSettingsReadService settingsReadService,
-        IAppSettingsWriteService settingsWriteService,
+        IAppSettingsReader settingsReader,
+        IAppSettingsWriter settingsWriter,
         IAppUpdateCheckService appUpdateCheckService,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
@@ -127,8 +127,8 @@ public sealed partial class SettingsWindowViewModel :
         _fromFolderRemover = fromFolderRemover;
         _outputDevice = outputDevice;
         _versionChecker = versionChecker;
-        _settingsReadService = settingsReadService;
-        _settingsWriteService = settingsWriteService;
+        _settingsReader = settingsReader;
+        _settingsWriter = settingsWriter;
         _appUpdateCheckService = appUpdateCheckService;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _globalHookSettingsSyncService = globalHookSettingsSyncService;
@@ -149,7 +149,7 @@ public sealed partial class SettingsWindowViewModel :
             "Always on top"
         };
 
-        var musicFolderRequests = _settingsReadService.GetMusicFolderRequests();
+        var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
         _folderRecursionByPath.Clear();
         foreach (var folderRequest in musicFolderRequests)
         {
@@ -157,34 +157,34 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         Folders = new(musicFolderRequests.Select(x => x.Path));
-        var selectedFont = _settingsReadService.GetFontFamily();
+        var selectedFont = _settingsReader.GetFontFamily();
         FontFamily = selectedFont;
         SelectedFontFamily = string.IsNullOrEmpty(selectedFont) ? "Segoe UI" : selectedFont;
 
-        var selectedWindowPosition = _settingsReadService.GetNewSongWindowPosition();
+        var selectedWindowPosition = _settingsReader.GetNewSongWindowPosition();
         SelectedNewSongWindowPosition = string.IsNullOrWhiteSpace(selectedWindowPosition)
             ? "Default"
             : selectedWindowPosition;
-        EnableGlobalMediaKeys = _settingsReadService.GetEnableGlobalMediaKeys();
-        EnableCornerNowPlayingPopup = _settingsReadService.GetEnableCornerNowPlayingPopup();
-        CornerTriggerSizePx = Math.Clamp((int)_settingsReadService.GetCornerTriggerSizePx(), MinCornerTriggerSizePx, MaxCornerTriggerSizePx);
-        CornerTriggerDebounceMs = Math.Clamp((int)_settingsReadService.GetCornerTriggerDebounceMs(), MinCornerDebounceMs, MaxCornerDebounceMs);
-        StartupVolumePercent = _playbackDefaultsService.ToVolumePercent(_settingsReadService.GetStartupVolume());
-        StartMuted = _settingsReadService.GetStartMuted();
-        AutoCheckUpdatesOnStartup = _settingsReadService.GetAutoCheckUpdatesOnStartup();
-        AutoScanOnFolderAdd = _settingsReadService.GetAutoScanOnFolderAdd();
-        ShowTaskPercentage = _settingsReadService.GetShowTaskPercentage();
+        EnableGlobalMediaKeys = _settingsReader.GetEnableGlobalMediaKeys();
+        EnableCornerNowPlayingPopup = _settingsReader.GetEnableCornerNowPlayingPopup();
+        CornerTriggerSizePx = Math.Clamp((int)_settingsReader.GetCornerTriggerSizePx(), MinCornerTriggerSizePx, MaxCornerTriggerSizePx);
+        CornerTriggerDebounceMs = Math.Clamp((int)_settingsReader.GetCornerTriggerDebounceMs(), MinCornerDebounceMs, MaxCornerDebounceMs);
+        StartupVolumePercent = _playbackDefaultsService.ToVolumePercent(_settingsReader.GetStartupVolume());
+        StartMuted = _settingsReader.GetStartMuted();
+        AutoCheckUpdatesOnStartup = _settingsReader.GetAutoCheckUpdatesOnStartup();
+        AutoScanOnFolderAdd = _settingsReader.GetAutoScanOnFolderAdd();
+        ShowTaskPercentage = _settingsReader.GetShowTaskPercentage();
         TaskPercentageReportInterval = Math.Clamp(
-            (int)_settingsReadService.GetTaskPercentageReportInterval(),
+            (int)_settingsReader.GetTaskPercentageReportInterval(),
             MinTaskPercentageStep,
             MaxTaskPercentageStep);
-        ShowScanMilestoneCount = _settingsReadService.GetShowScanMilestoneCount();
+        ShowScanMilestoneCount = _settingsReader.GetShowScanMilestoneCount();
         ScanMilestoneInterval = Math.Clamp(
-            (int)_settingsReadService.GetScanMilestoneInterval(),
+            (int)_settingsReader.GetScanMilestoneInterval(),
             MinScanMilestoneInterval,
             MaxScanMilestoneInterval);
-        SelectedScanMilestoneBasis = _settingsReadService.GetScanMilestoneBasis();
-        FolderBrowserStartAtLastLocation = _settingsReadService.GetFolderBrowserStartAtLastLocation();
+        SelectedScanMilestoneBasis = _settingsReader.GetScanMilestoneBasis();
+        FolderBrowserStartAtLastLocation = _settingsReader.GetFolderBrowserStartAtLastLocation();
         ReloadPinnedFolders();
 
         await GetAudioOutputDevices();
@@ -211,7 +211,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Font family changed to: {FontFamily}", value);
-        _settingsWriteService.SetFontFamily(value);
+        _settingsWriter.SetFontFamily(value);
         _ = _mediator.Publish(new FontFamilyChangedNotification(value));
     }
 
@@ -223,7 +223,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] Audio output device changed to: {DeviceName}", value.Name);
-        _settingsWriteService.SetAudioOutputDeviceName(value.Name);
+        _settingsWriter.SetAudioOutputDeviceName(value.Name);
         _ = _mediator.Publish(new AudioOutputDeviceChangedNotification(value));
     }
 
@@ -235,7 +235,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _logger.Information("[SettingsWindowViewModel] New song window position changed to: {Position}", value);
-        _settingsWriteService.SetNewSongWindowPosition(value);
+        _settingsWriter.SetNewSongWindowPosition(value);
         _ = _mediator.Publish(new NewSongWindowPositionChangedNotification(value));
     }
 
@@ -268,7 +268,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _folderRecursionByPath[SelectedFolder] = value;
-        _settingsWriteService.SetFolderIncludeSubdirectories(SelectedFolder, value);
+        _settingsWriter.SetFolderIncludeSubdirectories(SelectedFolder, value);
     }
 
     partial void OnEnableGlobalMediaKeysChanged(bool value)
@@ -278,7 +278,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetEnableGlobalMediaKeys(value);
+        _settingsWriter.SetEnableGlobalMediaKeys(value);
         _ = SyncGlobalHookRegistrationAsync();
     }
 
@@ -289,7 +289,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetEnableCornerNowPlayingPopup(value);
+        _settingsWriter.SetEnableCornerNowPlayingPopup(value);
         _ = SyncGlobalHookRegistrationAsync();
     }
 
@@ -307,7 +307,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetCornerTriggerSizePx((short)clamped);
+        _settingsWriter.SetCornerTriggerSizePx((short)clamped);
     }
 
     partial void OnCornerTriggerDebounceMsChanged(int value)
@@ -324,7 +324,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetCornerTriggerDebounceMs((short)clamped);
+        _settingsWriter.SetCornerTriggerDebounceMs((short)clamped);
     }
 
     partial void OnStartupVolumePercentChanged(int value)
@@ -341,7 +341,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetStartupVolume(_playbackDefaultsService.FromVolumePercent(clamped));
+        _settingsWriter.SetStartupVolume(_playbackDefaultsService.FromVolumePercent(clamped));
         if (clamped > 0 && StartMuted)
         {
             StartMuted = false;
@@ -355,7 +355,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetStartMuted(value);
+        _settingsWriter.SetStartMuted(value);
     }
 
     partial void OnAutoCheckUpdatesOnStartupChanged(bool value)
@@ -365,7 +365,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetAutoCheckUpdatesOnStartup(value);
+        _settingsWriter.SetAutoCheckUpdatesOnStartup(value);
         if (!value)
         {
             UpdateAvailableText = "Automatic update checks are disabled.";
@@ -380,7 +380,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetAutoScanOnFolderAdd(value);
+        _settingsWriter.SetAutoScanOnFolderAdd(value);
     }
 
     partial void OnShowTaskPercentageChanged(bool value)
@@ -390,7 +390,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetShowTaskPercentage(value);
+        _settingsWriter.SetShowTaskPercentage(value);
         _backgroundTaskStatusService.RefreshSnapshot();
     }
 
@@ -408,7 +408,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetTaskPercentageReportInterval((short)clamped);
+        _settingsWriter.SetTaskPercentageReportInterval((short)clamped);
         _backgroundTaskStatusService.RefreshSnapshot();
     }
 
@@ -419,7 +419,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetShowScanMilestoneCount(value);
+        _settingsWriter.SetShowScanMilestoneCount(value);
         _backgroundTaskStatusService.RefreshSnapshot();
     }
 
@@ -437,7 +437,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetScanMilestoneInterval((short)clamped);
+        _settingsWriter.SetScanMilestoneInterval((short)clamped);
         _backgroundTaskStatusService.RefreshSnapshot();
     }
 
@@ -448,7 +448,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetScanMilestoneBasis(value);
+        _settingsWriter.SetScanMilestoneBasis(value);
         _backgroundTaskStatusService.RefreshSnapshot();
     }
 
@@ -459,7 +459,7 @@ public sealed partial class SettingsWindowViewModel :
             return;
         }
 
-        _settingsWriteService.SetFolderBrowserStartAtLastLocation(value);
+        _settingsWriter.SetFolderBrowserStartAtLastLocation(value);
     }
 
     [RelayCommand]
@@ -529,7 +529,7 @@ public sealed partial class SettingsWindowViewModel :
                 CancelClearMetadataButtonContent = $"Cancel ({_secondsToCancelClear})";
 
                 _folderRecursionByPath.Clear();
-                _settingsWriteService.SetMusicFolders(Array.Empty<FolderScanRequest>());
+                _settingsWriter.SetMusicFolders(Array.Empty<FolderScanRequest>());
                 _logger.Debug("[SettingsWindowViewModel] Metadata cleared");
             }
 
@@ -609,7 +609,7 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         var selectedIndex = 0;
-        var savedName = _settingsReadService.GetAudioOutputDeviceName();
+        var savedName = _settingsReader.GetAudioOutputDeviceName();
         if (!string.IsNullOrEmpty(savedName))
         {
             var audioOutputDevice = AudioOutputDevices
@@ -629,17 +629,17 @@ public sealed partial class SettingsWindowViewModel :
             .Select(path => new FolderScanRequest(
                 path,
                 _folderRecursionByPath.TryGetValue(path, out var includeSubdirectories) && includeSubdirectories));
-        _settingsWriteService.SetMusicFolders(folders);
+        _settingsWriter.SetMusicFolders(folders);
     }
 
     private void PersistPinnedFolders()
     {
-        _settingsWriteService.SetPinnedFolders(_pinnedFoldersService.Normalize(PinnedFolders));
+        _settingsWriter.SetPinnedFolders(_pinnedFoldersService.Normalize(PinnedFolders));
     }
 
     private void ReloadPinnedFolders()
     {
-        var pinnedFolders = _pinnedFoldersService.Normalize(_settingsReadService.GetPinnedFolders());
+        var pinnedFolders = _pinnedFoldersService.Normalize(_settingsReader.GetPinnedFolders());
 
         PinnedFolders.Clear();
         foreach (var pinnedFolder in pinnedFolders)
@@ -711,7 +711,7 @@ public sealed partial class SettingsWindowViewModel :
     {
         var pinnedFolders = _pinnedFoldersService.Normalize(notification.PinnedFolders);
         PinnedFolders = new ObservableCollection<string>(pinnedFolders);
-        _settingsWriteService.SetPinnedFolders(pinnedFolders);
+        _settingsWriter.SetPinnedFolders(pinnedFolders);
 
         await Task.CompletedTask;
     }

@@ -1,12 +1,11 @@
 using Listen2MeRefined.Infrastructure.Scanning;
-using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
 /// <summary>
 /// Provides typed read access to persisted application settings.
 /// </summary>
-public interface IAppSettingsReadService
+public interface IAppSettingsReader
 {
     /// <summary>Gets the configured application font family.</summary>
     string GetFontFamily();

@@ -1,15 +1,12 @@
 using Listen2MeRefined.Infrastructure.Scanning;
-using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
-using Contracts;
-
-public sealed class AppSettingsWriteService : IAppSettingsWriteService
+public sealed class AppSettingsWriter : IAppSettingsWriter
 {
     private readonly ISettingsManager<AppSettings> _settingsManager;
 
-    public AppSettingsWriteService(ISettingsManager<AppSettings> settingsManager)
+    public AppSettingsWriter(ISettingsManager<AppSettings> settingsManager)
     {
         _settingsManager = settingsManager;
     }

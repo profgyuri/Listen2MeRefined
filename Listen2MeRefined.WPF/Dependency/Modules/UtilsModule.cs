@@ -24,11 +24,11 @@ public class UtilsModule : Module
             .As<IVersionChecker>();
         
         builder
-            .RegisterType<AppSettingsReadService>()
-            .As<IAppSettingsReadService>();
+            .RegisterType<AppSettingsReader>()
+            .As<IAppSettingsReader>();
         builder
-            .RegisterType<AppSettingsWriteService>()
-            .As<IAppSettingsWriteService>();
+            .RegisterType<AppSettingsWriter>()
+            .As<IAppSettingsWriter>();
         builder
             .RegisterType<AppUpdateCheckService>()
             .As<IAppUpdateCheckService>();

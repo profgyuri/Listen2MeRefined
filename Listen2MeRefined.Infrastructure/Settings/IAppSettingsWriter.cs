@@ -1,12 +1,11 @@
 using Listen2MeRefined.Infrastructure.Scanning;
-using Listen2MeRefined.Infrastructure.Services.Models;
 
-namespace Listen2MeRefined.Infrastructure.Services.Contracts;
+namespace Listen2MeRefined.Infrastructure.Settings;
 
 /// <summary>
 /// Provides typed write operations for persisted application settings.
 /// </summary>
-public interface IAppSettingsWriteService
+public interface IAppSettingsWriter
 {
     /// <summary>Sets whether startup folder scan is enabled.</summary>
     void SetScanOnStartup(bool value);

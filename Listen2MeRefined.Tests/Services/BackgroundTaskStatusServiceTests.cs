@@ -122,7 +122,7 @@ public sealed class BackgroundTaskStatusServiceTests
     [Fact]
     public void GetSnapshot_NoTasks_DoesNotReadSettings()
     {
-        var readService = new Mock<IAppSettingsReadService>(MockBehavior.Strict);
+        var readService = new Mock<IAppSettingsReader>(MockBehavior.Strict);
         var sut = new BackgroundTaskStatusService(readService.Object, Mock.Of<Serilog.ILogger>());
 
         var snapshot = sut.GetSnapshot();
@@ -137,7 +137,7 @@ public sealed class BackgroundTaskStatusServiceTests
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);
 
-        var readService = new AppSettingsReadService(settingsManager.Object);
+        var readService = new AppSettingsReader(settingsManager.Object);
         return new BackgroundTaskStatusService(readService, Mock.Of<Serilog.ILogger>(), terminalVisibility);
     }
 }

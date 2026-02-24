@@ -39,7 +39,7 @@ public sealed class AppSettingsServicesTests
         };
 
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsReadService(manager.Object);
+        var sut = new AppSettingsReader(manager.Object);
 
         Assert.Equal("Segoe UI", sut.GetFontFamily());
         Assert.Equal("Always on top", sut.GetNewSongWindowPosition());
@@ -71,7 +71,7 @@ public sealed class AppSettingsServicesTests
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsWriteService(manager.Object);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetMusicFolders([@" C:\Music ", @"c:\music", @"D:\Rock"]);
 
@@ -85,7 +85,7 @@ public sealed class AppSettingsServicesTests
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsWriteService(manager.Object);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetPinnedFolders([@" C:\A ", @"c:\a", @"D:\B"]);
 
@@ -99,7 +99,7 @@ public sealed class AppSettingsServicesTests
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsWriteService(manager.Object);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetMusicFolders(
         [
@@ -117,7 +117,7 @@ public sealed class AppSettingsServicesTests
     {
         var settings = new AppSettings { ScanOnStartup = true };
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsWriteService(manager.Object);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetScanOnStartup(false);
 
@@ -132,7 +132,7 @@ public sealed class AppSettingsServicesTests
             MusicFolders = [new MusicFolderModel(@"C:\Music", false)]
         };
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsWriteService(manager.Object);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetFolderIncludeSubdirectories(@"C:\Music", true);
 
@@ -144,7 +144,7 @@ public sealed class AppSettingsServicesTests
     {
         var settings = new AppSettings();
         var manager = CreateSettingsManager(settings);
-        var sut = new AppSettingsWriteService(manager.Object);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetShowTaskPercentage(false);
         sut.SetTaskPercentageReportInterval(7);

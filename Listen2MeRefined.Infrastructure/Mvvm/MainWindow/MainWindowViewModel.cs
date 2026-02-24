@@ -14,7 +14,7 @@ public sealed partial class MainWindowViewModel :
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
     private readonly IAppUpdateCheckService _appUpdateCheckService;
-    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly StartupManager _startupManager;
     private readonly IMainWindowNavigationService _navigationService;
@@ -44,7 +44,7 @@ public sealed partial class MainWindowViewModel :
         ILogger logger,
         IUiDispatcher ui,
         IAppUpdateCheckService appUpdateCheckService,
-        IAppSettingsReadService settingsReadService,
+        IAppSettingsReader settingsReader,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         SearchbarViewModel searchbarViewModel,
         PlayerControlsViewModel playerControlsViewModel,
@@ -57,7 +57,7 @@ public sealed partial class MainWindowViewModel :
         _logger = logger;
         _ui = ui;
         _appUpdateCheckService = appUpdateCheckService;
-        _settingsReadService = settingsReadService;
+        _settingsReader = settingsReader;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _startupManager = startupManager;
         _navigationService = navigationService;
@@ -93,7 +93,7 @@ public sealed partial class MainWindowViewModel :
             throw;
         }
         
-        if (_settingsReadService.GetAutoCheckUpdatesOnStartup())
+        if (_settingsReader.GetAutoCheckUpdatesOnStartup())
         {
             _logger.Information("[MainWindowViewModel] Checking for latest version...");
             var status = await _appUpdateCheckService.CheckForUpdatesAsync();

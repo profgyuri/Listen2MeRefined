@@ -13,7 +13,7 @@ public partial class AdvancedSearchViewModel :
     private readonly IMediator _mediator;
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
-    private readonly IAppSettingsReadService _settingsReadService;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
 
     [ObservableProperty] private string _fontFamily = string.Empty;
@@ -78,13 +78,13 @@ public partial class AdvancedSearchViewModel :
         IMediator mediator,
         ILogger logger,
         IUiDispatcher ui,
-        IAppSettingsReadService settingsReadService,
+        IAppSettingsReader settingsReader,
         IAdvancedSearchCriteriaService criteriaService)
     {
         _mediator = mediator;
         _logger = logger;
         _ui = ui;
-        _settingsReadService = settingsReadService;
+        _settingsReader = settingsReader;
         _criteriaService = criteriaService;
         SelectedColumnName = string.Empty;
         Criterias.CollectionChanged += OnCriteriasChanged;
@@ -98,7 +98,7 @@ public partial class AdvancedSearchViewModel :
 
         await Task.Run(() =>
         {
-            FontFamily = _settingsReadService.GetFontFamily();
+            FontFamily = _settingsReader.GetFontFamily();
             ColumnName = _criteriaService.GetColumnNames().ToList();
             SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
             MatchMode = SearchMatchMode.All;

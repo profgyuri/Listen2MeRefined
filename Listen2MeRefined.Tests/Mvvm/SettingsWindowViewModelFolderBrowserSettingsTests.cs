@@ -80,8 +80,8 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             .Setup(x => x.SaveSettings(It.IsAny<Action<AppSettings>>()))
             .Callback<Action<AppSettings>>(apply => apply(settings));
 
-        var settingsReadService = new AppSettingsReadService(settingsManager.Object);
-        var settingsWriteService = new AppSettingsWriteService(settingsManager.Object);
+        var settingsReadService = new AppSettingsReader(settingsManager.Object);
+        var settingsWriteService = new AppSettingsWriter(settingsManager.Object);
         var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
 
         var outputDevice = new Mock<IOutputDevice>();

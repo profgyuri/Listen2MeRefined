@@ -92,7 +92,7 @@ public class AdvancedSearchViewModelTests
         var settings = new Mock<ISettingsManager<AppSettings>>();
         var ui = new Mock<IUiDispatcher>();
         settings.SetupGet(s => s.Settings).Returns(new AppSettings { FontFamily = "Segoe UI" });
-        var settingsReadService = new AppSettingsReadService(settings.Object);
+        var settingsReadService = new AppSettingsReader(settings.Object);
         var criteriaService = new AdvancedSearchCriteriaService();
 
         var vm = new AdvancedSearchViewModel(

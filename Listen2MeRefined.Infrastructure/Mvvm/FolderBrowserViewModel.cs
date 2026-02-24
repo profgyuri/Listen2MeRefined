@@ -12,8 +12,8 @@ public sealed partial class FolderBrowserViewModel :
     private readonly IMediator _mediator;
     private readonly IFolderNavigationService _folderNavigationService;
     private readonly IPinnedFoldersService _pinnedFoldersService;
-    private readonly IAppSettingsReadService _settingsReadService;
-    private readonly IAppSettingsWriteService _settingsWriteService;
+    private readonly IAppSettingsReader _settingsReader;
+    private readonly IAppSettingsWriter _settingsWriter;
     private readonly List<string> _allFolders = new();
 
     [ObservableProperty] private string _fontFamily = "";
@@ -33,27 +33,27 @@ public sealed partial class FolderBrowserViewModel :
         IMediator mediator,
         IFolderNavigationService folderNavigationService,
         IPinnedFoldersService pinnedFoldersService,
-        IAppSettingsReadService settingsReadService,
-        IAppSettingsWriteService settingsWriteService)
+        IAppSettingsReader settingsReader,
+        IAppSettingsWriter settingsWriter)
     {
         _logger = logger;
         _mediator = mediator;
         _folderNavigationService = folderNavigationService;
         _pinnedFoldersService = pinnedFoldersService;
-        _settingsReadService = settingsReadService;
-        _settingsWriteService = settingsWriteService;
+        _settingsReader = settingsReader;
+        _settingsWriter = settingsWriter;
 
         _logger.Debug("[FolderBrowserViewModel] initialized");
     }
 
     protected override Task InitializeCoreAsync(CancellationToken ct)
     {
-        FontFamily = _settingsReadService.GetFontFamily();
+        FontFamily = _settingsReader.GetFontFamily();
         LoadQuickAccessCollections();
 
         var initialPath = _folderNavigationService.ResolveInitialPath(
-            _settingsReadService.GetFolderBrowserStartAtLastLocation(),
-            _settingsReadService.GetLastBrowsedFolder(),
+            _settingsReader.GetFolderBrowserStartAtLastLocation(),
+            _settingsReader.GetLastBrowsedFolder(),
             PinnedFolders);
         if (string.IsNullOrWhiteSpace(initialPath))
         {
@@ -179,7 +179,7 @@ public sealed partial class FolderBrowserViewModel :
 
         ClearValidationError();
         FullPath = candidatePath;
-        _settingsWriteService.SetLastBrowsedFolder(candidatePath);
+        _settingsWriter.SetLastBrowsedFolder(candidatePath);
 
         _logger.Debug("[FolderBrowserViewModel] Publishing full path: {FullPath}", candidatePath);
         var notification = new FolderBrowserNotification(candidatePath);
@@ -191,12 +191,12 @@ public sealed partial class FolderBrowserViewModel :
     {
         Drives = new(_folderNavigationService.GetDrives());
 
-        var sourcePinnedFolders = _settingsReadService.GetPinnedFolders();
+        var sourcePinnedFolders = _settingsReader.GetPinnedFolders();
         var pinnedFolders = _pinnedFoldersService.NormalizeExisting(sourcePinnedFolders);
 
         if (!pinnedFolders.SequenceEqual(sourcePinnedFolders, StringComparer.OrdinalIgnoreCase))
         {
-            _settingsWriteService.SetPinnedFolders(pinnedFolders);
+            _settingsWriter.SetPinnedFolders(pinnedFolders);
         }
 
         PinnedFolders = new(pinnedFolders);
@@ -239,7 +239,7 @@ public sealed partial class FolderBrowserViewModel :
         if (!string.IsNullOrWhiteSpace(FullPath))
         {
             _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
-            _settingsWriteService.SetLastBrowsedFolder(FullPath);
+            _settingsWriter.SetLastBrowsedFolder(FullPath);
         }
 
         _allFolders.Clear();
@@ -263,7 +263,7 @@ public sealed partial class FolderBrowserViewModel :
     private async Task SavePinnedFoldersAsync()
     {
         var pinnedFolders = _pinnedFoldersService.NormalizeExisting(PinnedFolders);
-        _settingsWriteService.SetPinnedFolders(pinnedFolders);
+        _settingsWriter.SetPinnedFolders(pinnedFolders);
         await _mediator.Publish(new PinnedFoldersChangedNotification(pinnedFolders));
     }
 

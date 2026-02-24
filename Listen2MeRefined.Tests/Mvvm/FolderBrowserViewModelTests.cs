@@ -147,8 +147,8 @@ public sealed class FolderBrowserViewModelTests
         mediator.Setup(x => x.Publish(It.IsAny<PinnedFoldersChangedNotification>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        var settingsReadService = new AppSettingsReadService(settingsManager.Object);
-        var settingsWriteService = new AppSettingsWriteService(settingsManager.Object);
+        var settingsReadService = new AppSettingsReader(settingsManager.Object);
+        var settingsWriteService = new AppSettingsWriter(settingsManager.Object);
         var folderNavigationService = new FolderNavigationService(folderBrowser);
         var pinnedFoldersService = new PinnedFoldersService(folderBrowser);
 
