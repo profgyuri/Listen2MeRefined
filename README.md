@@ -91,6 +91,9 @@ There is no specific roadmap. I try to implement things as I see fit, but now it
    - Enumerating audio output devices
    - Sliders feel janky
  - Localization (hungarian and german planned, help needed with other languages if they will be requested)
+ - and many more
+
+See [this milestone](https://github.com/profgyuri/Listen2MeRefined/milestone/1) for the progress.
 
 ## Known issues
 
