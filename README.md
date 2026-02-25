@@ -1,65 +1,96 @@
 # Listen2MeRefined
 
-## Quick Starting Guide
+Welcome to Listen2Me, a music player app aimed for electronic music! The project is currently open source, all written in C#.
 
-As per now, after releasing version 0.5.0, the first start of the application will create a database file (listen2me.db). This file will contain your settings, and also the metadata stored on your music files.
+Before you get any ideas, it is not meant to challange AIMP, ITunes, or whatever app you use for playing your music. But who knows, what the future holds.
 
-At the first startup you have to let the application know, where your msuic files live on your system.
-First, head to the settings, found in the top right corner:
+This project was initially created to accomodate my needs in a music player app. I prefer hard dance music in almost every form, but this does not mean, that your favorite rock music cannot be played with this app (as long as you have a copy of it on your computer). It is still under development, but 1.0 is on the horizon!
 
-![Settings-circled](https://user-images.githubusercontent.com/44247462/224454100-4d88627b-1715-4934-9d56-7eb43de0f74e.jpg)
+Important to note, that due to some of the used dependencies, this is a __Windows only__ app - at least for now.
 
-Now, that the settings window is open, you can add you music folders at the 'Local Folders' option, clicking the 'Browse' button.
+You can always find the **latest release** [here](https://github.com/profgyuri/Listen2MeRefined/releases)
 
-![Local-Folders-Browse-circled](https://user-images.githubusercontent.com/44247462/224454412-55b4d97b-ca4c-413b-8f08-08cfe7c11ca3.jpg)
+## Features
 
-This opens a folder browser window. After you navigated to your music folder either with going the the filesystem, or simply pasting the path at the botton of the window, hit the 'Select' button to add the folder to the database.
+- All the necessary playback controls (previous, next, play, pause, stop, volume)
+- Shuffling - the new order of the playlist is visible,  so you can reorder it if you'd like
+- Quick search
+- Advanced search via a criterion builder - filter trough every metadata that is currently supported
+- Thourough settings menu - from font styles, folder management, small window settings
+- Small window displaying the currently playing song in all 4 corners of your window
+- Drag 'n drop support (currently only within the app)
 
-![Folder-Browser](https://user-images.githubusercontent.com/44247462/224454709-a69a6985-4fe0-4e5d-a137-c6634eaa9b92.jpg)
+## Quick Start
 
-If you have selected a folder from the available list, it will be added to the end of the path, if you press 'Select', otherwise you can see the path that will be added to your local folders list. 
+By simply opening the app, nothing will happen, but here is a basic process to get you started:
 
-After adding one of your folders, the program will automatically scan for your supported music files. The scanning is not recursive, meaning subfolders will not be scanned. 
-As per now, there is no visual feedback for the scanning progress, so for a baseline, I could scan 1000 songs in around 15 seconds with an AMD Ryzen 5800x cpu. The scanning happens in alphabetic order, so if you can see the song that is alphabetically last in the folder, then everything is set.
+1. Open settings from the top right corner.
+2. Go to the 'Library' tab and add 1 of your music folders via the file browser.
+3. Now you may see a 'Scanning' status on the top of the main window. When it reaches 100%, you are free to proceed.
+4. At the bottom of the window you will find the search bar. Either click on the search button without any text provided, or write there something to apply it as a filter.
+5. The search results are shown on the left side. Above them there is an arrow pointing to the right. Click on that to move the results to the playlist.
+6. Double click on any song and use your media keys, or the buttons on the UI to start the playback.
 
-### I added my folder, but i can't see my songs?
+## Feature request and bug report
 
-To keep the cpu load relatively low during development, your songs won't show up automatically. You have to initiate a search.
+You can open a new [issue](https://github.com/profgyuri/Listen2MeRefined/issues) at any time, user created issues will always be prioritized.
 
-![Searchbar](https://user-images.githubusercontent.com/44247462/224455658-d4b11a73-5393-4535-9b6a-37a1218092fd.jpg)
+**Report a bug**: The title should be starting with [BUG] and a short description about what is not working as expected, the description should contain exact steps to reproduce, and what you expected to happen. 
 
-You can find the searchbar at the bottom of the maind window. The first part is an input field, which is basically a filter for your quick search. If you leave this field empty, every song that was scanned will show up in the 'Search Results'. However, if you want to use a filter, the program will search for it in every supported metadata of your scanned files, including the path. If there is at least 1 metadata, that contains your keyword (which can be a number), the song will show up in the search results, but only after you hit enter, or clikced on the quick search button (represented by a magnifying glass).
+**Request a feature**: The title should be starting with [FEATURE], and then the name of your feature. Write down in the description in a list, what behaviour are you expecting in what scenarios. The better the description is, the faster I can get to it. 
 
-There is also an option for advanced searching, right next to the magnifying glass (shown as an opened book). This will open up the advanced search window.
+Examples:
 
-![Advanced-Search](https://user-images.githubusercontent.com/44247462/224456586-8c2e9fc4-a1d7-40e8-a7dc-104a3ef3c36d.jpg)
+[BUG] Shuffle button does not shuffle
 
-Here you can set up as many filters as you want. You also have the option to include, exclude, a specific filter, or make the exact. After you set up your filters, you can choose, if you want any of them to match within a song's metadata, or to match every single filter you set up on every song that should be returned to the search results. For this to work properly, it is recommended to set up the artists, title, genre, bpm, etc. in every files metadata, because if the values are empty, then there is simply nothing to search for. 
+[FEATURE] Mobile companion app
 
-Now that you have your songs in the search results list, you can simply drag and drop them to the playlist, hit ctrl + right arrow key, or use the button next to the 'Search Results' text. If you have nothing selected, then every item from the search results will be replaced to the playlist, otherwise only the selected songs will be added.
+## Contribution
 
-## What's still needed for the release version?
+I try to keep the code as simple as I can, but that doesn't mean there are no hundreds of lines in a file. This is mainly true for viewmodel files, since I don't want to add extra confusion with self-made partial classes. Sorry, if it differs from your preferences.
+
+**Some** harder concepts are documented in the [wiki](https://github.com/profgyuri/Listen2MeRefined/wiki).
+
+### ViewModels
+
+Please keep in mind, that the existing viewmodels are using the CommunityToolkit. This means if you plan to contribute, use ```ObservablePropertyAttribute``` on private fields if you need a bindable property (some exceptions may apply), and ```RelayCommandAttribute``` on methods to use as bindable commands. All viewmodels have to inherit from ```ViewModelBase```, and if there is any text on it's UI, also from ```INotificationHandler<FontFamilyChangedNotification>```.
+
+If you have any long running initialization tasks, that have to be run on a background, override ```InitializeCoreAsync```. See an existing viewmodel for usage.
+
+### General
+
+- If you have to create a new class, also create the interface for its public methods and properties. Naming should be straightforward, see: ```IMusicPlayer``` -> ```NAudioMusicPlayer``` or ```IFileTransmitter``` -> ```FileTransmitter```
+- Add unit tests in the Tests project to cover at least 50% of the submitter code. You can use [coverlet](https://github.com/coverlet-coverage/coverlet) to check if you have enough coverage.
+- Always place the test file in the same structure, as you can see it in the Infrastructure project. *SameFolder*/*SameName*Tests.cs
+- The project uses Autofac modules for DI in the WPF project. Either use the best representing, currently existing module for your registrations, or create a new one.
+- Logging is mandatory in viewmodels, but lower layers can log events too, if it makes sense. The used framework is Serilog.
+- If you use AI agents, double check the work they do!
+- Please give a proper explanation of your changes in the PR comment, so I know, what I should try out before merging.
+
+For any open work to do, see either the [issues](https://github.com/profgyuri/Listen2MeRefined/issues), or [projects](https://github.com/users/profgyuri/projects/1) page of the repo. Give a sign in any form, that you intend to start working on a problem.
+
+## Roadmap
+
+There is no specific roadmap. I try to implement things as I see fit, but now it is time to push for 1.0
+
+### What's still needed for 1.0?
 
  - Implementing playlists
  - Drag 'n drop from outside the application
  - UX/QOL improvements like:
    - Individually choosable colors OR color themes
- - Adding context menu to list items (to "jump here", scan individually, etc.)
- - Performance improvements (registering global keyboard and mouse hooks is still a problem)
-
-## Working features
-
- - Audio playing in general
- - Quick search
- - Advanced search
- - Waveform as progress bar during playback
- - All available options are working
-   - Adding local folders for scanning
-   - Scan on startup or only manually
-   - Change fontstyle
-   - Change audio output device
+ - Adding context menu to list items (to "jump here", scan individually, etc.) (properly on right click)
+ - Performance improvements
+   - Registering global keyboard and mouse hooks
+   - Enumerating audio output devices
+   - Sliders feel janky
+ - Localization (hungarian and german planned, help needed with other languages if they will be requested)
 
 ## Known issues
 
- - Multiple display setup is currently not supported in any form.
+ - Multiple display setup is currently not supported in any form. (Fix is not planned as per now.)
  - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
+
+## Support
+
+If you like what I've done so far, or just believe in the project, feel free to let me know with any amount of donation. This would certainly make me push harder.
