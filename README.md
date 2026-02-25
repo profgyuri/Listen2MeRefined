@@ -45,7 +45,7 @@ Examples:
 
 [BUG] Shuffle button does not shuffle
 
-[FEATURE] Mobile companion app
+[[FEATURE] Mobile companion app](https://github.com/profgyuri/Listen2MeRefined/issues/80)
 
 ## Contribution
 
