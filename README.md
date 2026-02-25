@@ -1,5 +1,7 @@
 # Listen2MeRefined
 
+MIT License as per the License.md
+
 Welcome to Listen2Me, a music player app aimed for electronic music! The project is currently open source, all written in C#.
 
 Before you get any ideas, it is not meant to challange AIMP, ITunes, or whatever app you use for playing your music. But who knows, what the future holds.
