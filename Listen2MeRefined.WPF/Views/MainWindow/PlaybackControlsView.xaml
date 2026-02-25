@@ -53,11 +53,11 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"/>
-                        <Button Command="{Binding StopCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" />
-                        <Button Command="{Binding PlayPauseCommand}" Style="{StaticResource PlaybackPrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" />
-                        <Button Command="{Binding NextCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" />
-                        <Button Command="{Binding ShuffleCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" />
+                        <Button Command="{Binding PreviousCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}" IsEnabled="{Binding ArePlaybackButtonsEnabled}"/>
+                        <Button Command="{Binding StopCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
+                        <Button Command="{Binding PlayPauseCommand}" Style="{StaticResource PlaybackPrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
+                        <Button Command="{Binding NextCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
+                        <Button Command="{Binding ShuffleCommand}" Style="{StaticResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0">

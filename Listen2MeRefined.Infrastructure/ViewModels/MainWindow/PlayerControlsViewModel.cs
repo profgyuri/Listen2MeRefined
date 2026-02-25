@@ -38,6 +38,7 @@ public partial class PlayerControlsViewModel :
     [ObservableProperty] private int _waveFormWidth;
     [ObservableProperty] private int _waveFormHeight;
     [ObservableProperty] private double _totalTime;
+    [ObservableProperty] private bool _arePlaybackButtonsEnabled = true;
 
     public double CurrentTime
     {
@@ -330,16 +331,28 @@ public partial class PlayerControlsViewModel :
     {
         _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
 
-        _currentTrackPath = notification.Audio.Path;
-        await DrawPlaceholderLineAsync(cancellationToken);
-
-        if (!string.IsNullOrWhiteSpace(_currentTrackPath))
+        try
         {
-            await DrawTrackWaveFormAsync(_currentTrackPath, cancellationToken);
-        }
+            ArePlaybackButtonsEnabled = false;
+            _currentTrackPath = notification.Audio.Path;
+            await DrawPlaceholderLineAsync(cancellationToken);
 
-        TotalTime = notification.Audio.Length.TotalMilliseconds;
-        OnPropertyChanged(nameof(TotalTimeDisplay));
+            if (!string.IsNullOrWhiteSpace(_currentTrackPath))
+            {
+                await DrawTrackWaveFormAsync(_currentTrackPath, cancellationToken);
+            }
+
+            TotalTime = notification.Audio.Length.TotalMilliseconds;
+            OnPropertyChanged(nameof(TotalTimeDisplay));
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "[PlayerControlsViewModel] Failed to draw waveform.");
+        }
+        finally
+        {
+            ArePlaybackButtonsEnabled = true;
+        }
     }
 
     private void SetMuted(bool isMuted)
