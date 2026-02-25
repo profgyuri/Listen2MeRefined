@@ -53,6 +53,10 @@ I try to keep the code as simple as I can, but that doesn't mean there are no hu
 
 **Some** harder concepts are documented in the [wiki](https://github.com/profgyuri/Listen2MeRefined/wiki).
 
+### First time contribution?
+
+If this would be your first time working on  someone else's repo and you feel overwhelmed, a good entry point is to fix some [sonar issues](https://sonarcloud.io/project/issues?issueStatuses=OPEN%2CCONFIRMED&id=profgyuri_Listen2MeRefined). The site explains what the problem is and how you could solve it. It is simple, but still looks good on your resume.
+
 ### ViewModels
 
 Please keep in mind, that the existing viewmodels are using the CommunityToolkit. This means if you plan to contribute, use ```ObservablePropertyAttribute``` on private fields if you need a bindable property (some exceptions may apply), and ```RelayCommandAttribute``` on methods to use as bindable commands. All viewmodels have to inherit from ```ViewModelBase```, and if there is any text on it's UI, also from ```INotificationHandler<FontFamilyChangedNotification>```.
