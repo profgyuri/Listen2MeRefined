@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Startup;
 
@@ -7,7 +8,8 @@ namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 public sealed partial class MainWindowViewModel :
     ViewModelBase,
     INotificationHandler<FontFamilyChangedNotification>,
-    INotificationHandler<CurrentSongNotification>
+    INotificationHandler<CurrentSongNotification>,
+    INotificationHandler<PlayerStateChangedNotification>
 {
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
@@ -18,7 +20,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IMainWindowNavigationService _navigationService;
 
     public SearchbarViewModel SearchbarViewModel { get; }
-    public PlayerControlsViewModel PlayerControlsViewModel { get; }
+    public PlaybackControlsViewModel PlaybackControlsViewModel { get; }
     public ListsViewModel ListsViewModel { get; }
     public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
     public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
@@ -37,6 +39,7 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private bool _isTaskStatusVisible;
     [ObservableProperty] private string _taskStatusText = "";
     [ObservableProperty] private string _taskStatusTooltip = "";
+    [ObservableProperty] private PlayerState _playerState = PlayerState.Stopped;
 
     public MainWindowViewModel(
         ILogger logger,
@@ -45,7 +48,7 @@ public sealed partial class MainWindowViewModel :
         IAppSettingsReader settingsReader,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         SearchbarViewModel searchbarViewModel,
-        PlayerControlsViewModel playerControlsViewModel,
+        PlaybackControlsViewModel playbackControlsViewModel,
         ListsViewModel listsViewModel,
         PlaylistPaneViewModel playlistPaneViewModel,
         SearchResultsPaneViewModel searchResultsPaneViewModel,
@@ -61,7 +64,7 @@ public sealed partial class MainWindowViewModel :
         _navigationService = navigationService;
 
         SearchbarViewModel = searchbarViewModel;
-        PlayerControlsViewModel = playerControlsViewModel;
+        PlaybackControlsViewModel = playbackControlsViewModel;
         ListsViewModel = listsViewModel;
         PlaylistPaneViewModel = playlistPaneViewModel;
         SearchResultsPaneViewModel = searchResultsPaneViewModel;
@@ -78,7 +81,7 @@ public sealed partial class MainWindowViewModel :
         try
         {
             await _startupManager.StartAsync(ct);
-            await PlayerControlsViewModel.InitializeAsync(ct);
+            await PlaybackControlsViewModel.InitializeAsync(ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -216,5 +219,11 @@ public sealed partial class MainWindowViewModel :
         return string.IsNullOrWhiteSpace(task.Message)
             ? fallbackText
             : task.Message!;
+    }
+
+    public Task Handle(PlayerStateChangedNotification notification, CancellationToken cancellationToken)
+    {
+        PlayerState = notification.PlayerState;
+        return Task.CompletedTask;
     }
 }

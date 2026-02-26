@@ -6,7 +6,7 @@ using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
-public partial class PlayerControlsViewModel :
+public partial class PlaybackControlsViewModel :
     ViewModelBase,
     INotificationHandler<CurrentSongNotification>,
     IWaveformViewportAware
@@ -27,7 +27,6 @@ public partial class PlayerControlsViewModel :
     private readonly SemaphoreSlim _waveformRenderLock = new(1, 1);
     private readonly Func<TimeSpan, CancellationToken, Task> _delayAsync;
     private readonly TimeSpan _waveformResizeDebounce;
-    private bool _isMuted;
     private float _lastNonZeroVolume = 0.7f;
     private int _waveformResizeRequestId;
     private string? _currentTrackPath;
@@ -39,7 +38,8 @@ public partial class PlayerControlsViewModel :
     [ObservableProperty] private int _waveFormHeight;
     [ObservableProperty] private double _totalTime;
     [ObservableProperty] private bool _arePlaybackButtonsEnabled = true;
-
+    [ObservableProperty] private bool _isMuted;
+    
     public double CurrentTime
     {
         get => _musicPlayerController.CurrentTime;
@@ -51,7 +51,7 @@ public partial class PlayerControlsViewModel :
         }
     }
 
-    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds((double)TotalTime);
+    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
     public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
     public float Volume
@@ -72,25 +72,23 @@ public partial class PlayerControlsViewModel :
                 _lastNonZeroVolume = clampedValue;
             }
 
-            if (_isMuted && clampedValue > VolumeEpsilon)
+            if (IsMuted && clampedValue > VolumeEpsilon)
             {
                 SetMuted(false);
             }
-            else if (!_isMuted && clampedValue <= VolumeEpsilon)
+            else if (!IsMuted && clampedValue <= VolumeEpsilon)
             {
                 SetMuted(true);
             }
 
-            _playbackDefaultsService.PersistPlaybackDefaults(clampedValue, _isMuted);
+            _playbackDefaultsService.PersistPlaybackDefaults(clampedValue, IsMuted);
             OnPropertyChanged();
             OnPropertyChanged(nameof(VolumeIconKind));
         }
     }
 
-    public bool IsMuted => _isMuted;
-
     public string VolumeIconKind =>
-        _isMuted || Volume <= VolumeEpsilon
+        IsMuted || Volume <= VolumeEpsilon
             ? "VolumeOff"
             : Volume < 0.34f
                 ? "VolumeLow"
@@ -98,7 +96,7 @@ public partial class PlayerControlsViewModel :
                     ? "VolumeMedium"
                     : "VolumeHigh";
 
-    public PlayerControlsViewModel(
+    public PlaybackControlsViewModel(
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IMusicPlayerController musicPlayerController,
@@ -214,7 +212,7 @@ public partial class PlayerControlsViewModel :
     [RelayCommand]
     private void ToggleMute()
     {
-        if (_isMuted)
+        if (IsMuted)
         {
             var restoredVolume = _lastNonZeroVolume > VolumeEpsilon ? _lastNonZeroVolume : 0.7f;
             _musicPlayerController.Volume = restoredVolume;
@@ -357,26 +355,23 @@ public partial class PlayerControlsViewModel :
 
     private void SetMuted(bool isMuted)
     {
-        if (_isMuted == isMuted)
+        if (IsMuted == isMuted)
         {
             return;
         }
 
-        _isMuted = isMuted;
-        OnPropertyChanged(nameof(IsMuted));
+        IsMuted = isMuted;
         OnPropertyChanged(nameof(VolumeIconKind));
     }
 
     private void ApplyStartupPlaybackDefaults()
     {
-        var defaults = _playbackDefaultsService.LoadStartupDefaults();
-        var startupVolume = defaults.StartupVolume;
+        var (startupVolume, startsMuted) = _playbackDefaultsService.LoadStartupDefaults();
         if (startupVolume > VolumeEpsilon)
         {
             _lastNonZeroVolume = startupVolume;
         }
 
-        var startsMuted = defaults.StartMuted;
         _musicPlayerController.Volume = startsMuted ? 0f : startupVolume;
         SetMuted(startsMuted || startupVolume <= VolumeEpsilon);
     }

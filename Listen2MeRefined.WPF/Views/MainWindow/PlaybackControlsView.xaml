@@ -9,7 +9,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
-    <Border DataContext="{Binding PlayerControlsViewModel}"
+    <Border DataContext="{Binding PlaybackControlsViewModel}"
             Background="#272727"
             BorderBrush="#3A3A3A"
             BorderThickness="1"
