@@ -36,7 +36,8 @@
                                  SettingsCommand="{Binding OpenSettingsWindowCommand}"
                                  MinimizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MinimizeWindowCommand}"
                                  ToggleMaximizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ToggleWindowStateCommand}"
-                                 CloseCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CloseWindowCommand}" />
+                                 CloseCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CloseWindowCommand}"
+                                 IsUpdateAvailableFeedbackVisible="False"/>
 
             <Grid Grid.Row="1" Margin="10">
                 <Grid.RowDefinitions>
