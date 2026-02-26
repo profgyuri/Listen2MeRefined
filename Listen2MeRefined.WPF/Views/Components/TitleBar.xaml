@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
              mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
              d:DesignWidth="400">
     <Border Style="{StaticResource ComponentTitleBarContainerBorder}">
         <Grid VerticalAlignment="Center">
@@ -51,10 +53,19 @@
                         Orientation="Horizontal"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center">
-                <Button Command="{Binding SettingsCommand, ElementName=Root}"
-                        Style="{StaticResource ComponentTitleActionButton}"
-                        Content="{materialDesign:PackIcon Kind=CogOutline,Size=15}"
-                        Visibility="{Binding ShowSettingsButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <Grid>
+                    <Button Command="{Binding SettingsCommand, ElementName=Root}"
+                            Style="{StaticResource ComponentTitleActionButton}"
+                            Content="{materialDesign:PackIcon Kind=CogOutline,Size=15}"
+                            Visibility="{Binding ShowSettingsButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <Ellipse Width="6"
+                             Height="6"
+                             Fill="{StaticResource TertiaryBrush}"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Top"
+                             Margin="0,6,6,0"
+                             Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </Grid>
 
                 <Button Command="{Binding EffectiveMinimizeCommand, ElementName=Root}"
                         Style="{StaticResource ComponentTitleActionButton}"

@@ -155,18 +155,6 @@ public sealed partial class MainWindowViewModel :
         }
     }
 
-    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
-        return _ui.InvokeAsync<AudioModel>(() => Song = notification.Audio, cancellationToken);
-    }
-
-    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        return _ui.InvokeAsync<string>(() => FontFamily = notification.FontFamily, cancellationToken);
-    }
-
     private void BackgroundTaskStatusServiceOnSnapshotChanged(object? sender, BackgroundTaskSnapshot snapshot)
     {
         _ = _ui.InvokeAsync(() => ApplyTaskSnapshot(snapshot));
@@ -220,9 +208,22 @@ public sealed partial class MainWindowViewModel :
             ? fallbackText
             : task.Message!;
     }
+    
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
+        return _ui.InvokeAsync<AudioModel>(() => Song = notification.Audio, cancellationToken);
+    }
+
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
+        return _ui.InvokeAsync<string>(() => FontFamily = notification.FontFamily, cancellationToken);
+    }
 
     public Task Handle(PlayerStateChangedNotification notification, CancellationToken cancellationToken)
     {
+        _logger.Information("[MainWindowViewModel] Received PlayerStateChangedNotification: {PlayerState}", notification.PlayerState);
         PlayerState = notification.PlayerState;
         return Task.CompletedTask;
     }
