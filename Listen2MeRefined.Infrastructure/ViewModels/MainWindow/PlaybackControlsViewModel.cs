@@ -6,7 +6,7 @@ using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
-public partial class PlayerControlsViewModel :
+public partial class PlaybackControlsViewModel :
     ViewModelBase,
     INotificationHandler<CurrentSongNotification>,
     IWaveformViewportAware
@@ -96,7 +96,7 @@ public partial class PlayerControlsViewModel :
                     ? "VolumeMedium"
                     : "VolumeHigh";
 
-    public PlayerControlsViewModel(
+    public PlaybackControlsViewModel(
         ILogger logger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IMusicPlayerController musicPlayerController,

@@ -5,17 +5,10 @@ namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 /// <summary>
 /// Wrapper class for NAudio.
 /// </summary>
-public sealed class NAudioMusicPlayer :
+public sealed partial class NAudioMusicPlayer :
     IMusicPlayerController,
     INotificationHandler<AudioOutputDeviceChangedNotification>
 {
-    private enum PlayerState
-    {
-        Stopped,
-        Playing,
-        Paused
-    }
-
     private bool _startSongAutomatically;
     private int _outputDeviceIndex = -1;
     private AudioModel? _currentSong;
@@ -343,6 +336,7 @@ public sealed class NAudioMusicPlayer :
 
     private void SetState(PlayerState newState)
     {
+        _mediator.Publish(new PlayerStateChangedNotification(newState));
         _state = newState;
     }
 }

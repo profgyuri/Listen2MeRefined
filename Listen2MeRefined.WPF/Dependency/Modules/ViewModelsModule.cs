@@ -36,7 +36,7 @@ public class ViewModelsModule : Module
             .AsImplementedInterfaces()
             .InstancePerLifetimeScope();
         builder
-            .RegisterType<PlayerControlsViewModel>()
+            .RegisterType<PlaybackControlsViewModel>()
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();

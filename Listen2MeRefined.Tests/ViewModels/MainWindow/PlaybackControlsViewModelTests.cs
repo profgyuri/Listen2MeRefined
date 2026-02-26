@@ -6,14 +6,14 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.Utils;
+using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 using Moq;
 using Serilog;
 using SkiaSharp;
-using PlayerControlsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.PlayerControlsViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
-public class PlayerControlsViewModelTests
+public class PlaybackControlsViewModelTests
 {
     [Fact]
     public async Task InitializeAsync_AppliesConfiguredStartupVolume_WhenNotMuted()
@@ -156,7 +156,7 @@ public class PlayerControlsViewModelTests
         await timedTask.StopAsync();
     }
 
-    private static async Task<(PlayerControlsViewModel ViewModel, Mock<IMusicPlayerController> MusicPlayer, TimedTask TimedTask, Mock<IWaveFormDrawer<SKBitmap>> WaveFormDrawer)> CreateViewModelAsync(
+    private static async Task<(PlaybackControlsViewModel ViewModel, Mock<IMusicPlayerController> MusicPlayer, TimedTask TimedTask, Mock<IWaveFormDrawer<SKBitmap>> WaveFormDrawer)> CreateViewModelAsync(
         AppSettings settings,
         TimeSpan? waveformResizeDebounce = null)
     {
@@ -176,7 +176,7 @@ public class PlayerControlsViewModelTests
 
         var timedTask = new TimedTask();
         var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
-        var viewModel = new PlayerControlsViewModel(
+        var viewModel = new PlaybackControlsViewModel(
             logger,
             waveFormDrawer.Object,
             musicPlayer.Object,
