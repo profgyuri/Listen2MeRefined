@@ -430,6 +430,9 @@ public partial class PlaylistPaneViewModel :
         return Task.CompletedTask;
     }
 
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
+        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+
     private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ListsViewModel.SelectedSong))

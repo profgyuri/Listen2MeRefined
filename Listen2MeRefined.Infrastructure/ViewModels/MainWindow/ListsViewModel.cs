@@ -26,7 +26,6 @@ public partial class ListsViewModel :
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
-    private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
     private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
 
@@ -62,7 +61,6 @@ public partial class ListsViewModel :
         IAppSettingsReader settingsReader,
         IMusicPlayerController musicPlayerController,
         IPlaylist playList,
-        IAppSettingsReader settingsReader,
         IAppSettingsWriter settingsWriter,
         IDroppedSongFolderPromptService droppedSongFolderPromptService,
         IExternalAudioOpenService externalAudioOpenService)
