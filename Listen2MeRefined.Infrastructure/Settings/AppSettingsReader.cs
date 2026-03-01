@@ -39,4 +39,6 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public string GetLastBrowsedFolder() => _settingsManager.Settings.LastBrowsedFolder;
     public IReadOnlyList<string> GetPinnedFolders() => _settingsManager.Settings.PinnedFolders.ToList();
     public SearchResultsTransferMode GetSearchResultsTransferMode() => _settingsManager.Settings.SearchResultsTransferMode;
+    public string GetThemeMode() => _settingsManager.Settings.ThemeMode;
+    public string GetAccentColor() => _settingsManager.Settings.AccentColor;
 }

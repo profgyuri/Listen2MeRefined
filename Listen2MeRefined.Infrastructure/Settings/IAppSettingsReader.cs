@@ -55,4 +55,8 @@ public interface IAppSettingsReader
     IReadOnlyList<string> GetPinnedFolders();
     /// <summary>Gets search-results transfer mode for default playlist tab.</summary>
     SearchResultsTransferMode GetSearchResultsTransferMode();
+    /// <summary>Gets current theme mode.</summary>
+    string GetThemeMode();
+    /// <summary>Gets current accent color name.</summary>
+    string GetAccentColor();
 }

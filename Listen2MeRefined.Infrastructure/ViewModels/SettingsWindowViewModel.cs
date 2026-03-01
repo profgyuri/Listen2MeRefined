@@ -6,6 +6,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
+using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels;
@@ -43,6 +44,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IPlaybackDefaultsService _playbackDefaultsService;
+    private readonly IAppThemeService _appThemeService;
     private readonly IPlaylistLibraryService _playlistLibraryService;
 
     private TimedTask? _timedTask;
@@ -83,6 +85,10 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
     [ObservableProperty] private string? _selectedPinnedFolder = "";
+    [ObservableProperty] private ObservableCollection<string> _themeModes = new();
+    [ObservableProperty] private ObservableCollection<string> _accentColors = new();
+    [ObservableProperty] private string _selectedThemeMode = "Dark";
+    [ObservableProperty] private string _selectedAccentColor = "Orange";
     [ObservableProperty] private ObservableCollection<PlaylistSummary> _playlists = new();
     [ObservableProperty] private PlaylistSummary? _selectedPlaylist;
     [ObservableProperty] private string _playlistNameInput = "";
@@ -124,7 +130,8 @@ public sealed partial class SettingsWindowViewModel :
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
         IPinnedFoldersService pinnedFoldersService,
         IPlaybackDefaultsService playbackDefaultsService,
-        IPlaylistLibraryService playlistLibraryService)
+        IPlaylistLibraryService playlistLibraryService,
+        IAppThemeService appThemeService)
     {
         _logger = logger;
         _audioRepository = audioRepository;
@@ -144,6 +151,7 @@ public sealed partial class SettingsWindowViewModel :
         _pinnedFoldersService = pinnedFoldersService;
         _playbackDefaultsService = playbackDefaultsService;
         _playlistLibraryService = playlistLibraryService;
+        _appThemeService = appThemeService;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
     }
@@ -158,6 +166,8 @@ public sealed partial class SettingsWindowViewModel :
             "Default",
             "Always on top"
         };
+        ThemeModes = new ObservableCollection<string>(_appThemeService.GetThemeModes());
+        AccentColors = new ObservableCollection<string>(_appThemeService.GetAccentColors());
 
         var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
         _folderRecursionByPath.Clear();
@@ -196,6 +206,8 @@ public sealed partial class SettingsWindowViewModel :
         SelectedScanMilestoneBasis = _settingsReader.GetScanMilestoneBasis();
         FolderBrowserStartAtLastLocation = _settingsReader.GetFolderBrowserStartAtLastLocation();
         SelectedSearchResultsTransferMode = _settingsReader.GetSearchResultsTransferMode();
+        SelectedThemeMode = _settingsReader.GetThemeMode();
+        SelectedAccentColor = _settingsReader.GetAccentColor();
         ReloadPinnedFolders();
         await ReloadPlaylistsAsync(ct);
 
@@ -472,6 +484,28 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _settingsWriter.SetFolderBrowserStartAtLastLocation(value);
+    }
+
+    partial void OnSelectedThemeModeChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _settingsWriter.SetThemeMode(value);
+        _appThemeService.ApplyTheme(value, SelectedAccentColor);
+    }
+
+    partial void OnSelectedAccentColorChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _settingsWriter.SetAccentColor(value);
+        _appThemeService.ApplyTheme(SelectedThemeMode, value);
     }
 
     partial void OnSelectedSearchResultsTransferModeChanged(SearchResultsTransferMode value)
