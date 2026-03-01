@@ -33,6 +33,10 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("AccentColor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<short>("CornerTriggerDebounceMs")
                         .HasColumnType("INTEGER");
 
@@ -84,6 +88,10 @@ namespace Listen2MeRefined.Infrastructure.Migrations
 
                     b.Property<short>("TaskPercentageReportInterval")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ThemeMode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<float>("StartupVolume")
                         .HasColumnType("REAL");

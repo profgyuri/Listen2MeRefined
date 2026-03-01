@@ -83,6 +83,26 @@
                                             </components:FormFieldRow.FieldContent>
                                         </components:FormFieldRow>
 
+                                        <components:FormFieldRow Margin="0,0,0,10"
+                                                                 Label="Theme:"
+                                                                 LabelWidth="170">
+                                            <components:FormFieldRow.FieldContent>
+                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                          SelectedItem="{Binding SelectedThemeMode}"
+                                                          ItemsSource="{Binding ThemeModes}" />
+                                            </components:FormFieldRow.FieldContent>
+                                        </components:FormFieldRow>
+
+                                        <components:FormFieldRow Margin="0,0,0,10"
+                                                                 Label="Accent color:"
+                                                                 LabelWidth="170">
+                                            <components:FormFieldRow.FieldContent>
+                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                          SelectedItem="{Binding SelectedAccentColor}"
+                                                          ItemsSource="{Binding AccentColors}" />
+                                            </components:FormFieldRow.FieldContent>
+                                        </components:FormFieldRow>
+
                                         <CheckBox IsChecked="{Binding AutoCheckUpdatesOnStartup}"
                                                   Content="Automatically check for updates on startup"
                                                   Margin="0,0,0,10" />

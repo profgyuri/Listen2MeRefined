@@ -39,5 +39,10 @@ public class StartupModule : Module
             .AsSelf()
             .As<IStartupTask>()
             .SingleInstance();
+        builder
+            .RegisterType<ThemeStartupTask>()
+            .AsSelf()
+            .As<IStartupTask>()
+            .SingleInstance();
     }
 }

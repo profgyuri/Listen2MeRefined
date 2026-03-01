@@ -54,4 +54,8 @@ public interface IAppSettingsWriter
     void SetFolderIncludeSubdirectories(string path, bool includeSubdirectories);
     /// <summary>Sets configured pinned folder paths.</summary>
     void SetPinnedFolders(IEnumerable<string> folders);
+    /// <summary>Sets current theme mode.</summary>
+    void SetThemeMode(string value);
+    /// <summary>Sets current accent color name.</summary>
+    void SetAccentColor(string value);
 }
