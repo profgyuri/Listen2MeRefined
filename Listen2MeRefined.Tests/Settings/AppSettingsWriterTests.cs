@@ -42,8 +42,8 @@ public sealed class AppSettingsWriterTests
     public void SetMutedDroppedSongFolders_PersistsValue()
     {
         var settings = new AppSettings();
-        var manager = new FakeSettingsManager(settings);
-        var sut = new AppSettingsWriter(manager);
+        var manager = CreateSettingsManager(settings);
+        var sut = new AppSettingsWriter(manager.Object);
 
         sut.SetMutedDroppedSongFolders([@"C:\Muted"]);
 
