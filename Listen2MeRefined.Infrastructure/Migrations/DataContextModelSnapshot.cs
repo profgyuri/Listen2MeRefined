@@ -64,6 +64,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SearchResultsTransferMode")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ScanMilestoneBasis")
                         .HasColumnType("INTEGER");
 
@@ -123,15 +126,10 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PlaylistModelId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PlaylistModelId");
 
                     b.HasIndex("Path")
                         .IsUnique();
@@ -171,18 +169,30 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
+                        .UseCollation("NOCASE")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Playlists");
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", b =>
+            modelBuilder.Entity("PlaylistSongs", b =>
                 {
-                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", null)
-                        .WithMany("Songs")
-                        .HasForeignKey("PlaylistModelId");
+                    b.Property<int>("PlaylistId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PlaylistId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("PlaylistSongs");
                 });
 
             modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.MusicFolderModel", b =>
@@ -190,6 +200,21 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.HasOne("Listen2MeRefined.Infrastructure.Data.AppSettings", null)
                         .WithMany("MusicFolders")
                         .HasForeignKey("AppSettingsId");
+                });
+
+            modelBuilder.Entity("PlaylistSongs", b =>
+                {
+                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", null)
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", null)
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.AppSettings", b =>

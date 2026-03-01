@@ -27,11 +27,12 @@
                                       ActionIconKind="ArrowRightCircleOutline"
                                       ActionCommand="{Binding SendSelectedToPlaylistCommand}" />
 
-            <ListView Grid.Row="2"
+                <ListView Grid.Row="2"
                       Height="{Binding ElementName=ListRow, Path=Height}"
                       Foreground="{StaticResource SecondaryBrush}"
                       dd:DragDrop.IsDragSource="True"
                       dd:DragDrop.IsDropTarget="True"
+                      PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
                       ItemsSource="{Binding SearchResults}"
                       SelectionMode="Extended"
                       ItemContainerStyle="{StaticResource SearchResultsListItemStyle}"
@@ -41,6 +42,10 @@
                 <ListView.InputBindings>
                     <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
                 </ListView.InputBindings>
+                <ListView.ContextMenu>
+                    <ContextMenu Opened="SongContextMenuOnOpened"
+                                 Style="{StaticResource PlaylistContextMenuStyle}" />
+                </ListView.ContextMenu>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>

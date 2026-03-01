@@ -20,64 +20,130 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <components:SectionHeader Grid.Row="0"
-                                      Title="Playlist"
-                                      IconKind="PlaylistMusic"
-                                      AccentBrush="{StaticResource TertiaryBrush}"
-                                      ShowActionButton="True"
-                                      ActionToolTip="Remove Selected / All from Playlist"
-                                      ActionIconKind="CloseBoxOutline"
-                                      ActionCommand="{Binding RemoveSelectedFromPlaylistCommand}" />
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <ListView Grid.Row="2"
-                      dd:DragDrop.IsDragSource="True"
-                      dd:DragDrop.IsDropTarget="True"
-                      ItemsSource="{Binding PlayList}"
-                      Style="{StaticResource PlaylistListView}"
-                      SelectedIndex="{Binding SelectedIndex}"
-                      SelectedItem="{Binding SelectedSong}"
-                      utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding PlaylistSelectionAddedCommand}"
-                      utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding PlaylistSelectionRemovedCommand}"
-                      utils:SelectionChangedCommandBehavior.ScrollSelectedItemIntoView="True">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding JumpToSelectedSongCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseRightButtonUp">
-                        <i:InvokeCommandAction Command="{Binding SwitchToSongMenuTabCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <ListView.InputBindings>
-                    <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
-                    <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding RemoveSelectedFromPlaylistCommand}"/>
-                </ListView.InputBindings>
-                <ListView.ItemTemplate>
+                <components:SectionHeader Grid.Column="0"
+                                          Title="Playlist"
+                                          IconKind="PlaylistMusic"
+                                          AccentBrush="{StaticResource TertiaryBrush}"
+                                          ShowActionButton="True"
+                                          ActionToolTip="Remove Selected / All from Active Tab"
+                                          ActionIconKind="CloseBoxOutline"
+                                          ActionCommand="{Binding RemoveSelectedFromActiveTabCommand}" />
+
+                <Button Grid.Column="1"
+                        Width="38"
+                        Height="38"
+                        Margin="8,0,0,0"
+                        ToolTip="Open playlist"
+                        Style="{StaticResource SearchBarActionButton}"
+                        Click="PlusButtonOnClick">
+                    <materialDesign:PackIcon Kind="Plus" Width="18" Height="18" />
+                    <Button.ContextMenu>
+                        <ContextMenu x:Name="PlaylistPickerContextMenu"
+                                     Style="{StaticResource PlaylistContextMenuStyle}"
+                                     ItemsSource="{Binding AvailablePlaylists}">
+                            <ContextMenu.ItemContainerStyle>
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
+                                    <Setter Property="Header" Value="{Binding Name}" />
+                                    <Setter Property="Command" Value="{Binding DataContext.OpenPlaylistTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
+                                </Style>
+                            </ContextMenu.ItemContainerStyle>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+            </Grid>
+
+            <TabControl Grid.Row="2"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ItemsSource="{Binding Tabs}"
+                        SelectedItem="{Binding SelectedTab}">
+                <TabControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid MinWidth="320" ClipToBounds="True">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="8" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
-                                                           Foreground="#D7D7D7"
-                                                           FontSize="16"
-                                                           FontWeight="Bold"
-                                                           TextTrimming="None"
-                                                           HorizontalAlignment="Left"
-                                                           ClipToBounds="True"
-                                                           utils:FlowingTextBehavior.IsEnabled="True" />
-
-                            <components:MetaBadgeRow Grid.Row="2"
-                                                     BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"
-                                                     BitrateText="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}"
-                                                     LengthText="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
-                                                     GenreText="{Binding Genre, FallbackValue=Genre}" />
-                        </Grid>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Header}"
+                                       Foreground="{StaticResource SecondaryBrush}"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center" />
+                            <Button Width="18"
+                                    Height="18"
+                                    Padding="0"
+                                    Margin="0"
+                                    ToolTip="Close tab"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="{StaticResource SecondaryBrush}"
+                                    Visibility="{Binding IsCloseable, Converter={StaticResource BoolToVisibilityConverter}}"
+                                    Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}">
+                                <materialDesign:PackIcon Kind="Close" Width="14" Height="14" />
+                            </Button>
+                        </StackPanel>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </TabControl.ItemTemplate>
+
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <ListView dd:DragDrop.IsDragSource="True"
+                                  dd:DragDrop.IsDropTarget="True"
+                                  ItemsSource="{Binding Songs}"
+                                  Style="{StaticResource PlaylistListView}"
+                                  PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
+                                  SelectedItem="{Binding DataContext.SelectedSong, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                                  SelectedIndex="{Binding DataContext.SelectedIndex, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                                  SelectionMode="Extended"
+                                  utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding DataContext.PlaylistSelectionAddedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding DataContext.PlaylistSelectionRemovedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  utils:SelectionChangedCommandBehavior.ScrollSelectedItemIntoView="True">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.PlaySelectedFromActiveTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListView.InputBindings>
+                                <KeyBinding Modifiers="Ctrl" Key="Delete" Command="{Binding DataContext.RemoveSelectedFromActiveTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                <KeyBinding Modifiers="Ctrl+Shift" Key="Delete" Command="{Binding DataContext.RemoveSelectedFromActiveTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </ListView.InputBindings>
+                            <ListView.ContextMenu>
+                                <ContextMenu Opened="SongContextMenuOnOpened"
+                                             Style="{StaticResource PlaylistContextMenuStyle}" />
+                            </ListView.ContextMenu>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid MinWidth="320" ClipToBounds="True">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="8" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
+                                                                       Foreground="#D7D7D7"
+                                                                       FontSize="16"
+                                                                       FontWeight="Bold"
+                                                                       TextTrimming="None"
+                                                                       HorizontalAlignment="Left"
+                                                                       ClipToBounds="True"
+                                                                       utils:FlowingTextBehavior.IsEnabled="True" />
+
+                                        <components:MetaBadgeRow Grid.Row="2"
+                                                                 BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"
+                                                                 BitrateText="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}"
+                                                                 LengthText="{Binding Length, StringFormat={}{0:hh\\:mm\\:ss\\.f}, FallbackValue=Length}"
+                                                                 GenreText="{Binding Genre, FallbackValue=Genre}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
         </Grid>
     </Border>
 </UserControl>

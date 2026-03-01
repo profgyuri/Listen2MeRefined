@@ -5,6 +5,7 @@ using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
@@ -71,6 +72,23 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         Assert.Equal(@"D:\After", viewModel.PinnedFolders[0]);
     }
 
+    [Fact]
+    public async Task SelectedSearchResultsTransferModeChanged_PersistsSetting()
+    {
+        var settings = new AppSettings
+        {
+            AutoCheckUpdatesOnStartup = false,
+            SearchResultsTransferMode = SearchResultsTransferMode.Move
+        };
+
+        var viewModel = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        viewModel.SelectedSearchResultsTransferMode = SearchResultsTransferMode.Copy;
+
+        Assert.Equal(SearchResultsTransferMode.Copy, settings.SearchResultsTransferMode);
+    }
+
     private static SettingsWindowViewModel CreateViewModel(AppSettings settings)
     {
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
@@ -102,6 +120,10 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             .Setup(x => x.DirectoryExists(It.IsAny<string>()))
             .Returns<string>(Directory.Exists);
         var pinnedFoldersService = new PinnedFoldersService(folderBrowser.Object);
+        var playlistLibraryService = new Mock<IPlaylistLibraryService>();
+        playlistLibraryService
+            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<PlaylistSummary>());
 
         return new SettingsWindowViewModel(
             Mock.Of<ILogger>(),
@@ -120,6 +142,7 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             Mock.Of<IBackgroundTaskStatusService>(),
             Mock.Of<IGlobalHookSettingsSyncService>(),
             pinnedFoldersService,
-            playbackDefaultsService);
+            playbackDefaultsService,
+            playlistLibraryService.Object);
     }
 }

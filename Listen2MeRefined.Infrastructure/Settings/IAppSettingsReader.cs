@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -52,4 +53,6 @@ public interface IAppSettingsReader
     string GetLastBrowsedFolder();
     /// <summary>Gets configured pinned folder paths.</summary>
     IReadOnlyList<string> GetPinnedFolders();
+    /// <summary>Gets search-results transfer mode for default playlist tab.</summary>
+    SearchResultsTransferMode GetSearchResultsTransferMode();
 }

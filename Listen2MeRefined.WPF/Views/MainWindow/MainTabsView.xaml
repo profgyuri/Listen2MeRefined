@@ -74,7 +74,10 @@
                         <Border Grid.Row="4" Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="DeleteOutline" Width="18" Height="18" Foreground="{StaticResource TertiaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding RemoveSelectedFromPlaylistCommand}" Content="Remove From Playlist" Margin="0" />
+                                <Button Style="{StaticResource MainTabsActionButton}"
+                                        Command="{Binding DataContext.PlaylistPaneViewModel.RemoveSelectedFromActiveTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Content="Remove From Playlist"
+                                        Margin="0" />
                             </StackPanel>
                         </Border>
                     </Grid>

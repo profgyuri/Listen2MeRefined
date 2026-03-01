@@ -155,6 +155,9 @@ public sealed class AudioRepository :
                 var ids = toRemove.Select(x => x.Id).Where(id => id > 0).Distinct().ToArray();
                 if (ids.Length > 0)
                 {
+                    const string removePlaylistLinksSql = "DELETE FROM PlaylistSongs WHERE SongId IN @Ids";
+                    await _dbConnection.ExecuteAsync(removePlaylistLinksSql, new { Ids = ids }, transaction);
+
                     const string removeSql = "DELETE FROM Songs WHERE Id IN @Ids";
                     await _dbConnection.ExecuteAsync(removeSql, new { Ids = ids }, transaction);
                 }
@@ -171,6 +174,16 @@ public sealed class AudioRepository :
 
     public async Task RemoveFromFolderAsync(string folderPath)
     {
+        const string removePlaylistLinksSql = """
+            DELETE FROM PlaylistSongs
+            WHERE SongId IN (
+                SELECT Id
+                FROM Songs
+                WHERE Path LIKE @PathPrefix
+            );
+            """;
+        await _dbConnection.ExecuteAsync(removePlaylistLinksSql, new { PathPrefix = $"{folderPath}%" });
+
         var sql = $"DELETE FROM {_tableName} WHERE Path LIKE @PathPrefix";
         await _dbConnection.ExecuteAsync(sql, new { PathPrefix = $"{folderPath}%" });
     }

@@ -82,6 +82,7 @@ public sealed partial class MainWindowViewModel :
         {
             await _startupManager.StartAsync(ct);
             await PlaybackControlsViewModel.InitializeAsync(ct);
+            await PlaylistPaneViewModel.InitializeAsync(ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {

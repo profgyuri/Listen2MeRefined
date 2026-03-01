@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -37,4 +38,5 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public bool GetFolderBrowserStartAtLastLocation() => _settingsManager.Settings.FolderBrowserStartAtLastLocation;
     public string GetLastBrowsedFolder() => _settingsManager.Settings.LastBrowsedFolder;
     public IReadOnlyList<string> GetPinnedFolders() => _settingsManager.Settings.PinnedFolders.ToList();
+    public SearchResultsTransferMode GetSearchResultsTransferMode() => _settingsManager.Settings.SearchResultsTransferMode;
 }
