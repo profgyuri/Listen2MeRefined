@@ -81,6 +81,8 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
     [ObservableProperty] private string? _selectedPinnedFolder = "";
+    [ObservableProperty] private ObservableCollection<string> _mutedDroppedSongFolders = new();
+    [ObservableProperty] private string? _selectedMutedDroppedSongFolder = "";
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
@@ -186,6 +188,7 @@ public sealed partial class SettingsWindowViewModel :
         SelectedScanMilestoneBasis = _settingsReader.GetScanMilestoneBasis();
         FolderBrowserStartAtLastLocation = _settingsReader.GetFolderBrowserStartAtLastLocation();
         ReloadPinnedFolders();
+        ReloadMutedDroppedSongFolders();
 
         await GetAudioOutputDevices();
         _isLoadingSettings = false;
@@ -505,6 +508,25 @@ public sealed partial class SettingsWindowViewModel :
     }
 
     [RelayCommand]
+    private void RemoveMutedDroppedSongFolder()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedMutedDroppedSongFolder))
+        {
+            return;
+        }
+
+        MutedDroppedSongFolders.Remove(SelectedMutedDroppedSongFolder);
+        PersistMutedDroppedSongFolders();
+    }
+
+    [RelayCommand]
+    private void ResetDroppedFolderPrompts()
+    {
+        MutedDroppedSongFolders.Clear();
+        PersistMutedDroppedSongFolders();
+    }
+
+    [RelayCommand]
     private void ClearMetadata()
     {
         _logger.Information("[SettingsWindowViewModel] Clearing metadata...");
@@ -645,6 +667,22 @@ public sealed partial class SettingsWindowViewModel :
         foreach (var pinnedFolder in pinnedFolders)
         {
             PinnedFolders.Add(pinnedFolder);
+        }
+    }
+
+    private void PersistMutedDroppedSongFolders()
+    {
+        _settingsWriter.SetMutedDroppedSongFolders(MutedDroppedSongFolders);
+    }
+
+    private void ReloadMutedDroppedSongFolders()
+    {
+        var mutedFolders = _settingsReader.GetMutedDroppedSongFolders();
+
+        MutedDroppedSongFolders.Clear();
+        foreach (var mutedFolder in mutedFolders)
+        {
+            MutedDroppedSongFolders.Add(mutedFolder);
         }
     }
 

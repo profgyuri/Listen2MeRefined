@@ -4,6 +4,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
+using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
 using Serilog;
@@ -87,6 +88,13 @@ public class ListsViewModelTests
         var scanner = new Mock<IFileScanner>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
 
         var vm = new ListsViewModel(
             logger.Object,
@@ -94,7 +102,10 @@ public class ListsViewModelTests
             audioSearchExecutionService.Object,
             scanner.Object,
             playerController.Object,
-            playlist);
+            playlist,
+            settingsReader.Object,
+            settingsWriter.Object,
+            prompt.Object);
 
         SearchMatchMode? capturedMatchMode = null;
         audioSearchExecutionService
@@ -117,6 +128,101 @@ public class ListsViewModelTests
             Times.Once);
     }
 
+
+    [Fact]
+    public async Task HandleExternalFileDropAsync_InsertsScannedSongsAtDropIndex()
+    {
+        var logger = new Mock<ILogger>();
+        var mediator = new Mock<IMediator>();
+        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
+        var scanner = new Mock<IFileScanner>();
+        var playerController = new Mock<IMusicPlayerController>();
+        var playlist = new Playlist();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+
+        var vm = new ListsViewModel(
+            logger.Object,
+            mediator.Object,
+            audioSearchExecutionService.Object,
+            scanner.Object,
+            playerController.Object,
+            playlist,
+            settingsReader.Object,
+            settingsWriter.Object,
+            prompt.Object);
+
+        var existing = new AudioModel { Path = "existing.mp3", Title = "Existing" };
+        vm.PlayList.Add(existing);
+
+        var filePath = Path.Combine(Path.GetTempPath(), $"drop-{Guid.NewGuid():N}.mp3");
+        await File.WriteAllTextAsync(filePath, "fake");
+
+        var scanned = new AudioModel { Path = filePath, Title = "Dropped" };
+        scanner.Setup(x => x.ScanAsync(filePath, It.IsAny<CancellationToken>())).ReturnsAsync(scanned);
+
+        try
+        {
+            await vm.HandleExternalFileDropAsync([filePath], 0);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+
+        Assert.Equal(scanned, vm.PlayList[0]);
+        Assert.Equal(existing, vm.PlayList[1]);
+    }
+
+    [Fact]
+    public async Task HandleExternalFileDropAsync_WhenUserChoosesDontAskAgain_PersistsPreference()
+    {
+        var logger = new Mock<ILogger>();
+        var mediator = new Mock<IMediator>();
+        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
+        var scanner = new Mock<IFileScanner>();
+        var playerController = new Mock<IMusicPlayerController>();
+        var playlist = new Playlist();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AddDroppedSongFolderDecision.SkipAndDontAskAgain);
+
+        var vm = new ListsViewModel(
+            logger.Object,
+            mediator.Object,
+            audioSearchExecutionService.Object,
+            scanner.Object,
+            playerController.Object,
+            playlist,
+            settingsReader.Object,
+            settingsWriter.Object,
+            prompt.Object);
+
+        var filePath = Path.Combine(Path.GetTempPath(), $"drop-{Guid.NewGuid():N}.mp3");
+        await File.WriteAllTextAsync(filePath, "fake");
+
+        scanner.Setup(x => x.ScanAsync(filePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AudioModel { Path = filePath, Title = "Dropped" });
+
+        try
+        {
+            await vm.HandleExternalFileDropAsync([filePath], 0);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+
+        settingsWriter.Verify(x => x.SetMutedDroppedSongFolders(It.Is<IEnumerable<string>>(f => f.Contains(Path.GetDirectoryName(filePath)!))), Times.Once);
+    }
+
     private static ListsViewModel CreateViewModel(out Mock<IMusicPlayerController> playerController)
     {
         var logger = new Mock<ILogger>();
@@ -125,6 +231,13 @@ public class ListsViewModelTests
         var scanner = new Mock<IFileScanner>();
         playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
 
         return new ListsViewModel(
             logger.Object,
@@ -132,7 +245,10 @@ public class ListsViewModelTests
             audioSearchExecutionService.Object,
             scanner.Object,
             playerController.Object,
-            playlist);
+            playlist,
+            settingsReader.Object,
+            settingsWriter.Object,
+            prompt.Object);
     }
 }
 

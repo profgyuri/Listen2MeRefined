@@ -38,6 +38,9 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     [RelayCommand]
     private void PlaylistSelectionRemoved(IList items) => _lists.RemoveSelectedPlaylistItems(items.Cast<AudioModel>());
 
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
+        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+
     private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ListsViewModel.SelectedSong))

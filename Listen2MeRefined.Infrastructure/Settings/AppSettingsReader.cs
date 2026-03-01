@@ -37,4 +37,5 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public bool GetFolderBrowserStartAtLastLocation() => _settingsManager.Settings.FolderBrowserStartAtLastLocation;
     public string GetLastBrowsedFolder() => _settingsManager.Settings.LastBrowsedFolder;
     public IReadOnlyList<string> GetPinnedFolders() => _settingsManager.Settings.PinnedFolders.ToList();
+    public IReadOnlyList<string> GetMutedDroppedSongFolders() => _settingsManager.Settings.MutedDroppedSongFolders.ToList();
 }

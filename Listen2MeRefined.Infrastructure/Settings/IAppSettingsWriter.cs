@@ -54,4 +54,6 @@ public interface IAppSettingsWriter
     void SetFolderIncludeSubdirectories(string path, bool includeSubdirectories);
     /// <summary>Sets configured pinned folder paths.</summary>
     void SetPinnedFolders(IEnumerable<string> folders);
+    /// <summary>Sets folders where the dropped-song folder add prompt is muted.</summary>
+    void SetMutedDroppedSongFolders(IEnumerable<string> folders);
 }

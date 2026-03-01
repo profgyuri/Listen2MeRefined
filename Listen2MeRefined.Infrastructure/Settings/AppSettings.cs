@@ -30,12 +30,20 @@ public sealed class AppSettings : Settings
     public string LastBrowsedFolder { get; set; } = "";
     public bool FolderBrowserStartAtLastLocation { get; set; } = true;
     public string PinnedFoldersJson { get; set; } = "[]";
+    public string MutedDroppedSongFoldersJson { get; set; } = "[]";
 
     [NotMapped]
     public List<string> PinnedFolders
     {
         get => Deserialize(PinnedFoldersJson);
         set => PinnedFoldersJson = Serialize(value);
+    }
+
+    [NotMapped]
+    public List<string> MutedDroppedSongFolders
+    {
+        get => Deserialize(MutedDroppedSongFoldersJson);
+        set => MutedDroppedSongFoldersJson = Serialize(value);
     }
 
     private static string Serialize(List<string>? paths)
