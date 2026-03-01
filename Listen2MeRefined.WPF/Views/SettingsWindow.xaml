@@ -261,6 +261,43 @@
                                                   Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding ScanOnStartup}" Content="Scan folders on startup" Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding AutoScanOnFolderAdd}" Content="Scan newly added folders immediately" Margin="0,0,0,10" />
+                                        
+                                        <Border Margin="0,0,0,10"
+                                                Padding="10"
+                                                Background="#202020"
+                                                BorderBrush="#363636"
+                                                BorderThickness="1"
+                                                CornerRadius="8">
+                                            <StackPanel>
+                                                <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
+                                                           Text="Muted dropped-folder prompts (folder-specific)" />
+                                                <ListView Height="100"
+                                                          Margin="0,8,0,8"
+                                                          Style="{StaticResource VirtualizedListView}"
+                                                          ItemsSource="{Binding MutedDroppedSongFolders}"
+                                                          SelectedItem="{Binding SelectedMutedDroppedSongFolder}">
+                                                    <ListView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}"
+                                                                       Foreground="{StaticResource SecondaryBrush}"
+                                                                       TextTrimming="CharacterEllipsis" />
+                                                        </DataTemplate>
+                                                    </ListView.ItemTemplate>
+                                                </ListView>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Style="{StaticResource SettingsActionButton}"
+                                                            MinWidth="120"
+                                                            Content="Remove Selected"
+                                                            Command="{Binding RemoveMutedDroppedSongFolderCommand}" />
+                                                    <Button Style="{StaticResource SettingsActionButton}"
+                                                            MinWidth="120"
+                                                            Margin="8,0,0,0"
+                                                            Content="Reset All"
+                                                            Command="{Binding ResetDroppedFolderPromptsCommand}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                        
                                         <Button Style="{DynamicResource SettingsActionButton}"
                                                 HorizontalAlignment="Left"
                                                 MinWidth="130"

@@ -89,6 +89,26 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         Assert.Equal(SearchResultsTransferMode.Copy, settings.SearchResultsTransferMode);
     }
 
+
+
+    [Fact]
+    public async Task ResetDroppedFolderPrompts_ClearsMutedPromptFolders()
+    {
+        var settings = new AppSettings
+        {
+            AutoCheckUpdatesOnStartup = false,
+            MutedDroppedSongFolders = [@"C:\Music\A", @"D:\Music\B"]
+        };
+
+        var viewModel = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        viewModel.ResetDroppedFolderPromptsCommand.Execute(null);
+
+        Assert.Empty(viewModel.MutedDroppedSongFolders);
+        Assert.Empty(settings.MutedDroppedSongFolders);
+    }
+
     private static SettingsWindowViewModel CreateViewModel(AppSettings settings)
     {
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();

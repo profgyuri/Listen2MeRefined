@@ -57,6 +57,8 @@ public interface IAppSettingsReader
     IReadOnlyList<string> GetPinnedFolders();
     /// <summary>Gets search-results transfer mode for default playlist tab.</summary>
     SearchResultsTransferMode GetSearchResultsTransferMode();
+    /// <summary>Gets folders where the dropped-song folder add prompt is muted.</summary>
+    IReadOnlyList<string> GetMutedDroppedSongFolders();
     /// <summary>Gets current theme mode.</summary>
     string GetThemeMode();
     /// <summary>Gets current accent color name.</summary>

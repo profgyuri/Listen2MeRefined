@@ -421,6 +421,9 @@ public partial class PlaylistPaneViewModel :
         return -1;
     }
 
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
+        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+
     public Task Handle(PlaylistViewModeChangedNotification notification, CancellationToken cancellationToken)
     {
         IsCompactPlaylistView = notification.UseCompactPlaylistView;

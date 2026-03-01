@@ -59,6 +59,8 @@ public interface IAppSettingsWriter
     void SetPinnedFolders(IEnumerable<string> folders);
     /// <summary>Sets search-results transfer mode for default playlist tab.</summary>
     void SetSearchResultsTransferMode(SearchResultsTransferMode mode);
+    /// <summary>Sets folders where the dropped-song folder add prompt is muted.</summary>
+    void SetMutedDroppedSongFolders(IEnumerable<string> folders);
     /// <summary>Sets current theme mode.</summary>
     void SetThemeMode(string value);
     /// <summary>Sets current accent color name.</summary>

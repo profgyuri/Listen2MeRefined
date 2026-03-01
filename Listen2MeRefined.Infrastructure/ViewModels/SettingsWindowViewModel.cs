@@ -94,6 +94,8 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private PlaylistSummary? _selectedPlaylist;
     [ObservableProperty] private string _playlistNameInput = "";
     [ObservableProperty] private SearchResultsTransferMode _selectedSearchResultsTransferMode = SearchResultsTransferMode.Move;
+    [ObservableProperty] private ObservableCollection<string> _mutedDroppedSongFolders = new();
+    [ObservableProperty] private string? _selectedMutedDroppedSongFolder = "";
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
@@ -215,6 +217,7 @@ public sealed partial class SettingsWindowViewModel :
         SelectedAccentColor = _settingsReader.GetAccentColor();
         ReloadPinnedFolders();
         await ReloadPlaylistsAsync(ct);
+        ReloadMutedDroppedSongFolders();
 
         await GetAudioOutputDevices();
         _isLoadingSettings = false;
@@ -579,6 +582,25 @@ public sealed partial class SettingsWindowViewModel :
     }
 
     [RelayCommand]
+    private void RemoveMutedDroppedSongFolder()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedMutedDroppedSongFolder))
+        {
+            return;
+        }
+
+        MutedDroppedSongFolders.Remove(SelectedMutedDroppedSongFolder);
+        PersistMutedDroppedSongFolders();
+    }
+
+    [RelayCommand]
+    private void ResetDroppedFolderPrompts()
+    {
+        MutedDroppedSongFolders.Clear();
+        PersistMutedDroppedSongFolders();
+    }
+
+    [RelayCommand]
     private async Task CreatePlaylistAsync()
     {
         if (string.IsNullOrWhiteSpace(PlaylistNameInput))
@@ -813,6 +835,22 @@ public sealed partial class SettingsWindowViewModel :
     partial void OnSelectedPlaylistChanged(PlaylistSummary? value)
     {
         PlaylistNameInput = value?.Name ?? string.Empty;
+    }
+
+    private void PersistMutedDroppedSongFolders()
+    {
+        _settingsWriter.SetMutedDroppedSongFolders(MutedDroppedSongFolders);
+    }
+
+    private void ReloadMutedDroppedSongFolders()
+    {
+        var mutedFolders = _settingsReader.GetMutedDroppedSongFolders();
+
+        MutedDroppedSongFolders.Clear();
+        foreach (var mutedFolder in mutedFolders)
+        {
+            MutedDroppedSongFolders.Add(mutedFolder);
+        }
     }
 
     private async Task SyncGlobalHookRegistrationAsync()

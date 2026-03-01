@@ -158,6 +158,12 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.SearchResultsTransferMode = mode);
     }
 
+    public void SetMutedDroppedSongFolders(IEnumerable<string> folders)
+    {
+        var normalized = Normalize(folders);
+        _settingsManager.SaveSettings(s => s.MutedDroppedSongFolders = normalized);
+    }
+
     public void SetThemeMode(string value)
     {
         _settingsManager.SaveSettings(s => s.ThemeMode = value);

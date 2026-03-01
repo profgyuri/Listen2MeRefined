@@ -36,6 +36,9 @@ public class UtilsModule : Module
             .RegisterType<AppSettingsWriter>()
             .As<IAppSettingsWriter>();
         builder
+            .RegisterType<DroppedSongFolderPromptService>()
+            .As<IDroppedSongFolderPromptService>();
+        builder
             .RegisterType<AppUpdateChecker>()
             .As<IAppUpdateChecker>();
         builder

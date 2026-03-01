@@ -147,6 +147,13 @@ public class PlaylistPaneViewModelTests
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
         var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
         settingsReader
             .Setup(x => x.GetSearchResultsTransferMode())
@@ -160,6 +167,9 @@ public class PlaylistPaneViewModelTests
             settingsReader.Object,
             playerController.Object,
             playlist,
+            settingsReader.Object,
+            settingsWriter.Object,
+            prompt.Object,
             externalAudioOpenService.Object);
     }
 }
