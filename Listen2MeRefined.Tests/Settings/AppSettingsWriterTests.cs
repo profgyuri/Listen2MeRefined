@@ -37,6 +37,20 @@ public sealed class AppSettingsWriterTests
         Assert.Contains(@"D:\B", settings.PinnedFolders, StringComparer.OrdinalIgnoreCase);
     }
 
+
+    [Fact]
+    public void SetMutedDroppedSongFolders_PersistsValue()
+    {
+        var settings = new AppSettings();
+        var manager = new FakeSettingsManager(settings);
+        var sut = new AppSettingsWriter(manager);
+
+        sut.SetMutedDroppedSongFolders([@"C:\Muted"]);
+
+        Assert.Single(settings.MutedDroppedSongFolders);
+        Assert.Equal(@"C:\Muted", settings.MutedDroppedSongFolders[0]);
+    }
+
     [Fact]
     public void SetMusicFolders_WithRequests_PersistsRecursionFlags()
     {

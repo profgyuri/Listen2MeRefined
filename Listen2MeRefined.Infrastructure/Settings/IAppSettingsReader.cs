@@ -54,6 +54,8 @@ public interface IAppSettingsReader
     string GetLastBrowsedFolder();
     /// <summary>Gets configured pinned folder paths.</summary>
     IReadOnlyList<string> GetPinnedFolders();
+    /// <summary>Gets folders where the dropped-song folder add prompt is muted.</summary>
+    IReadOnlyList<string> GetMutedDroppedSongFolders();
     /// <summary>Gets current theme mode.</summary>
     string GetThemeMode();
     /// <summary>Gets current accent color name.</summary>
