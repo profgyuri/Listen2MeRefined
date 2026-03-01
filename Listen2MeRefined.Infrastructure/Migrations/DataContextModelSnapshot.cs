@@ -147,8 +147,6 @@ namespace Listen2MeRefined.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlaylistModelId");
-
                     b.HasIndex("Path")
                         .IsUnique();
 
