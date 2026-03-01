@@ -6,6 +6,7 @@ using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 using MediatR;
 using Moq;
 using Serilog;
@@ -131,6 +132,7 @@ public class PlaylistPaneViewModelTests
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
         settingsReader
             .Setup(x => x.GetSearchResultsTransferMode())
             .Returns(SearchResultsTransferMode.Move);
@@ -142,7 +144,8 @@ public class PlaylistPaneViewModelTests
             scanner.Object,
             settingsReader.Object,
             playerController.Object,
-            playlist);
+            playlist,
+            externalAudioOpenService.Object);
     }
 }
 

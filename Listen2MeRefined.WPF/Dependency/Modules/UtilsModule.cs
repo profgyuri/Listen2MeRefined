@@ -7,6 +7,7 @@ using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
 using Listen2MeRefined.Infrastructure.ViewModels;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
@@ -68,6 +69,10 @@ public class UtilsModule : Module
         builder
             .RegisterType<MainWindowNavigationService>()
             .As<IMainWindowNavigationService>()
+            .SingleInstance();
+        builder
+            .RegisterType<ExternalAudioOpenService>()
+            .As<IExternalAudioOpenService>()
             .SingleInstance();
 
         builder.Register(ctx =>

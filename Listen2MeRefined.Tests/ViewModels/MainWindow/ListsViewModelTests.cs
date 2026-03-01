@@ -5,6 +5,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
@@ -133,6 +134,7 @@ public class ListsViewModelTests
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
         settingsReader
             .Setup(x => x.GetSearchResultsTransferMode())
             .Returns(SearchResultsTransferMode.Move);
@@ -144,7 +146,8 @@ public class ListsViewModelTests
             scanner.Object,
             settingsReader.Object,
             playerController.Object,
-            playlist);
+            playlist,
+            externalAudioOpenService.Object);
 
         SearchMatchMode? capturedMatchMode = null;
         audioSearchExecutionService
@@ -178,6 +181,7 @@ public class ListsViewModelTests
         var settingsReader = new Mock<IAppSettingsReader>();
         playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
         settingsReader
             .Setup(x => x.GetSearchResultsTransferMode())
             .Returns(transferMode);
@@ -189,7 +193,8 @@ public class ListsViewModelTests
             scanner.Object,
             settingsReader.Object,
             playerController.Object,
-            playlist);
+            playlist,
+            externalAudioOpenService.Object);
     }
 }
 

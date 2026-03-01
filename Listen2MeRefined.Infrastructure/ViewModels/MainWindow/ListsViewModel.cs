@@ -4,6 +4,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
@@ -12,7 +13,8 @@ public partial class ListsViewModel :
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
-    INotificationHandler<QuickSearchResultsNotification>
+    INotificationHandler<QuickSearchResultsNotification>,
+    INotificationHandler<ExternalAudioFilesOpenedNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
@@ -21,6 +23,7 @@ public partial class ListsViewModel :
     private readonly IAppSettingsReader _settingsReader;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
+    private readonly IExternalAudioOpenService _externalAudioOpenService;
 
     private int _currentSongIndex = -1;
     private int? _activeNamedPlaylistId;
@@ -48,7 +51,9 @@ public partial class ListsViewModel :
         IAudioSearchExecutionService audioSearchExecutionService,
         IFileScanner fileScanner,
         IAppSettingsReader settingsReader,
-        IMusicPlayerController musicPlayerController, IPlaylist playList)
+        IMusicPlayerController musicPlayerController,
+        IPlaylist playList,
+        IExternalAudioOpenService externalAudioOpenService)
     {
         _logger = logger;
         _mediator = mediator;
@@ -57,6 +62,7 @@ public partial class ListsViewModel :
         _settingsReader = settingsReader;
         _musicPlayerController = musicPlayerController;
         _playList = playList;
+        _externalAudioOpenService = externalAudioOpenService;
 
         _logger.Debug("[ListsViewModel] Class initialized");
     }
@@ -343,9 +349,16 @@ public partial class ListsViewModel :
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
+        _externalAudioOpenService.SetCurrentSong(notification.Audio);
         SelectedSong = notification.Audio;
         _currentSongIndex = PlayList.IndexOf(SelectedSong);
         await Task.CompletedTask;
+    }
+
+    public Task Handle(ExternalAudioFilesOpenedNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Handling {Count} shell-opened audio file(s)", notification.Paths.Count);
+        return _externalAudioOpenService.OpenAsync(notification.Paths, cancellationToken);
     }
 
     public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
