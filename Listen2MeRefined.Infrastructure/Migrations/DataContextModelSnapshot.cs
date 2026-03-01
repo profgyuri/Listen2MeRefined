@@ -96,6 +96,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<float>("StartupVolume")
                         .HasColumnType("REAL");
 
+                    b.Property<bool>("UseCompactPlaylistView")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("Settings");

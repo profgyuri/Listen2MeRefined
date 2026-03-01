@@ -68,6 +68,11 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.AutoCheckUpdatesOnStartup = value);
     }
 
+    public void SetUseCompactPlaylistView(bool value)
+    {
+        _settingsManager.SaveSettings(s => s.UseCompactPlaylistView = value);
+    }
+
     public void SetAutoScanOnFolderAdd(bool value)
     {
         _settingsManager.SaveSettings(s => s.AutoScanOnFolderAdd = value);

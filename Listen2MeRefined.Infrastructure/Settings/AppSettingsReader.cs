@@ -29,6 +29,7 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public float GetStartupVolume() => _settingsManager.Settings.StartupVolume;
     public bool GetStartMuted() => _settingsManager.Settings.StartMuted;
     public bool GetAutoCheckUpdatesOnStartup() => _settingsManager.Settings.AutoCheckUpdatesOnStartup;
+    public bool GetUseCompactPlaylistView() => _settingsManager.Settings.UseCompactPlaylistView;
     public bool GetAutoScanOnFolderAdd() => _settingsManager.Settings.AutoScanOnFolderAdd;
     public bool GetShowTaskPercentage() => _settingsManager.Settings.ShowTaskPercentage;
     public short GetTaskPercentageReportInterval() => _settingsManager.Settings.TaskPercentageReportInterval;

@@ -35,6 +35,8 @@ public interface IAppSettingsReader
     bool GetStartMuted();
     /// <summary>Gets whether automatic update checks on startup are enabled.</summary>
     bool GetAutoCheckUpdatesOnStartup();
+    /// <summary>Gets whether playlist uses compact visual rows.</summary>
+    bool GetUseCompactPlaylistView();
     /// <summary>Gets whether a folder should be auto-scanned when added.</summary>
     bool GetAutoScanOnFolderAdd();
     /// <summary>Gets whether background task percentage should be shown in the title bar.</summary>
