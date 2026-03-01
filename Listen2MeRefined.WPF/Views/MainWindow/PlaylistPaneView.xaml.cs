@@ -15,9 +15,13 @@ public partial class PlaylistPaneView : UserControl
 
     private void PlaylistListView_OnPreviewDragOver(object sender, DragEventArgs e)
     {
-        e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop)
-            ? DragDropEffects.Copy
-            : DragDropEffects.None;
+        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            // Let existing in-app drag/drop handlers (Gong) process non-file drags.
+            return;
+        }
+
+        e.Effects = DragDropEffects.Copy;
         e.Handled = true;
     }
 
