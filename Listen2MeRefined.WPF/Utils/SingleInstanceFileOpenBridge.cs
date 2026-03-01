@@ -1,9 +1,14 @@
+using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Notifications;
 using MediatR;
+using Serilog;
 
 namespace Listen2MeRefined.WPF.Utils;
 
