@@ -8,7 +8,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock Style="{StaticResource SettingsFieldLabelText}"
+        <TextBlock Style="{DynamicResource SettingsFieldLabelText}"
                    Text="{Binding Label, ElementName=Root}"
                    Width="{Binding LabelWidth, ElementName=Root}"
                    VerticalAlignment="Center" />

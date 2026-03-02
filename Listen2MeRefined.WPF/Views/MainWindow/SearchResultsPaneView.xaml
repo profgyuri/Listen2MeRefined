@@ -21,7 +21,7 @@
             <components:SectionHeader Grid.Row="0"
                                       Title="Search Results"
                                       IconKind="MusicNote"
-                                      AccentBrush="{StaticResource SearchResultsBorderAccentBrush}"
+                                      AccentBrush="{DynamicResource SearchResultsBorderAccentBrush}"
                                       ShowActionButton="True"
                                       ActionToolTip="Add Selected / All to Playlist"
                                       ActionIconKind="ArrowRightCircleOutline"
@@ -29,14 +29,14 @@
 
                 <ListView Grid.Row="2"
                       Height="{Binding ElementName=ListRow, Path=Height}"
-                      Foreground="{StaticResource SecondaryBrush}"
+                      Foreground="{DynamicResource SecondaryBrush}"
                       dd:DragDrop.IsDragSource="True"
                       dd:DragDrop.IsDropTarget="True"
                       PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
                       ItemsSource="{Binding SearchResults}"
                       SelectionMode="Extended"
-                      ItemContainerStyle="{StaticResource SearchResultsListItemStyle}"
-                      Style="{StaticResource SearchResultsListViewStyle}"
+                      ItemContainerStyle="{DynamicResource SearchResultsListItemStyle}"
+                      Style="{DynamicResource SearchResultsListViewStyle}"
                       utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}"
                       utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}">
                 <ListView.InputBindings>
@@ -61,19 +61,19 @@
                                 </Grid.ColumnDefinitions>
 
                                 <ToggleButton x:Name="RowExpandToggle"
-                                              Style="{StaticResource SearchResultsRowExpandToggleButtonStyle}"
+                                              Style="{DynamicResource SearchResultsRowExpandToggleButtonStyle}"
                                               ToolTip="Show details">
                                     <Grid>
                                         <materialDesign:PackIcon x:Name="RowExpandIconDown"
                                                                  Kind="ChevronDown"
                                                                  Width="16"
                                                                  Height="16"
-                                                                 Foreground="{StaticResource SecondaryBrush}" />
+                                                                 Foreground="{DynamicResource SecondaryBrush}" />
                                         <materialDesign:PackIcon x:Name="RowExpandIconUp"
                                                                  Kind="ChevronUp"
                                                                  Width="16"
                                                                  Height="16"
-                                                                 Foreground="{StaticResource SecondaryBrush}"
+                                                                 Foreground="{DynamicResource SecondaryBrush}"
                                                                  Visibility="Collapsed" />
                                     </Grid>
                                 </ToggleButton>
@@ -81,7 +81,7 @@
                                 <TextBlock Grid.Column="1"
                                            Text="{Binding Display}"
                                            FontSize="14"
-                                           Foreground="{StaticResource SecondaryBrush}"
+                                           Foreground="{DynamicResource SecondaryBrush}"
                                            VerticalAlignment="Center"
                                            TextTrimming="CharacterEllipsis" />
                             </Grid>
@@ -96,28 +96,28 @@
                                     Visibility="{Binding IsChecked, ElementName=RowExpandToggle, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <UniformGrid Columns="3">
                                     <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Artist" Style="{StaticResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Artist}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Artist" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Artist}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Title" Style="{StaticResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Title}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Title" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Title}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <StackPanel>
-                                        <TextBlock Text="Genre" Style="{StaticResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Genre}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Genre" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Genre}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <StackPanel Margin="0,8,12,0">
-                                        <TextBlock Text="BPM" Style="{StaticResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding BPM}" Style="{StaticResource SearchResultsToolbarValueText}" />
+                                        <TextBlock Text="BPM" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding BPM}" Style="{DynamicResource SearchResultsToolbarValueText}" />
                                     </StackPanel>
                                     <StackPanel Margin="0,8,12,0">
-                                        <TextBlock Text="Bitrate" Style="{StaticResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{StaticResource SearchResultsToolbarValueText}" />
+                                        <TextBlock Text="Bitrate" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{DynamicResource SearchResultsToolbarValueText}" />
                                     </StackPanel>
                                     <StackPanel Margin="0,8,0,0">
-                                        <TextBlock Text="Path" Style="{StaticResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Path}" Style="{StaticResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="Path" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                        <TextBlock Text="{Binding Path}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                 </UniformGrid>
                             </Border>

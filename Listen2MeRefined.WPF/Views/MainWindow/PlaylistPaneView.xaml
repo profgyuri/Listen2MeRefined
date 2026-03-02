@@ -29,7 +29,7 @@
                 <components:SectionHeader Grid.Column="0"
                                           Title="Playlist"
                                           IconKind="PlaylistMusic"
-                                          AccentBrush="{StaticResource TertiaryBrush}"
+                                          AccentBrush="{DynamicResource TertiaryBrush}"
                                           ShowActionButton="True"
                                           ActionToolTip="Remove Selected / All from Active Tab"
                                           ActionIconKind="CloseBoxOutline"
@@ -68,7 +68,7 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding Header}"
-                                       Foreground="{StaticResource SecondaryBrush}"
+                                       Foreground="{DynamicResource SecondaryBrush}"
                                        Margin="0,0,6,0"
                                        VerticalAlignment="Center" />
                             <Button Width="18"
@@ -78,7 +78,7 @@
                                     ToolTip="Close tab"
                                     Background="Transparent"
                                     BorderThickness="0"
-                                    Foreground="{StaticResource SecondaryBrush}"
+                                    Foreground="{DynamicResource SecondaryBrush}"
                                     Visibility="{Binding IsCloseable, Converter={StaticResource BoolToVisibilityConverter}}"
                                     Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}">
@@ -93,7 +93,7 @@
                         <ListView dd:DragDrop.IsDragSource="True"
                                   dd:DragDrop.IsDropTarget="True"
                                   ItemsSource="{Binding Songs}"
-                                  Style="{StaticResource PlaylistListView}"
+                                  Style="{DynamicResource PlaylistListView}"
                                   PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
                                   SelectedItem="{Binding DataContext.SelectedSong, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                                   SelectedIndex="{Binding DataContext.SelectedIndex, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
@@ -112,7 +112,7 @@
                             </ListView.InputBindings>
                             <ListView.ContextMenu>
                                 <ContextMenu Opened="SongContextMenuOnOpened"
-                                             Style="{StaticResource PlaylistContextMenuStyle}" />
+                                             Style="{DynamicResource PlaylistContextMenuStyle}" />
                             </ListView.ContextMenu>
                             <ListView.ItemTemplate>
                                 <DataTemplate>

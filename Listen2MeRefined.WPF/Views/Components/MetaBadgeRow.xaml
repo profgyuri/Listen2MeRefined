@@ -3,25 +3,25 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <WrapPanel VerticalAlignment="Center">
-        <Border Style="{StaticResource ComponentMetaBadge}"
+        <Border Style="{DynamicResource ComponentMetaBadge}"
                 Visibility="{Binding ShowBpm, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
-            <TextBlock Style="{StaticResource ComponentMetaText}"
+            <TextBlock Style="{DynamicResource ComponentMetaText}"
                        Text="{Binding BpmText, ElementName=Root}" />
         </Border>
-        <Border Style="{StaticResource ComponentMetaBadge}"
+        <Border Style="{DynamicResource ComponentMetaBadge}"
                 Visibility="{Binding ShowBitrate, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
-            <TextBlock Style="{StaticResource ComponentMetaText}"
+            <TextBlock Style="{DynamicResource ComponentMetaText}"
                        Text="{Binding BitrateText, ElementName=Root}" />
         </Border>
-        <Border Style="{StaticResource ComponentMetaBadge}"
+        <Border Style="{DynamicResource ComponentMetaBadge}"
                 Visibility="{Binding ShowLength, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
-            <TextBlock Style="{StaticResource ComponentMetaText}"
+            <TextBlock Style="{DynamicResource ComponentMetaText}"
                        Text="{Binding LengthText, ElementName=Root}" />
         </Border>
-        <Border Style="{StaticResource ComponentMetaBadge}"
+        <Border Style="{DynamicResource ComponentMetaBadge}"
                 Margin="0"
                 Visibility="{Binding ShowGenre, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
-            <TextBlock Style="{StaticResource ComponentMetaText}"
+            <TextBlock Style="{DynamicResource ComponentMetaText}"
                        Text="{Binding GenreText, ElementName=Root}" />
         </Border>
     </WrapPanel>

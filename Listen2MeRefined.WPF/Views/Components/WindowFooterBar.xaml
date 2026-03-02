@@ -22,14 +22,14 @@
             <Button Grid.Column="1"
                     Content="{Binding PrimaryButtonText, ElementName=Root}"
                     MinWidth="{Binding PrimaryButtonMinWidth, ElementName=Root}"
-                    Style="{StaticResource WindowFooterActionButton}"
+                    Style="{DynamicResource WindowFooterActionButton}"
                     Click="PrimaryButton_Click" />
 
             <Button Grid.Column="2"
                     Content="{Binding SecondaryButtonText, ElementName=Root}"
                     MinWidth="{Binding SecondaryButtonMinWidth, ElementName=Root}"
                     Margin="8,0,0,0"
-                    Style="{StaticResource WindowFooterActionButton}"
+                    Style="{DynamicResource WindowFooterActionButton}"
                     Visibility="{Binding ShowSecondaryButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}"
                     Click="SecondaryButton_Click" />
         </Grid>

@@ -7,7 +7,7 @@
                 Background="Transparent"
                 BorderThickness="0"
                 materialDesign:ColorZoneAssist.Mode="Custom"
-                ItemContainerStyle="{StaticResource MainTabsSegmentTabItemStyle}">
+                ItemContainerStyle="{DynamicResource MainTabsSegmentTabItemStyle}">
 
         <TabItem Header="Search Results" IsSelected="{Binding IsSearchResultsTabVisible}" Cursor="Hand">
             <views:SearchResultsPaneView DataContext="{Binding DataContext.SearchResultsPaneViewModel, RelativeSource={RelativeSource AncestorType=Window}}" />
@@ -32,9 +32,9 @@
 
                         <Border Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Playback Actions" />
-                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding JumpToSelectedSongCommand}" Content="Jump To This Song" />
-                                <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding SetSelectedSongAsNextCommand}" Content="Set As Next Song" Margin="0" />
+                                <TextBlock Style="{DynamicResource MainTabsCardTitleText}" Text="Playback Actions" />
+                                <Button Style="{DynamicResource MainTabsActionButton}" Command="{Binding JumpToSelectedSongCommand}" Content="Jump To This Song" />
+                                <Button Style="{DynamicResource MainTabsActionButton}" Command="{Binding SetSelectedSongAsNextCommand}" Content="Set As Next Song" Margin="0" />
                             </StackPanel>
                         </Border>
 
@@ -46,35 +46,35 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                    <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Song Details" />
+                                    <TextBlock Style="{DynamicResource MainTabsCardTitleText}" Text="Song Details" />
                                     <TextBox Text="{Binding SelectedSong.Artist}" Margin="0,0,0,10" materialDesign:HintAssist.Hint="Artist" />
                                     <TextBox Text="{Binding SelectedSong.Title}" Margin="0,0,0,10" materialDesign:HintAssist.Hint="Title" />
                                     <TextBox Text="{Binding SelectedSong.Genre}" materialDesign:HintAssist.Hint="Genre" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Style="{StaticResource MainTabsCardTitleText}" Text="Audio Meta" />
+                                    <TextBlock Style="{DynamicResource MainTabsCardTitleText}" Text="Audio Meta" />
                                     <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
                                         <StackPanel>
-                                            <TextBlock Style="{StaticResource MainTabsMetaLabelText}" Text="BITRATE" />
-                                            <TextBlock Style="{StaticResource MainTabsMetaValueText}" Text="{Binding SelectedSong.Bitrate}" />
+                                            <TextBlock Style="{DynamicResource MainTabsMetaLabelText}" Text="BITRATE" />
+                                            <TextBlock Style="{DynamicResource MainTabsMetaValueText}" Text="{Binding SelectedSong.Bitrate}" />
                                         </StackPanel>
                                     </Border>
                                     <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10">
                                         <StackPanel>
-                                            <TextBlock Style="{StaticResource MainTabsMetaLabelText}" Text="BPM" />
-                                            <TextBlock Style="{StaticResource MainTabsMetaValueText}" Text="{Binding SelectedSong.BPM}" />
+                                            <TextBlock Style="{DynamicResource MainTabsMetaLabelText}" Text="BPM" />
+                                            <TextBlock Style="{DynamicResource MainTabsMetaValueText}" Text="{Binding SelectedSong.BPM}" />
                                         </StackPanel>
                                     </Border>
-                                    <Button Style="{StaticResource MainTabsActionButton}" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song" Margin="0,10,0,0" />
+                                    <Button Style="{DynamicResource MainTabsActionButton}" Command="{Binding ScanSelectedSongCommand}" Content="Scan This Song" Margin="0,10,0,0" />
                                 </StackPanel>
                             </Grid>
                         </Border>
 
                         <Border Grid.Row="4" Background="#232323" BorderBrush="#383838" BorderThickness="1" CornerRadius="10" Padding="12">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <materialDesign:PackIcon Kind="DeleteOutline" Width="18" Height="18" Foreground="{StaticResource TertiaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
-                                <Button Style="{StaticResource MainTabsActionButton}"
+                                <materialDesign:PackIcon Kind="DeleteOutline" Width="18" Height="18" Foreground="{DynamicResource TertiaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <Button Style="{DynamicResource MainTabsActionButton}"
                                         Command="{Binding DataContext.PlaylistPaneViewModel.RemoveSelectedFromActiveTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         Content="Remove From Playlist"
                                         Margin="0" />
