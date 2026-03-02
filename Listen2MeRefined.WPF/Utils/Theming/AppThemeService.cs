@@ -105,9 +105,9 @@ public sealed class AppThemeService : IAppThemeService
             Application.Current.Resources[colorKey] = color;
 
             if (ColorToBrushMap.TryGetValue(colorKey, out var brushKey)
-                && Application.Current.Resources[brushKey] is SolidColorBrush brush)
+                && Application.Current.Resources[brushKey] is SolidColorBrush)
             {
-                brush.Color = color;
+                Application.Current.Resources[brushKey] = new SolidColorBrush(color);
             }
         }
     }
