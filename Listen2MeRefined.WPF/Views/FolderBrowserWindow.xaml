@@ -218,12 +218,6 @@
                                         </TextBox.InputBindings>
                                     </TextBox>
                                 </Border>
-                                <Button Grid.Column="1"
-                                        Margin="8,0,0,0"
-                                        Content="Go"
-                                        Command="{Binding GoToPathCommand}"
-                                        Style="{StaticResource FolderBrowserActionButton}"
-                                        MinWidth="78" />
                                 <Button Grid.Column="2"
                                         Margin="8,0,0,0"
                                         Content="Pin Current"
