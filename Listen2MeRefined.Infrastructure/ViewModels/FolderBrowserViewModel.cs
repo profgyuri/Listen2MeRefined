@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Notifications;
 
@@ -14,6 +15,7 @@ public sealed partial class FolderBrowserViewModel :
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
+    private readonly IClipboardService _clipboardService;
     private readonly List<string> _allFolders = new();
 
     [ObservableProperty] private string _fontFamily = "";
@@ -34,7 +36,8 @@ public sealed partial class FolderBrowserViewModel :
         IFolderNavigationService folderNavigationService,
         IPinnedFoldersService pinnedFoldersService,
         IAppSettingsReader settingsReader,
-        IAppSettingsWriter settingsWriter)
+        IAppSettingsWriter settingsWriter,
+        IClipboardService clipboardService)
     {
         _logger = logger;
         _mediator = mediator;
@@ -42,6 +45,7 @@ public sealed partial class FolderBrowserViewModel :
         _pinnedFoldersService = pinnedFoldersService;
         _settingsReader = settingsReader;
         _settingsWriter = settingsWriter;
+        _clipboardService = clipboardService;
 
         _logger.Debug("[FolderBrowserViewModel] initialized");
     }
@@ -110,6 +114,32 @@ public sealed partial class FolderBrowserViewModel :
         if (!TryNavigateToPath(FullPath))
         {
             SetValidationError($"Could not open '{FullPath}'.");
+        }
+    }
+
+    [RelayCommand]
+    private void NavigateToClipboardPath()
+    {
+        var text = _clipboardService.GetText().Trim();
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            SetValidationError("Clipboard is empty.");
+            return;
+        }
+
+        // If the clipboard contains a file path, use its parent directory.
+        var resolvedPath = text;
+        if (File.Exists(text))
+        {
+            resolvedPath = Path.GetDirectoryName(text) ?? text;
+        }
+
+        _logger.Debug("[FolderBrowserViewModel] Ctrl+V navigation to '{Path}'", resolvedPath);
+
+        if (!TryNavigateToPath(resolvedPath))
+        {
+            SetValidationError($"Could not open '{resolvedPath}'.");
         }
     }
 

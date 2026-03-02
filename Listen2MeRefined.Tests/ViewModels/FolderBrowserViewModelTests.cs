@@ -129,11 +129,80 @@ public sealed class FolderBrowserViewModelTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task NavigateToClipboardPathCommand_ValidFolderInClipboard_NavigatesSuccessfully()
+    {
+        var settings = new AppSettings();
+        var viewModel = CreateViewModel(
+            settings,
+            new FakeFolderBrowser(
+                drives: [@"C:\"],
+                existingFolders: [@"C:\Music"]),
+            clipboardText: @"C:\Music",
+            out _);
+
+        await viewModel.InitializeAsync();
+
+        viewModel.NavigateToClipboardPathCommand.Execute(null);
+
+        Assert.Equal(@"C:\Music", viewModel.FullPath);
+        Assert.False(viewModel.HasValidationError);
+    }
+
+    [Fact]
+    public async Task NavigateToClipboardPathCommand_InvalidPathInClipboard_SetsValidationError()
+    {
+        var settings = new AppSettings();
+        var viewModel = CreateViewModel(
+            settings,
+            new FakeFolderBrowser(
+                drives: [@"C:\"],
+                existingFolders: [@"C:\Music"]),
+            clipboardText: @"Z:\NotHere",
+            out _);
+
+        await viewModel.InitializeAsync();
+
+        viewModel.NavigateToClipboardPathCommand.Execute(null);
+
+        Assert.True(viewModel.HasValidationError);
+        Assert.Contains("Could not open", viewModel.ValidationMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task NavigateToClipboardPathCommand_EmptyClipboard_SetsValidationError()
+    {
+        var settings = new AppSettings();
+        var viewModel = CreateViewModel(
+            settings,
+            new FakeFolderBrowser(
+                drives: [@"C:\"],
+                existingFolders: [@"C:\Music"]),
+            clipboardText: "",
+            out _);
+
+        await viewModel.InitializeAsync();
+
+        viewModel.NavigateToClipboardPathCommand.Execute(null);
+
+        Assert.True(viewModel.HasValidationError);
+        Assert.Contains("empty", viewModel.ValidationMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static FolderBrowserViewModel CreateViewModel(
         AppSettings settings,
         IFolderBrowser folderBrowser,
+        out Mock<IMediator> mediator) =>
+        CreateViewModel(settings, folderBrowser, clipboardText: string.Empty, out mediator);
+
+    private static FolderBrowserViewModel CreateViewModel(
+        AppSettings settings,
+        IFolderBrowser folderBrowser,
+        string clipboardText,
         out Mock<IMediator> mediator)
     {
+        var clipboardService = new FakeClipboardService(clipboardText);
+
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);
         settingsManager
@@ -157,7 +226,13 @@ public sealed class FolderBrowserViewModelTests
             folderNavigationService,
             pinnedFoldersService,
             settingsReadService,
-            settingsWriteService);
+            settingsWriteService,
+            clipboardService);
+    }
+
+    private sealed class FakeClipboardService(string text) : IClipboardService
+    {
+        public string GetText() => text;
     }
 
     private sealed class FakeFolderBrowser(

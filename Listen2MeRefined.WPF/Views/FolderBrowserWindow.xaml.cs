@@ -47,10 +47,9 @@ public sealed partial class FolderBrowserWindow : Window
             return;
         }
 
-        if (e.Key == Key.L && Keyboard.Modifiers == ModifierKeys.Control)
+        if (e.Key == Key.V && Keyboard.Modifiers == ModifierKeys.Control)
         {
-            PathTextBox.Focus();
-            PathTextBox.SelectAll();
+            _viewModel.NavigateToClipboardPathCommand.Execute(null);
             e.Handled = true;
         }
     }

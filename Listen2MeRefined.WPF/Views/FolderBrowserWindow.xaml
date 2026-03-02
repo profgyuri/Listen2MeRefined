@@ -196,7 +196,6 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Border Grid.Column="0"
                                         Background="#2A2A2A"
@@ -204,21 +203,16 @@
                                         BorderThickness="1"
                                         CornerRadius="8"
                                         Padding="10,0">
-                                    <TextBox x:Name="PathTextBox"
-                                             materialDesign:HintAssist.Hint="Full path"
-                                             materialDesign:HintAssist.Foreground="#9A9A9A"
-                                             Foreground="{StaticResource SecondaryBrush}"
-                                             Background="Transparent"
-                                             BorderThickness="0"
-                                             Height="36"
-                                             VerticalContentAlignment="Center"
-                                             Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                        <TextBox.InputBindings>
-                                            <KeyBinding Key="Return" Command="{Binding GoToPathCommand}" />
-                                        </TextBox.InputBindings>
-                                    </TextBox>
+                                    <TextBlock x:Name="PathTextBlock"
+                                               Foreground="{StaticResource SecondaryBrush}"
+                                               Background="Transparent"
+                                               Height="36"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding FullPath}"
+                                               Text="{Binding FullPath}" />
                                 </Border>
-                                <Button Grid.Column="2"
+                                <Button Grid.Column="1"
                                         Margin="8,0,0,0"
                                         Content="Pin Current"
                                         Command="{Binding TogglePinCommand}"
@@ -239,7 +233,7 @@
 
             <components:WindowFooterBar Grid.Row="2"
                                         Margin="10,10,10,10"
-                                        InfoText="Enter/Right to open folder. Left to go back. Select adds folder to library."
+                                        InfoText="Enter/Right to open. Left to go back. Ctrl+V jumps to clipboard path. Select adds folder to library."
                                         PrimaryButtonText="Select"
                                         PrimaryButtonMinWidth="110"
                                         ShowSecondaryButton="True"
