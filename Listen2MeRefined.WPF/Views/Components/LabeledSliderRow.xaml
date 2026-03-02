@@ -12,7 +12,6 @@
         <TextBlock Grid.Column="0"
                    Style="{DynamicResource SettingsFieldLabelText}"
                    Width="{Binding LabelWidth, ElementName=Root}"
-                   VerticalAlignment="Center"
                    Text="{Binding Label, ElementName=Root}" />
 
         <Slider Grid.Column="1"
