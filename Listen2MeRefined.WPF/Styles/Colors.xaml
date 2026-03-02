@@ -13,6 +13,7 @@
     <Color x:Key="TertiaryLightMidColor">#D07A42</Color>
     <Color x:Key="TertiaryMidColor">#33FF8A3D</Color>
     <Color x:Key="TertiaryDarkColor">#1FFF8A3D</Color>
+    <Color x:Key="ValidationErrorColor">#E26A6A</Color>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}" />
     <SolidColorBrush x:Key="PrimaryLightBrush" Color="{DynamicResource PrimaryLightColor}" />
     <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource BorderColor}" />
@@ -28,4 +29,5 @@
     <SolidColorBrush x:Key="HoloBackground" Color="{DynamicResource PrimaryColor}" Opacity=".9" />
     <SolidColorBrush x:Key="MaterialDesignPaper" Color="{DynamicResource PrimaryColor}"/>
     <SolidColorBrush x:Key="ContainerGradientBackgroundBrush" Color="{DynamicResource PrimaryLightColor}" />
+    <SolidColorBrush x:Key="ValidationErrorBrush" Color="{DynamicResource ValidationErrorColor}" />
 </ResourceDictionary>

@@ -68,12 +68,8 @@
             </Border>
 
             <Border Grid.Row="1"
-                    Margin="10"
-                    Background="#272727"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    Padding="10,8">
+                    Style="{DynamicResource DarkBorderContainer}"
+                    Margin="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

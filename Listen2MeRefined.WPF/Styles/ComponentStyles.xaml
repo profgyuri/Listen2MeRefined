@@ -217,15 +217,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="SettingsSectionCard" TargetType="Border">
-        <Setter Property="Background" Value="#232323" />
-        <Setter Property="BorderBrush" Value="#393939" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="Padding" Value="12" />
-        <Setter Property="Margin" Value="0,0,0,10" />
-    </Style>
-
     <Style x:Key="SettingsSectionHeaderText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="15" />
