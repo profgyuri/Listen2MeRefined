@@ -38,8 +38,8 @@
                              Height="36"
                              BorderThickness="0"
                              Background="Transparent"
-                             Foreground="{StaticResource SecondaryBrush}"
-                             CaretBrush="{StaticResource TertiaryBrush}"
+                             Foreground="{DynamicResource SecondaryBrush}"
+                             CaretBrush="{DynamicResource TertiaryBrush}"
                              VerticalContentAlignment="Center"
                              materialDesign:HintAssist.Hint="Quick Search"
                              materialDesign:HintAssist.Foreground="#9A9A9A"
@@ -53,12 +53,12 @@
 
             <Button Grid.Column="1"
                     Command="{Binding QuickSearchCommand}"
-                    Style="{StaticResource SearchBarActionButton}"
+                    Style="{DynamicResource SearchBarActionButton}"
                     ToolTip="Quick Search"
                     Content="{materialDesign:PackIcon Kind=Search,Size=18}" />
             <Button Grid.Column="2"
                     Command="{Binding DataContext.OpenAdvancedSearchWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                    Style="{StaticResource SearchBarActionButton}"
+                    Style="{DynamicResource SearchBarActionButton}"
                     ToolTip="Advanced Search"
                     Content="{materialDesign:PackIcon Kind=Tune,Size=18}" />
         </Grid>

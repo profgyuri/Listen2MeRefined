@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:SettingsWindowViewModel}"
-        Style="{StaticResource BasicWindow}"
+        Style="{DynamicResource BasicWindow}"
         FontFamily="{Binding SelectedFontFamily}"
         ResizeMode="NoResize"
         Title="Settings"
@@ -20,8 +20,8 @@
     </WindowChrome.WindowChrome>
 
     <Border BorderThickness="2"
-            BorderBrush="{StaticResource TertiaryBrush}"
-            Background="{StaticResource PrimaryBrush}"
+            BorderBrush="{DynamicResource TertiaryBrush}"
+            Background="{DynamicResource PrimaryBrush}"
             CornerRadius="0,0,8,8">
         <Grid>
             <Grid.RowDefinitions>
@@ -48,7 +48,7 @@
                 <TabControl Background="Transparent"
                             BorderThickness="0"
                             TabStripPlacement="Left"
-                            ItemContainerStyle="{StaticResource SettingsNavTabItemStyle}">
+                            ItemContainerStyle="{DynamicResource SettingsNavTabItemStyle}">
                     <TabItem Cursor="Hand">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
@@ -58,20 +58,20 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="General Preferences" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Basic app behavior and update policy." />
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="General Preferences" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Basic app behavior and update policy." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
                                         <components:FormFieldRow Margin="0,0,0,10"
                                                                  Label="Font family:"
                                                                  LabelWidth="170">
                                             <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                <ComboBox Style="{DynamicResource CustomComboBox}"
                                                           SelectedItem="{Binding SelectedFontFamily}"
                                                           ItemsSource="{Binding FontFamilies}">
                                                     <ComboBox.ItemTemplate>
@@ -87,7 +87,7 @@
                                                                  Label="Theme:"
                                                                  LabelWidth="170">
                                             <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                <ComboBox Style="{DynamicResource CustomComboBox}"
                                                           SelectedItem="{Binding SelectedThemeMode}"
                                                           ItemsSource="{Binding ThemeModes}" />
                                             </components:FormFieldRow.FieldContent>
@@ -97,7 +97,7 @@
                                                                  Label="Accent color:"
                                                                  LabelWidth="170">
                                             <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                <ComboBox Style="{DynamicResource CustomComboBox}"
                                                           SelectedItem="{Binding SelectedAccentColor}"
                                                           ItemsSource="{Binding AccentColors}" />
                                             </components:FormFieldRow.FieldContent>
@@ -107,11 +107,11 @@
                                                   Content="Automatically check for updates on startup"
                                                   Margin="0,0,0,10" />
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                        <Button Style="{StaticResource SettingsActionButton}"
+                                        <Button Style="{DynamicResource SettingsActionButton}"
                                                 MinWidth="130"
                                                 Content="Check Now"
                                                 Command="{Binding CheckForUpdatesNowCommand}" />
-                                        <Button Style="{StaticResource SettingsActionButton}"
+                                        <Button Style="{DynamicResource SettingsActionButton}"
                                                 MinWidth="130"
                                                 Margin="10,0,0,0"
                                                 Content="{materialDesign:PackIcon Kind=Download, Size=16}"
@@ -119,7 +119,7 @@
                                                 Command="{Binding OpenBrowserForUpdateCommand}"
                                                 Visibility="{Binding IsUpdateButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                                         </StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="{Binding UpdateAvailableText}" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="{Binding UpdateAvailableText}" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
@@ -135,14 +135,14 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Playback" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Audio output and startup playback defaults." />
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Playback" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Audio output and startup playback defaults." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -158,8 +158,8 @@
                                                                  Label="Audio output:"
                                                                  LabelWidth="200">
                                             <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
-                                                          Foreground="{StaticResource SecondaryBrush}"
+                                                <ComboBox Style="{DynamicResource CustomComboBox}"
+                                                          Foreground="{DynamicResource SecondaryBrush}"
                                                           SelectedItem="{Binding SelectedAudioOutputDevice}"
                                                           ItemsSource="{Binding AudioOutputDevices}">
                                                     <ComboBox.ItemTemplate>
@@ -202,14 +202,14 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Library" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Folders and scan behavior for your local library." />
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Library" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Folders and scan behavior for your local library." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
                                         <Grid Margin="0,0,0,10">
                                         <Grid.RowDefinitions>
@@ -224,7 +224,7 @@
                                         <ListView Grid.RowSpan="2"
                                                   Height="180"
                                                   Margin="0,0,10,0"
-                                                  Style="{StaticResource VirtualizedListView}"
+                                                  Style="{DynamicResource VirtualizedListView}"
                                                   ItemsSource="{Binding Folders}"
                                                   SelectedItem="{Binding SelectedFolder}"
                                                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -232,7 +232,7 @@
                                             <ListView.ItemTemplate>
                                                 <DataTemplate>
                                                     <TextBlock Text="{Binding}"
-                                                               Foreground="{StaticResource SecondaryBrush}"
+                                                               Foreground="{DynamicResource SecondaryBrush}"
                                                                TextTrimming="CharacterEllipsis">
                                                         <TextBlock.ToolTip>
                                                             <ToolTip Visibility="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTextBlockVisibilityConverter}}"
@@ -245,7 +245,7 @@
 
                                         <Button x:Name="OpenFolderBrowser"
                                                 Grid.Column="1"
-                                                Style="{StaticResource SettingsIconActionButton}"
+                                                Style="{DynamicResource SettingsIconActionButton}"
                                                 Click="OpenFolderBrowser_Click"
                                                 Content="{materialDesign:PackIcon Kind=FolderAddOutline, Size=18}"
                                                 ToolTip="Browse and add folder"
@@ -253,7 +253,7 @@
                                         <Button x:Name="RemoveFolder"
                                                 Grid.Row="1"
                                                 Grid.Column="1"
-                                                Style="{StaticResource SettingsIconActionButton}"
+                                                Style="{DynamicResource SettingsIconActionButton}"
                                                 Command="{Binding RemoveFolderCommand}"
                                                 IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
                                                 Content="{materialDesign:PackIcon Kind=FolderRemoveOutline, Size=18}"
@@ -266,7 +266,7 @@
                                                   Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding ScanOnStartup}" Content="Scan folders on startup" Margin="0,0,0,6" />
                                         <CheckBox IsChecked="{Binding AutoScanOnFolderAdd}" Content="Scan newly added folders immediately" Margin="0,0,0,10" />
-                                        <Button Style="{StaticResource SettingsActionButton}"
+                                        <Button Style="{DynamicResource SettingsActionButton}"
                                                 HorizontalAlignment="Left"
                                                 MinWidth="130"
                                                 Content="Rescan Now"
@@ -280,7 +280,7 @@
                                                 BorderThickness="1"
                                                 CornerRadius="8">
                                             <StackPanel>
-                                                <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
+                                                <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
                                                            Text="Background task status in title bar" />
                                                 <CheckBox Margin="0,8,0,0"
                                                           IsChecked="{Binding ShowTaskPercentage}"
@@ -303,7 +303,7 @@
                                                                          Label="Count basis:"
                                                                          LabelWidth="170">
                                                     <components:FormFieldRow.FieldContent>
-                                                        <ComboBox Style="{StaticResource CustomComboBox}"
+                                                        <ComboBox Style="{DynamicResource CustomComboBox}"
                                                                   SelectedItem="{Binding SelectedScanMilestoneBasis}"
                                                                   ItemsSource="{Binding ScanMilestoneBases}" />
                                                     </components:FormFieldRow.FieldContent>
@@ -324,10 +324,10 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Folder Browser Speed" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Folder Browser Speed" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
                                                    Margin="0,0,0,10"
                                                    Text="Tune how quickly the folder browser returns to common locations." />
 
@@ -340,7 +340,7 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
 
-                                            <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Start location:" />
+                                            <TextBlock Style="{DynamicResource SettingsFieldLabelText}" Text="Start location:" />
                                             <CheckBox Grid.Column="1"
                                                       IsChecked="{Binding FolderBrowserStartAtLastLocation}"
                                                       Content="Open browser at the last browsed folder when possible" />
@@ -356,27 +356,27 @@
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
 
-                                            <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Pinned folders" />
+                                            <TextBlock Style="{DynamicResource SettingsFieldLabelText}" Text="Pinned folders" />
                                             <ListView Grid.Row="1"
                                                       Height="120"
                                                       Margin="0,6,0,8"
-                                                      Style="{StaticResource VirtualizedListView}"
+                                                      Style="{DynamicResource VirtualizedListView}"
                                                       ItemsSource="{Binding PinnedFolders}"
                                                       SelectedItem="{Binding SelectedPinnedFolder}">
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate>
                                                         <TextBlock Text="{Binding}"
-                                                                   Foreground="{StaticResource SecondaryBrush}"
+                                                                   Foreground="{DynamicResource SecondaryBrush}"
                                                                    TextTrimming="CharacterEllipsis" />
                                                     </DataTemplate>
                                                 </ListView.ItemTemplate>
                                             </ListView>
                                             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                                <Button Style="{StaticResource SettingsActionButton}"
+                                                <Button Style="{DynamicResource SettingsActionButton}"
                                                         MinWidth="110"
                                                         Content="Remove Pin"
                                                         Command="{Binding RemovePinnedFolderCommand}" />
-                                                <Button Style="{StaticResource SettingsActionButton}"
+                                                <Button Style="{DynamicResource SettingsActionButton}"
                                                         MinWidth="130"
                                                         Margin="8,0,0,0"
                                                         Content="Clear Invalid Pins"
@@ -398,14 +398,14 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Notifications and Hooks" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Global key hooks and corner popup behavior." />
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Notifications and Hooks" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Global key hooks and corner popup behavior." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -417,10 +417,10 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Style="{StaticResource SettingsFieldLabelText}" Text="Global media keys:" />
+                                        <TextBlock Style="{DynamicResource SettingsFieldLabelText}" Text="Global media keys:" />
                                         <CheckBox Grid.Column="1" IsChecked="{Binding EnableGlobalMediaKeys}" Content="Enable global media key shortcuts" />
 
-                                        <TextBlock Grid.Row="1" Style="{StaticResource SettingsFieldLabelText}" Text="Corner popup:" />
+                                        <TextBlock Grid.Row="1" Style="{DynamicResource SettingsFieldLabelText}" Text="Corner popup:" />
                                         <StackPanel Grid.Row="1" Grid.Column="1">
                                             <CheckBox IsChecked="{Binding EnableCornerNowPlayingPopup}" Content="Enable corner now-playing popup" Margin="0,0,0,8" />
                                             <components:LabeledSliderRow Margin="0,0,0,8"
@@ -450,7 +450,7 @@
                                                                  Label="Notification window:"
                                                                  LabelWidth="210">
                                             <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                <ComboBox Style="{DynamicResource CustomComboBox}"
                                                           SelectedItem="{Binding SelectedNewSongWindowPosition}"
                                                           ItemsSource="{Binding NewSongWindowPositions}" />
                                             </components:FormFieldRow.FieldContent>
@@ -469,28 +469,28 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Advanced" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Danger zone. Clearing metadata removes songs, playlists, and folder registrations from the local database." />
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Advanced" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Danger zone. Clearing metadata removes songs, playlists, and folder registrations from the local database." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}" BorderBrush="#6B3D3D" Background="#2A2121">
+                                <Border Style="{DynamicResource SettingsSectionCard}" BorderBrush="#6B3D3D" Background="#2A2121">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
                                                    Foreground="#E2A4A4"
                                                    Text="This action cannot be undone. Use it only when you want a full local reset."
                                                    Margin="0,0,0,10" />
                                         <StackPanel Orientation="Horizontal">
                                         <Button x:Name="ClearMetadataButton"
-                                                Style="{StaticResource SettingsActionButton}"
+                                                Style="{DynamicResource SettingsActionButton}"
                                                 MinWidth="150"
                                                 Content="Clear Metadata"
                                                 Command="{Binding ClearMetadataCommand}"
                                                 Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                                             <Button x:Name="CancelClearMetadataButton"
-                                                    Style="{StaticResource SettingsActionButton}"
+                                                    Style="{DynamicResource SettingsActionButton}"
                                                     MinWidth="150"
                                                     Margin="10,0,0,0"
                                                     Content="{Binding CancelClearMetadataButtonContent}"

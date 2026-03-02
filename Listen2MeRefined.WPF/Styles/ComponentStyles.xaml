@@ -7,10 +7,10 @@
     <Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="HasDropShadow" Value="False" />
-        <Setter Property="Background" Value="{StaticResource PrimaryLightBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource DarkBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource DarkBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Padding" Value="10,6" />
         <Setter Property="FontSize" Value="11" />
         <Setter Property="MaxWidth" Value="320" />
@@ -70,7 +70,7 @@
     <Style x:Key="ComponentTitleBarBrandText" TargetType="TextBlock">
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
@@ -88,7 +88,7 @@
 
     <Style x:Key="ComponentTitleBarCenterText" TargetType="TextBlock">
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
@@ -98,15 +98,15 @@
         <Setter Property="Padding" Value="8,3" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-        <Setter Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
+        <Setter Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
         <Setter Property="MaxWidth" Value="420" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <Style x:Key="ComponentTitleBarStatusBadgeText" TargetType="TextBlock">
         <Setter Property="FontSize" Value="11" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="TextWrapping" Value="NoWrap" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -119,7 +119,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="#3F3F3F" />
         <Setter Property="Background" Value="#2A2A2A" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -132,7 +132,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="ButtonBorder" Property="Background" Value="#353535" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -205,8 +205,8 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="TabBorder" Property="Background" Value="#353535" />
-                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="TabBorder" Property="Background" Value="#383838" />
@@ -227,7 +227,7 @@
     </Style>
 
     <Style x:Key="SettingsSectionHeaderText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,0,0,3" />
@@ -248,7 +248,7 @@
         <Setter Property="Height" Value="38" />
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Padding" Value="14,0" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="BorderBrush" Value="#4A4A4A" />
         <Setter Property="Background" Value="#303030" />
         <Setter Property="BorderThickness" Value="1" />
@@ -264,7 +264,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="BtnBorder" Property="Background" Value="#383838" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -285,12 +285,12 @@
 
     <Style x:Key="AdvancedSearchTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{DynamicResource TertiaryBrush}" />
     </Style>
 
     <Style x:Key="AdvancedSearchToolbarTitleText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -307,9 +307,9 @@
         <Setter Property="Width" Value="38" />
         <Setter Property="Height" Value="38" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
         <Setter Property="Background" Value="#2E2E2E" />
-        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
     </Style>
 
     <Style x:Key="AdvancedSearchCriteriaListView" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
@@ -338,12 +338,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="ItemBorder" Property="Background" Value="#313131" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -359,14 +359,14 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="BorderBrush" Value="#5A5A5A" />
         <Setter Property="Background" Value="#343434" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
     </Style>
 
     <Style x:Key="FolderBrowserActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
         <Setter Property="Height" Value="38" />
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Padding" Value="14,0" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="BorderBrush" Value="#4A4A4A" />
         <Setter Property="Background" Value="#303030" />
         <Setter Property="BorderThickness" Value="1" />
@@ -382,7 +382,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="BtnBorder" Property="Background" Value="#383838" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -395,7 +395,7 @@
     </Style>
 
     <Style x:Key="FolderBrowserSectionTitleText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,0,0,6" />
@@ -429,7 +429,7 @@
                                         <Setter TargetName="ItemBorder" Property="Background" Value="#2C2C2C" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                                         <Setter TargetName="ItemBorder" Property="Background" Value="#323232" />
                                         <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1" />
                                         <Setter Property="Margin" Value="0,1,0,1" />
@@ -465,8 +465,8 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="TabBorder" Property="Background" Value="#353535" />
-                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="TabBorder" Property="Background" Value="#383838" />
@@ -483,14 +483,14 @@
         <Setter Property="Padding" Value="14,0" />
         <Setter Property="Margin" Value="0,0,0,10" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="BorderBrush" Value="#4A4A4A" />
         <Setter Property="Background" Value="#303030" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
     <Style x:Key="MainTabsCardTitleText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,0,0,10" />
@@ -503,13 +503,13 @@
     </Style>
 
     <Style x:Key="MainTabsMetaValueText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="PlaylistTitleText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="18" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -519,9 +519,9 @@
         <Setter Property="Width" Value="38" />
         <Setter Property="Height" Value="38" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
         <Setter Property="Background" Value="#2E2E2E" />
-        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
     </Style>
 
     <Style x:Key="PlaylistListView" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
@@ -550,11 +550,11 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                                         <Setter TargetName="ItemBorder" Property="Background" Value="#2C2C2C" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                                         <Setter TargetName="ItemBorder" Property="Background" Value="#323232" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -586,7 +586,7 @@
         <Setter Property="Height" Value="38" />
         <Setter Property="Margin" Value="10,0,0,0" />
         <Setter Property="BorderBrush" Value="#4A4A4A" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Background" Value="#313131" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
@@ -601,7 +601,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="BtnBorder" Property="Background" Value="#383838" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -613,7 +613,7 @@
         </Setter>
     </Style>
 
-    <SolidColorBrush x:Key="SearchResultsBorderAccentBrush" Color="{StaticResource TertiaryColor}" />
+    <SolidColorBrush x:Key="SearchResultsBorderAccentBrush" Color="{DynamicResource TertiaryColor}" />
 
     <Style x:Key="SearchResultsToolbarLabelText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="#A8A8A8" />
@@ -623,7 +623,7 @@
     </Style>
 
     <Style x:Key="SearchResultsToolbarValueText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -656,12 +656,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="ItemBorder" Property="Background" Value="#313131" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -695,12 +695,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="ToggleBorder" Property="Background" Value="#363636" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
+                            <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -734,7 +734,7 @@
     <Style x:Key="TrackInfoMetricValueText" TargetType="TextBlock">
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="TextWrapping" Value="NoWrap" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
@@ -744,7 +744,7 @@
         <Setter Property="Height" Value="36" />
         <Setter Property="BorderBrush" Value="#4A4A4A" />
         <Setter Property="Background" Value="#2F2F2F" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Margin" Value="3,0" />
         <Setter Property="Template">
             <Setter.Value>
@@ -758,7 +758,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="BtnBorder" Property="Background" Value="#353535" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -773,9 +773,9 @@
     <Style x:Key="PlaybackPrimaryTransportButton" TargetType="Button" BasedOn="{StaticResource PlaybackTransportButton}">
         <Setter Property="Width" Value="42" />
         <Setter Property="Height" Value="42" />
-        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
         <Setter Property="Background" Value="#313131" />
-        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
     </Style>
 
     <Style x:Key="PlaybackTimeText" TargetType="TextBlock">
@@ -790,7 +790,7 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="BorderBrush" Value="#4A4A4A" />
         <Setter Property="Background" Value="#2F2F2F" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -803,7 +803,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                             <Setter TargetName="BtnBorder" Property="Background" Value="#353535" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
@@ -819,7 +819,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="materialDesign:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
         <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
         <Setter Property="Height" Value="20" />
         <Setter Property="Template">
             <Setter.Value>
@@ -846,7 +846,7 @@
                             <Track.Thumb>
                                 <Thumb Width="10"
                                        Height="10"
-                                       Background="{StaticResource TertiaryBrush}"
+                                       Background="{DynamicResource TertiaryBrush}"
                                        BorderBrush="#D55F16"
                                        BorderThickness="1"
                                        Focusable="False">
@@ -884,13 +884,13 @@
     </Style>
 
     <Style x:Key="NewSongHeaderText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="NewSongTrackTitleText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontSize" Value="24" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />

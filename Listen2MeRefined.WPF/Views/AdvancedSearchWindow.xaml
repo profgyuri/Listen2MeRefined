@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:AdvancedSearchViewModel}"
-        Style="{StaticResource BasicWindow}"
+        Style="{DynamicResource BasicWindow}"
         ResizeMode="CanResizeWithGrip"
         MinHeight="460"
         MinWidth="640"
@@ -25,8 +25,8 @@
     </WindowChrome.WindowChrome>
 
     <Border BorderThickness="2"
-            BorderBrush="{StaticResource TertiaryBrush}"
-            Background="{StaticResource PrimaryBrush}"
+            BorderBrush="{DynamicResource TertiaryBrush}"
+            Background="{DynamicResource PrimaryBrush}"
             CornerRadius="0,0,8,8">
         <Grid>
             <Grid.RowDefinitions>
@@ -64,7 +64,7 @@
                                               Subtitle="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter."
                                               ShowSubtitle="True"
                                               IconKind="Tune"
-                                              AccentBrush="{StaticResource TertiaryBrush}" />
+                                              AccentBrush="{DynamicResource TertiaryBrush}" />
 
                     <Border Grid.Row="2"
                             Background="#232323"
@@ -85,7 +85,7 @@
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Grid.ColumnSpan="4"
-                                       Style="{StaticResource AdvancedSearchToolbarLabelText}"
+                                       Style="{DynamicResource AdvancedSearchToolbarLabelText}"
                                        Text="New Filter" />
 
                             <ComboBox x:Name="TableColumnName"
@@ -93,7 +93,7 @@
                                       Grid.Column="0"
                                       ItemsSource="{Binding ColumnName}"
                                       SelectedItem="{Binding SelectedColumnName}"
-                                      Style="{StaticResource CustomComboBox}"
+                                      Style="{DynamicResource CustomComboBox}"
                                       Margin="0,6,6,0" />
 
                             <ComboBox x:Name="Relation"
@@ -101,7 +101,7 @@
                                       Grid.Column="1"
                                       ItemsSource="{Binding Relation}"
                                       SelectedItem="{Binding SelectedRelation}"
-                                      Style="{StaticResource CustomComboBox}"
+                                      Style="{DynamicResource CustomComboBox}"
                                       Margin="0,6,6,0" />
 
                             <Border Grid.Row="1"
@@ -113,7 +113,7 @@
                                     CornerRadius="8"
                                     Padding="8,0">
                                 <TextBox x:Name="GeneralInput"
-                                         Style="{StaticResource AdvancedSearchTextBoxStyle}"
+                                         Style="{DynamicResource AdvancedSearchTextBoxStyle}"
                                          BorderThickness="0"
                                          Background="Transparent"
                                          Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
@@ -129,7 +129,7 @@
                                     Grid.Row="1"
                                     Grid.Column="3"
                                     Margin="0,6,0,0"
-                                    Style="{StaticResource ComponentQuickActionButton}"
+                                    Style="{DynamicResource ComponentQuickActionButton}"
                                     ToolTip="Add Filter"
                                     Command="{Binding AddCriteriaCommand}"
                                     Content="{materialDesign:PackIcon Kind=Plus, Size=20}"
@@ -156,11 +156,11 @@
 
                             <TextBlock Grid.Row="0"
                                        Grid.Column="0"
-                                       Style="{StaticResource AdvancedSearchToolbarTitleText}"
+                                       Style="{DynamicResource AdvancedSearchToolbarTitleText}"
                                        Text="Filters" />
                             <TextBlock Grid.Row="0"
                                        Grid.Column="1"
-                                       Style="{StaticResource AdvancedSearchToolbarLabelText}"
+                                       Style="{DynamicResource AdvancedSearchToolbarLabelText}"
                                        Text="{Binding Criterias.Count, StringFormat={}{0} total}" />
 
                             <ListView x:Name="SearchCriterias"
@@ -168,8 +168,8 @@
                                       Grid.ColumnSpan="2"
                                       ItemsSource="{Binding Criterias}"
                                       SelectedItem="{Binding SelectedCriteria}"
-                                      ItemContainerStyle="{StaticResource AdvancedSearchCriteriaListItem}"
-                                      Style="{StaticResource AdvancedSearchCriteriaListView}">
+                                      ItemContainerStyle="{DynamicResource AdvancedSearchCriteriaListItem}"
+                                      Style="{DynamicResource AdvancedSearchCriteriaListView}">
                                 <ListView.InputBindings>
                                     <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}" />
                                 </ListView.InputBindings>
@@ -184,23 +184,23 @@
                                             <TextBlock Text="{Binding Display}"
                                                        VerticalAlignment="Center"
                                                        TextTrimming="CharacterEllipsis"
-                                                       Foreground="{StaticResource SecondaryBrush}" />
+                                                       Foreground="{DynamicResource SecondaryBrush}" />
 
                                             <StackPanel Grid.Column="1"
                                                         Orientation="Horizontal"
                                                         VerticalAlignment="Center">
-                                                <Button Style="{StaticResource AdvancedSearchMiniActionButton}"
+                                                <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
                                                         ToolTip="Edit"
                                                         Command="{Binding DataContext.EditCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
                                                         Click="EditCriteriaButton_Click"
                                                         Content="{materialDesign:PackIcon Kind=Pencil, Size=14}" />
-                                                <Button Style="{StaticResource AdvancedSearchMiniActionButton}"
+                                                <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
                                                         ToolTip="Duplicate"
                                                         Command="{Binding DataContext.DuplicateCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
                                                         Content="{materialDesign:PackIcon Kind=ContentCopy, Size=14}" />
-                                                <Button Style="{StaticResource AdvancedSearchMiniActionButton}"
+                                                <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
                                                         ToolTip="Remove"
                                                         Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                         CommandParameter="{Binding}"
@@ -241,13 +241,13 @@
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center">
                             <RadioButton GroupName="MatchModeGroup"
-                                         Style="{StaticResource MaterialDesignTabRadioButton}"
+                                         Style="{DynamicResource MaterialDesignTabRadioButton}"
                                          Foreground="{DynamicResource TertiaryBrush}"
                                          BorderBrush="{DynamicResource TertiaryBrush}"
                                          IsChecked="{Binding IsMatchAll, Mode=TwoWay}"
                                          Content="Match All" />
                             <RadioButton GroupName="MatchModeGroup"
-                                         Style="{StaticResource MaterialDesignTabRadioButton}"
+                                         Style="{DynamicResource MaterialDesignTabRadioButton}"
                                          Foreground="{DynamicResource TertiaryBrush}"
                                          BorderBrush="{DynamicResource TertiaryBrush}"
                                          IsChecked="{Binding IsMatchAny, Mode=TwoWay}"
@@ -261,16 +261,16 @@
                                     HorizontalAlignment="Right">
                             <Button Content="Clear All"
                                     Command="{Binding ClearAllCommand}"
-                                    Style="{StaticResource InteractionButton}"
+                                    Style="{DynamicResource InteractionButton}"
                                     Margin="0,0,8,0"
                                     MinWidth="92" />
                             <Button Content="Search"
                                     Command="{Binding SearchCommand}"
-                                    Style="{StaticResource InteractionButton}"
+                                    Style="{DynamicResource InteractionButton}"
                                     Margin="0,0,8,0"
                                     MinWidth="92" />
                             <Button Content="Close"
-                                    Style="{StaticResource InteractionButton}"
+                                    Style="{DynamicResource InteractionButton}"
                                     MinWidth="92"
                                     Click="CloseButton_Click" />
                         </StackPanel>

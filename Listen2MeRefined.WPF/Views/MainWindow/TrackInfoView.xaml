@@ -35,19 +35,19 @@
                                                  Height="14"
                                                  Margin="0,0,6,0"
                                                  VerticalAlignment="Center"
-                                                 Foreground="{StaticResource TertiaryBrush}" />
-                        <TextBlock Style="{StaticResource TrackInfoInfoBadgeText}" Text="NOW PLAYING" VerticalAlignment="Center" />
+                                                 Foreground="{DynamicResource TertiaryBrush}" />
+                        <TextBlock Style="{DynamicResource TrackInfoInfoBadgeText}" Text="NOW PLAYING" VerticalAlignment="Center" />
                     </StackPanel>
 
                     <Border DockPanel.Dock="Right"
                             CornerRadius="8"
                             HorizontalAlignment="Right"
-                            Background="{StaticResource TertiaryDarkBrush}"
-                            BorderBrush="{StaticResource TertiaryLightMidBrush}"
+                            Background="{DynamicResource TertiaryDarkBrush}"
+                            BorderBrush="{DynamicResource TertiaryLightMidBrush}"
                             BorderThickness="1"
                             Padding="7,2,7,2">
                         <TextBlock FontSize="10"
-                                   Foreground="{StaticResource TertiaryLightBrush}"
+                                   Foreground="{DynamicResource TertiaryLightBrush}"
                                    Text="{Binding PlayerState}" />
                     </Border>
                 </DockPanel>
@@ -67,7 +67,7 @@
 
                     <TextBlock FontSize="26"
                                FontWeight="Bold"
-                               Foreground="{StaticResource SecondaryBrush}"
+                               Foreground="{DynamicResource SecondaryBrush}"
                                Text="{Binding Song.Title, FallbackValue=Title}"
                                TextTrimming="CharacterEllipsis" />
 
@@ -87,49 +87,49 @@
             </Border>
 
             <UniformGrid Grid.Row="4" Columns="3">
-                <Border Style="{StaticResource TrackInfoMetricCardBorder}">
+                <Border Style="{DynamicResource TrackInfoMetricCardBorder}">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Metronome"
                                                      Width="14"
                                                      Height="14"
                                                      Margin="0,0,5,0"
-                                                     Foreground="{StaticResource TertiaryBrush}" />
-                            <TextBlock Style="{StaticResource TrackInfoMetricLabelText}" Text="TEMPO" />
+                                                     Foreground="{DynamicResource TertiaryBrush}" />
+                            <TextBlock Style="{DynamicResource TrackInfoMetricLabelText}" Text="TEMPO" />
                         </StackPanel>
-                        <TextBlock Style="{StaticResource TrackInfoMetricValueText}"
+                        <TextBlock Style="{DynamicResource TrackInfoMetricValueText}"
                                    Margin="0,4,0,0"
                                    Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource TrackInfoMetricCardBorder}">
+                <Border Style="{DynamicResource TrackInfoMetricCardBorder}">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="ShapeOutline"
                                                      Width="14"
                                                      Height="14"
                                                      Margin="0,0,5,0"
-                                                     Foreground="{StaticResource TertiaryBrush}" />
-                            <TextBlock Style="{StaticResource TrackInfoMetricLabelText}" Text="GENRE" />
+                                                     Foreground="{DynamicResource TertiaryBrush}" />
+                            <TextBlock Style="{DynamicResource TrackInfoMetricLabelText}" Text="GENRE" />
                         </StackPanel>
-                        <TextBlock Style="{StaticResource TrackInfoMetricValueText}"
+                        <TextBlock Style="{DynamicResource TrackInfoMetricValueText}"
                                    Margin="0,4,0,0"
                                    Text="{Binding Song.Genre, FallbackValue=Genre}" />
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource TrackInfoMetricCardBorder}" Margin="0">
+                <Border Style="{DynamicResource TrackInfoMetricCardBorder}" Margin="0">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="SignalCellular3"
                                                      Width="14"
                                                      Height="14"
                                                      Margin="0,0,5,0"
-                                                     Foreground="{StaticResource TertiaryBrush}" />
-                            <TextBlock Style="{StaticResource TrackInfoMetricLabelText}" Text="BITRATE" />
+                                                     Foreground="{DynamicResource TertiaryBrush}" />
+                            <TextBlock Style="{DynamicResource TrackInfoMetricLabelText}" Text="BITRATE" />
                         </StackPanel>
-                        <TextBlock Style="{StaticResource TrackInfoMetricValueText}"
+                        <TextBlock Style="{DynamicResource TrackInfoMetricValueText}"
                                    Margin="0,4,0,0"
                                    Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}" />
                     </StackPanel>

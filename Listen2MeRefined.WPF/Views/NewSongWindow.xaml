@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:NewSongWindowViewModel}"
-        Style="{StaticResource BasicWindow}"
+        Style="{DynamicResource BasicWindow}"
         Topmost="{Binding IsTopmost}"
         ResizeMode="NoResize"
         FontSize="15"
@@ -16,8 +16,8 @@
         Height="180"
         Width="500">
 
-    <Border BorderBrush="{StaticResource TertiaryBrush}"
-            Background="{StaticResource HoloBackground}"
+    <Border BorderBrush="{DynamicResource TertiaryBrush}"
+            Background="{DynamicResource HoloBackground}"
             BorderThickness="2"
             CornerRadius="0,0,10,10">
         <Grid>
@@ -39,7 +39,7 @@
 
                     <Border Width="22"
                             Height="22"
-                            Background="{StaticResource TertiaryBrush}"
+                            Background="{DynamicResource TertiaryBrush}"
                             CornerRadius="11"
                             VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="MusicNote"
@@ -54,13 +54,13 @@
                                 Margin="8,0,0,0"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource NewSongHeaderText}" Text="Now Playing" />
+                        <TextBlock Style="{DynamicResource NewSongHeaderText}" Text="Now Playing" />
                         <Ellipse Width="5"
                                  Height="5"
-                                 Fill="{StaticResource TertiaryBrush}"
+                                 Fill="{DynamicResource TertiaryBrush}"
                                  Margin="8,0,8,0"
                                  VerticalAlignment="Center" />
-                        <TextBlock Style="{StaticResource NewSongHeaderText}"
+                        <TextBlock Style="{DynamicResource NewSongHeaderText}"
                                    Foreground="#A8A8A8"
                                    Text="{Binding Song.Length, StringFormat={}{0:mm\\:ss}, FallbackValue=00:00}" />
                     </StackPanel>
@@ -84,10 +84,10 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
-                               Style="{StaticResource NewSongTrackTitleText}"
+                               Style="{DynamicResource NewSongTrackTitleText}"
                                Text="{Binding Song.Title, FallbackValue=Title}" />
                     <TextBlock Grid.Row="2"
-                               Style="{StaticResource NewSongTrackArtistText}"
+                               Style="{DynamicResource NewSongTrackArtistText}"
                                Text="{Binding Song.Artist, FallbackValue=Artist}" />
 
                     <components:MetaBadgeRow Grid.Row="4"

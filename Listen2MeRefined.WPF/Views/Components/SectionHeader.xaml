@@ -31,15 +31,15 @@
             <StackPanel Grid.Column="1"
                         Margin="10,0,0,0"
                         VerticalAlignment="Center">
-                <TextBlock Style="{StaticResource AdvancedSearchToolbarTitleText}"
+                <TextBlock Style="{DynamicResource AdvancedSearchToolbarTitleText}"
                            Text="{Binding Title, ElementName=Root}" />
-                <TextBlock Style="{StaticResource AdvancedSearchToolbarLabelText}"
+                <TextBlock Style="{DynamicResource AdvancedSearchToolbarLabelText}"
                            Text="{Binding Subtitle, ElementName=Root}"
                            Visibility="{Binding ShowSubtitle, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
             </StackPanel>
 
             <Button Grid.Column="2"
-                    Style="{StaticResource ComponentQuickActionButton}"
+                    Style="{DynamicResource ComponentQuickActionButton}"
                     Command="{Binding ActionCommand, ElementName=Root}"
                     ToolTip="{Binding ActionToolTip, ElementName=Root}"
                     Visibility="{Binding ShowActionButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
