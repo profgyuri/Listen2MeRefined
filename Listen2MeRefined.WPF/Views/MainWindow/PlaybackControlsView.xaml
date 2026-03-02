@@ -10,11 +10,7 @@
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
     <Border DataContext="{Binding PlaybackControlsViewModel}"
-            Background="#272727"
-            BorderBrush="#3A3A3A"
-            BorderThickness="1"
-            CornerRadius="10"
-            Padding="8">
+            Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -22,12 +18,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0"
-                    Background="#222222"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="4">
+            <Border Grid.Row="0" Style="{DynamicResource DarkBorderContainer}" Padding="4">
                 <Grid x:Name="WaveAreaGrid">
                     <wpf:WaveSlider Style="{DynamicResource NoHaloSlider}"
                                     Foreground="{DynamicResource TertiaryBrush}"
@@ -40,15 +31,11 @@
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     Margin="6,0" />
-
                 </Grid>
             </Border>
 
             <Border Grid.Row="2"
-                    Background="#232323"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="8"
+                    Style="{DynamicResource DarkBorderContainer}"
                     Padding="6,5">
                 <Grid>
                     <Grid.ColumnDefinitions>

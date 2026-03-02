@@ -7,12 +7,8 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
-    <Border Margin="0,0,10,0"
-            CornerRadius="10"
-            BorderThickness="1"
-            BorderBrush="#3A3A3A"
-            Background="#272727"
-            Padding="8">
+    <Border Style="{DynamicResource BorderContainer}"
+            Margin="0,0,10,0">
         <Grid ClipToBounds="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -23,11 +19,7 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0"
-                    Background="#232323"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="10,7">
+                    Style="{DynamicResource DarkBorderContainer}">
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                         <materialDesign:PackIcon Kind="Equalizer"
@@ -40,11 +32,8 @@
                     </StackPanel>
 
                     <Border DockPanel.Dock="Right"
-                            CornerRadius="8"
+                            Style="{DynamicResource StatusBorderContainer}"
                             HorizontalAlignment="Right"
-                            Background="{DynamicResource TertiaryDarkBrush}"
-                            BorderBrush="{DynamicResource TertiaryLightMidBrush}"
-                            BorderThickness="1"
                             Padding="7,2,7,2">
                         <TextBlock FontSize="10"
                                    Foreground="{DynamicResource TertiaryLightBrush}"
@@ -54,11 +43,8 @@
             </Border>
 
             <Border Grid.Row="2"
-                    Background="#232323"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="12,10">
+                    Style="{DynamicResource TrackInfoMetricCardBorder}"
+                    Margin="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -77,9 +63,9 @@
                                                  Width="15"
                                                  Height="15"
                                                  Margin="0,0,6,0"
-                                                 Foreground="#A3A3A3" />
+                                                 Foreground="{DynamicResource SecondaryDarkBrush}" />
                         <TextBlock FontSize="17"
-                                   Foreground="#CCCCCC"
+                                   Foreground="{DynamicResource SecondaryDarkBrush}"
                                    Text="{Binding Song.Artist, FallbackValue=Artist}"
                                    TextTrimming="CharacterEllipsis" />
                     </StackPanel>
