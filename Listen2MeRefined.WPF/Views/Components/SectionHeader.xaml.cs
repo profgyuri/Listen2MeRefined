@@ -36,13 +36,6 @@ public partial class SectionHeader : UserControl
             typeof(SectionHeader),
             new PropertyMetadata(false));
 
-    public static readonly DependencyProperty AccentBrushProperty =
-        DependencyProperty.Register(
-            nameof(AccentBrush),
-            typeof(Brush),
-            typeof(SectionHeader),
-            new PropertyMetadata(Brushes.Orange));
-
     public static readonly DependencyProperty ShowActionButtonProperty =
         DependencyProperty.Register(
             nameof(ShowActionButton),
@@ -98,12 +91,6 @@ public partial class SectionHeader : UserControl
     {
         get => (bool)GetValue(ShowSubtitleProperty);
         set => SetValue(ShowSubtitleProperty, value);
-    }
-
-    public Brush? AccentBrush
-    {
-        get => (Brush?)GetValue(AccentBrushProperty);
-        set => SetValue(AccentBrushProperty, value);
     }
 
     public bool ShowActionButton

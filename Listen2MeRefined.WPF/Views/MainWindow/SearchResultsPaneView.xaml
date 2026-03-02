@@ -21,7 +21,6 @@
             <components:SectionHeader Grid.Row="0"
                                       Title="Search Results"
                                       IconKind="MusicNote"
-                                      AccentBrush="{DynamicResource SearchResultsBorderAccentBrush}"
                                       ShowActionButton="True"
                                       ActionToolTip="Add Selected / All to Playlist"
                                       ActionIconKind="ArrowRightCircleOutline"
