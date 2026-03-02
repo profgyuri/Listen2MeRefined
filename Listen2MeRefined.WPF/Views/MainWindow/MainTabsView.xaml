@@ -55,13 +55,13 @@
 
                                 <StackPanel Grid.Column="1">
                                     <TextBlock Style="{DynamicResource MainTabsCardTitleText}" Text="Audio Meta" />
-                                    <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,8">
+                                    <Border Style="{DynamicResource BorderContainer}" Margin="0,0,0,8">
                                         <StackPanel>
                                             <TextBlock Style="{DynamicResource MainTabsMetaLabelText}" Text="BITRATE" />
                                             <TextBlock Style="{DynamicResource MainTabsMetaValueText}" Text="{Binding SelectedSong.Bitrate}" />
                                         </StackPanel>
                                     </Border>
-                                    <Border Background="#2C2C2C" BorderBrush="#404040" BorderThickness="1" CornerRadius="8" Padding="10">
+                                    <Border Style="{DynamicResource BorderContainer}">
                                         <StackPanel>
                                             <TextBlock Style="{DynamicResource MainTabsMetaLabelText}" Text="BPM" />
                                             <TextBlock Style="{DynamicResource MainTabsMetaValueText}" Text="{Binding SelectedSong.BPM}" />
