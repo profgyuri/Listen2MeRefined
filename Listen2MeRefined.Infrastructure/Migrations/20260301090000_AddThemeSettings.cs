@@ -1,9 +1,13 @@
+using Listen2MeRefined.Infrastructure.Data.EntityFramework;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Listen2MeRefined.Infrastructure.Migrations;
 
+[DbContext(typeof(DataContext))]
+[Migration("20260301090000_AddThemeSettings")]
 public partial class AddThemeSettings : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
