@@ -10,8 +10,7 @@
 
         <TextBlock Style="{DynamicResource SettingsFieldLabelText}"
                    Text="{Binding Label, ElementName=Root}"
-                   Width="{Binding LabelWidth, ElementName=Root}"
-                   VerticalAlignment="Center" />
+                   Width="{Binding LabelWidth, ElementName=Root}" />
 
         <ContentPresenter Grid.Column="1"
                           VerticalAlignment="Center"
