@@ -23,7 +23,6 @@
             <components:SectionHeader Grid.Row="0"
                                       Title="Playlist"
                                       IconKind="PlaylistMusic"
-                                      AccentBrush="{DynamicResource TertiaryBrush}"
                                       ShowActionButton="True"
                                       ActionToolTip="Remove Selected / All from Playlist"
                                       ActionIconKind="CloseBoxOutline"

@@ -63,8 +63,7 @@
                                               Title="Advanced Search Filters"
                                               Subtitle="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter."
                                               ShowSubtitle="True"
-                                              IconKind="Tune"
-                                              AccentBrush="{DynamicResource TertiaryBrush}" />
+                                              IconKind="Tune" />
 
                     <Border Grid.Row="2"
                             Background="#232323"
