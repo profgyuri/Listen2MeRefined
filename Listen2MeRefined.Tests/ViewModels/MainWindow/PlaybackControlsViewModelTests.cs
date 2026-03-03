@@ -156,6 +156,54 @@ public class PlaybackControlsViewModelTests
         await timedTask.StopAsync();
     }
 
+    [Fact]
+    public async Task InitializeAsync_CurrentSongAlreadySet_DoesNotRedrawPlaceholderAfterWaveform()
+    {
+        var settings = new AppSettings();
+        var logger = Mock.Of<ILogger>();
+        var waveFormDrawer = new Mock<IWaveFormDrawer<SKBitmap>>();
+        waveFormDrawer.Setup(x => x.LineAsync()).ReturnsAsync(new SKBitmap(1, 1));
+        waveFormDrawer.Setup(x => x.WaveFormAsync(It.IsAny<string>())).ReturnsAsync(new SKBitmap(1, 1));
+
+        var musicPlayer = new Mock<IMusicPlayerController>();
+        musicPlayer.SetupProperty(x => x.Volume, 1f);
+
+        var settingsManager = new Mock<ISettingsManager<AppSettings>>();
+        settingsManager.SetupGet(x => x.Settings).Returns(settings);
+        settingsManager
+            .Setup(x => x.SaveSettings(It.IsAny<Action<AppSettings>>()))
+            .Callback<Action<AppSettings>>(action => action(settings));
+
+        var timedTask = new TimedTask();
+        var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
+        var viewModel = new PlaybackControlsViewModel(
+            logger,
+            waveFormDrawer.Object,
+            musicPlayer.Object,
+            playbackDefaultsService,
+            timedTask);
+
+        var audio = new AudioModel
+        {
+            Path = "E:\\music\\startup-track.mp3",
+            Length = TimeSpan.FromSeconds(120)
+        };
+
+        await viewModel.Handle(new CurrentSongNotification(audio), CancellationToken.None);
+        var lineCallCountBeforeInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+        var waveformCallCountBeforeInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+
+        await viewModel.InitializeAsync();
+
+        var lineCallCountAfterInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+        var waveformCallCountAfterInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+
+        Assert.Equal(lineCallCountBeforeInit, lineCallCountAfterInit);
+        Assert.True(waveformCallCountAfterInit > waveformCallCountBeforeInit);
+
+        await timedTask.StopAsync();
+    }
+
     private static async Task<(PlaybackControlsViewModel ViewModel, Mock<IMusicPlayerController> MusicPlayer, TimedTask TimedTask, Mock<IWaveFormDrawer<SKBitmap>> WaveFormDrawer)> CreateViewModelAsync(
         AppSettings settings,
         TimeSpan? waveformResizeDebounce = null)

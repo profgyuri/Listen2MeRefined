@@ -146,7 +146,14 @@ public partial class PlaybackControlsViewModel :
         }
 
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        await DrawPlaceholderLineAsync(ct);
+        if (string.IsNullOrWhiteSpace(_currentTrackPath))
+        {
+            await DrawPlaceholderLineAsync(ct);
+        }
+        else
+        {
+            await DrawTrackWaveFormAsync(_currentTrackPath, ct);
+        }
 
         _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
     }
