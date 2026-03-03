@@ -18,7 +18,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Style="{DynamicResource ComponentTitleBarBrandBorder}">
+                    Style="{DynamicResource BorderContainer}" Padding="10 0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Image Source="pack://application:,,,/Resources/Listen2Me.ico"
                            Width="16"
