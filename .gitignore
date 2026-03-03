@@ -369,3 +369,6 @@ FodyWeavers.xsd
 /Listen2MeRefined.Infrastructure/.dotnet-cli/.dotnet
 /Listen2MeRefined.Infrastructure/listentome.db
 /coveragereport
+*.db
+*.txt
+/Listen2MeRefined.WPF/Properties/launchSettings.json
