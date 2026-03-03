@@ -10,6 +10,7 @@ public partial class PlaylistPaneViewModel :
     INotificationHandler<PlaylistViewModeChangedNotification>
 {
     private readonly ListsViewModel _lists;
+    private readonly IAppSettingsReader _settingsReader;
 
     [ObservableProperty] private bool _isCompactPlaylistView;
 
@@ -34,8 +35,14 @@ public partial class PlaylistPaneViewModel :
     public PlaylistPaneViewModel(ListsViewModel lists, IAppSettingsReader settingsReader)
     {
         _lists = lists;
-        IsCompactPlaylistView = settingsReader.GetUseCompactPlaylistView();
+        _settingsReader = settingsReader;
         _lists.PropertyChanged += ListsOnPropertyChanged;
+    }
+
+    protected override Task InitializeCoreAsync(CancellationToken ct)
+    {
+        IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
