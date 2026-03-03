@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:converters="clr-namespace:MaterialDesignThemes.Wpf.Converters;assembly=MaterialDesignThemes.Wpf"
     xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF">
 
     <Style TargetType="Window" x:Key="BasicWindow">
@@ -13,7 +12,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontSize" Value="16" />
         <Setter Property="AllowsTransparency" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="FontFamily" Value="{Binding FontFamily}" />
     </Style>
 
@@ -28,13 +27,14 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
-        <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource SecondaryBrush}" />
-        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource TertiaryBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="materialDesign:HintAssist.Foreground" Value="{DynamicResource SecondaryBrush}" />
+        <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{DynamicResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
         <Setter Property="Padding" Value="5" />
-        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-        <Setter Property="materialDesign:HintAssist.Background" Value="{StaticResource PrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
+        <Setter Property="materialDesign:HintAssist.Background" Value="{DynamicResource PrimaryBrush}" />
         <Setter Property="ItemContainerStyle" Value="{DynamicResource CustomComboBoxItem}" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
@@ -46,10 +46,11 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style x:Key="CustomComboBoxItem" TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
-        <Setter Property="Background" Value="#2E2E2E" />
-        <Setter Property="BorderBrush" Value="#3C3C3C" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
+        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="Padding" Value="10,6" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -68,33 +69,29 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#353535" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                         </Trigger>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#353535" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#3A2F27" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="True" />
                                 <Condition Property="IsMouseOver" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#3A2F27" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryMidBrush}" />
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style TargetType="CheckBox">
-        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
@@ -110,8 +107,8 @@
                                 Height="18"
                                 CornerRadius="3"
                                 BorderThickness="1"
-                                BorderBrush="#5A5A5A"
-                                Background="#2A2A2A"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Background="{DynamicResource PrimaryLightBrush}"
                                 VerticalAlignment="Center" />
                         <Path x:Name="CheckGlyph"
                               Grid.Column="0"
@@ -120,7 +117,7 @@
                               VerticalAlignment="Center"
                               HorizontalAlignment="Center"
                               Data="M 0 4 L 3 7 L 10 0"
-                              Stroke="{StaticResource SecondaryBrush}"
+                              Stroke="{DynamicResource SecondaryBrush}"
                               StrokeThickness="1.8"
                               StrokeEndLineCap="Round"
                               StrokeStartLineCap="Round"
@@ -132,21 +129,21 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource TertiaryLightMidBrush}" />
-                            <Setter TargetName="CheckBorder" Property="Background" Value="#313131" />
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="CheckBorder" Property="Background" Value="#272727" />
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
-                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                             <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="CheckBorder" Property="Opacity" Value="0.5" />
                             <Setter TargetName="CheckGlyph" Property="Opacity" Value="0.55" />
-                            <Setter Property="Foreground" Value="#8A8A8A" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -173,16 +170,16 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource TertiaryMidBrush}" />
+                <Setter Property="Background" Value="{DynamicResource TertiaryMidBrush}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{StaticResource TertiaryDarkBrush}" />
+                <Setter Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -191,16 +188,6 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Margin" Value="0 1 0 0" />
     </Style>
-    <Style TargetType="Button" x:Key="WindowCloseButton" BasedOn="{StaticResource TitleBarButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#970000" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#6f0000" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
     <!--#endregion-->
 
     <!--#region Global Slider -->
@@ -208,14 +195,14 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="wpf:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
         <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource TertiaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
         <Setter Property="Height" Value="20" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Slider}">
                     <Grid VerticalAlignment="Center">
                         <Border Height="4"
-                                Background="#4A4A4A"
+                                Background="{DynamicResource PrimaryLightBrush}"
                                 CornerRadius="2"
                                 VerticalAlignment="Center" />
                         <Track x:Name="PART_Track"
@@ -236,7 +223,7 @@
                                 <Thumb Width="10"
                                        Height="10"
                                        Background="{TemplateBinding Foreground}"
-                                       BorderBrush="#D55F16"
+                                       BorderBrush="{DynamicResource TertiaryBrush}"
                                        BorderThickness="1"
                                        Focusable="False">
                                     <Thumb.Template>
@@ -322,13 +309,13 @@
                 </Canvas>
                 <Track Grid.Row="1" x:Name="PART_Track" VerticalAlignment="Stretch">
                     <Track.DecreaseRepeatButton>
-                        <RepeatButton Command="{x:Static resources:WaveSlider.DecreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
+                        <RepeatButton Command="{x:Static resources:WaveSlider.DecreaseLarge}" Style="{DynamicResource MaterialDesignRepeatButton}" />
                     </Track.DecreaseRepeatButton>
                     <Track.IncreaseRepeatButton>
-                        <RepeatButton Command="{x:Static resources:WaveSlider.IncreaseLarge}" Style="{StaticResource MaterialDesignRepeatButton}" />
+                        <RepeatButton Command="{x:Static resources:WaveSlider.IncreaseLarge}" Style="{DynamicResource MaterialDesignRepeatButton}" />
                     </Track.IncreaseRepeatButton>
                     <Track.Thumb>
-                        <Thumb Foreground="{TemplateBinding Foreground}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Template="{StaticResource MaterialDesignSliderThumb}" />
+                        <Thumb Foreground="{TemplateBinding Foreground}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Template="{DynamicResource MaterialDesignSliderThumb}" />
                     </Track.Thumb>
                 </Track>
             </Grid>
@@ -343,12 +330,12 @@
         <Setter Property="IsMoveToPointEnabled" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="False" />
         <Setter Property="UseLayoutRounding" Value="False" />
-        <Setter Property="Template" Value="{StaticResource MaterialDesignSliderHorizontal}" />
+        <Setter Property="Template" Value="{DynamicResource MaterialDesignSliderHorizontal}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="wpf:SliderAssist.OnlyShowFocusVisualWhileDragging" Value="True" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
-                <Setter Property="Template" Value="{StaticResource MaterialDesignSliderVertical}" />
+                <Setter Property="Template" Value="{DynamicResource MaterialDesignSliderVertical}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource MaterialDesignCheckBoxDisabled}" />
@@ -358,7 +345,7 @@
     <!--#endregion-->
 
     <Style TargetType="{x:Type Thumb}" x:Key="ScrollBarThumbStyle">
-        <Setter Property="Background" Value="{StaticResource TertiaryLightMidBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource TertiaryLightMidBrush}"/>
         <Setter Property="IsHitTestVisible" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
@@ -394,7 +381,7 @@
                             Grid.Row="1"
                             IsDirectionReversed="True">
                             <Track.Thumb>
-                                <Thumb Style="{StaticResource ScrollBarThumbStyle}"/>
+                                <Thumb Style="{DynamicResource ScrollBarThumbStyle}"/>
                             </Track.Thumb>
                         </Track>
                     </Grid>
@@ -412,7 +399,7 @@
 
                                 <Track x:Name="PART_Track" IsDirectionReversed="True">
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" Width="4" />
+                                        <Thumb x:Name="Thumb" Background="{DynamicResource TertiaryLightMidBrush}" Width="4" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
@@ -435,7 +422,7 @@
 
                                 <Track x:Name="PART_Track">
                                     <Track.Thumb>
-                                        <Thumb x:Name="Thumb" Background="{StaticResource TertiaryLightMidBrush}" Height="4" />
+                                        <Thumb x:Name="Thumb" Background="{DynamicResource TertiaryLightMidBrush}" Height="4" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
