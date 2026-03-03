@@ -10,6 +10,8 @@ using System.Windows.Input;
 /// </summary>
 public sealed partial class SettingsWindow : Window
 {
+    private bool _isLoadedOnce;
+
     public ICommand HideWindowCommand { get; }
 
     public SettingsWindow(SettingsWindowViewModel viewModel)
@@ -20,6 +22,7 @@ public sealed partial class SettingsWindow : Window
         DataContext = viewModel;
 
         Loaded += SettingsWindow_Loaded;
+        IsVisibleChanged += SettingsWindow_IsVisibleChanged;
     }
 
     private async void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
@@ -27,6 +30,20 @@ public sealed partial class SettingsWindow : Window
         if (DataContext is SettingsWindowViewModel viewModel)
         {
             await viewModel.InitializeAsync().ConfigureAwait(false);
+            _isLoadedOnce = true;
+        }
+    }
+
+    private void SettingsWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (!_isLoadedOnce || e.NewValue is not true)
+        {
+            return;
+        }
+
+        if (DataContext is SettingsWindowViewModel viewModel)
+        {
+            viewModel.RefreshLibraryTabData();
         }
     }
 

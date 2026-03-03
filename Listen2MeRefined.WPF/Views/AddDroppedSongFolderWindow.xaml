@@ -5,7 +5,7 @@
         xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
         Style="{StaticResource BasicWindow}"
         Title="Add music folder"
-        Height="250"
+        Height="280"
         Width="520"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner">
@@ -13,7 +13,7 @@
             Background="{StaticResource HoloBackground}"
             BorderThickness="2"
             CornerRadius="0,0,10,10">
-        <Grid Margin="12">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="12" />
@@ -31,29 +31,39 @@
                                  ShowCloseButton="True" />
 
             <Border Grid.Row="2"
+                    Margin="10 0"
                     Background="#272727"
                     BorderBrush="#3A3A3A"
                     BorderThickness="1"
                     CornerRadius="10"
                     Padding="12">
-                <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
                     <TextBlock Foreground="#D7D7D7"
                                TextWrapping="Wrap"
                                FontSize="14"
                                Text="This song's folder is not in your music folder list. Add it now?" />
-                    <TextBlock x:Name="FolderPathText"
+                    <TextBlock Grid.Row="1"
+                               x:Name="FolderPathText"
+                               VerticalAlignment="Center"
                                Margin="0,10,0,0"
                                Foreground="#A8A8A8"
                                TextWrapping="Wrap"
                                FontFamily="Consolas" />
-                    <CheckBox x:Name="DontAskAgainCheckBox"
-                              Margin="0,14,0,0"
+                    <CheckBox Grid.Row="2" 
+                              x:Name="DontAskAgainCheckBox"
+                              Margin="0,10,0,5"
                               Foreground="#D7D7D7"
-                              Content="Don't ask again for this folder when I click No" />
-                </StackPanel>
+                              Content="Don't ask again for this folder" />
+                </Grid>
             </Border>
 
             <components:WindowFooterBar Grid.Row="4"
+                                        Margin="10 0 10 10"
                                         PrimaryButtonText="Yes, add folder"
                                         SecondaryButtonText="No"
                                         ShowSecondaryButton="True"
