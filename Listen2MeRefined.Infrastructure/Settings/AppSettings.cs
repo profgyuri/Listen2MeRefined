@@ -21,6 +21,7 @@ public sealed class AppSettings : Settings
     public float StartupVolume { get; set; } = 0.7f;
     public bool StartMuted { get; set; }
     public bool AutoCheckUpdatesOnStartup { get; set; } = true;
+    public bool UseCompactPlaylistView { get; set; }
     public bool AutoScanOnFolderAdd { get; set; } = true;
     public bool ShowTaskPercentage { get; set; } = true;
     public short TaskPercentageReportInterval { get; set; } = 1;

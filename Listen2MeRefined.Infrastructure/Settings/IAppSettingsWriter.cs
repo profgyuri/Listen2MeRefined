@@ -30,6 +30,8 @@ public interface IAppSettingsWriter
     void SetStartMuted(bool value);
     /// <summary>Sets whether automatic update checks on startup are enabled.</summary>
     void SetAutoCheckUpdatesOnStartup(bool value);
+    /// <summary>Sets whether playlist uses compact visual rows.</summary>
+    void SetUseCompactPlaylistView(bool value);
     /// <summary>Sets whether a folder should be auto-scanned when added.</summary>
     void SetAutoScanOnFolderAdd(bool value);
     /// <summary>Sets whether background task percentage should be shown in the title bar.</summary>

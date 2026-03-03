@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Listen2MeRefined.Infrastructure.Notifications;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
-public partial class PlaylistPaneViewModel : ViewModelBase
+public partial class PlaylistPaneViewModel :
+    ViewModelBase,
+    INotificationHandler<PlaylistViewModeChangedNotification>
 {
     private readonly ListsViewModel _lists;
+
+    [ObservableProperty] private bool _isCompactPlaylistView;
 
     public ObservableCollection<AudioModel> PlayList => _lists.PlayList;
 
@@ -26,9 +31,10 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     public IAsyncRelayCommand JumpToSelectedSongCommand => _lists.JumpToSelectedSongCommand;
     public IRelayCommand SwitchToSongMenuTabCommand => _lists.SwitchToSongMenuTabCommand;
 
-    public PlaylistPaneViewModel(ListsViewModel lists)
+    public PlaylistPaneViewModel(ListsViewModel lists, IAppSettingsReader settingsReader)
     {
         _lists = lists;
+        IsCompactPlaylistView = settingsReader.GetUseCompactPlaylistView();
         _lists.PropertyChanged += ListsOnPropertyChanged;
     }
 
@@ -37,6 +43,12 @@ public partial class PlaylistPaneViewModel : ViewModelBase
 
     [RelayCommand]
     private void PlaylistSelectionRemoved(IList items) => _lists.RemoveSelectedPlaylistItems(items.Cast<AudioModel>());
+
+    public Task Handle(PlaylistViewModeChangedNotification notification, CancellationToken cancellationToken)
+    {
+        IsCompactPlaylistView = notification.UseCompactPlaylistView;
+        return Task.CompletedTask;
+    }
 
     private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
