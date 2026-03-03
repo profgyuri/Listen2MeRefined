@@ -3,5 +3,8 @@
     <Color x:Key="PrimaryColor">#F4F6F8</Color>
     <Color x:Key="PrimaryLightColor">#E6EAEF</Color>
     <Color x:Key="SecondaryColor">#1E242D</Color>
-    <Color x:Key="DarkBorderColor">#C6CFD9</Color>
+    <Color x:Key="SecondaryDarkColor">#282828</Color>
+    <Color x:Key="BorderColor">#C6CFD9</Color>
+    <Color x:Key="DefaultBorderBackgroundColor">#D8D8D8</Color>
+    <Color x:Key="DarkBorderBackgroundColor">#CDCDCD</Color>
 </ResourceDictionary>
