@@ -31,6 +31,7 @@ public sealed class AppSettings : Settings
     public string LastBrowsedFolder { get; set; } = "";
     public bool FolderBrowserStartAtLastLocation { get; set; } = true;
     public string PinnedFoldersJson { get; set; } = "[]";
+    public string MutedDroppedSongFoldersJson { get; set; } = "[]";
     public string ThemeMode { get; set; } = "Dark";
     public string AccentColor { get; set; } = "Orange";
 
@@ -39,6 +40,13 @@ public sealed class AppSettings : Settings
     {
         get => Deserialize(PinnedFoldersJson);
         set => PinnedFoldersJson = Serialize(value);
+    }
+
+    [NotMapped]
+    public List<string> MutedDroppedSongFolders
+    {
+        get => Deserialize(MutedDroppedSongFoldersJson);
+        set => MutedDroppedSongFoldersJson = Serialize(value);
     }
 
     private static string Serialize(List<string>? paths)

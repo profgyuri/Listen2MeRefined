@@ -71,7 +71,78 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         Assert.Equal(@"D:\After", viewModel.PinnedFolders[0]);
     }
 
-    private static SettingsWindowViewModel CreateViewModel(AppSettings settings)
+
+
+    [Fact]
+    public async Task ResetDroppedFolderPrompts_ClearsMutedPromptFolders()
+    {
+        var settings = new AppSettings
+        {
+            AutoCheckUpdatesOnStartup = false,
+            MutedDroppedSongFolders = [@"C:\Music\A", @"D:\Music\B"]
+        };
+
+        var viewModel = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        viewModel.ResetDroppedFolderPromptsCommand.Execute(null);
+
+        Assert.Empty(viewModel.MutedDroppedSongFolders);
+        Assert.Empty(settings.MutedDroppedSongFolders);
+    }
+
+    [Fact]
+    public async Task RefreshLibraryTabData_WhenSettingsChangedExternally_UpdatesFolders()
+    {
+        var settings = new AppSettings
+        {
+            AutoCheckUpdatesOnStartup = false,
+            MusicFolders = [new MusicFolderModel(@"C:\Initial", false)]
+        };
+
+        var viewModel = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+        Assert.Single(viewModel.Folders);
+        Assert.Equal(@"C:\Initial", viewModel.Folders[0]);
+
+        settings.MusicFolders = [new MusicFolderModel(@"D:\External", true)];
+
+        viewModel.RefreshLibraryTabData();
+
+        Assert.Single(viewModel.Folders);
+        Assert.Equal(@"D:\External", viewModel.Folders[0]);
+        Assert.Equal(@"D:\External", viewModel.SelectedFolder);
+        Assert.True(viewModel.SelectedFolderIncludeSubdirectories);
+    }
+
+    [Fact]
+    public async Task RemoveFolder_WhenRecursionNeverEnabled_RemovesWithoutNullCrash()
+    {
+        var settings = new AppSettings
+        {
+            AutoCheckUpdatesOnStartup = false,
+            MusicFolders = [new MusicFolderModel(@"C:\Music", false)]
+        };
+
+        var fromFolderRemover = new Mock<IFromFolderRemover>();
+        fromFolderRemover
+            .Setup(x => x.RemoveFromFolderAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        var viewModel = CreateViewModel(settings, fromFolderRemover);
+        await viewModel.InitializeAsync();
+        viewModel.SelectedFolder = @"C:\Music";
+
+        await viewModel.RemoveFolderCommand.ExecuteAsync(null);
+
+        Assert.Empty(viewModel.Folders);
+        Assert.Empty(settings.MusicFolders);
+        fromFolderRemover.Verify(x => x.RemoveFromFolderAsync(@"C:\Music"), Times.Once);
+    }
+
+    private static SettingsWindowViewModel CreateViewModel(
+        AppSettings settings,
+        Mock<IFromFolderRemover>? fromFolderRemover = null)
     {
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);
@@ -114,7 +185,7 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             Mock.Of<IRepository<MusicFolderModel>>(),
             Mock.Of<IRepository<PlaylistModel>>(),
             Mock.Of<IFolderScanner>(),
-            Mock.Of<IFromFolderRemover>(),
+            (fromFolderRemover ?? new Mock<IFromFolderRemover>()).Object,
             outputDevice.Object,
             versionChecker.Object,
             settingsReadService,

@@ -51,6 +51,9 @@ public partial class PlaylistPaneViewModel :
     [RelayCommand]
     private void PlaylistSelectionRemoved(IList items) => _lists.RemoveSelectedPlaylistItems(items.Cast<AudioModel>());
 
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
+        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+
     public Task Handle(PlaylistViewModeChangedNotification notification, CancellationToken cancellationToken)
     {
         IsCompactPlaylistView = notification.UseCompactPlaylistView;

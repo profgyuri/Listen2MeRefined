@@ -22,7 +22,8 @@ public class UtilsModule : Module
     {
         builder
             .RegisterType<DatabaseSettingsManager<AppSettings>>()
-            .As<ISettingsManager<AppSettings>>();
+            .As<ISettingsManager<AppSettings>>()
+            .SingleInstance();
 
         builder
             .RegisterType<VersionChecker>()
@@ -34,6 +35,9 @@ public class UtilsModule : Module
         builder
             .RegisterType<AppSettingsWriter>()
             .As<IAppSettingsWriter>();
+        builder
+            .RegisterType<DroppedSongFolderPromptService>()
+            .As<IDroppedSongFolderPromptService>();
         builder
             .RegisterType<AppUpdateChecker>()
             .As<IAppUpdateChecker>();
