@@ -12,7 +12,7 @@
         WindowStartupLocation="Manual"
         Title="{Binding Song.Display}"
         MinHeight="502" MinWidth="1030"
-        Height="702" Width="1030">
+        Height="752" Width="1030">
 
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
