@@ -1,5 +1,6 @@
 ﻿namespace Listen2MeRefined.WPF;
 using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -38,7 +39,17 @@ public sealed partial class App : Application
             _singleInstanceFileOpenBridge = new SingleInstanceFileOpenBridge(logger);
             if (!_singleInstanceFileOpenBridge.IsPrimaryInstance)
             {
-                _singleInstanceFileOpenBridge.ForwardToPrimaryAsync(e.Args).GetAwaiter().GetResult();
+                using var forwardTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+                var forwarded = _singleInstanceFileOpenBridge
+                    .ForwardToPrimaryAsync(e.Args, forwardTimeout.Token)
+                    .GetAwaiter()
+                    .GetResult();
+
+                if (!forwarded)
+                {
+                    logger.Warning("[App] Failed to forward shell-open args to primary instance");
+                }
+
                 Shutdown(0);
                 return;
             }
