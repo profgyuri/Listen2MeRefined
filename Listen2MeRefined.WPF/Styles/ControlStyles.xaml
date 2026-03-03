@@ -225,7 +225,7 @@
                                 <Thumb Width="10"
                                        Height="10"
                                        Background="{TemplateBinding Foreground}"
-                                       BorderBrush="{DynamicResource TertiaryLightBrush}"
+                                       BorderBrush="{DynamicResource TertiaryBrush}"
                                        BorderThickness="1"
                                        Focusable="False">
                                     <Thumb.Template>

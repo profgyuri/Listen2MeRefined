@@ -72,8 +72,7 @@
                                 Minimum="0"
                                 Maximum="1"
                                 Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                VerticalAlignment="Center"
-                                Style="{DynamicResource PlaybackVolumeSliderStyle}" />
+                                VerticalAlignment="Center" />
                     </StackPanel>
                 </Grid>
             </Border>

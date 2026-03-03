@@ -692,7 +692,7 @@
     <Style x:Key="TrackInfoInfoBadgeText" TargetType="TextBlock">
         <Setter Property="FontSize" Value="10" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
     </Style>
 
     <Style x:Key="TrackInfoMetricCardBorder" TargetType="Border">
@@ -790,69 +790,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
-
-    <Style x:Key="PlaybackVolumeSliderStyle" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Slider">
-                    <Grid VerticalAlignment="Center">
-                        <Border Height="4"
-                                Background="Transparent"
-                                CornerRadius="2"
-                                VerticalAlignment="Center" />
-                        <Track x:Name="PART_Track"
-                               VerticalAlignment="Center">
-                            <Track.DecreaseRepeatButton>
-                                <RepeatButton Background="{TemplateBinding Foreground}"
-                                              BorderThickness="0"
-                                              Height="4"
-                                              Focusable="False">
-                                    <RepeatButton.Template>
-                                        <ControlTemplate TargetType="RepeatButton">
-                                            <Border Background="{TemplateBinding Background}" CornerRadius="2" />
-                                        </ControlTemplate>
-                                    </RepeatButton.Template>
-                                </RepeatButton>
-                            </Track.DecreaseRepeatButton>
-                            <Track.Thumb>
-                                <Thumb Width="10"
-                                       Height="10"
-                                       Background="{DynamicResource TertiaryBrush}"
-                                       BorderBrush="{DynamicResource TertiaryLightBrush}"
-                                       BorderThickness="1"
-                                       Focusable="False">
-                                    <Thumb.Template>
-                                        <ControlTemplate TargetType="Thumb">
-                                            <Ellipse Fill="{TemplateBinding Background}"
-                                                     Stroke="{TemplateBinding BorderBrush}"
-                                                     StrokeThickness="{TemplateBinding BorderThickness}" />
-                                        </ControlTemplate>
-                                    </Thumb.Template>
-                                </Thumb>
-                            </Track.Thumb>
-                            <Track.IncreaseRepeatButton>
-                                <RepeatButton Background="Transparent"
-                                              BorderThickness="0"
-                                              Height="4"
-                                              Focusable="False">
-                                    <RepeatButton.Template>
-                                        <ControlTemplate TargetType="RepeatButton">
-                                            <Border Background="{TemplateBinding Background}" CornerRadius="2" />
-                                        </ControlTemplate>
-                                    </RepeatButton.Template>
-                                </RepeatButton>
-                            </Track.IncreaseRepeatButton>
-                        </Track>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsMuted}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
 
     <Style x:Key="NewSongHeaderText" TargetType="TextBlock">

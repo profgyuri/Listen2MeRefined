@@ -61,7 +61,7 @@
                                  Margin="8,0,8,0"
                                  VerticalAlignment="Center" />
                         <TextBlock Style="{DynamicResource NewSongHeaderText}"
-                                   Foreground="#A8A8A8"
+                                   Foreground="{DynamicResource SecondaryDarkBrush}"
                                    Text="{Binding Song.Length, StringFormat={}{0:mm\\:ss}, FallbackValue=00:00}" />
                     </StackPanel>
                 </Grid>
