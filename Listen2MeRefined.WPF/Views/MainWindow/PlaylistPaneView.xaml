@@ -79,8 +79,8 @@
 
                             <resources:StoryboardTextBlock x:Name="CompactViewText"
                                                            Text="{Binding Display, FallbackValue=Track}"
-                                                           Foreground="#D7D7D7"
-                                                           FontSize="16"
+                                                           Foreground="{DynamicResource SecondaryBrush}"
+                                                           FontSize="14"
                                                            FontWeight="Bold"
                                                            TextTrimming="None"
                                                            HorizontalAlignment="Left"

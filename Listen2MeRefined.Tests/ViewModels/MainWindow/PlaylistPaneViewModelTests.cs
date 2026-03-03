@@ -4,6 +4,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
+using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
 using Serilog;
@@ -18,7 +19,8 @@ public class PlaylistPaneViewModelTests
     public async Task CurrentSongNotification_PropagatesSelectedSongChangeToPlaylistPane()
     {
         var lists = CreateListsViewModel();
-        var pane = new PlaylistPaneViewModel(lists);
+        var settingsReader = new Mock<IAppSettingsReader>();
+        var pane = new PlaylistPaneViewModel(lists, settingsReader.Object);
         var song = new AudioModel { Title = "Current", Path = "song.mp3" };
         lists.PlayList.Add(song);
 
@@ -35,6 +37,20 @@ public class PlaylistPaneViewModelTests
 
         Assert.True(changed);
         Assert.Same(song, pane.SelectedSong);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_LoadsCompactViewModeFromSettings()
+    {
+        var lists = CreateListsViewModel();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(true);
+        var pane = new PlaylistPaneViewModel(lists, settingsReader.Object);
+
+        await pane.InitializeAsync();
+
+        Assert.True(pane.IsCompactPlaylistView);
+        settingsReader.Verify(x => x.GetUseCompactPlaylistView(), Times.Once);
     }
 
     private static ListsViewModel CreateListsViewModel()
