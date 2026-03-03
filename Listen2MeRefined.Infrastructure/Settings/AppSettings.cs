@@ -30,6 +30,8 @@ public sealed class AppSettings : Settings
     public string LastBrowsedFolder { get; set; } = "";
     public bool FolderBrowserStartAtLastLocation { get; set; } = true;
     public string PinnedFoldersJson { get; set; } = "[]";
+    public string ThemeMode { get; set; } = "Dark";
+    public string AccentColor { get; set; } = "Orange";
 
     [NotMapped]
     public List<string> PinnedFolders

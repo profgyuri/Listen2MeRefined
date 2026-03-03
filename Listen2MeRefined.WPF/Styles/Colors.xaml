@@ -4,22 +4,30 @@
     <Color x:Key="PrimaryColor">#1F1F1F</Color>
     <Color x:Key="PrimaryLightColor">#2A2A2A</Color>
     <Color x:Key="SecondaryColor">#ECECEC</Color>
+    <Color x:Key="SecondaryDarkColor">#A8A8A8</Color>
     <Color x:Key="TertiaryColor">#FF8A3D</Color>
-    <Color x:Key="DarkBorderColor">#3A3A3A</Color>
+    <Color x:Key="BorderColor">#393939</Color>
+    <Color x:Key="DefaultBorderBackgroundColor">#282828</Color>
+    <Color x:Key="DarkBorderBackgroundColor">#232323</Color>
     <Color x:Key="TertiaryLightColor">#FFB37A</Color>
     <Color x:Key="TertiaryLightMidColor">#D07A42</Color>
     <Color x:Key="TertiaryMidColor">#33FF8A3D</Color>
     <Color x:Key="TertiaryDarkColor">#1FFF8A3D</Color>
-    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
-    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource PrimaryLightColor}" />
-    <SolidColorBrush x:Key="DarkBorderBrush" Color="{StaticResource DarkBorderColor}" />
-    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}" />
-    <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource TertiaryColor}" />
-    <SolidColorBrush x:Key="TertiaryLightBrush" Color="{StaticResource TertiaryLightColor}" />
-    <SolidColorBrush x:Key="TertiaryLightMidBrush" Color="{StaticResource TertiaryLightMidColor}" />
-    <SolidColorBrush x:Key="TertiaryMidBrush" Color="{StaticResource TertiaryMidColor}" />
-    <SolidColorBrush x:Key="TertiaryDarkBrush" Color="{StaticResource TertiaryDarkColor}" />
-    <SolidColorBrush x:Key="HoloBackground" Color="{StaticResource PrimaryColor}" Opacity=".9" />
-    <SolidColorBrush x:Key="MaterialDesignPaper" Color="{StaticResource PrimaryColor}"/>
-    <SolidColorBrush x:Key="ContainerGradientBackgroundBrush" Color="{StaticResource PrimaryLightColor}" />
+    <Color x:Key="ValidationErrorColor">#E26A6A</Color>
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}" />
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{DynamicResource PrimaryLightColor}" />
+    <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource BorderColor}" />
+    <SolidColorBrush x:Key="DefaultBorderBackgroundBrush" Color="{DynamicResource DefaultBorderBackgroundColor}" />
+    <SolidColorBrush x:Key="DarkBorderBackgroundBrush" Color="{DynamicResource DarkBorderBackgroundColor}" />
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{DynamicResource SecondaryColor}" />
+    <SolidColorBrush x:Key="SecondaryDarkBrush" Color="{DynamicResource SecondaryDarkColor}"/>
+    <SolidColorBrush x:Key="TertiaryBrush" Color="{DynamicResource TertiaryColor}" />
+    <SolidColorBrush x:Key="TertiaryLightBrush" Color="{DynamicResource TertiaryLightColor}" />
+    <SolidColorBrush x:Key="TertiaryLightMidBrush" Color="{DynamicResource TertiaryLightMidColor}" />
+    <SolidColorBrush x:Key="TertiaryMidBrush" Color="{DynamicResource TertiaryMidColor}" />
+    <SolidColorBrush x:Key="TertiaryDarkBrush" Color="{DynamicResource TertiaryDarkColor}" />
+    <SolidColorBrush x:Key="HoloBackground" Color="{DynamicResource PrimaryColor}" Opacity=".9" />
+    <SolidColorBrush x:Key="MaterialDesignPaper" Color="{DynamicResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="ContainerGradientBackgroundBrush" Color="{DynamicResource PrimaryLightColor}" />
+    <SolidColorBrush x:Key="ValidationErrorBrush" Color="{DynamicResource ValidationErrorColor}" />
 </ResourceDictionary>

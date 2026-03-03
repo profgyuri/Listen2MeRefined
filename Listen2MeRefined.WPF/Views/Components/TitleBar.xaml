@@ -9,7 +9,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
              d:DesignWidth="400">
-    <Border Style="{StaticResource ComponentTitleBarContainerBorder}">
+    <Border Style="{DynamicResource ComponentTitleBarContainerBorder}">
         <Grid VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -18,7 +18,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0"
-                    Style="{StaticResource ComponentTitleBarBrandBorder}">
+                    Style="{DynamicResource BorderContainer}" Padding="10 0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Image Source="pack://application:,,,/Resources/Listen2Me.ico"
                            Width="16"
@@ -26,25 +26,25 @@
                            SnapsToDevicePixels="True"
                            Margin="0,0,7,0" />
                     <TextBlock Text="Listen2Me Refined"
-                               Style="{StaticResource ComponentTitleBarBrandText}" />
+                               Style="{DynamicResource ComponentTitleBarBrandText}" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="0"
                     Grid.ColumnSpan="3"
-                    Style="{StaticResource ComponentTitleBarCenterBorder}">
+                    Style="{DynamicResource ComponentTitleBarCenterBorder}">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Ellipse Width="6"
                              Height="6"
-                             Fill="{StaticResource TertiaryBrush}"
+                             Fill="{DynamicResource TertiaryBrush}"
                              Margin="0,0,6,0" />
                     <TextBlock Text="{Binding CenterText, ElementName=Root}"
-                               Style="{StaticResource ComponentTitleBarCenterText}" />
-                    <Border Style="{StaticResource ComponentTitleBarStatusBadgeBorder}"
+                               Style="{DynamicResource ComponentTitleBarCenterText}" />
+                    <Border Style="{DynamicResource ComponentTitleBarStatusBadgeBorder}"
                             ToolTip="{Binding TaskStatusTooltip, ElementName=Root}"
                             Visibility="{Binding ShowTaskStatus, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
                         <TextBlock Text="{Binding TaskStatusText, ElementName=Root}"
-                                   Style="{StaticResource ComponentTitleBarStatusBadgeText}" />
+                                   Style="{DynamicResource ComponentTitleBarStatusBadgeText}" />
                     </Border>
                 </StackPanel>
             </Border>
@@ -55,12 +55,12 @@
                         VerticalAlignment="Center">
                 <Grid>
                     <Button Command="{Binding SettingsCommand, ElementName=Root}"
-                            Style="{StaticResource ComponentTitleActionButton}"
+                            Style="{DynamicResource ComponentTitleActionButton}"
                             Content="{materialDesign:PackIcon Kind=CogOutline,Size=15}"
                             Visibility="{Binding ShowSettingsButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
                     <Ellipse Width="6"
                              Height="6"
-                             Fill="{StaticResource TertiaryBrush}"
+                             Fill="{DynamicResource TertiaryBrush}"
                              HorizontalAlignment="Right"
                              VerticalAlignment="Top"
                              Margin="0,6,6,0"
@@ -68,18 +68,18 @@
                 </Grid>
 
                 <Button Command="{Binding EffectiveMinimizeCommand, ElementName=Root}"
-                        Style="{StaticResource ComponentTitleActionButton}"
+                        Style="{DynamicResource ComponentTitleActionButton}"
                         Margin="6,0,0,0"
                         Content="{materialDesign:PackIcon Kind=WindowMinimize,Size=15}"
                         Visibility="{Binding ShowMinimizeButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <Button Command="{Binding EffectiveToggleMaximizeCommand, ElementName=Root}"
-                        Style="{StaticResource ComponentMaximizeTitleActionButton}">
-                    <materialDesign:PackIcon Style="{StaticResource ComponentMaximizePackIcon}" />
+                        Style="{DynamicResource ComponentMaximizeTitleActionButton}">
+                    <materialDesign:PackIcon Style="{DynamicResource ComponentMaximizePackIcon}" />
                 </Button>
 
                 <Button Command="{Binding EffectiveCloseCommand, ElementName=Root}"
-                        Style="{StaticResource ComponentCloseTitleActionButton}"
+                        Style="{DynamicResource ComponentCloseTitleActionButton}"
                         Content="{materialDesign:PackIcon Kind=Close,Size=15}"
                         Margin="6,0,0,0"
                         Visibility="{Binding ShowCloseButton, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}" />

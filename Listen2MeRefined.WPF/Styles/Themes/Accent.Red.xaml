@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="TertiaryColor">#F05E5E</Color>
+    <Color x:Key="TertiaryLightColor">#F48C8C</Color>
+    <Color x:Key="TertiaryLightMidColor">#B55858</Color>
+    <Color x:Key="TertiaryMidColor">#33F05E5E</Color>
+    <Color x:Key="TertiaryDarkColor">#1FF05E5E</Color>
+</ResourceDictionary>

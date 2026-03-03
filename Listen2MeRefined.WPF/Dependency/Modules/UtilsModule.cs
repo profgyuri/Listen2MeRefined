@@ -12,6 +12,7 @@ namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Versioning;
+using Listen2MeRefined.WPF.Utils.Theming;
 using Listen2MeRefined.WPF.Utils;
 using System.Windows;
 
@@ -61,6 +62,10 @@ public class UtilsModule : Module
         builder
             .RegisterType<WindowPositionPolicyService>()
             .As<IWindowPositionPolicyService>();
+        builder
+            .RegisterType<AppThemeService>()
+            .As<IAppThemeService>()
+            .SingleInstance();
 
         builder
             .RegisterType<MainWindowNavigationService>()
