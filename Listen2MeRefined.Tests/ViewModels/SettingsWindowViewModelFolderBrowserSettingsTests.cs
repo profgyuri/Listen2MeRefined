@@ -133,7 +133,34 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         Assert.True(viewModel.SelectedFolderIncludeSubdirectories);
     }
 
-    private static SettingsWindowViewModel CreateViewModel(AppSettings settings)
+    [Fact]
+    public async Task RemoveFolder_WhenRecursionNeverEnabled_RemovesWithoutNullCrash()
+    {
+        var settings = new AppSettings
+        {
+            AutoCheckUpdatesOnStartup = false,
+            MusicFolders = [new MusicFolderModel(@"C:\Music", false)]
+        };
+
+        var fromFolderRemover = new Mock<IFromFolderRemover>();
+        fromFolderRemover
+            .Setup(x => x.RemoveFromFolderAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        var viewModel = CreateViewModel(settings, fromFolderRemover);
+        await viewModel.InitializeAsync();
+        viewModel.SelectedFolder = @"C:\Music";
+
+        await viewModel.RemoveFolderCommand.ExecuteAsync(null);
+
+        Assert.Empty(viewModel.Folders);
+        Assert.Empty(settings.MusicFolders);
+        fromFolderRemover.Verify(x => x.RemoveFromFolderAsync(@"C:\Music"), Times.Once);
+    }
+
+    private static SettingsWindowViewModel CreateViewModel(
+        AppSettings settings,
+        Mock<IFromFolderRemover>? fromFolderRemover = null)
     {
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);
@@ -180,7 +207,7 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             Mock.Of<IRepository<MusicFolderModel>>(),
             Mock.Of<IRepository<PlaylistModel>>(),
             Mock.Of<IFolderScanner>(),
-            Mock.Of<IFromFolderRemover>(),
+            (fromFolderRemover ?? new Mock<IFromFolderRemover>()).Object,
             outputDevice.Object,
             versionChecker.Object,
             settingsReadService,
