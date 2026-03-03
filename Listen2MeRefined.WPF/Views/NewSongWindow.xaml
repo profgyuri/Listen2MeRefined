@@ -28,9 +28,9 @@
 
             <Border Grid.Row="0"
                     Padding="10,5"
-                    BorderBrush="#3A3A3A"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="0,0,0,1"
-                    Background="#232323">
+                    Background="{DynamicResource DarkBorderBackgroundBrush}">
                 <Grid VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -45,7 +45,7 @@
                         <materialDesign:PackIcon Kind="MusicNote"
                                                  Width="13"
                                                  Height="13"
-                                                 Foreground="#1F1F1F"
+                                                 Foreground="{DynamicResource SecondaryBrush}"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center" />
                     </Border>

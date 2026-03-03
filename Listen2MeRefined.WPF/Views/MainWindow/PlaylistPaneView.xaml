@@ -61,7 +61,7 @@
                             </Grid.RowDefinitions>
 
                             <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
-                                                           Foreground="#D7D7D7"
+                                                           Foreground="{DynamicResource SecondaryBrush}"
                                                            FontSize="16"
                                                            FontWeight="Bold"
                                                            TextTrimming="None"
