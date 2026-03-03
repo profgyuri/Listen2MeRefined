@@ -20,7 +20,8 @@ public class UtilsModule : Module
     {
         builder
             .RegisterType<DatabaseSettingsManager<AppSettings>>()
-            .As<ISettingsManager<AppSettings>>();
+            .As<ISettingsManager<AppSettings>>()
+            .SingleInstance();
 
         builder
             .RegisterType<VersionChecker>()
