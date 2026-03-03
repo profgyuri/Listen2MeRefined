@@ -468,17 +468,18 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task RemoveFolder()
     {
-        if (string.IsNullOrWhiteSpace(SelectedFolder))
+        var folderToRemove = SelectedFolder;
+        if (string.IsNullOrWhiteSpace(folderToRemove))
         {
             return;
         }
 
-        _logger.Information<string>("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
-        Folders.Remove(SelectedFolder);
-        _folderRecursionByPath.Remove(SelectedFolder);
-        await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
+        _logger.Information<string>("[SettingsWindowViewModel] Removing folder: {Folder}", folderToRemove);
+        Folders.Remove(folderToRemove);
+        _folderRecursionByPath.Remove(folderToRemove);
+        await _fromFolderRemover.RemoveFromFolderAsync(folderToRemove);
         PersistMusicFolders();
-        _logger.Verbose<string>("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
+        _logger.Verbose<string>("[SettingsWindowViewModel] Folder removed: {Folder}", folderToRemove);
     }
 
     [RelayCommand]
