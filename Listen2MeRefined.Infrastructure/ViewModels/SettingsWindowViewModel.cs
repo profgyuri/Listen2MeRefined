@@ -697,6 +697,46 @@ public sealed partial class SettingsWindowViewModel :
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
 
+    public void RefreshLibraryTabData()
+    {
+        var wasLoading = _isLoadingSettings;
+        _isLoadingSettings = true;
+        try
+        {
+            var previousSelection = SelectedFolder;
+            var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
+
+            _folderRecursionByPath.Clear();
+            foreach (var folderRequest in musicFolderRequests)
+            {
+                _folderRecursionByPath[folderRequest.Path] = folderRequest.IncludeSubdirectories;
+            }
+
+            Folders.Clear();
+            foreach (var folderRequest in musicFolderRequests)
+            {
+                Folders.Add(folderRequest.Path);
+            }
+
+            if (!string.IsNullOrWhiteSpace(previousSelection)
+                && Folders.Contains(previousSelection))
+            {
+                SelectedFolder = previousSelection;
+            }
+            else
+            {
+                SelectedFolder = Folders.FirstOrDefault();
+            }
+
+            ReloadPinnedFolders();
+            ReloadMutedDroppedSongFolders();
+        }
+        finally
+        {
+            _isLoadingSettings = wasLoading;
+        }
+    }
+
     private void PersistMusicFolders()
     {
         var folders = Enumerable
