@@ -147,6 +147,12 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.PinnedFolders = normalized);
     }
 
+    public void SetMutedDroppedSongFolders(IEnumerable<string> folders)
+    {
+        var normalized = Normalize(folders);
+        _settingsManager.SaveSettings(s => s.MutedDroppedSongFolders = normalized);
+    }
+
     private static List<string> Normalize(IEnumerable<string> folders)
     {
         return folders
