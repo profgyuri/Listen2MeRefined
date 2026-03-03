@@ -11,7 +11,8 @@ public class WaveFormModule : Module
         builder
             .RegisterType<SkiaCanvas>()
             .As<ICanvas<SKPoint, SKBitmap>>()
-            .AsImplementedInterfaces();
+            .AsImplementedInterfaces()
+            .SingleInstance();
         
         builder
             .RegisterType<WaveFormDrawer>()
