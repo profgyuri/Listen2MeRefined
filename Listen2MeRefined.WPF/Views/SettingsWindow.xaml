@@ -83,6 +83,16 @@
                                             </components:FormFieldRow.FieldContent>
                                         </components:FormFieldRow>
 
+                                        <components:FormFieldRow Margin="0,0,0,10"
+                                                                 Label="Playlist view:"
+                                                                 LabelWidth="170">
+                                            <components:FormFieldRow.FieldContent>
+                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                          SelectedItem="{Binding SelectedPlaylistViewMode}"
+                                                          ItemsSource="{Binding PlaylistViewModes}" />
+                                            </components:FormFieldRow.FieldContent>
+                                        </components:FormFieldRow>
+
                                         <CheckBox IsChecked="{Binding AutoCheckUpdatesOnStartup}"
                                                   Content="Automatically check for updates on startup"
                                                   Margin="0,0,0,10" />

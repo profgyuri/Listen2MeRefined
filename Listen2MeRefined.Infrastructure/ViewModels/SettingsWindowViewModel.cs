@@ -72,6 +72,7 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private int _startupVolumePercent = 70;
     [ObservableProperty] private bool _startMuted;
     [ObservableProperty] private bool _autoCheckUpdatesOnStartup = true;
+    [ObservableProperty] private string _selectedPlaylistViewMode = "Detailed";
     [ObservableProperty] private bool _autoScanOnFolderAdd = true;
     [ObservableProperty] private bool _showTaskPercentage = true;
     [ObservableProperty] private int _taskPercentageReportInterval = 1;
@@ -84,6 +85,9 @@ public sealed partial class SettingsWindowViewModel :
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
+
+    public ObservableCollection<string> PlaylistViewModes { get; } =
+        new(new[] { "Detailed", "Compact" });
 
     public bool ScanOnStartup
     {
@@ -172,6 +176,7 @@ public sealed partial class SettingsWindowViewModel :
         StartupVolumePercent = _playbackDefaultsService.ToVolumePercent(_settingsReader.GetStartupVolume());
         StartMuted = _settingsReader.GetStartMuted();
         AutoCheckUpdatesOnStartup = _settingsReader.GetAutoCheckUpdatesOnStartup();
+        SelectedPlaylistViewMode = _settingsReader.GetUseCompactPlaylistView() ? "Compact" : "Detailed";
         AutoScanOnFolderAdd = _settingsReader.GetAutoScanOnFolderAdd();
         ShowTaskPercentage = _settingsReader.GetShowTaskPercentage();
         TaskPercentageReportInterval = Math.Clamp(
@@ -371,6 +376,19 @@ public sealed partial class SettingsWindowViewModel :
             UpdateAvailableText = "Automatic update checks are disabled.";
             IsUpdateButtonVisible = false;
         }
+    }
+
+
+    partial void OnSelectedPlaylistViewModeChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        var useCompactPlaylistView = string.Equals(value, "Compact", StringComparison.Ordinal);
+        _settingsWriter.SetUseCompactPlaylistView(useCompactPlaylistView);
+        _ = _mediator.Publish(new PlaylistViewModeChangedNotification(useCompactPlaylistView));
     }
 
     partial void OnAutoScanOnFolderAddChanged(bool value)
