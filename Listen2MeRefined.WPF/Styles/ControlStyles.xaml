@@ -27,6 +27,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style TargetType="ComboBox" x:Key="CustomComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
         <Setter Property="materialDesign:HintAssist.Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{DynamicResource TertiaryBrush}" />
@@ -45,6 +46,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style x:Key="CustomComboBoxItem" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
@@ -74,11 +76,6 @@
                             <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                         </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryMidBrush}" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
-                            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
-                        </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsSelected" Value="True" />
@@ -92,6 +89,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
         <Setter Property="Template">
