@@ -193,6 +193,7 @@ public class ListsViewModelTests
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         var settingsWriter = new Mock<IAppSettingsWriter>();
         var prompt = new Mock<IDroppedSongFolderPromptService>();
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
 
         var vm = new ListsViewModel(
             logger.Object,
@@ -203,7 +204,8 @@ public class ListsViewModelTests
             playlist,
             settingsReader.Object,
             settingsWriter.Object,
-            prompt.Object);
+            prompt.Object,
+            externalAudioOpenService.Object);
 
         var existing = new AudioModel { Path = "existing.mp3", Title = "Existing" };
         vm.PlayList.Add(existing);
@@ -243,6 +245,7 @@ public class ListsViewModelTests
         var prompt = new Mock<IDroppedSongFolderPromptService>();
         prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(AddDroppedSongFolderDecision.SkipAndDontAskAgain);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
 
         var vm = new ListsViewModel(
             logger.Object,
@@ -253,7 +256,8 @@ public class ListsViewModelTests
             playlist,
             settingsReader.Object,
             settingsWriter.Object,
-            prompt.Object);
+            prompt.Object,
+            externalAudioOpenService.Object);
 
         var filePath = Path.Combine(Path.GetTempPath(), $"drop-{Guid.NewGuid():N}.mp3");
         await File.WriteAllTextAsync(filePath, "fake");
