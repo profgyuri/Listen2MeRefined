@@ -172,7 +172,7 @@
     </Style>
 
     <Style x:Key="SettingsNavTabItemStyle" TargetType="TabItem">
-        <Setter Property="Foreground" Value="#AFAFAF" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Padding" Value="14,10" />
@@ -597,7 +597,7 @@
         <Setter Property="Margin" Value="10,0,0,0" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
-        <Setter Property="Background" Value="#313131" />
+        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">

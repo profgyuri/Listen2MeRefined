@@ -124,14 +124,14 @@
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
 
-                                        <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
-                                                                       Foreground="#D7D7D7"
-                                                                       FontSize="16"
-                                                                       FontWeight="Bold"
-                                                                       TextTrimming="None"
-                                                                       HorizontalAlignment="Left"
-                                                                       ClipToBounds="True"
-                                                                       utils:FlowingTextBehavior.IsEnabled="True" />
+                            <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
+                                                           Foreground="{DynamicResource SecondaryBrush}"
+                                                           FontSize="16"
+                                                           FontWeight="Bold"
+                                                           TextTrimming="None"
+                                                           HorizontalAlignment="Left"
+                                                           ClipToBounds="True"
+                                                           utils:FlowingTextBehavior.IsEnabled="True" />
 
                                         <components:MetaBadgeRow Grid.Row="2"
                                                                  BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"

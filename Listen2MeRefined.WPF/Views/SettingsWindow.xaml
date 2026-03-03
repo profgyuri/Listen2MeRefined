@@ -554,7 +554,7 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{DynamicResource DarkBorderContainer}" BorderBrush="#6B3D3D" Background="#2A2121" Margin="0 10">
+                                <Border Style="{DynamicResource DarkBorderContainer}" BorderBrush="{DynamicResource ValidationErrorBrush}" Background="{DynamicResource DefaultBorderBackgroundBrush}" Margin="0 10">
                                     <StackPanel>
                                         <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
                                                    Foreground="{DynamicResource ValidationErrorBrush}"
