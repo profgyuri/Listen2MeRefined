@@ -67,15 +67,15 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#353535" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                         </Trigger>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#353535" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#3A2F27" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryMidBrush}" />
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                             <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
                         </Trigger>
@@ -84,7 +84,7 @@
                                 <Condition Property="IsSelected" Value="True" />
                                 <Condition Property="IsMouseOver" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="ItemBorder" Property="Background" Value="#3A2F27" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryMidBrush}" />
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
@@ -109,8 +109,8 @@
                                 Height="18"
                                 CornerRadius="3"
                                 BorderThickness="1"
-                                BorderBrush="#5A5A5A"
-                                Background="#2A2A2A"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                Background="{DynamicResource PrimaryLightBrush}"
                                 VerticalAlignment="Center" />
                         <Path x:Name="CheckGlyph"
                               Grid.Column="0"
@@ -132,10 +132,10 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
-                            <Setter TargetName="CheckBorder" Property="Background" Value="#313131" />
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="CheckBorder" Property="Background" Value="#272727" />
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
@@ -145,7 +145,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="CheckBorder" Property="Opacity" Value="0.5" />
                             <Setter TargetName="CheckGlyph" Property="Opacity" Value="0.55" />
-                            <Setter Property="Foreground" Value="#8A8A8A" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -190,16 +190,6 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Margin" Value="0 1 0 0" />
     </Style>
-    <Style TargetType="Button" x:Key="WindowCloseButton" BasedOn="{StaticResource TitleBarButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#970000" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="#6f0000" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
     <!--#endregion-->
 
     <!--#region Global Slider -->
@@ -214,7 +204,7 @@
                 <ControlTemplate TargetType="{x:Type Slider}">
                     <Grid VerticalAlignment="Center">
                         <Border Height="4"
-                                Background="#4A4A4A"
+                                Background="{DynamicResource PrimaryLightBrush}"
                                 CornerRadius="2"
                                 VerticalAlignment="Center" />
                         <Track x:Name="PART_Track"
@@ -235,7 +225,7 @@
                                 <Thumb Width="10"
                                        Height="10"
                                        Background="{TemplateBinding Foreground}"
-                                       BorderBrush="#D55F16"
+                                       BorderBrush="{DynamicResource TertiaryLightBrush}"
                                        BorderThickness="1"
                                        Focusable="False">
                                     <Thumb.Template>
