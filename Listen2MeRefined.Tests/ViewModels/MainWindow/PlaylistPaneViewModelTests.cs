@@ -25,7 +25,8 @@ public class PlaylistPaneViewModelTests
         playlistLibrary
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<PlaylistSummary>());
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>());
+        var settingsReader = new Mock<IAppSettingsReader>();
+        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
         var song = new AudioModel { Title = "Current", Path = "song.mp3" };
         lists.PlayList.Add(song);
 
@@ -121,6 +122,20 @@ public class PlaylistPaneViewModelTests
         mediator.Verify(
             x => x.Publish(It.IsAny<PlaylistMembershipChangedNotification>(), It.IsAny<CancellationToken>()),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_LoadsCompactViewModeFromSettings()
+    {
+        var lists = CreateListsViewModel();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(true);
+        var pane = new PlaylistPaneViewModel(lists, settingsReader.Object);
+
+        await pane.InitializeAsync();
+
+        Assert.True(pane.IsCompactPlaylistView);
+        settingsReader.Verify(x => x.GetUseCompactPlaylistView(), Times.Once);
     }
 
     private static ListsViewModel CreateListsViewModel()

@@ -15,6 +15,7 @@ public partial class PlaylistPaneViewModel :
     INotificationHandler<PlaylistMembershipChangedNotification>
 {
     private readonly ListsViewModel _lists;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IMediator _mediator;
 
@@ -50,6 +51,7 @@ public partial class PlaylistPaneViewModel :
         IAppSettingsReader settingsReader)
     {
         _lists = lists;
+        _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
         IsCompactPlaylistView = settingsReader.GetUseCompactPlaylistView();
@@ -63,6 +65,7 @@ public partial class PlaylistPaneViewModel :
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         await RefreshAvailablePlaylistsAsync(ct);
+        IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
     }
 
     [RelayCommand]
