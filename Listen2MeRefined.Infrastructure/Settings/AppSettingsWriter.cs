@@ -152,6 +152,16 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.PinnedFolders = normalized);
     }
 
+    public void SetThemeMode(string value)
+    {
+        _settingsManager.SaveSettings(s => s.ThemeMode = value);
+    }
+
+    public void SetAccentColor(string value)
+    {
+        _settingsManager.SaveSettings(s => s.AccentColor = value);
+    }
+
     private static List<string> Normalize(IEnumerable<string> folders)
     {
         return folders

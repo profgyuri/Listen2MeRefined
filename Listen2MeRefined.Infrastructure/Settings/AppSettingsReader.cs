@@ -38,4 +38,6 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public bool GetFolderBrowserStartAtLastLocation() => _settingsManager.Settings.FolderBrowserStartAtLastLocation;
     public string GetLastBrowsedFolder() => _settingsManager.Settings.LastBrowsedFolder;
     public IReadOnlyList<string> GetPinnedFolders() => _settingsManager.Settings.PinnedFolders.ToList();
+    public string GetThemeMode() => _settingsManager.Settings.ThemeMode;
+    public string GetAccentColor() => _settingsManager.Settings.AccentColor;
 }

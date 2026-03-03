@@ -8,7 +8,7 @@
         xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
-        Style="{StaticResource BasicWindow}"
+        Style="{DynamicResource BasicWindow}"
         WindowStartupLocation="Manual"
         Title="{Binding Song.Display}"
         MinHeight="502" MinWidth="1030"
@@ -18,7 +18,7 @@
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>
 
-    <Border BorderThickness="2" BorderBrush="{StaticResource TertiaryBrush}" Background="{StaticResource PrimaryBrush}" CornerRadius="0, 0, 8, 8">
+    <Border BorderThickness="2" BorderBrush="{DynamicResource TertiaryBrush}" Background="{DynamicResource PrimaryBrush}" CornerRadius="0, 0, 8, 8">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=40}" />

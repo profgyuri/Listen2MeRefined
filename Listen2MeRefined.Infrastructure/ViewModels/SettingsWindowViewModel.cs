@@ -5,6 +5,7 @@ using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
+using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels;
@@ -42,6 +43,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IPlaybackDefaultsService _playbackDefaultsService;
+    private readonly IAppThemeService _appThemeService;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -82,6 +84,10 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
     [ObservableProperty] private string? _selectedPinnedFolder = "";
+    [ObservableProperty] private ObservableCollection<string> _themeModes = new();
+    [ObservableProperty] private ObservableCollection<string> _accentColors = new();
+    [ObservableProperty] private string _selectedThemeMode = "Dark";
+    [ObservableProperty] private string _selectedAccentColor = "Orange";
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
@@ -119,7 +125,8 @@ public sealed partial class SettingsWindowViewModel :
         IBackgroundTaskStatusService backgroundTaskStatusService,
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
         IPinnedFoldersService pinnedFoldersService,
-        IPlaybackDefaultsService playbackDefaultsService)
+        IPlaybackDefaultsService playbackDefaultsService,
+        IAppThemeService appThemeService)
     {
         _logger = logger;
         _audioRepository = audioRepository;
@@ -138,6 +145,7 @@ public sealed partial class SettingsWindowViewModel :
         _globalHookSettingsSyncService = globalHookSettingsSyncService;
         _pinnedFoldersService = pinnedFoldersService;
         _playbackDefaultsService = playbackDefaultsService;
+        _appThemeService = appThemeService;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
     }
@@ -152,6 +160,8 @@ public sealed partial class SettingsWindowViewModel :
             "Default",
             "Always on top"
         };
+        ThemeModes = new ObservableCollection<string>(_appThemeService.GetThemeModes());
+        AccentColors = new ObservableCollection<string>(_appThemeService.GetAccentColors());
 
         var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
         _folderRecursionByPath.Clear();
@@ -190,6 +200,8 @@ public sealed partial class SettingsWindowViewModel :
             MaxScanMilestoneInterval);
         SelectedScanMilestoneBasis = _settingsReader.GetScanMilestoneBasis();
         FolderBrowserStartAtLastLocation = _settingsReader.GetFolderBrowserStartAtLastLocation();
+        SelectedThemeMode = _settingsReader.GetThemeMode();
+        SelectedAccentColor = _settingsReader.GetAccentColor();
         ReloadPinnedFolders();
 
         await GetAudioOutputDevices();
@@ -478,6 +490,28 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         _settingsWriter.SetFolderBrowserStartAtLastLocation(value);
+    }
+
+    partial void OnSelectedThemeModeChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _settingsWriter.SetThemeMode(value);
+        _appThemeService.ApplyTheme(value, SelectedAccentColor);
+    }
+
+    partial void OnSelectedAccentColorChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _settingsWriter.SetAccentColor(value);
+        _appThemeService.ApplyTheme(SelectedThemeMode, value);
     }
 
     [RelayCommand]

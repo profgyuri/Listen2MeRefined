@@ -54,4 +54,8 @@ public interface IAppSettingsReader
     string GetLastBrowsedFolder();
     /// <summary>Gets configured pinned folder paths.</summary>
     IReadOnlyList<string> GetPinnedFolders();
+    /// <summary>Gets current theme mode.</summary>
+    string GetThemeMode();
+    /// <summary>Gets current accent color name.</summary>
+    string GetAccentColor();
 }

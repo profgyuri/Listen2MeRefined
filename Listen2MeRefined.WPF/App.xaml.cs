@@ -1,11 +1,14 @@
 ﻿namespace Listen2MeRefined.WPF;
 using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Autofac;
 using Dapper;
+using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.WPF.Dependency;
+using Listen2MeRefined.WPF.Utils;
 using Serilog;
 
 /// <summary>
@@ -13,6 +16,8 @@ using Serilog;
 /// </summary>
 public sealed partial class App : Application
 {
+    private SingleInstanceFileOpenBridge? _singleInstanceFileOpenBridge;
+
     protected override void OnStartup(StartupEventArgs e)
     {
         // Subscribe as early as possible
@@ -27,12 +32,45 @@ public sealed partial class App : Application
 
         try
         {
+            using var startupScope = IocContainer.GetContainer().BeginLifetimeScope();
+            var logger = startupScope.Resolve<ILogger>();
+            var mediator = startupScope.Resolve<MediatR.IMediator>();
+
+            _singleInstanceFileOpenBridge = new SingleInstanceFileOpenBridge(logger);
+            if (!_singleInstanceFileOpenBridge.IsPrimaryInstance)
+            {
+                using var forwardTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+                var forwarded = _singleInstanceFileOpenBridge
+                    .ForwardToPrimaryAsync(e.Args, forwardTimeout.Token)
+                    .GetAwaiter()
+                    .GetResult();
+
+                if (!forwarded)
+                {
+                    logger.Warning("[App] Failed to forward shell-open args to primary instance");
+                }
+
+                Shutdown(0);
+                return;
+            }
+
             WindowManager.ShowMainWindow<MainWindow>();
+
+            if (e.Args.Length > 0)
+            {
+                _ = mediator.Publish(new ExternalAudioFilesOpenedNotification(e.Args));
+            }
         }
         catch (Exception ex)
         {
             Shutdown(-1);
         }
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _singleInstanceFileOpenBridge?.Dispose();
+        base.OnExit(e);
     }
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
