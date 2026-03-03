@@ -1,12 +1,27 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using Listen2MeRefined.Infrastructure.Media.SoundWave;
+using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Settings;
+using MediatR;
+using SkiaSharp;
 
 namespace Listen2MeRefined.WPF.Utils.Theming;
 
 public sealed class AppThemeService : IAppThemeService
 {
+    private readonly IMediator _mediator;
+    private readonly IEnumerable<IWaveformPaletteAware> _waveformPaletteAwareTargets;
+
+    public AppThemeService(
+        IMediator mediator,
+        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets)
+    {
+        _mediator = mediator;
+        _waveformPaletteAwareTargets = waveformPaletteAwareTargets;
+    }
+
     private static readonly IReadOnlyList<string> SupportedThemeModes = ["Dark", "Light"];
     private static readonly IReadOnlyList<string> SupportedAccentColors = ["Orange", "Blue", "Green", "Purple", "Red"];
 
@@ -97,6 +112,20 @@ public sealed class AppThemeService : IAppThemeService
         {
             containerBrush.Color = primaryLightColor;
         }
+
+        var waveformLineColor = Application.Current.Resources["TertiaryColor"] is Color accent
+            ? ToSkColor(accent)
+            : new SKColor(255, 138, 61);
+        var waveformBackgroundColor = Application.Current.Resources["DarkBorderBackgroundColor"] is Color background
+            ? ToSkColor(background)
+            : new SKColor(35, 35, 35);
+
+        foreach (var paletteAwareTarget in _waveformPaletteAwareTargets)
+        {
+            paletteAwareTarget.UpdatePalette(waveformLineColor, waveformBackgroundColor);
+        }
+
+        _ = _mediator.Publish(new AppThemeChangedNotification());
     }
 
     private static void ApplyPalette(ResourceDictionary palette, IEnumerable<string> colorKeys)
@@ -117,4 +146,6 @@ public sealed class AppThemeService : IAppThemeService
             }
         }
     }
+
+    private static SKColor ToSkColor(Color color) => new(color.R, color.G, color.B, color.A);
 }
