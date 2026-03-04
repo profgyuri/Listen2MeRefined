@@ -2,6 +2,7 @@ using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
@@ -32,6 +33,44 @@ public class ListsViewModelTests
         Assert.Contains(first, vm.PlayList);
         Assert.DoesNotContain(first, vm.SearchResults);
         Assert.Contains(second, vm.SearchResults);
+    }
+
+    [Fact]
+    public void SendSelectedToPlaylist_CopyMode_LeavesSearchResultsUntouched()
+    {
+        var vm = CreateViewModel(out _, SearchResultsTransferMode.Copy);
+        var first = new AudioModel { Title = "First", Path = "a" };
+        var second = new AudioModel { Title = "Second", Path = "b" };
+
+        vm.SearchResults.Add(first);
+        vm.SearchResults.Add(second);
+        vm.AddSelectedSearchResults([first]);
+
+        vm.SendSelectedToPlaylistCommand.Execute(null);
+
+        Assert.Single(vm.PlayList);
+        Assert.Contains(first, vm.PlayList);
+        Assert.Contains(first, vm.SearchResults);
+        Assert.Contains(second, vm.SearchResults);
+    }
+
+    [Fact]
+    public void SendSelectedToPlaylist_DoesNotDuplicatePathEntriesInDefaultPlaylist()
+    {
+        var vm = CreateViewModel(out _, SearchResultsTransferMode.Copy);
+        var first = new AudioModel { Title = "First", Path = "a" };
+        var duplicateByPath = new AudioModel { Title = "First Duplicate", Path = "a" };
+
+        vm.SearchResults.Add(first);
+        vm.SendSelectedToPlaylistCommand.Execute(null);
+
+        vm.SearchResults.Clear();
+        vm.SearchResults.Add(duplicateByPath);
+        vm.SendSelectedToPlaylistCommand.Execute(null);
+
+        Assert.Single(vm.DefaultPlaylist);
+        Assert.Single(vm.PlayList);
+        Assert.Equal("a", vm.DefaultPlaylist[0].Path);
     }
 
     [Fact]
@@ -73,11 +112,16 @@ public class ListsViewModelTests
 
         Assert.False(vm.JumpToSelectedSongCommand.CanExecute(null));
 
-        vm.SelectedIndex = 2;
+        var first = new AudioModel { Title = "First", Path = "a" };
+        var second = new AudioModel { Title = "Second", Path = "b" };
+        vm.PlayList.Add(first);
+        vm.PlayList.Add(second);
+        vm.SelectedSong = second;
+        vm.SelectedIndex = 1;
         Assert.True(vm.JumpToSelectedSongCommand.CanExecute(null));
 
         await vm.JumpToSelectedSongCommand.ExecuteAsync(null);
-        playerController.Verify(x => x.JumpToIndexAsync(2), Times.Once);
+        playerController.Verify(x => x.JumpToIndexAsync(1), Times.Once);
     }
 
     [Fact]
@@ -87,16 +131,19 @@ public class ListsViewModelTests
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
+        var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
         var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
-        var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         var settingsWriter = new Mock<IAppSettingsWriter>();
         var prompt = new Mock<IDroppedSongFolderPromptService>();
         prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
+        settingsReader
+            .Setup(x => x.GetSearchResultsTransferMode())
+            .Returns(SearchResultsTransferMode.Move);
 
         var vm = new ListsViewModel(
             logger.Object,
@@ -230,15 +277,17 @@ public class ListsViewModelTests
         settingsWriter.Verify(x => x.SetMutedDroppedSongFolders(It.Is<IEnumerable<string>>(f => f.Contains(Path.GetDirectoryName(filePath)!))), Times.Once);
     }
 
-    private static ListsViewModel CreateViewModel(out Mock<IMusicPlayerController> playerController)
+    private static ListsViewModel CreateViewModel(
+        out Mock<IMusicPlayerController> playerController,
+        SearchResultsTransferMode transferMode = SearchResultsTransferMode.Move)
     {
         var logger = new Mock<ILogger>();
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
+        var settingsReader = new Mock<IAppSettingsReader>();
         playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
-        var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         var settingsWriter = new Mock<IAppSettingsWriter>();
@@ -246,12 +295,16 @@ public class ListsViewModelTests
         prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
         var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
+        settingsReader
+            .Setup(x => x.GetSearchResultsTransferMode())
+            .Returns(transferMode);
 
         return new ListsViewModel(
             logger.Object,
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
+            settingsReader.Object,
             playerController.Object,
             playlist,
             settingsReader.Object,

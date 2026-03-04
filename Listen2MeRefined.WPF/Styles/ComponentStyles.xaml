@@ -582,6 +582,29 @@
         <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
+    <Style x:Key="PlaylistContextMenuStyle" TargetType="ContextMenu">
+        <Setter Property="Background" Value="#2B2B2B" />
+        <Setter Property="BorderBrush" Value="#3D3D3D" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <Style x:Key="PlaylistContextMenuItemStyle" TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{StaticResource SecondaryBrush}" />
+        <Setter Property="Background" Value="#2B2B2B" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="8,4" />
+        <Style.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" Value="#343434" />
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="#3A2F27" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="ComponentMetaBadge" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />

@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -56,6 +57,8 @@ public interface IAppSettingsWriter
     void SetFolderIncludeSubdirectories(string path, bool includeSubdirectories);
     /// <summary>Sets configured pinned folder paths.</summary>
     void SetPinnedFolders(IEnumerable<string> folders);
+    /// <summary>Sets search-results transfer mode for default playlist tab.</summary>
+    void SetSearchResultsTransferMode(SearchResultsTransferMode mode);
     /// <summary>Sets folders where the dropped-song folder add prompt is muted.</summary>
     void SetMutedDroppedSongFolders(IEnumerable<string> folders);
     /// <summary>Sets current theme mode.</summary>

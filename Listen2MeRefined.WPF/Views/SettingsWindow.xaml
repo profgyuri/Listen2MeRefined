@@ -78,16 +78,6 @@
                                                 </ComboBox>
                                             </components:FormFieldRow.FieldContent>
                                         </components:FormFieldRow>
-                                      
-                                        <components:FormFieldRow Margin="0,0,0,10"
-                                                                 Label="Playlist view:"
-                                                                 LabelWidth="170">
-                                            <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
-                                                          SelectedItem="{Binding SelectedPlaylistViewMode}"
-                                                          ItemsSource="{Binding PlaylistViewModes}" />
-                                            </components:FormFieldRow.FieldContent>
-                                        </components:FormFieldRow>
 
                                         <components:FormFieldRow Margin="0,0,0,10"
                                                                  Label="Theme:"
@@ -421,6 +411,92 @@
                                                         Command="{Binding ClearInvalidPinsCommand}" />
                                             </StackPanel>
                                         </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Cursor="Hand">
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="PlaylistMusic" Width="16" Height="16" Margin="0,0,8,0" />
+                                <TextBlock Text="Playlists" />
+                            </StackPanel>
+                        </TabItem.Header>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="12,0,0,0">
+                                <Border Style="{StaticResource SettingsSectionCard}">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Playlists" />
+                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Manage playlist names and search transfer behavior." />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource SettingsSectionCard}">
+                                    <StackPanel>
+                                        <components:FormFieldRow Margin="0,0,0,12"
+                                                                 Label="Search to default tab:"
+                                                                 LabelWidth="190">
+                                            <components:FormFieldRow.FieldContent>
+                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                          SelectedItem="{Binding SelectedSearchResultsTransferMode}"
+                                                          ItemsSource="{Binding SearchResultsTransferModes}" />
+                                            </components:FormFieldRow.FieldContent>
+                                        </components:FormFieldRow>
+
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <ListView Grid.RowSpan="2"
+                                                      Height="170"
+                                                      Margin="0,0,10,0"
+                                                      Style="{StaticResource VirtualizedListView}"
+                                                      ItemsSource="{Binding Playlists}"
+                                                      SelectedItem="{Binding SelectedPlaylist}">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   Foreground="{StaticResource SecondaryBrush}"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+
+                                            <Button Grid.Column="1"
+                                                    Style="{StaticResource SettingsIconActionButton}"
+                                                    Command="{Binding DeleteSelectedPlaylistCommand}"
+                                                    Content="{materialDesign:PackIcon Kind=DeleteOutline, Size=18}"
+                                                    ToolTip="Delete selected playlist" />
+                                        </Grid>
+
+                                        <components:FormFieldRow Margin="0,0,0,10"
+                                                                 Label="Playlist name:"
+                                                                 LabelWidth="190">
+                                            <components:FormFieldRow.FieldContent>
+                                                <TextBox Text="{Binding PlaylistNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         Foreground="{StaticResource SecondaryBrush}" />
+                                            </components:FormFieldRow.FieldContent>
+                                        </components:FormFieldRow>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Style="{StaticResource SettingsActionButton}"
+                                                    MinWidth="110"
+                                                    Content="Create"
+                                                    Command="{Binding CreatePlaylistCommand}" />
+                                            <Button Style="{StaticResource SettingsActionButton}"
+                                                    MinWidth="110"
+                                                    Margin="8,0,0,0"
+                                                    Content="Rename"
+                                                    Command="{Binding RenameSelectedPlaylistCommand}" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </StackPanel>

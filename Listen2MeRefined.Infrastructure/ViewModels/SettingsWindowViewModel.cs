@@ -3,6 +3,7 @@ using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Settings;
@@ -44,6 +45,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IPlaybackDefaultsService _playbackDefaultsService;
     private readonly IAppThemeService _appThemeService;
+    private readonly IPlaylistLibraryService _playlistLibraryService;
 
     private TimedTask? _timedTask;
     private int _secondsToCancelClear = 5;
@@ -88,11 +90,17 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private ObservableCollection<string> _accentColors = new();
     [ObservableProperty] private string _selectedThemeMode = "Dark";
     [ObservableProperty] private string _selectedAccentColor = "Orange";
+    [ObservableProperty] private ObservableCollection<PlaylistSummary> _playlists = new();
+    [ObservableProperty] private PlaylistSummary? _selectedPlaylist;
+    [ObservableProperty] private string _playlistNameInput = "";
+    [ObservableProperty] private SearchResultsTransferMode _selectedSearchResultsTransferMode = SearchResultsTransferMode.Move;
     [ObservableProperty] private ObservableCollection<string> _mutedDroppedSongFolders = new();
     [ObservableProperty] private string? _selectedMutedDroppedSongFolder = "";
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
+    public ObservableCollection<SearchResultsTransferMode> SearchResultsTransferModes { get; } =
+        new(Enum.GetValues<SearchResultsTransferMode>());
 
     public ObservableCollection<string> PlaylistViewModes { get; } =
         new(new[] { "Detailed", "Compact" });
@@ -128,6 +136,7 @@ public sealed partial class SettingsWindowViewModel :
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
         IPinnedFoldersService pinnedFoldersService,
         IPlaybackDefaultsService playbackDefaultsService,
+        IPlaylistLibraryService playlistLibraryService,
         IAppThemeService appThemeService)
     {
         _logger = logger;
@@ -147,6 +156,7 @@ public sealed partial class SettingsWindowViewModel :
         _globalHookSettingsSyncService = globalHookSettingsSyncService;
         _pinnedFoldersService = pinnedFoldersService;
         _playbackDefaultsService = playbackDefaultsService;
+        _playlistLibraryService = playlistLibraryService;
         _appThemeService = appThemeService;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
@@ -202,9 +212,11 @@ public sealed partial class SettingsWindowViewModel :
             MaxScanMilestoneInterval);
         SelectedScanMilestoneBasis = _settingsReader.GetScanMilestoneBasis();
         FolderBrowserStartAtLastLocation = _settingsReader.GetFolderBrowserStartAtLastLocation();
+        SelectedSearchResultsTransferMode = _settingsReader.GetSearchResultsTransferMode();
         SelectedThemeMode = _settingsReader.GetThemeMode();
         SelectedAccentColor = _settingsReader.GetAccentColor();
         ReloadPinnedFolders();
+        await ReloadPlaylistsAsync(ct);
         ReloadMutedDroppedSongFolders();
 
         await GetAudioOutputDevices();
@@ -517,6 +529,16 @@ public sealed partial class SettingsWindowViewModel :
         _appThemeService.ApplyTheme(SelectedThemeMode, value);
     }
 
+    partial void OnSelectedSearchResultsTransferModeChanged(SearchResultsTransferMode value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriter.SetSearchResultsTransferMode(value);
+    }
+
     [RelayCommand]
     private async Task RemoveFolder()
     {
@@ -580,6 +602,74 @@ public sealed partial class SettingsWindowViewModel :
     }
 
     [RelayCommand]
+    private async Task CreatePlaylistAsync()
+    {
+        if (string.IsNullOrWhiteSpace(PlaylistNameInput))
+        {
+            return;
+        }
+
+        try
+        {
+            var created = await _playlistLibraryService.CreatePlaylistAsync(PlaylistNameInput.Trim());
+            await ReloadPlaylistsAsync();
+            SelectedPlaylist = Playlists.FirstOrDefault(x => x.Id == created.Id);
+            PlaylistNameInput = string.Empty;
+            await _mediator.Publish(new PlaylistCreatedNotification(created.Id, created.Name));
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[SettingsWindowViewModel] Could not create playlist");
+        }
+    }
+
+    [RelayCommand]
+    private async Task RenameSelectedPlaylistAsync()
+    {
+        if (SelectedPlaylist is null || string.IsNullOrWhiteSpace(PlaylistNameInput))
+        {
+            return;
+        }
+
+        var playlistId = SelectedPlaylist.Id;
+        var newName = PlaylistNameInput.Trim();
+        try
+        {
+            await _playlistLibraryService.RenamePlaylistAsync(playlistId, newName);
+            await ReloadPlaylistsAsync();
+            SelectedPlaylist = Playlists.FirstOrDefault(x => x.Id == playlistId);
+            await _mediator.Publish(new PlaylistRenamedNotification(playlistId, newName));
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[SettingsWindowViewModel] Could not rename playlist");
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteSelectedPlaylistAsync()
+    {
+        if (SelectedPlaylist is null)
+        {
+            return;
+        }
+
+        var playlistId = SelectedPlaylist.Id;
+        try
+        {
+            await _playlistLibraryService.DeletePlaylistAsync(playlistId);
+            await ReloadPlaylistsAsync();
+            SelectedPlaylist = Playlists.FirstOrDefault();
+            PlaylistNameInput = SelectedPlaylist?.Name ?? string.Empty;
+            await _mediator.Publish(new PlaylistDeletedNotification(playlistId));
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[SettingsWindowViewModel] Could not delete playlist");
+        }
+    }
+
+    [RelayCommand]
     private void ClearMetadata()
     {
         _logger.Information("[SettingsWindowViewModel] Clearing metadata...");
@@ -596,6 +686,9 @@ public sealed partial class SettingsWindowViewModel :
                 _logger.Debug("[SettingsWindowViewModel] Database was successfully cleared");
 
                 Folders = new();
+                Playlists = new();
+                SelectedPlaylist = null;
+                PlaylistNameInput = string.Empty;
 
                 await _timedTask?.StopAsync()!;
                 IsClearMetadataButtonVisible = true;
@@ -761,6 +854,28 @@ public sealed partial class SettingsWindowViewModel :
         {
             PinnedFolders.Add(pinnedFolder);
         }
+    }
+
+    private async Task ReloadPlaylistsAsync(CancellationToken ct = default)
+    {
+        var playlists = await _playlistLibraryService.GetAllPlaylistsAsync(ct);
+        Playlists = new ObservableCollection<PlaylistSummary>(playlists);
+
+        if (SelectedPlaylist is not null)
+        {
+            SelectedPlaylist = Playlists.FirstOrDefault(x => x.Id == SelectedPlaylist.Id);
+        }
+        else if (Playlists.Count > 0)
+        {
+            SelectedPlaylist = Playlists[0];
+        }
+
+        PlaylistNameInput = SelectedPlaylist?.Name ?? string.Empty;
+    }
+
+    partial void OnSelectedPlaylistChanged(PlaylistSummary? value)
+    {
+        PlaylistNameInput = value?.Name ?? string.Empty;
     }
 
     private void PersistMutedDroppedSongFolders()

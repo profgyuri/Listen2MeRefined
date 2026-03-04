@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -150,6 +151,11 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
     {
         var normalized = Normalize(folders);
         _settingsManager.SaveSettings(s => s.PinnedFolders = normalized);
+    }
+
+    public void SetSearchResultsTransferMode(SearchResultsTransferMode mode)
+    {
+        _settingsManager.SaveSettings(s => s.SearchResultsTransferMode = mode);
     }
 
     public void SetMutedDroppedSongFolders(IEnumerable<string> folders)
