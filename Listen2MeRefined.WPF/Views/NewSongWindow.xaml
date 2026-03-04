@@ -8,7 +8,7 @@
         xmlns:viewModels="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels;assembly=Listen2MeRefined.Infrastructure"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:NewSongWindowViewModel}"
-        Style="{StaticResource BasicWindow}"
+        Style="{DynamicResource BasicWindow}"
         Topmost="{Binding IsTopmost}"
         ResizeMode="NoResize"
         FontSize="15"
@@ -16,8 +16,8 @@
         Height="180"
         Width="500">
 
-    <Border BorderBrush="{StaticResource TertiaryBrush}"
-            Background="{StaticResource HoloBackground}"
+    <Border BorderBrush="{DynamicResource TertiaryBrush}"
+            Background="{DynamicResource HoloBackground}"
             BorderThickness="2"
             CornerRadius="0,0,10,10">
         <Grid>
@@ -28,9 +28,9 @@
 
             <Border Grid.Row="0"
                     Padding="10,5"
-                    BorderBrush="#3A3A3A"
+                    BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="0,0,0,1"
-                    Background="#232323">
+                    Background="{DynamicResource DarkBorderBackgroundBrush}">
                 <Grid VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -39,13 +39,13 @@
 
                     <Border Width="22"
                             Height="22"
-                            Background="{StaticResource TertiaryBrush}"
+                            Background="{DynamicResource TertiaryBrush}"
                             CornerRadius="11"
                             VerticalAlignment="Center">
                         <materialDesign:PackIcon Kind="MusicNote"
                                                  Width="13"
                                                  Height="13"
-                                                 Foreground="#1F1F1F"
+                                                 Foreground="{DynamicResource SecondaryBrush}"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center" />
                     </Border>
@@ -54,26 +54,22 @@
                                 Margin="8,0,0,0"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource NewSongHeaderText}" Text="Now Playing" />
+                        <TextBlock Style="{DynamicResource NewSongHeaderText}" Text="Now Playing" />
                         <Ellipse Width="5"
                                  Height="5"
-                                 Fill="{StaticResource TertiaryBrush}"
+                                 Fill="{DynamicResource TertiaryBrush}"
                                  Margin="8,0,8,0"
                                  VerticalAlignment="Center" />
-                        <TextBlock Style="{StaticResource NewSongHeaderText}"
-                                   Foreground="#A8A8A8"
+                        <TextBlock Style="{DynamicResource NewSongHeaderText}"
+                                   Foreground="{DynamicResource SecondaryDarkBrush}"
                                    Text="{Binding Song.Length, StringFormat={}{0:mm\\:ss}, FallbackValue=00:00}" />
                     </StackPanel>
                 </Grid>
             </Border>
 
             <Border Grid.Row="1"
-                    Margin="10"
-                    Background="#272727"
-                    BorderBrush="#3A3A3A"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    Padding="10,8">
+                    Style="{DynamicResource DarkBorderContainer}"
+                    Margin="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -84,10 +80,10 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
-                               Style="{StaticResource NewSongTrackTitleText}"
+                               Style="{DynamicResource NewSongTrackTitleText}"
                                Text="{Binding Song.Title, FallbackValue=Title}" />
                     <TextBlock Grid.Row="2"
-                               Style="{StaticResource NewSongTrackArtistText}"
+                               Style="{DynamicResource NewSongTrackArtistText}"
                                Text="{Binding Song.Artist, FallbackValue=Artist}" />
 
                     <components:MetaBadgeRow Grid.Row="4"

@@ -68,6 +68,11 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.AutoCheckUpdatesOnStartup = value);
     }
 
+    public void SetUseCompactPlaylistView(bool value)
+    {
+        _settingsManager.SaveSettings(s => s.UseCompactPlaylistView = value);
+    }
+
     public void SetAutoScanOnFolderAdd(bool value)
     {
         _settingsManager.SaveSettings(s => s.AutoScanOnFolderAdd = value);
@@ -151,6 +156,22 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
     public void SetSearchResultsTransferMode(SearchResultsTransferMode mode)
     {
         _settingsManager.SaveSettings(s => s.SearchResultsTransferMode = mode);
+    }
+
+    public void SetMutedDroppedSongFolders(IEnumerable<string> folders)
+    {
+        var normalized = Normalize(folders);
+        _settingsManager.SaveSettings(s => s.MutedDroppedSongFolders = normalized);
+    }
+
+    public void SetThemeMode(string value)
+    {
+        _settingsManager.SaveSettings(s => s.ThemeMode = value);
+    }
+
+    public void SetAccentColor(string value)
+    {
+        _settingsManager.SaveSettings(s => s.AccentColor = value);
     }
 
     private static List<string> Normalize(IEnumerable<string> folders)

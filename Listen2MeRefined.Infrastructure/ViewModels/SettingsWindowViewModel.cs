@@ -6,6 +6,7 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
+using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels;
@@ -43,6 +44,7 @@ public sealed partial class SettingsWindowViewModel :
     private readonly IGlobalHookSettingsSyncService _globalHookSettingsSyncService;
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IPlaybackDefaultsService _playbackDefaultsService;
+    private readonly IAppThemeService _appThemeService;
     private readonly IPlaylistLibraryService _playlistLibraryService;
 
     private TimedTask? _timedTask;
@@ -74,6 +76,7 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private int _startupVolumePercent = 70;
     [ObservableProperty] private bool _startMuted;
     [ObservableProperty] private bool _autoCheckUpdatesOnStartup = true;
+    [ObservableProperty] private string _selectedPlaylistViewMode = "Detailed";
     [ObservableProperty] private bool _autoScanOnFolderAdd = true;
     [ObservableProperty] private bool _showTaskPercentage = true;
     [ObservableProperty] private int _taskPercentageReportInterval = 1;
@@ -83,15 +86,24 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
     [ObservableProperty] private string? _selectedPinnedFolder = "";
+    [ObservableProperty] private ObservableCollection<string> _themeModes = new();
+    [ObservableProperty] private ObservableCollection<string> _accentColors = new();
+    [ObservableProperty] private string _selectedThemeMode = "Dark";
+    [ObservableProperty] private string _selectedAccentColor = "Orange";
     [ObservableProperty] private ObservableCollection<PlaylistSummary> _playlists = new();
     [ObservableProperty] private PlaylistSummary? _selectedPlaylist;
     [ObservableProperty] private string _playlistNameInput = "";
     [ObservableProperty] private SearchResultsTransferMode _selectedSearchResultsTransferMode = SearchResultsTransferMode.Move;
+    [ObservableProperty] private ObservableCollection<string> _mutedDroppedSongFolders = new();
+    [ObservableProperty] private string? _selectedMutedDroppedSongFolder = "";
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
     public ObservableCollection<SearchResultsTransferMode> SearchResultsTransferModes { get; } =
         new(Enum.GetValues<SearchResultsTransferMode>());
+
+    public ObservableCollection<string> PlaylistViewModes { get; } =
+        new(new[] { "Detailed", "Compact" });
 
     public bool ScanOnStartup
     {
@@ -124,7 +136,8 @@ public sealed partial class SettingsWindowViewModel :
         IGlobalHookSettingsSyncService globalHookSettingsSyncService,
         IPinnedFoldersService pinnedFoldersService,
         IPlaybackDefaultsService playbackDefaultsService,
-        IPlaylistLibraryService playlistLibraryService)
+        IPlaylistLibraryService playlistLibraryService,
+        IAppThemeService appThemeService)
     {
         _logger = logger;
         _audioRepository = audioRepository;
@@ -144,6 +157,7 @@ public sealed partial class SettingsWindowViewModel :
         _pinnedFoldersService = pinnedFoldersService;
         _playbackDefaultsService = playbackDefaultsService;
         _playlistLibraryService = playlistLibraryService;
+        _appThemeService = appThemeService;
 
         _logger.Debug("[SettingsWindowViewModel] initialized");
     }
@@ -158,6 +172,8 @@ public sealed partial class SettingsWindowViewModel :
             "Default",
             "Always on top"
         };
+        ThemeModes = new ObservableCollection<string>(_appThemeService.GetThemeModes());
+        AccentColors = new ObservableCollection<string>(_appThemeService.GetAccentColors());
 
         var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
         _folderRecursionByPath.Clear();
@@ -182,6 +198,7 @@ public sealed partial class SettingsWindowViewModel :
         StartupVolumePercent = _playbackDefaultsService.ToVolumePercent(_settingsReader.GetStartupVolume());
         StartMuted = _settingsReader.GetStartMuted();
         AutoCheckUpdatesOnStartup = _settingsReader.GetAutoCheckUpdatesOnStartup();
+        SelectedPlaylistViewMode = _settingsReader.GetUseCompactPlaylistView() ? "Compact" : "Detailed";
         AutoScanOnFolderAdd = _settingsReader.GetAutoScanOnFolderAdd();
         ShowTaskPercentage = _settingsReader.GetShowTaskPercentage();
         TaskPercentageReportInterval = Math.Clamp(
@@ -196,8 +213,11 @@ public sealed partial class SettingsWindowViewModel :
         SelectedScanMilestoneBasis = _settingsReader.GetScanMilestoneBasis();
         FolderBrowserStartAtLastLocation = _settingsReader.GetFolderBrowserStartAtLastLocation();
         SelectedSearchResultsTransferMode = _settingsReader.GetSearchResultsTransferMode();
+        SelectedThemeMode = _settingsReader.GetThemeMode();
+        SelectedAccentColor = _settingsReader.GetAccentColor();
         ReloadPinnedFolders();
         await ReloadPlaylistsAsync(ct);
+        ReloadMutedDroppedSongFolders();
 
         await GetAudioOutputDevices();
         _isLoadingSettings = false;
@@ -385,6 +405,19 @@ public sealed partial class SettingsWindowViewModel :
         }
     }
 
+
+    partial void OnSelectedPlaylistViewModeChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        var useCompactPlaylistView = string.Equals(value, "Compact", StringComparison.Ordinal);
+        _settingsWriter.SetUseCompactPlaylistView(useCompactPlaylistView);
+        _ = _mediator.Publish(new PlaylistViewModeChangedNotification(useCompactPlaylistView));
+    }
+
     partial void OnAutoScanOnFolderAddChanged(bool value)
     {
         if (_isLoadingSettings)
@@ -474,6 +507,28 @@ public sealed partial class SettingsWindowViewModel :
         _settingsWriter.SetFolderBrowserStartAtLastLocation(value);
     }
 
+    partial void OnSelectedThemeModeChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _settingsWriter.SetThemeMode(value);
+        _appThemeService.ApplyTheme(value, SelectedAccentColor);
+    }
+
+    partial void OnSelectedAccentColorChanged(string value)
+    {
+        if (_isLoadingSettings || string.IsNullOrWhiteSpace(value))
+        {
+            return;
+        }
+
+        _settingsWriter.SetAccentColor(value);
+        _appThemeService.ApplyTheme(SelectedThemeMode, value);
+    }
+
     partial void OnSelectedSearchResultsTransferModeChanged(SearchResultsTransferMode value)
     {
         if (_isLoadingSettings)
@@ -487,17 +542,18 @@ public sealed partial class SettingsWindowViewModel :
     [RelayCommand]
     private async Task RemoveFolder()
     {
-        if (string.IsNullOrWhiteSpace(SelectedFolder))
+        var folderToRemove = SelectedFolder;
+        if (string.IsNullOrWhiteSpace(folderToRemove))
         {
             return;
         }
 
-        _logger.Information<string>("[SettingsWindowViewModel] Removing folder: {Folder}", SelectedFolder);
-        Folders.Remove(SelectedFolder);
-        _folderRecursionByPath.Remove(SelectedFolder);
-        await _fromFolderRemover.RemoveFromFolderAsync(SelectedFolder);
+        _logger.Information<string>("[SettingsWindowViewModel] Removing folder: {Folder}", folderToRemove);
+        Folders.Remove(folderToRemove);
+        _folderRecursionByPath.Remove(folderToRemove);
+        await _fromFolderRemover.RemoveFromFolderAsync(folderToRemove);
         PersistMusicFolders();
-        _logger.Verbose<string>("[SettingsWindowViewModel] Folder removed: {Folder}", SelectedFolder);
+        _logger.Verbose<string>("[SettingsWindowViewModel] Folder removed: {Folder}", folderToRemove);
     }
 
     [RelayCommand]
@@ -524,6 +580,25 @@ public sealed partial class SettingsWindowViewModel :
         }
 
         PersistPinnedFolders();
+    }
+
+    [RelayCommand]
+    private void RemoveMutedDroppedSongFolder()
+    {
+        if (string.IsNullOrWhiteSpace(SelectedMutedDroppedSongFolder))
+        {
+            return;
+        }
+
+        MutedDroppedSongFolders.Remove(SelectedMutedDroppedSongFolder);
+        PersistMutedDroppedSongFolders();
+    }
+
+    [RelayCommand]
+    private void ResetDroppedFolderPrompts()
+    {
+        MutedDroppedSongFolders.Clear();
+        PersistMutedDroppedSongFolders();
     }
 
     [RelayCommand]
@@ -716,6 +791,46 @@ public sealed partial class SettingsWindowViewModel :
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
 
+    public void RefreshLibraryTabData()
+    {
+        var wasLoading = _isLoadingSettings;
+        _isLoadingSettings = true;
+        try
+        {
+            var previousSelection = SelectedFolder;
+            var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
+
+            _folderRecursionByPath.Clear();
+            foreach (var folderRequest in musicFolderRequests)
+            {
+                _folderRecursionByPath[folderRequest.Path] = folderRequest.IncludeSubdirectories;
+            }
+
+            Folders.Clear();
+            foreach (var folderRequest in musicFolderRequests)
+            {
+                Folders.Add(folderRequest.Path);
+            }
+
+            if (!string.IsNullOrWhiteSpace(previousSelection)
+                && Folders.Contains(previousSelection))
+            {
+                SelectedFolder = previousSelection;
+            }
+            else
+            {
+                SelectedFolder = Folders.FirstOrDefault();
+            }
+
+            ReloadPinnedFolders();
+            ReloadMutedDroppedSongFolders();
+        }
+        finally
+        {
+            _isLoadingSettings = wasLoading;
+        }
+    }
+
     private void PersistMusicFolders()
     {
         var folders = Enumerable
@@ -761,6 +876,22 @@ public sealed partial class SettingsWindowViewModel :
     partial void OnSelectedPlaylistChanged(PlaylistSummary? value)
     {
         PlaylistNameInput = value?.Name ?? string.Empty;
+    }
+
+    private void PersistMutedDroppedSongFolders()
+    {
+        _settingsWriter.SetMutedDroppedSongFolders(MutedDroppedSongFolders);
+    }
+
+    private void ReloadMutedDroppedSongFolders()
+    {
+        var mutedFolders = _settingsReader.GetMutedDroppedSongFolders();
+
+        MutedDroppedSongFolders.Clear();
+        foreach (var mutedFolder in mutedFolders)
+        {
+            MutedDroppedSongFolders.Add(mutedFolder);
+        }
     }
 
     private async Task SyncGlobalHookRegistrationAsync()

@@ -31,6 +31,8 @@ public interface IAppSettingsWriter
     void SetStartMuted(bool value);
     /// <summary>Sets whether automatic update checks on startup are enabled.</summary>
     void SetAutoCheckUpdatesOnStartup(bool value);
+    /// <summary>Sets whether playlist uses compact visual rows.</summary>
+    void SetUseCompactPlaylistView(bool value);
     /// <summary>Sets whether a folder should be auto-scanned when added.</summary>
     void SetAutoScanOnFolderAdd(bool value);
     /// <summary>Sets whether background task percentage should be shown in the title bar.</summary>
@@ -57,4 +59,10 @@ public interface IAppSettingsWriter
     void SetPinnedFolders(IEnumerable<string> folders);
     /// <summary>Sets search-results transfer mode for default playlist tab.</summary>
     void SetSearchResultsTransferMode(SearchResultsTransferMode mode);
+    /// <summary>Sets folders where the dropped-song folder add prompt is muted.</summary>
+    void SetMutedDroppedSongFolders(IEnumerable<string> folders);
+    /// <summary>Sets current theme mode.</summary>
+    void SetThemeMode(string value);
+    /// <summary>Sets current accent color name.</summary>
+    void SetAccentColor(string value);
 }

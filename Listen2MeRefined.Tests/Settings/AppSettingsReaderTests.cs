@@ -26,6 +26,7 @@ public sealed class AppSettingsReaderTests
             StartMuted = false,
             AutoCheckUpdatesOnStartup = true,
             AutoScanOnFolderAdd = false,
+            MutedDroppedSongFolders = [@"C:\Muted"],
             ShowTaskPercentage = true,
             TaskPercentageReportInterval = 5,
             ShowScanMilestoneCount = true,
@@ -54,6 +55,8 @@ public sealed class AppSettingsReaderTests
         Assert.False(sut.GetStartMuted());
         Assert.True(sut.GetAutoCheckUpdatesOnStartup());
         Assert.False(sut.GetAutoScanOnFolderAdd());
+        Assert.Single(sut.GetMutedDroppedSongFolders());
+        Assert.Equal(@"C:\Muted", sut.GetMutedDroppedSongFolders()[0]);
         Assert.True(sut.GetShowTaskPercentage());
         Assert.Equal((short)5, sut.GetTaskPercentageReportInterval());
         Assert.True(sut.GetShowScanMilestoneCount());

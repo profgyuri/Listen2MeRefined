@@ -9,6 +9,7 @@ namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 public partial class PlaybackControlsViewModel :
     ViewModelBase,
     INotificationHandler<CurrentSongNotification>,
+    INotificationHandler<AppThemeChangedNotification>,
     IWaveformViewportAware
 {
     private const float VolumeEpsilon = 0.0001f;
@@ -146,7 +147,14 @@ public partial class PlaybackControlsViewModel :
         }
 
         _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
-        await DrawPlaceholderLineAsync(ct);
+        if (string.IsNullOrWhiteSpace(_currentTrackPath))
+        {
+            await DrawPlaceholderLineAsync(ct);
+        }
+        else
+        {
+            await DrawTrackWaveFormAsync(_currentTrackPath, ct);
+        }
 
         _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
     }
@@ -351,6 +359,12 @@ public partial class PlaybackControlsViewModel :
         {
             ArePlaybackButtonsEnabled = true;
         }
+    }
+
+    public Task Handle(AppThemeChangedNotification notification, CancellationToken cancellationToken)
+    {
+        ScheduleWaveformRedraw();
+        return Task.CompletedTask;
     }
 
     private void SetMuted(bool isMuted)

@@ -3,16 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance mainWindow:PlaylistPaneViewModel}"
              xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils">
     <Border Margin="0,20,0,14"
-            Background="#272727"
-            BorderBrush="#3A3A3A"
-            BorderThickness="1"
-            CornerRadius="12"
-            Padding="10">
+            Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -29,7 +30,6 @@
                 <components:SectionHeader Grid.Column="0"
                                           Title="Playlist"
                                           IconKind="PlaylistMusic"
-                                          AccentBrush="{StaticResource TertiaryBrush}"
                                           ShowActionButton="True"
                                           ActionToolTip="Remove Selected / All from Active Tab"
                                           ActionIconKind="CloseBoxOutline"
@@ -68,7 +68,7 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding Header}"
-                                       Foreground="{StaticResource SecondaryBrush}"
+                                       Foreground="{DynamicResource SecondaryBrush}"
                                        Margin="0,0,6,0"
                                        VerticalAlignment="Center" />
                             <Button Width="18"
@@ -78,7 +78,7 @@
                                     ToolTip="Close tab"
                                     Background="Transparent"
                                     BorderThickness="0"
-                                    Foreground="{StaticResource SecondaryBrush}"
+                                    Foreground="{DynamicResource SecondaryBrush}"
                                     Visibility="{Binding IsCloseable, Converter={StaticResource BoolToVisibilityConverter}}"
                                     Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                     CommandParameter="{Binding}">
@@ -93,7 +93,7 @@
                         <ListView dd:DragDrop.IsDragSource="True"
                                   dd:DragDrop.IsDropTarget="True"
                                   ItemsSource="{Binding Songs}"
-                                  Style="{StaticResource PlaylistListView}"
+                                  Style="{DynamicResource PlaylistListView}"
                                   PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
                                   SelectedItem="{Binding DataContext.SelectedSong, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                                   SelectedIndex="{Binding DataContext.SelectedIndex, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
@@ -112,7 +112,7 @@
                             </ListView.InputBindings>
                             <ListView.ContextMenu>
                                 <ContextMenu Opened="SongContextMenuOnOpened"
-                                             Style="{StaticResource PlaylistContextMenuStyle}" />
+                                             Style="{DynamicResource PlaylistContextMenuStyle}" />
                             </ListView.ContextMenu>
                             <ListView.ItemTemplate>
                                 <DataTemplate>
@@ -123,14 +123,14 @@
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
 
-                                        <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
-                                                                       Foreground="#D7D7D7"
-                                                                       FontSize="16"
-                                                                       FontWeight="Bold"
-                                                                       TextTrimming="None"
-                                                                       HorizontalAlignment="Left"
-                                                                       ClipToBounds="True"
-                                                                       utils:FlowingTextBehavior.IsEnabled="True" />
+                            <resources:StoryboardTextBlock Text="{Binding Display, FallbackValue=Track}"
+                                                           Foreground="{DynamicResource SecondaryBrush}"
+                                                           FontSize="16"
+                                                           FontWeight="Bold"
+                                                           TextTrimming="None"
+                                                           HorizontalAlignment="Left"
+                                                           ClipToBounds="True"
+                                                           utils:FlowingTextBehavior.IsEnabled="True" />
 
                                         <components:MetaBadgeRow Grid.Row="2"
                                                                  BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"

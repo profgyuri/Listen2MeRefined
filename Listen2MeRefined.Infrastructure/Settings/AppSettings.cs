@@ -22,6 +22,7 @@ public sealed class AppSettings : Settings
     public float StartupVolume { get; set; } = 0.7f;
     public bool StartMuted { get; set; }
     public bool AutoCheckUpdatesOnStartup { get; set; } = true;
+    public bool UseCompactPlaylistView { get; set; }
     public bool AutoScanOnFolderAdd { get; set; } = true;
     public bool ShowTaskPercentage { get; set; } = true;
     public short TaskPercentageReportInterval { get; set; } = 1;
@@ -32,12 +33,22 @@ public sealed class AppSettings : Settings
     public bool FolderBrowserStartAtLastLocation { get; set; } = true;
     public string PinnedFoldersJson { get; set; } = "[]";
     public SearchResultsTransferMode SearchResultsTransferMode { get; set; } = SearchResultsTransferMode.Move;
+    public string MutedDroppedSongFoldersJson { get; set; } = "[]";
+    public string ThemeMode { get; set; } = "Dark";
+    public string AccentColor { get; set; } = "Orange";
 
     [NotMapped]
     public List<string> PinnedFolders
     {
         get => Deserialize(PinnedFoldersJson);
         set => PinnedFoldersJson = Serialize(value);
+    }
+
+    [NotMapped]
+    public List<string> MutedDroppedSongFolders
+    {
+        get => Deserialize(MutedDroppedSongFoldersJson);
+        set => MutedDroppedSongFoldersJson = Serialize(value);
     }
 
     private static string Serialize(List<string>? paths)

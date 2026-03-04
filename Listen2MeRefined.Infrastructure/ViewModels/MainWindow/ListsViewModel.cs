@@ -4,6 +4,9 @@ using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
+using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Utils;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
@@ -12,7 +15,8 @@ public partial class ListsViewModel :
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
-    INotificationHandler<QuickSearchResultsNotification>
+    INotificationHandler<QuickSearchResultsNotification>,
+    INotificationHandler<ExternalAudioFilesOpenedNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
@@ -21,6 +25,13 @@ public partial class ListsViewModel :
     private readonly IAppSettingsReader _settingsReader;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
+    private readonly IExternalAudioOpenService _externalAudioOpenService;
+    private readonly IAppSettingsWriter _settingsWriter;
+    private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
+
+    private static readonly HashSet<string> SupportedExtensions = new(
+        GlobalConstants.SupportedExtensions,
+        StringComparer.OrdinalIgnoreCase);
 
     private int _currentSongIndex = -1;
     private int? _activeNamedPlaylistId;
@@ -48,7 +59,11 @@ public partial class ListsViewModel :
         IAudioSearchExecutionService audioSearchExecutionService,
         IFileScanner fileScanner,
         IAppSettingsReader settingsReader,
-        IMusicPlayerController musicPlayerController, IPlaylist playList)
+        IMusicPlayerController musicPlayerController,
+        IPlaylist playList,
+        IAppSettingsWriter settingsWriter,
+        IDroppedSongFolderPromptService droppedSongFolderPromptService,
+        IExternalAudioOpenService externalAudioOpenService)
     {
         _logger = logger;
         _mediator = mediator;
@@ -57,8 +72,83 @@ public partial class ListsViewModel :
         _settingsReader = settingsReader;
         _musicPlayerController = musicPlayerController;
         _playList = playList;
+        _externalAudioOpenService = externalAudioOpenService;
+        _settingsReader = settingsReader;
+        _settingsWriter = settingsWriter;
+        _droppedSongFolderPromptService = droppedSongFolderPromptService;
 
         _logger.Debug("[ListsViewModel] Class initialized");
+    }
+
+    public async Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
+    {
+        var supportedFiles = droppedPaths
+            .Where(x => !string.IsNullOrWhiteSpace(x) && File.Exists(x))
+            .Where(x => SupportedExtensions.Contains(Path.GetExtension(x)))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (supportedFiles.Count == 0)
+        {
+            return;
+        }
+
+        var folders = supportedFiles
+            .Select(Path.GetDirectoryName)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x!)
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        await PromptAndPersistMissingMusicFoldersAsync(folders, ct);
+
+        var targetIndex = Math.Clamp(insertIndex, 0, PlayList.Count);
+        foreach (var file in supportedFiles)
+        {
+            var scanned = await _fileScanner.ScanAsync(file, ct);
+            PlayList.Insert(targetIndex, scanned);
+            targetIndex++;
+        }
+    }
+
+    private async Task PromptAndPersistMissingMusicFoldersAsync(IEnumerable<string> folders, CancellationToken ct)
+    {
+        var existing = _settingsReader.GetMusicFolders();
+        var toAdd = existing.ToList();
+        var mutedFolders = _settingsReader.GetMutedDroppedSongFolders().ToList();
+        var changed = false;
+        var mutedChanged = false;
+
+        foreach (var folder in folders)
+        {
+            if (existing.Contains(folder, StringComparer.OrdinalIgnoreCase) ||
+                toAdd.Contains(folder, StringComparer.OrdinalIgnoreCase) ||
+                mutedFolders.Contains(folder, StringComparer.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var decision = await _droppedSongFolderPromptService.PromptAsync(folder, ct);
+            if (decision == AddDroppedSongFolderDecision.AddFolder)
+            {
+                toAdd.Add(folder);
+                changed = true;
+            }
+            else if (decision == AddDroppedSongFolderDecision.SkipAndDontAskAgain)
+            {
+                mutedFolders.Add(folder);
+                mutedChanged = true;
+            }
+        }
+
+        if (changed)
+        {
+            _settingsWriter.SetMusicFolders(toAdd);
+        }
+
+        if (mutedChanged)
+        {
+            _settingsWriter.SetMutedDroppedSongFolders(mutedFolders);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
@@ -343,9 +433,16 @@ public partial class ListsViewModel :
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
+        _externalAudioOpenService.SetCurrentSong(notification.Audio);
         SelectedSong = notification.Audio;
         _currentSongIndex = PlayList.IndexOf(SelectedSong);
         await Task.CompletedTask;
+    }
+
+    public Task Handle(ExternalAudioFilesOpenedNotification notification, CancellationToken cancellationToken)
+    {
+        _logger.Information("[ListsViewModel] Handling {Count} shell-opened audio file(s)", notification.Paths.Count);
+        return _externalAudioOpenService.OpenAsync(notification.Paths, cancellationToken);
     }
 
     public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)

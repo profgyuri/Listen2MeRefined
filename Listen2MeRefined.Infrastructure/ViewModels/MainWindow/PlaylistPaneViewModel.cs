@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class PlaylistPaneViewModel :
     ViewModelBase,
+    INotificationHandler<PlaylistViewModeChangedNotification>,
     INotificationHandler<PlaylistCreatedNotification>,
     INotificationHandler<PlaylistRenamedNotification>,
     INotificationHandler<PlaylistDeletedNotification>,
     INotificationHandler<PlaylistMembershipChangedNotification>
 {
     private readonly ListsViewModel _lists;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IMediator _mediator;
 
@@ -21,6 +24,9 @@ public partial class PlaylistPaneViewModel :
     [ObservableProperty] private ObservableCollection<PlaylistTabItem> _tabs = new();
     [ObservableProperty] private PlaylistTabItem? _selectedTab;
     [ObservableProperty] private ObservableCollection<PlaylistSummary> _availablePlaylists = new();
+    [ObservableProperty] private bool _isCompactPlaylistView;
+
+    public ObservableCollection<AudioModel> PlayList => _lists.PlayList;
 
     public AudioModel? SelectedSong
     {
@@ -34,14 +40,18 @@ public partial class PlaylistPaneViewModel :
         set => _lists.SelectedIndex = value;
     }
 
+    public IRelayCommand RemoveSelectedFromPlaylistCommand => _lists.RemoveSelectedFromPlaylistCommand;
     public IAsyncRelayCommand JumpToSelectedSongCommand => _lists.JumpToSelectedSongCommand;
+    public IRelayCommand SwitchToSongMenuTabCommand => _lists.SwitchToSongMenuTabCommand;
 
     public PlaylistPaneViewModel(
         ListsViewModel lists,
         IPlaylistLibraryService playlistLibraryService,
-        IMediator mediator)
+        IMediator mediator,
+        IAppSettingsReader settingsReader)
     {
         _lists = lists;
+        _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
         _lists.PropertyChanged += ListsOnPropertyChanged;
@@ -54,6 +64,7 @@ public partial class PlaylistPaneViewModel :
     protected override async Task InitializeCoreAsync(CancellationToken ct)
     {
         await RefreshAvailablePlaylistsAsync(ct);
+        IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
     }
 
     [RelayCommand]
@@ -407,6 +418,15 @@ public partial class PlaylistPaneViewModel :
         }
 
         return -1;
+    }
+
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
+        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+
+    public Task Handle(PlaylistViewModeChangedNotification notification, CancellationToken cancellationToken)
+    {
+        IsCompactPlaylistView = notification.UseCompactPlaylistView;
+        return Task.CompletedTask;
     }
 
     private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

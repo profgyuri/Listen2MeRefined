@@ -29,6 +29,7 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public float GetStartupVolume() => _settingsManager.Settings.StartupVolume;
     public bool GetStartMuted() => _settingsManager.Settings.StartMuted;
     public bool GetAutoCheckUpdatesOnStartup() => _settingsManager.Settings.AutoCheckUpdatesOnStartup;
+    public bool GetUseCompactPlaylistView() => _settingsManager.Settings.UseCompactPlaylistView;
     public bool GetAutoScanOnFolderAdd() => _settingsManager.Settings.AutoScanOnFolderAdd;
     public bool GetShowTaskPercentage() => _settingsManager.Settings.ShowTaskPercentage;
     public short GetTaskPercentageReportInterval() => _settingsManager.Settings.TaskPercentageReportInterval;
@@ -39,4 +40,7 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public string GetLastBrowsedFolder() => _settingsManager.Settings.LastBrowsedFolder;
     public IReadOnlyList<string> GetPinnedFolders() => _settingsManager.Settings.PinnedFolders.ToList();
     public SearchResultsTransferMode GetSearchResultsTransferMode() => _settingsManager.Settings.SearchResultsTransferMode;
+    public IReadOnlyList<string> GetMutedDroppedSongFolders() => _settingsManager.Settings.MutedDroppedSongFolders.ToList();
+    public string GetThemeMode() => _settingsManager.Settings.ThemeMode;
+    public string GetAccentColor() => _settingsManager.Settings.AccentColor;
 }

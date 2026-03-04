@@ -6,6 +6,7 @@ using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 using MediatR;
 using Moq;
 using Serilog;
@@ -24,7 +25,8 @@ public class PlaylistPaneViewModelTests
         playlistLibrary
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<PlaylistSummary>());
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>());
+        var settingsReader = new Mock<IAppSettingsReader>();
+        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
         var song = new AudioModel { Title = "Current", Path = "song.mp3" };
         lists.PlayList.Add(song);
 
@@ -58,7 +60,9 @@ public class PlaylistPaneViewModelTests
         lists.SearchResults.Add(songTwo);
         lists.SendSelectedToPlaylistCommand.Execute(null);
 
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>());
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
+        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
         await pane.RemoveSelectedFromActiveTabCommand.ExecuteAsync(null);
 
         Assert.Empty(lists.DefaultPlaylist);
@@ -77,7 +81,9 @@ public class PlaylistPaneViewModelTests
             .Setup(x => x.GetPlaylistSongsAsync(42, It.IsAny<CancellationToken>()))
             .ReturnsAsync([new AudioModel { Title = "Song", Path = "song.mp3" }]);
 
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>());
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
+        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
         await pane.Handle(new PlaylistCreatedNotification(42, "Road Trip"), CancellationToken.None);
 
         Assert.Equal(2, pane.Tabs.Count);
@@ -98,7 +104,9 @@ public class PlaylistPaneViewModelTests
             .Setup(x => x.CreatePlaylistAsync("Fresh", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PlaylistSummary(15, "Fresh"));
 
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, mediator.Object);
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
+        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, mediator.Object, settingsReader.Object);
         var first = new AudioModel { Title = "First", Path = "a.mp3" };
         var second = new AudioModel { Title = "Second", Path = "b.mp3" };
         lists.DefaultPlaylist.Add(first);
@@ -122,6 +130,24 @@ public class PlaylistPaneViewModelTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task InitializeAsync_LoadsCompactViewModeFromSettings()
+    {
+        var lists = CreateListsViewModel();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(true);
+        var playlistLibrary = new Mock<IPlaylistLibraryService>();
+        playlistLibrary
+            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<PlaylistSummary>());
+        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
+
+        await pane.InitializeAsync();
+
+        Assert.True(pane.IsCompactPlaylistView);
+        settingsReader.Verify(x => x.GetUseCompactPlaylistView(), Times.AtLeastOnce);
+    }
+
     private static ListsViewModel CreateListsViewModel()
     {
         var logger = new Mock<ILogger>();
@@ -131,6 +157,13 @@ public class PlaylistPaneViewModelTests
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
         var playlist = new Playlist();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
         settingsReader
             .Setup(x => x.GetSearchResultsTransferMode())
             .Returns(SearchResultsTransferMode.Move);
@@ -142,7 +175,10 @@ public class PlaylistPaneViewModelTests
             scanner.Object,
             settingsReader.Object,
             playerController.Object,
-            playlist);
+            playlist,
+            settingsWriter.Object,
+            prompt.Object,
+            externalAudioOpenService.Object);
     }
 }
 
