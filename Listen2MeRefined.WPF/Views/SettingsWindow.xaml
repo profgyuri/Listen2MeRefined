@@ -269,11 +269,11 @@
                                                 BorderThickness="1"
                                                 CornerRadius="8">
                                             <StackPanel>
-                                                <TextBlock Style="{StaticResource SettingsSectionDescriptionText}"
+                                                <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
                                                            Text="Muted dropped-folder prompts (folder-specific)" />
                                                 <ListView Height="100"
                                                           Margin="0,8,0,8"
-                                                          Style="{StaticResource VirtualizedListView}"
+                                                          Style="{DynamicResource VirtualizedListView}"
                                                           ItemsSource="{Binding MutedDroppedSongFolders}"
                                                           SelectedItem="{Binding SelectedMutedDroppedSongFolder}">
                                                     <ListView.ItemTemplate>
@@ -285,11 +285,11 @@
                                                     </ListView.ItemTemplate>
                                                 </ListView>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Button Style="{StaticResource SettingsActionButton}"
+                                                    <Button Style="{DynamicResource SettingsActionButton}"
                                                             MinWidth="120"
                                                             Content="Remove Selected"
                                                             Command="{Binding RemoveMutedDroppedSongFolderCommand}" />
-                                                    <Button Style="{StaticResource SettingsActionButton}"
+                                                    <Button Style="{DynamicResource SettingsActionButton}"
                                                             MinWidth="120"
                                                             Margin="8,0,0,0"
                                                             Content="Reset All"
@@ -426,20 +426,20 @@
                         </TabItem.Header>
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="12,0,0,0">
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
-                                        <TextBlock Style="{StaticResource SettingsSectionHeaderText}" Text="Playlists" />
-                                        <TextBlock Style="{StaticResource SettingsSectionDescriptionText}" Text="Manage playlist names and search transfer behavior." />
+                                        <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Playlists" />
+                                        <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Manage playlist names and search transfer behavior." />
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource SettingsSectionCard}">
+                                <Border Style="{DynamicResource SettingsSectionCard}">
                                     <StackPanel>
                                         <components:FormFieldRow Margin="0,0,0,12"
                                                                  Label="Search to default tab:"
                                                                  LabelWidth="190">
                                             <components:FormFieldRow.FieldContent>
-                                                <ComboBox Style="{StaticResource CustomComboBox}"
+                                                <ComboBox Style="{DynamicResource CustomComboBox}"
                                                           SelectedItem="{Binding SelectedSearchResultsTransferMode}"
                                                           ItemsSource="{Binding SearchResultsTransferModes}" />
                                             </components:FormFieldRow.FieldContent>
@@ -458,7 +458,7 @@
                                             <ListView Grid.RowSpan="2"
                                                       Height="170"
                                                       Margin="0,0,10,0"
-                                                      Style="{StaticResource VirtualizedListView}"
+                                                      Style="{DynamicResource VirtualizedListView}"
                                                       ItemsSource="{Binding Playlists}"
                                                       SelectedItem="{Binding SelectedPlaylist}">
                                                 <ListView.ItemTemplate>
@@ -471,7 +471,7 @@
                                             </ListView>
 
                                             <Button Grid.Column="1"
-                                                    Style="{StaticResource SettingsIconActionButton}"
+                                                    Style="{DynamicResource SettingsIconActionButton}"
                                                     Command="{Binding DeleteSelectedPlaylistCommand}"
                                                     Content="{materialDesign:PackIcon Kind=DeleteOutline, Size=18}"
                                                     ToolTip="Delete selected playlist" />
@@ -487,11 +487,11 @@
                                         </components:FormFieldRow>
 
                                         <StackPanel Orientation="Horizontal">
-                                            <Button Style="{StaticResource SettingsActionButton}"
+                                            <Button Style="{DynamicResource SettingsActionButton}"
                                                     MinWidth="110"
                                                     Content="Create"
                                                     Command="{Binding CreatePlaylistCommand}" />
-                                            <Button Style="{StaticResource SettingsActionButton}"
+                                            <Button Style="{DynamicResource SettingsActionButton}"
                                                     MinWidth="110"
                                                     Margin="8,0,0,0"
                                                     Content="Rename"

@@ -40,12 +40,12 @@
                         Height="38"
                         Margin="8,0,0,0"
                         ToolTip="Open playlist"
-                        Style="{StaticResource SearchBarActionButton}"
+                        Style="{DynamicResource SearchBarActionButton}"
                         Click="PlusButtonOnClick">
                     <materialDesign:PackIcon Kind="Plus" Width="18" Height="18" />
                     <Button.ContextMenu>
                         <ContextMenu x:Name="PlaylistPickerContextMenu"
-                                     Style="{StaticResource PlaylistContextMenuStyle}"
+                                     Style="{DynamicResource PlaylistContextMenuStyle}"
                                      ItemsSource="{Binding AvailablePlaylists}">
                             <ContextMenu.ItemContainerStyle>
                                 <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
