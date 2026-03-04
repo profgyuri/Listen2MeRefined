@@ -1,5 +1,6 @@
 #nullable disable
 
+using System;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -50,9 +51,12 @@ public partial class AddPlaylistManyToManyAndTransferModeSetting : Migration
             table: "PlaylistSongs",
             column: "SongId");
 
-        migrationBuilder.DropForeignKey(
-            name: "FK_Songs_Playlists_PlaylistModelId",
-            table: "Songs");
+        if (!string.Equals(ActiveProvider, "Microsoft.EntityFrameworkCore.Sqlite", StringComparison.Ordinal))
+        {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Songs_Playlists_PlaylistModelId",
+                table: "Songs");
+        }
 
         migrationBuilder.DropIndex(
             name: "IX_Songs_PlaylistModelId",
@@ -90,11 +94,14 @@ public partial class AddPlaylistManyToManyAndTransferModeSetting : Migration
             table: "Songs",
             column: "PlaylistModelId");
 
-        migrationBuilder.AddForeignKey(
-            name: "FK_Songs_Playlists_PlaylistModelId",
-            table: "Songs",
-            column: "PlaylistModelId",
-            principalTable: "Playlists",
-            principalColumn: "Id");
+        if (!string.Equals(ActiveProvider, "Microsoft.EntityFrameworkCore.Sqlite", StringComparison.Ordinal))
+        {
+            migrationBuilder.AddForeignKey(
+                name: "FK_Songs_Playlists_PlaylistModelId",
+                table: "Songs",
+                column: "PlaylistModelId",
+                principalTable: "Playlists",
+                principalColumn: "Id");
+        }
     }
 }
