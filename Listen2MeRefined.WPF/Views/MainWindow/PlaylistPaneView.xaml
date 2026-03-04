@@ -16,60 +16,33 @@
             Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="10" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <components:SectionHeader Grid.Column="0"
-                                          Title="Playlist"
-                                          IconKind="PlaylistMusic"
-                                          ShowActionButton="True"
-                                          ActionToolTip="Remove Selected / All from Active Tab"
-                                          ActionIconKind="CloseBoxOutline"
-                                          ActionCommand="{Binding RemoveSelectedFromActiveTabCommand}" />
-
-                <Button Grid.Column="1"
-                        Margin="8,0,0,0"
-                        ToolTip="Open playlist"
-                        Style="{DynamicResource SearchBarActionButton}"
-                        Click="PlusButtonOnClick">
-                    <materialDesign:PackIcon Kind="Plus" Width="18" Height="18" />
-                    <Button.ContextMenu>
-                        <ContextMenu x:Name="PlaylistPickerContextMenu"
-                                     Style="{DynamicResource PlaylistContextMenuStyle}"
-                                     ItemsSource="{Binding AvailablePlaylists}">
-                            <ContextMenu.ItemContainerStyle>
-                                <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
-                                    <Setter Property="Header" Value="{Binding Name}" />
-                                    <Setter Property="Command" Value="{Binding DataContext.OpenPlaylistTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                                    <Setter Property="CommandParameter" Value="{Binding}" />
-                                </Style>
-                            </ContextMenu.ItemContainerStyle>
-                        </ContextMenu>
-                    </Button.ContextMenu>
-                </Button>
-            </Grid>
-
-            <TabControl Grid.Row="2"
+            <TabControl Grid.Row="0"
+                        Margin="0,0,42,0"
                         Background="Transparent"
                         BorderThickness="0"
+                        ItemContainerStyle="{DynamicResource PlaylistTabItemStyle}"
                         ItemsSource="{Binding Tabs}"
                         SelectedItem="{Binding SelectedTab}">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Header}"
+                        <Grid VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="TabHeaderText"
+                                       Grid.Column="0"
+                                       Text="{Binding Header}"
                                        Foreground="{DynamicResource SecondaryBrush}"
                                        Margin="0,0,6,0"
                                        VerticalAlignment="Center" />
-                            <Button Width="18"
+                            <Button x:Name="CloseTabButton"
+                                    Grid.Column="1"
+                                    Width="18"
                                     Height="18"
                                     Padding="0"
                                     Margin="0"
@@ -82,7 +55,7 @@
                                     CommandParameter="{Binding}">
                                 <materialDesign:PackIcon Kind="Close" Width="14" Height="14" />
                             </Button>
-                        </StackPanel>
+                        </Grid>
                     </DataTemplate>
                 </TabControl.ItemTemplate>
 
@@ -165,6 +138,40 @@
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
+
+            <Button Grid.Row="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Width="34"
+                    Height="30"
+                    Padding="2"
+                    Margin="0,1,0,0"
+                    ToolTip="Open named playlists"
+                    Style="{DynamicResource MainTabsActionButton}"
+                    Click="OpenPlaylistPickerButton_OnClick">
+                <materialDesign:PackIcon Kind="Plus" Width="14" Height="14" />
+                <Button.ContextMenu>
+                    <ContextMenu x:Name="PlaylistPickerContextMenu"
+                                 Style="{DynamicResource PlaylistContextMenuStyle}"
+                                 ItemsSource="{Binding PlacementTarget.DataContext.AvailablePlaylists, RelativeSource={RelativeSource Self}}">
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
+                                <Setter Property="Header" Value="{Binding Name}" />
+                                <Setter Property="Command" Value="{Binding PlacementTarget.DataContext.OpenPlaylistTabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <Setter Property="CommandParameter" Value="{Binding}" />
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+
+            <Button Grid.Row="1"
+                    Margin="0,10,0,0"
+                    Content="Clear Default Playlist"
+                    ToolTip="Clear all songs from default playlist"
+                    Style="{DynamicResource MainTabsActionButton}"
+                    Visibility="{Binding SelectedTab.IsDefaultTab, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Command="{Binding RemoveSelectedFromActiveTabCommand}" />
         </Grid>
     </Border>
 </UserControl>

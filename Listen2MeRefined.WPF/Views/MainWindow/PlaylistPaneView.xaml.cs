@@ -3,6 +3,7 @@ namespace Listen2MeRefined.WPF.Views.MainWindow;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -11,6 +12,18 @@ public partial class PlaylistPaneView : UserControl
     public PlaylistPaneView()
     {
         InitializeComponent();
+    }
+
+    private void OpenPlaylistPickerButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.ContextMenu is null)
+        {
+            return;
+        }
+
+        button.ContextMenu.PlacementTarget = button;
+        button.ContextMenu.Placement = PlacementMode.Bottom;
+        button.ContextMenu.IsOpen = true;
     }
 
     private void PlaylistListView_OnPreviewDragOver(object sender, DragEventArgs e)
@@ -66,17 +79,6 @@ public partial class PlaylistPaneView : UserControl
         }
 
         return null;
-    }
-
-    private void PlusButtonOnClick(object sender, System.Windows.RoutedEventArgs e)
-    {
-        if (sender is not Button button || button.ContextMenu is null)
-        {
-            return;
-        }
-
-        button.ContextMenu.PlacementTarget = button;
-        button.ContextMenu.IsOpen = true;
     }
 
     private async void SongContextMenuOnOpened(object sender, System.Windows.RoutedEventArgs e)
