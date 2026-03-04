@@ -130,20 +130,69 @@ public partial class PlaylistPaneView : UserControl
             menu.Items.Add(new Separator());
         }
 
-        var textBox = new TextBox
+        var addToNewPlaylist = new MenuItem
         {
-            MinWidth = 180,
-            Margin = new System.Windows.Thickness(0),
-            Padding = new System.Windows.Thickness(4, 2, 4, 2),
-            Background = (System.Windows.Media.Brush?)FindResource("PrimaryBrush"),
-            Foreground = (System.Windows.Media.Brush?)FindResource("SecondaryBrush"),
-            BorderBrush = (System.Windows.Media.Brush?)FindResource("TertiaryBrush"),
-            BorderThickness = new System.Windows.Thickness(1),
-            ToolTip = "Type a name and press Enter"
+            Header = "Add To New Playlist",
+            StaysOpenOnClick = true,
+            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+        };
+        addToNewPlaylist.Click += (_, _) =>
+            AddInlineNewPlaylistDraft(menu, addToNewPlaylist, viewModel.AddToNewPlaylistFromContextAsync);
+
+        menu.Items.Add(addToNewPlaylist);
+    }
+
+    private void AddInlineNewPlaylistDraft(
+        ContextMenu menu,
+        MenuItem addToNewPlaylistMenuItem,
+        Func<string, Task> createPlaylistAsync)
+    {
+        if (addToNewPlaylistMenuItem.Tag is MenuItem existingDraft &&
+            existingDraft.Header is TextBox existingTextBox)
+        {
+            existingTextBox.Focus();
+            existingTextBox.SelectAll();
+            return;
+        }
+
+        var textBox = CreateInlinePlaylistNameEditor();
+        var draftMenuItem = new MenuItem
+        {
+            Header = textBox,
+            StaysOpenOnClick = true,
+            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+        };
+
+        addToNewPlaylistMenuItem.Tag = draftMenuItem;
+        addToNewPlaylistMenuItem.IsEnabled = false;
+
+        var insertIndex = menu.Items.IndexOf(addToNewPlaylistMenuItem);
+        if (insertIndex < 0)
+        {
+            menu.Items.Add(draftMenuItem);
+        }
+        else
+        {
+            menu.Items.Insert(insertIndex, draftMenuItem);
+        }
+
+        textBox.Loaded += (_, _) =>
+        {
+            textBox.Focus();
+            textBox.SelectAll();
         };
 
         textBox.KeyDown += async (_, args) =>
         {
+            if (args.Key == Key.Escape)
+            {
+                menu.Items.Remove(draftMenuItem);
+                addToNewPlaylistMenuItem.Tag = null;
+                addToNewPlaylistMenuItem.IsEnabled = true;
+                args.Handled = true;
+                return;
+            }
+
             if (args.Key != Key.Enter)
             {
                 return;
@@ -156,35 +205,39 @@ public partial class PlaylistPaneView : UserControl
                 return;
             }
 
+            textBox.IsEnabled = false;
             try
             {
-                await viewModel.AddToNewPlaylistFromContextAsync(newName);
-                menu.IsOpen = false;
+                await createPlaylistAsync(newName);
+                draftMenuItem.Header = newName;
+                draftMenuItem.Focusable = false;
+                addToNewPlaylistMenuItem.Tag = null;
+                addToNewPlaylistMenuItem.IsEnabled = true;
             }
             catch
             {
-                // Swallow: invalid names and duplicates are handled by view models/services.
+                textBox.IsEnabled = true;
+                textBox.Focus();
+                textBox.SelectAll();
             }
+
             args.Handled = true;
         };
+    }
 
-        var textBoxHost = new MenuItem
+    private TextBox CreateInlinePlaylistNameEditor()
+    {
+        return new TextBox
         {
-            Header = textBox,
-            StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+            MinWidth = 180,
+            Margin = new Thickness(0),
+            Padding = new Thickness(4, 2, 4, 2),
+            Background = (Brush?)FindResource("PrimaryBrush"),
+            Foreground = (Brush?)FindResource("SecondaryBrush"),
+            BorderBrush = (Brush?)FindResource("TertiaryBrush"),
+            BorderThickness = new Thickness(1),
+            ToolTip = "Type a name, Enter to create, Esc to cancel"
         };
-
-        var addToNewPlaylist = new MenuItem
-        {
-            Header = "Add To New Playlist",
-            StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
-        };
-        addToNewPlaylist.Items.Add(textBoxHost);
-        addToNewPlaylist.SubmenuOpened += (_, _) => textBox.Focus();
-
-        menu.Items.Add(addToNewPlaylist);
     }
 
     private void ListViewOnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)

@@ -28,6 +28,7 @@ public partial class ListsViewModel :
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
     private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
+    private readonly IUiDispatcher _ui;
 
     private static readonly HashSet<string> SupportedExtensions = new(
         GlobalConstants.SupportedExtensions,
@@ -63,7 +64,7 @@ public partial class ListsViewModel :
         IPlaylist playList,
         IAppSettingsWriter settingsWriter,
         IDroppedSongFolderPromptService droppedSongFolderPromptService,
-        IExternalAudioOpenService externalAudioOpenService)
+        IExternalAudioOpenService externalAudioOpenService, IUiDispatcher ui)
     {
         _logger = logger;
         _mediator = mediator;
@@ -72,6 +73,7 @@ public partial class ListsViewModel :
         _musicPlayerController = musicPlayerController;
         _playList = playList;
         _externalAudioOpenService = externalAudioOpenService;
+        _ui = ui;
         _settingsReader = settingsReader;
         _settingsWriter = settingsWriter;
         _droppedSongFolderPromptService = droppedSongFolderPromptService;
@@ -427,12 +429,12 @@ public partial class ListsViewModel :
 
     partial void OnSelectedIndexChanged(int value)
     {
-        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
+        _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
     }
 
     partial void OnSelectedSongChanged(AudioModel? value)
     {
-        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
+        _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
     }
 
     partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
