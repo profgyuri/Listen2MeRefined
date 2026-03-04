@@ -5,7 +5,6 @@ using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
@@ -70,23 +69,6 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
 
         Assert.Single(viewModel.PinnedFolders);
         Assert.Equal(@"D:\After", viewModel.PinnedFolders[0]);
-    }
-
-    [Fact]
-    public async Task SelectedSearchResultsTransferModeChanged_PersistsSetting()
-    {
-        var settings = new AppSettings
-        {
-            AutoCheckUpdatesOnStartup = false,
-            SearchResultsTransferMode = SearchResultsTransferMode.Move
-        };
-
-        var viewModel = CreateViewModel(settings);
-        await viewModel.InitializeAsync();
-
-        viewModel.SelectedSearchResultsTransferMode = SearchResultsTransferMode.Copy;
-
-        Assert.Equal(SearchResultsTransferMode.Copy, settings.SearchResultsTransferMode);
     }
 
 
@@ -161,31 +143,6 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
     private static SettingsWindowViewModel CreateViewModel(
         AppSettings settings,
         Mock<IFromFolderRemover>? fromFolderRemover = null)
-    [Fact]
-    public async Task RefreshLibraryTabData_WhenSettingsChangedExternally_UpdatesFolders()
-    {
-        var settings = new AppSettings
-        {
-            AutoCheckUpdatesOnStartup = false,
-            MusicFolders = [new MusicFolderModel(@"C:\Initial", false)]
-        };
-
-        var viewModel = CreateViewModel(settings);
-        await viewModel.InitializeAsync();
-        Assert.Single(viewModel.Folders);
-        Assert.Equal(@"C:\Initial", viewModel.Folders[0]);
-
-        settings.MusicFolders = [new MusicFolderModel(@"D:\External", true)];
-
-        viewModel.RefreshLibraryTabData();
-
-        Assert.Single(viewModel.Folders);
-        Assert.Equal(@"D:\External", viewModel.Folders[0]);
-        Assert.Equal(@"D:\External", viewModel.SelectedFolder);
-        Assert.True(viewModel.SelectedFolderIncludeSubdirectories);
-    }
-
-    private static SettingsWindowViewModel CreateViewModel(AppSettings settings)
     {
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);
@@ -216,10 +173,6 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             .Setup(x => x.DirectoryExists(It.IsAny<string>()))
             .Returns<string>(Directory.Exists);
         var pinnedFoldersService = new PinnedFoldersService(folderBrowser.Object);
-        var playlistLibraryService = new Mock<IPlaylistLibraryService>();
-        playlistLibraryService
-            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<PlaylistSummary>());
         var appThemeService = new Mock<IAppThemeService>();
         appThemeService.Setup(x => x.GetThemeModes()).Returns(["Dark", "Light"]);
         appThemeService.Setup(x => x.GetAccentColors()).Returns(["Orange", "Blue", "Green"]);
@@ -242,7 +195,6 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
             Mock.Of<IGlobalHookSettingsSyncService>(),
             pinnedFoldersService,
             playbackDefaultsService,
-            playlistLibraryService.Object,
             appThemeService.Object);
     }
 }

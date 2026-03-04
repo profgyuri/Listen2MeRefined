@@ -1,5 +1,4 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
-using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -57,8 +56,6 @@ public interface IAppSettingsReader
     IReadOnlyList<string> GetPinnedFolders();
     /// <summary>Gets folders where the dropped-song folder add prompt is muted.</summary>
     IReadOnlyList<string> GetMutedDroppedSongFolders();
-    /// <summary>Gets search-results transfer mode for default playlist tab.</summary>
-    SearchResultsTransferMode GetSearchResultsTransferMode();
     /// <summary>Gets current theme mode.</summary>
     string GetThemeMode();
     /// <summary>Gets current accent color name.</summary>

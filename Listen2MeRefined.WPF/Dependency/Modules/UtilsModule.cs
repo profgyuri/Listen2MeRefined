@@ -1,6 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
-using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
@@ -67,9 +66,6 @@ public class UtilsModule : Module
         builder
             .RegisterType<WindowPositionPolicyService>()
             .As<IWindowPositionPolicyService>();
-        builder
-            .RegisterType<PlaylistLibraryService>()
-            .As<IPlaylistLibraryService>();
         builder
             .RegisterType<AppThemeService>()
             .As<IAppThemeService>()

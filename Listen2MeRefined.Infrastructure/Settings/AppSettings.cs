@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
-using Listen2MeRefined.Infrastructure.Playlist;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
 
@@ -32,7 +31,6 @@ public sealed class AppSettings : Settings
     public string LastBrowsedFolder { get; set; } = "";
     public bool FolderBrowserStartAtLastLocation { get; set; } = true;
     public string PinnedFoldersJson { get; set; } = "[]";
-    public SearchResultsTransferMode SearchResultsTransferMode { get; set; } = SearchResultsTransferMode.Move;
     public string MutedDroppedSongFoldersJson { get; set; } = "[]";
     public string ThemeMode { get; set; } = "Dark";
     public string AccentColor { get; set; } = "Orange";
