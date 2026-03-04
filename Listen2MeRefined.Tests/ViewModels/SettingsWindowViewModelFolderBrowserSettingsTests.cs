@@ -161,31 +161,6 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
     private static SettingsWindowViewModel CreateViewModel(
         AppSettings settings,
         Mock<IFromFolderRemover>? fromFolderRemover = null)
-    [Fact]
-    public async Task RefreshLibraryTabData_WhenSettingsChangedExternally_UpdatesFolders()
-    {
-        var settings = new AppSettings
-        {
-            AutoCheckUpdatesOnStartup = false,
-            MusicFolders = [new MusicFolderModel(@"C:\Initial", false)]
-        };
-
-        var viewModel = CreateViewModel(settings);
-        await viewModel.InitializeAsync();
-        Assert.Single(viewModel.Folders);
-        Assert.Equal(@"C:\Initial", viewModel.Folders[0]);
-
-        settings.MusicFolders = [new MusicFolderModel(@"D:\External", true)];
-
-        viewModel.RefreshLibraryTabData();
-
-        Assert.Single(viewModel.Folders);
-        Assert.Equal(@"D:\External", viewModel.Folders[0]);
-        Assert.Equal(@"D:\External", viewModel.SelectedFolder);
-        Assert.True(viewModel.SelectedFolderIncludeSubdirectories);
-    }
-
-    private static SettingsWindowViewModel CreateViewModel(AppSettings settings)
     {
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);

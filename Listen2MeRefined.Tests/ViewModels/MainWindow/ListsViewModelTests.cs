@@ -150,9 +150,9 @@ public class ListsViewModelTests
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
+            settingsReader.Object,
             playerController.Object,
             playlist,
-            settingsReader.Object,
             settingsWriter.Object,
             prompt.Object,
             externalAudioOpenService.Object);
@@ -200,9 +200,9 @@ public class ListsViewModelTests
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
+            settingsReader.Object,
             playerController.Object,
             playlist,
-            settingsReader.Object,
             settingsWriter.Object,
             prompt.Object,
             externalAudioOpenService.Object);
@@ -252,9 +252,9 @@ public class ListsViewModelTests
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
+            settingsReader.Object,
             playerController.Object,
             playlist,
-            settingsReader.Object,
             settingsWriter.Object,
             prompt.Object,
             externalAudioOpenService.Object);
@@ -307,7 +307,6 @@ public class ListsViewModelTests
             settingsReader.Object,
             playerController.Object,
             playlist,
-            settingsReader.Object,
             settingsWriter.Object,
             prompt.Object,
             externalAudioOpenService.Object);

@@ -54,7 +54,6 @@ public partial class PlaylistPaneViewModel :
         _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
-        IsCompactPlaylistView = settingsReader.GetUseCompactPlaylistView();
         _lists.PropertyChanged += ListsOnPropertyChanged;
 
         var defaultTab = new PlaylistTabItem("Default", null, _lists.DefaultPlaylist);
@@ -429,9 +428,6 @@ public partial class PlaylistPaneViewModel :
         IsCompactPlaylistView = notification.UseCompactPlaylistView;
         return Task.CompletedTask;
     }
-
-    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
-        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
 
     private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

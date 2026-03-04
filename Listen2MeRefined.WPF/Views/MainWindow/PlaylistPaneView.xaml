@@ -30,7 +30,6 @@
                 <components:SectionHeader Grid.Column="0"
                                           Title="Playlist"
                                           IconKind="PlaylistMusic"
-                                          AccentBrush="{DynamicResource TertiaryBrush}"
                                           ShowActionButton="True"
                                           ActionToolTip="Remove Selected / All from Active Tab"
                                           ActionIconKind="CloseBoxOutline"

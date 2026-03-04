@@ -4,6 +4,7 @@ using Listen2MeRefined.Infrastructure.Data.Models;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
@@ -108,6 +109,10 @@ public sealed class SettingsWindowViewModelThemeSettingsTests
             .Setup(x => x.DirectoryExists(It.IsAny<string>()))
             .Returns<string>(Directory.Exists);
         var pinnedFoldersService = new PinnedFoldersService(folderBrowser.Object);
+        var playlistLibraryService = new Mock<IPlaylistLibraryService>();
+        playlistLibraryService
+            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<PlaylistSummary>());
 
         var viewModel = new SettingsWindowViewModel(
             Mock.Of<ILogger>(),
@@ -127,6 +132,7 @@ public sealed class SettingsWindowViewModelThemeSettingsTests
             Mock.Of<IGlobalHookSettingsSyncService>(),
             pinnedFoldersService,
             playbackDefaultsService,
+            playlistLibraryService.Object,
             appThemeService.Object);
 
         return (viewModel, appThemeService, settings);
