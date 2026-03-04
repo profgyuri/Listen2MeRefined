@@ -7,6 +7,7 @@ using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
+using Listen2MeRefined.Infrastructure.ViewModels;
 using MediatR;
 using Moq;
 using Serilog;
@@ -167,6 +168,7 @@ public class PlaylistPaneViewModelTests
         settingsReader
             .Setup(x => x.GetSearchResultsTransferMode())
             .Returns(SearchResultsTransferMode.Move);
+        var ui = new Mock<IUiDispatcher>();
 
         return new ListsViewModel(
             logger.Object,
@@ -178,7 +180,8 @@ public class PlaylistPaneViewModelTests
             playlist,
             settingsWriter.Object,
             prompt.Object,
-            externalAudioOpenService.Object);
+            externalAudioOpenService.Object,
+            ui.Object);
     }
 }
 
