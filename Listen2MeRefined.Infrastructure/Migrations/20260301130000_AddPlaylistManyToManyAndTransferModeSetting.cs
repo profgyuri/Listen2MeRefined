@@ -64,9 +64,14 @@ public partial class AddPlaylistManyToManyAndTransferModeSetting : Migration
 
         migrationBuilder.Sql("DELETE FROM Playlists;");
 
-        migrationBuilder.DropColumn(
-            name: "PlaylistModelId",
-            table: "Songs");
+        if (string.Equals(ActiveProvider, "Microsoft.EntityFrameworkCore.Sqlite", StringComparison.Ordinal))
+        {
+            migrationBuilder.Sql("ALTER TABLE \"Songs\" DROP COLUMN \"PlaylistModelId\";");
+        }
+        else
+        {
+            migrationBuilder.Sql("ALTER TABLE [Songs] DROP COLUMN [PlaylistModelId];");
+        }
 
         migrationBuilder.Sql("CREATE UNIQUE INDEX IX_Playlists_Name ON Playlists (Name COLLATE NOCASE);");
     }
