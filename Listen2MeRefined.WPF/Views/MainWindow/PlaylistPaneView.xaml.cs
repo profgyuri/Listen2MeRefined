@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class PlaylistPaneView : UserControl
 {
@@ -16,7 +15,7 @@ public partial class PlaylistPaneView : UserControl
 
     private void PlaylistListView_OnPreviewDragOver(object sender, DragEventArgs e)
     {
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+        if (!e.Data.GetDataPresent(DataFormats.FileDrop, autoConvert: true))
         {
             // Let existing in-app drag/drop handlers (Gong) process non-file drags.
             return;
@@ -26,11 +25,11 @@ public partial class PlaylistPaneView : UserControl
         e.Handled = true;
     }
 
-    private async void PlaylistListView_OnDrop(object sender, DragEventArgs e)
+    private async void PlaylistListView_OnPreviewDrop(object sender, DragEventArgs e)
     {
         if (DataContext is not PlaylistPaneViewModel vm ||
-            !e.Data.GetDataPresent(DataFormats.FileDrop) ||
-            e.Data.GetData(DataFormats.FileDrop) is not string[] droppedFiles)
+            !e.Data.GetDataPresent(DataFormats.FileDrop, autoConvert: true) ||
+            e.Data.GetData(DataFormats.FileDrop, autoConvert: true) is not string[] droppedFiles)
         {
             return;
         }

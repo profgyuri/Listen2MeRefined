@@ -227,6 +227,8 @@ public class ListsViewModelTests
 
         Assert.Equal(scanned, vm.PlayList[0]);
         Assert.Equal(existing, vm.PlayList[1]);
+        Assert.Single(vm.DefaultPlaylist);
+        Assert.Equal(scanned, vm.DefaultPlaylist[0]);
     }
 
     [Fact]
@@ -275,6 +277,61 @@ public class ListsViewModelTests
         }
 
         settingsWriter.Verify(x => x.SetMutedDroppedSongFolders(It.Is<IEnumerable<string>>(f => f.Contains(Path.GetDirectoryName(filePath)!))), Times.Once);
+    }
+
+    [Fact]
+    public async Task HandleExternalFileDropAsync_WhenNamedQueueIsActive_AddsOnlyToDefaultPlaylist()
+    {
+        var logger = new Mock<ILogger>();
+        var mediator = new Mock<IMediator>();
+        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
+        var scanner = new Mock<IFileScanner>();
+        var playerController = new Mock<IMusicPlayerController>();
+        var playlist = new Playlist();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        var settingsWriter = new Mock<IAppSettingsWriter>();
+        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
+
+        var vm = new ListsViewModel(
+            logger.Object,
+            mediator.Object,
+            audioSearchExecutionService.Object,
+            scanner.Object,
+            settingsReader.Object,
+            playerController.Object,
+            playlist,
+            settingsWriter.Object,
+            prompt.Object,
+            externalAudioOpenService.Object);
+
+        var activeQueueSong = new AudioModel { Path = "named.mp3", Title = "Named Queue Song" };
+        vm.ActivateNamedPlaylistQueue(99, [activeQueueSong]);
+
+        var filePath = Path.Combine(Path.GetTempPath(), $"drop-{Guid.NewGuid():N}.mp3");
+        await File.WriteAllTextAsync(filePath, "fake");
+
+        var scanned = new AudioModel { Path = filePath, Title = "Dropped" };
+        scanner.Setup(x => x.ScanAsync(filePath, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(scanned);
+
+        try
+        {
+            await vm.HandleExternalFileDropAsync([filePath], 0);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+
+        Assert.Single(vm.DefaultPlaylist);
+        Assert.Equal(scanned, vm.DefaultPlaylist[0]);
+        Assert.Single(vm.PlayList);
+        Assert.Equal(activeQueueSong, vm.PlayList[0]);
     }
 
     private static ListsViewModel CreateViewModel(

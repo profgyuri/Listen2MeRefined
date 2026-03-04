@@ -22,10 +22,10 @@ public partial class ListsViewModel :
     private readonly IMediator _mediator;
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IFileScanner _fileScanner;
-    private readonly IAppSettingsReader _settingsReader;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
     private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
 
@@ -69,7 +69,6 @@ public partial class ListsViewModel :
         _mediator = mediator;
         _audioSearchExecutionService = audioSearchExecutionService;
         _fileScanner = fileScanner;
-        _settingsReader = settingsReader;
         _musicPlayerController = musicPlayerController;
         _playList = playList;
         _externalAudioOpenService = externalAudioOpenService;
@@ -101,12 +100,30 @@ public partial class ListsViewModel :
 
         await PromptAndPersistMissingMusicFoldersAsync(folders, ct);
 
-        var targetIndex = Math.Clamp(insertIndex, 0, PlayList.Count);
+        var scannedSongs = new List<AudioModel>(supportedFiles.Count);
         foreach (var file in supportedFiles)
         {
             var scanned = await _fileScanner.ScanAsync(file, ct);
-            PlayList.Insert(targetIndex, scanned);
-            targetIndex++;
+            scannedSongs.Add(scanned);
+        }
+
+        var defaultTargetIndex = Math.Clamp(insertIndex, 0, _defaultPlaylist.Count);
+        foreach (var song in scannedSongs)
+        {
+            _defaultPlaylist.Insert(defaultTargetIndex, song);
+            defaultTargetIndex++;
+        }
+
+        if (!IsDefaultPlaylistActive)
+        {
+            return;
+        }
+
+        var playListTargetIndex = Math.Clamp(insertIndex, 0, PlayList.Count);
+        foreach (var song in scannedSongs)
+        {
+            PlayList.Insert(playListTargetIndex, song);
+            playListTargetIndex++;
         }
     }
 

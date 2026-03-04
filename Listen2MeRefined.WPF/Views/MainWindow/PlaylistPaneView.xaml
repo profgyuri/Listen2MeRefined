@@ -90,6 +90,9 @@
                     <DataTemplate>
                         <ListView dd:DragDrop.IsDragSource="True"
                                   dd:DragDrop.IsDropTarget="True"
+                                  AllowDrop="True"
+                                  PreviewDragOver="PlaylistListView_OnPreviewDragOver"
+                                  PreviewDrop="PlaylistListView_OnPreviewDrop"
                                   ItemsSource="{Binding Songs}"
                                   Style="{DynamicResource PlaylistListView}"
                                   PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
