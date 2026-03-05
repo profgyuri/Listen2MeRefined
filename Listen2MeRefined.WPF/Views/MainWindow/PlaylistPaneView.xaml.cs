@@ -103,7 +103,7 @@ public partial class PlaylistPaneView : UserControl
                 Header = state.PlaylistName,
                 IsCheckable = true,
                 IsChecked = state.IsChecked,
-                Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+                Style = (Style?)FindResource("PlaylistPaneContextMenuItemStyle")
             };
 
             menuItem.Click += async (_, _) =>
@@ -134,9 +134,9 @@ public partial class PlaylistPaneView : UserControl
 
         var addToNewPlaylist = new MenuItem
         {
-            Header = "Add To New Playlist",
+            Header = "Create New Playlist...",
             StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+            Style = (Style?)FindResource("PlaylistPaneContextMenuItemStyle")
         };
         addToNewPlaylist.Click += (_, _) =>
             AddInlineNewPlaylistDraft(menu, addToNewPlaylist, viewModel.AddToNewPlaylistFromContextAsync);
@@ -162,7 +162,7 @@ public partial class PlaylistPaneView : UserControl
         {
             Header = textBox,
             StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+            Style = (Style?)FindResource("PlaylistPaneContextMenuItemStyle")
         };
 
         addToNewPlaylistMenuItem.Tag = draftMenuItem;
