@@ -44,7 +44,7 @@
                 </ListView.InputBindings>
                 <ListView.ContextMenu>
                     <ContextMenu Opened="SongContextMenuOnOpened"
-                                 Style="{StaticResource PlaylistContextMenuStyle}" />
+                                 Style="{DynamicResource PlaylistContextMenuStyle}" />
                 </ListView.ContextMenu>
                 <ListView.ItemTemplate>
                     <DataTemplate>

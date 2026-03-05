@@ -3,9 +3,9 @@ namespace Listen2MeRefined.WPF.Views.MainWindow;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class PlaylistPaneView : UserControl
 {
@@ -14,9 +14,21 @@ public partial class PlaylistPaneView : UserControl
         InitializeComponent();
     }
 
+    private void OpenPlaylistPickerButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.ContextMenu is null)
+        {
+            return;
+        }
+
+        button.ContextMenu.PlacementTarget = button;
+        button.ContextMenu.Placement = PlacementMode.Bottom;
+        button.ContextMenu.IsOpen = true;
+    }
+
     private void PlaylistListView_OnPreviewDragOver(object sender, DragEventArgs e)
     {
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+        if (!e.Data.GetDataPresent(DataFormats.FileDrop, autoConvert: true))
         {
             // Let existing in-app drag/drop handlers (Gong) process non-file drags.
             return;
@@ -26,11 +38,11 @@ public partial class PlaylistPaneView : UserControl
         e.Handled = true;
     }
 
-    private async void PlaylistListView_OnDrop(object sender, DragEventArgs e)
+    private async void PlaylistListView_OnPreviewDrop(object sender, DragEventArgs e)
     {
         if (DataContext is not PlaylistPaneViewModel vm ||
-            !e.Data.GetDataPresent(DataFormats.FileDrop) ||
-            e.Data.GetData(DataFormats.FileDrop) is not string[] droppedFiles)
+            !e.Data.GetDataPresent(DataFormats.FileDrop, autoConvert: true) ||
+            e.Data.GetData(DataFormats.FileDrop, autoConvert: true) is not string[] droppedFiles)
         {
             return;
         }
@@ -69,17 +81,6 @@ public partial class PlaylistPaneView : UserControl
         return null;
     }
 
-    private void PlusButtonOnClick(object sender, System.Windows.RoutedEventArgs e)
-    {
-        if (sender is not Button button || button.ContextMenu is null)
-        {
-            return;
-        }
-
-        button.ContextMenu.PlacementTarget = button;
-        button.ContextMenu.IsOpen = true;
-    }
-
     private async void SongContextMenuOnOpened(object sender, System.Windows.RoutedEventArgs e)
     {
         if (sender is not ContextMenu menu || DataContext is not PlaylistPaneViewModel viewModel)
@@ -102,7 +103,7 @@ public partial class PlaylistPaneView : UserControl
                 Header = state.PlaylistName,
                 IsCheckable = true,
                 IsChecked = state.IsChecked,
-                Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+                Style = (Style?)FindResource("PlaylistPaneContextMenuItemStyle")
             };
 
             menuItem.Click += async (_, _) =>
@@ -131,20 +132,69 @@ public partial class PlaylistPaneView : UserControl
             menu.Items.Add(new Separator());
         }
 
-        var textBox = new TextBox
+        var addToNewPlaylist = new MenuItem
         {
-            MinWidth = 180,
-            Margin = new System.Windows.Thickness(0),
-            Padding = new System.Windows.Thickness(4, 2, 4, 2),
-            Background = (System.Windows.Media.Brush?)FindResource("PrimaryBrush"),
-            Foreground = (System.Windows.Media.Brush?)FindResource("SecondaryBrush"),
-            BorderBrush = (System.Windows.Media.Brush?)FindResource("TertiaryBrush"),
-            BorderThickness = new System.Windows.Thickness(1),
-            ToolTip = "Type a name and press Enter"
+            Header = "Create New Playlist...",
+            StaysOpenOnClick = true,
+            Style = (Style?)FindResource("PlaylistPaneContextMenuItemStyle")
+        };
+        addToNewPlaylist.Click += (_, _) =>
+            AddInlineNewPlaylistDraft(menu, addToNewPlaylist, viewModel.AddToNewPlaylistFromContextAsync);
+
+        menu.Items.Add(addToNewPlaylist);
+    }
+
+    private void AddInlineNewPlaylistDraft(
+        ContextMenu menu,
+        MenuItem addToNewPlaylistMenuItem,
+        Func<string, Task> createPlaylistAsync)
+    {
+        if (addToNewPlaylistMenuItem.Tag is MenuItem existingDraft &&
+            existingDraft.Header is TextBox existingTextBox)
+        {
+            existingTextBox.Focus();
+            existingTextBox.SelectAll();
+            return;
+        }
+
+        var textBox = CreateInlinePlaylistNameEditor();
+        var draftMenuItem = new MenuItem
+        {
+            Header = textBox,
+            StaysOpenOnClick = true,
+            Style = (Style?)FindResource("PlaylistPaneContextMenuItemStyle")
+        };
+
+        addToNewPlaylistMenuItem.Tag = draftMenuItem;
+        addToNewPlaylistMenuItem.IsEnabled = false;
+
+        var insertIndex = menu.Items.IndexOf(addToNewPlaylistMenuItem);
+        if (insertIndex < 0)
+        {
+            menu.Items.Add(draftMenuItem);
+        }
+        else
+        {
+            menu.Items.Insert(insertIndex, draftMenuItem);
+        }
+
+        textBox.Loaded += (_, _) =>
+        {
+            textBox.Focus();
+            textBox.SelectAll();
         };
 
         textBox.KeyDown += async (_, args) =>
         {
+            if (args.Key == Key.Escape)
+            {
+                menu.Items.Remove(draftMenuItem);
+                addToNewPlaylistMenuItem.Tag = null;
+                addToNewPlaylistMenuItem.IsEnabled = true;
+                args.Handled = true;
+                return;
+            }
+
             if (args.Key != Key.Enter)
             {
                 return;
@@ -157,35 +207,39 @@ public partial class PlaylistPaneView : UserControl
                 return;
             }
 
+            textBox.IsEnabled = false;
             try
             {
-                await viewModel.AddToNewPlaylistFromContextAsync(newName);
-                menu.IsOpen = false;
+                await createPlaylistAsync(newName);
+                draftMenuItem.Header = newName;
+                draftMenuItem.Focusable = false;
+                addToNewPlaylistMenuItem.Tag = null;
+                addToNewPlaylistMenuItem.IsEnabled = true;
             }
             catch
             {
-                // Swallow: invalid names and duplicates are handled by view models/services.
+                textBox.IsEnabled = true;
+                textBox.Focus();
+                textBox.SelectAll();
             }
+
             args.Handled = true;
         };
+    }
 
-        var textBoxHost = new MenuItem
+    private TextBox CreateInlinePlaylistNameEditor()
+    {
+        return new TextBox
         {
-            Header = textBox,
-            StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
+            MinWidth = 180,
+            Margin = new Thickness(0),
+            Padding = new Thickness(4, 2, 4, 2),
+            Background = (Brush?)FindResource("PrimaryBrush"),
+            Foreground = (Brush?)FindResource("SecondaryBrush"),
+            BorderBrush = (Brush?)FindResource("TertiaryBrush"),
+            BorderThickness = new Thickness(1),
+            ToolTip = "Type a name, Enter to create, Esc to cancel"
         };
-
-        var addToNewPlaylist = new MenuItem
-        {
-            Header = "Add To New Playlist",
-            StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
-        };
-        addToNewPlaylist.Items.Add(textBoxHost);
-        addToNewPlaylist.SubmenuOpened += (_, _) => textBox.Focus();
-
-        menu.Items.Add(addToNewPlaylist);
     }
 
     private void ListViewOnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)

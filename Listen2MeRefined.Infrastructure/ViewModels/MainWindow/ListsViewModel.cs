@@ -22,12 +22,13 @@ public partial class ListsViewModel :
     private readonly IMediator _mediator;
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IFileScanner _fileScanner;
-    private readonly IAppSettingsReader _settingsReader;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IPlaylist _playList;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
     private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
+    private readonly IUiDispatcher _ui;
 
     private static readonly HashSet<string> SupportedExtensions = new(
         GlobalConstants.SupportedExtensions,
@@ -63,16 +64,16 @@ public partial class ListsViewModel :
         IPlaylist playList,
         IAppSettingsWriter settingsWriter,
         IDroppedSongFolderPromptService droppedSongFolderPromptService,
-        IExternalAudioOpenService externalAudioOpenService)
+        IExternalAudioOpenService externalAudioOpenService, IUiDispatcher ui)
     {
         _logger = logger;
         _mediator = mediator;
         _audioSearchExecutionService = audioSearchExecutionService;
         _fileScanner = fileScanner;
-        _settingsReader = settingsReader;
         _musicPlayerController = musicPlayerController;
         _playList = playList;
         _externalAudioOpenService = externalAudioOpenService;
+        _ui = ui;
         _settingsReader = settingsReader;
         _settingsWriter = settingsWriter;
         _droppedSongFolderPromptService = droppedSongFolderPromptService;
@@ -101,12 +102,30 @@ public partial class ListsViewModel :
 
         await PromptAndPersistMissingMusicFoldersAsync(folders, ct);
 
-        var targetIndex = Math.Clamp(insertIndex, 0, PlayList.Count);
+        var scannedSongs = new List<AudioModel>(supportedFiles.Count);
         foreach (var file in supportedFiles)
         {
             var scanned = await _fileScanner.ScanAsync(file, ct);
-            PlayList.Insert(targetIndex, scanned);
-            targetIndex++;
+            scannedSongs.Add(scanned);
+        }
+
+        var defaultTargetIndex = Math.Clamp(insertIndex, 0, _defaultPlaylist.Count);
+        foreach (var song in scannedSongs)
+        {
+            _defaultPlaylist.Insert(defaultTargetIndex, song);
+            defaultTargetIndex++;
+        }
+
+        if (!IsDefaultPlaylistActive)
+        {
+            return;
+        }
+
+        var playListTargetIndex = Math.Clamp(insertIndex, 0, PlayList.Count);
+        foreach (var song in scannedSongs)
+        {
+            PlayList.Insert(playListTargetIndex, song);
+            playListTargetIndex++;
         }
     }
 
@@ -410,12 +429,12 @@ public partial class ListsViewModel :
 
     partial void OnSelectedIndexChanged(int value)
     {
-        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
+        _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
     }
 
     partial void OnSelectedSongChanged(AudioModel? value)
     {
-        JumpToSelectedSongCommand.NotifyCanExecuteChanged();
+        _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
     }
 
     partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
