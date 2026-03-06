@@ -3,6 +3,7 @@ using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 using Listen2MeRefined.Infrastructure.Utils;
+using Listen2MeRefined.WPF.Services;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using System.Linq;
@@ -40,6 +41,11 @@ public class SystemModule : Module
             .As<IFileScanner>()
             .SingleInstance();
         
+        builder
+            .RegisterType<WpfClipboardService>()
+            .As<IClipboardService>()
+            .SingleInstance();
+
         builder
             .RegisterType<NAudioOutputDevices>()
             .As<IOutputDevice>()

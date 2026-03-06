@@ -2,7 +2,6 @@ using Listen2MeRefined.Infrastructure.ViewModels;
 
 namespace Listen2MeRefined.WPF;
 using System.Windows;
-using System.Windows.Input;
 
 /// <summary>
 ///     Interaction logic for FolderBrowserWindow.xaml
@@ -38,20 +37,4 @@ public sealed partial class FolderBrowserWindow : Window
         Close();
     }
 
-    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Escape)
-        {
-            Close();
-            e.Handled = true;
-            return;
-        }
-
-        if (e.Key == Key.L && Keyboard.Modifiers == ModifierKeys.Control)
-        {
-            PathTextBox.Focus();
-            PathTextBox.SelectAll();
-            e.Handled = true;
-        }
-    }
 }

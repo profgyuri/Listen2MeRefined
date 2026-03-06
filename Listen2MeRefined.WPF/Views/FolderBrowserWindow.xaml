@@ -14,8 +14,16 @@
         Height="520"
         Width="860"
         MinHeight="470"
-        MinWidth="760"
-        PreviewKeyDown="Window_PreviewKeyDown">
+        MinWidth="760">
+
+    <Window.InputBindings>
+        <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding NavigateToClipboardPathCommand}" />
+        <KeyBinding Key="Escape" Command="{x:Static SystemCommands.CloseWindowCommand}" />
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" Executed="CancelButton_Click" />
+    </Window.CommandBindings>
 
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
@@ -181,32 +189,20 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Border Grid.Column="0"
                                         Style="{DynamicResource BorderContainer}"
-                                        Padding="10 0">
-                                    <TextBox x:Name="PathTextBox"
-                                             materialDesign:HintAssist.Hint="Full path"
-                                             materialDesign:HintAssist.Foreground="{DynamicResource SecondaryDarkBrush}"
-                                             Foreground="{DynamicResource SecondaryBrush}"
-                                             Background="Transparent"
-                                             BorderThickness="0"
-                                             Height="36"
-                                             VerticalContentAlignment="Center"
-                                             Text="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                        <TextBox.InputBindings>
-                                            <KeyBinding Key="Return" Command="{Binding GoToPathCommand}" />
-                                        </TextBox.InputBindings>
-                                    </TextBox>
+                                        Padding="10,0">
+                                    <TextBlock x:Name="PathTextBlock"
+                                               Foreground="{StaticResource SecondaryBrush}"
+                                               Background="Transparent"
+                                               Height="36"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               ToolTip="{Binding FullPath}"
+                                               Text="{Binding FullPath}" />
                                 </Border>
                                 <Button Grid.Column="1"
-                                        Margin="8,0,0,0"
-                                        Content="Go"
-                                        Command="{Binding GoToPathCommand}"
-                                        Style="{DynamicResource FolderBrowserActionButton}"
-                                        MinWidth="78" />
-                                <Button Grid.Column="2"
                                         Margin="8,0,0,0"
                                         Content="Pin Current"
                                         Command="{Binding TogglePinCommand}"
@@ -227,7 +223,7 @@
 
             <components:WindowFooterBar Grid.Row="2"
                                         Margin="10,10,10,10"
-                                        InfoText="Enter/Right to open folder. Left to go back. Select adds folder to library."
+                                        InfoText="Enter/Right to open. Left to go back. Ctrl+V jumps to clipboard path. Select adds folder to library."
                                         PrimaryButtonText="Select"
                                         PrimaryButtonMinWidth="110"
                                         ShowSecondaryButton="True"
