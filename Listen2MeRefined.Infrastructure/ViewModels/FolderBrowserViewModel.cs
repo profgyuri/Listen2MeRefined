@@ -124,8 +124,21 @@ public sealed partial class FolderBrowserViewModel :
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            SetValidationError("Clipboard is empty.");
+            SetValidationError("Clipboard doesn't contain a valid path.");
             return;
+        }
+
+        // 'Copy as Path' wraps the path in double-quotes – strip them if present.
+        if (text.StartsWith('"') && text.EndsWith('"') && text.Length >= 2)
+        {
+            text = text[1..^1].Trim();
+        }
+
+        // A trailing backslash confuses Path.GetDirectoryName – strip it unless it
+        // is the root of a drive (e.g. "C:\").
+        if (text.EndsWith('\\') && !Path.GetPathRoot(text).Equals(text, StringComparison.OrdinalIgnoreCase))
+        {
+            text = text.TrimEnd('\\');
         }
 
         // If the clipboard contains a file path, use its parent directory.

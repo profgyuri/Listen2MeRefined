@@ -186,7 +186,70 @@ public sealed class FolderBrowserViewModelTests
         viewModel.NavigateToClipboardPathCommand.Execute(null);
 
         Assert.True(viewModel.HasValidationError);
-        Assert.Contains("empty", viewModel.ValidationMessage, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("valid path", viewModel.ValidationMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task NavigateToClipboardPathCommand_QuotedFolderPath_StripsQuotesAndNavigates()
+    {
+        // Windows 'Copy as Path' wraps paths in double-quotes, e.g. "C:\Music"
+        var settings = new AppSettings();
+        var viewModel = CreateViewModel(
+            settings,
+            new FakeFolderBrowser(
+                drives: [@"C:\"],
+                existingFolders: [@"C:\Music"]),
+            clipboardText: "\"C:\\Music\"",
+            out _);
+
+        await viewModel.InitializeAsync();
+
+        viewModel.NavigateToClipboardPathCommand.Execute(null);
+
+        Assert.Equal(@"C:\Music", viewModel.FullPath);
+        Assert.False(viewModel.HasValidationError);
+    }
+
+    [Fact]
+    public async Task NavigateToClipboardPathCommand_TrailingBackslash_StripsBackslashAndNavigates()
+    {
+        // A path ending with '\' confuses Path.GetDirectoryName – the trailing separator must be removed.
+        var settings = new AppSettings();
+        var viewModel = CreateViewModel(
+            settings,
+            new FakeFolderBrowser(
+                drives: [@"C:\"],
+                existingFolders: [@"C:\Music"]),
+            clipboardText: @"C:\Music\",
+            out _);
+
+        await viewModel.InitializeAsync();
+
+        viewModel.NavigateToClipboardPathCommand.Execute(null);
+
+        Assert.Equal(@"C:\Music", viewModel.FullPath);
+        Assert.False(viewModel.HasValidationError);
+    }
+
+    [Fact]
+    public async Task NavigateToClipboardPathCommand_QuotedPathWithTrailingBackslash_StripsQuotesAndBackslashAndNavigates()
+    {
+        // Windows 'Copy as Path' on some folders produces "C:\Music\" – both issues must be handled.
+        var settings = new AppSettings();
+        var viewModel = CreateViewModel(
+            settings,
+            new FakeFolderBrowser(
+                drives: [@"C:\"],
+                existingFolders: [@"C:\Music"]),
+            clipboardText: "\"C:\\Music\\\"",
+            out _);
+
+        await viewModel.InitializeAsync();
+
+        viewModel.NavigateToClipboardPathCommand.Execute(null);
+
+        Assert.Equal(@"C:\Music", viewModel.FullPath);
+        Assert.False(viewModel.HasValidationError);
     }
 
     private static FolderBrowserViewModel CreateViewModel(
