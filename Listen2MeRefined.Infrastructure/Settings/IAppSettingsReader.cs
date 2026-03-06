@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -34,6 +35,8 @@ public interface IAppSettingsReader
     bool GetStartMuted();
     /// <summary>Gets whether automatic update checks on startup are enabled.</summary>
     bool GetAutoCheckUpdatesOnStartup();
+    /// <summary>Gets whether playlist uses compact visual rows.</summary>
+    bool GetUseCompactPlaylistView();
     /// <summary>Gets whether a folder should be auto-scanned when added.</summary>
     bool GetAutoScanOnFolderAdd();
     /// <summary>Gets whether background task percentage should be shown in the title bar.</summary>
@@ -52,4 +55,12 @@ public interface IAppSettingsReader
     string GetLastBrowsedFolder();
     /// <summary>Gets configured pinned folder paths.</summary>
     IReadOnlyList<string> GetPinnedFolders();
+    /// <summary>Gets folders where the dropped-song folder add prompt is muted.</summary>
+    IReadOnlyList<string> GetMutedDroppedSongFolders();
+    /// <summary>Gets search-results transfer mode for default playlist tab.</summary>
+    SearchResultsTransferMode GetSearchResultsTransferMode();
+    /// <summary>Gets current theme mode.</summary>
+    string GetThemeMode();
+    /// <summary>Gets current accent color name.</summary>
+    string GetAccentColor();
 }

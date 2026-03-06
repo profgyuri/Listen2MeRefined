@@ -15,83 +15,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
-
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.AppSettings", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("AutoCheckUpdatesOnStartup")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("AutoScanOnFolderAdd")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("AudioOutputDeviceName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<short>("CornerTriggerDebounceMs")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<short>("CornerTriggerSizePx")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("EnableCornerNowPlayingPopup")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("EnableGlobalMediaKeys")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FontFamily")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("FolderBrowserStartAtLastLocation")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("LastBrowsedFolder")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NewSongWindowPosition")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PinnedFoldersJson")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ScanMilestoneBasis")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<short>("ScanMilestoneInterval")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("ScanOnStartup")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("ShowScanMilestoneCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("ShowTaskPercentage")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("StartMuted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<short>("TaskPercentageReportInterval")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<float>("StartupVolume")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Settings");
-                });
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
             modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", b =>
                 {
@@ -114,24 +38,19 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<DateTime>("LastWriteUtc")
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("LengthBytes")
-                        .HasColumnType("INTEGER");
-
                     b.Property<TimeSpan>("Length")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("LengthBytes")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Path")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("PlaylistModelId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PlaylistModelId");
 
                     b.HasIndex("Path")
                         .IsUnique();
@@ -171,35 +90,151 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Playlists");
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", b =>
+            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Settings.AppSettings", b =>
                 {
-                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", null)
-                        .WithMany("Songs")
-                        .HasForeignKey("PlaylistModelId");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AccentColor")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AudioOutputDeviceName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("AutoCheckUpdatesOnStartup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoScanOnFolderAdd")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("CornerTriggerDebounceMs")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("CornerTriggerSizePx")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableCornerNowPlayingPopup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EnableGlobalMediaKeys")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("FolderBrowserStartAtLastLocation")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FontFamily")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastBrowsedFolder")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MutedDroppedSongFoldersJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NewSongWindowPosition")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PinnedFoldersJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ScanMilestoneBasis")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("ScanMilestoneInterval")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ScanOnStartup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SearchResultsTransferMode")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ShowScanMilestoneCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("ShowTaskPercentage")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("StartMuted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("StartupVolume")
+                        .HasColumnType("REAL");
+
+                    b.Property<short>("TaskPercentageReportInterval")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ThemeMode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("UseCompactPlaylistView")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Settings");
+                });
+
+            modelBuilder.Entity("PlaylistSongs", b =>
+                {
+                    b.Property<int>("PlaylistId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SongId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PlaylistId", "SongId");
+
+                    b.HasIndex("SongId");
+
+                    b.ToTable("PlaylistSongs", (string)null);
                 });
 
             modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.MusicFolderModel", b =>
                 {
-                    b.HasOne("Listen2MeRefined.Infrastructure.Data.AppSettings", null)
+                    b.HasOne("Listen2MeRefined.Infrastructure.Settings.AppSettings", null)
                         .WithMany("MusicFolders")
                         .HasForeignKey("AppSettingsId");
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.AppSettings", b =>
+            modelBuilder.Entity("PlaylistSongs", b =>
                 {
-                    b.Navigation("MusicFolders");
+                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", null)
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", null)
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", b =>
+            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Settings.AppSettings", b =>
                 {
-                    b.Navigation("Songs");
+                    b.Navigation("MusicFolders");
                 });
 #pragma warning restore 612, 618
         }

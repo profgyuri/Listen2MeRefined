@@ -1,4 +1,5 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
@@ -65,6 +66,11 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
     public void SetAutoCheckUpdatesOnStartup(bool value)
     {
         _settingsManager.SaveSettings(s => s.AutoCheckUpdatesOnStartup = value);
+    }
+
+    public void SetUseCompactPlaylistView(bool value)
+    {
+        _settingsManager.SaveSettings(s => s.UseCompactPlaylistView = value);
     }
 
     public void SetAutoScanOnFolderAdd(bool value)
@@ -145,6 +151,27 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
     {
         var normalized = Normalize(folders);
         _settingsManager.SaveSettings(s => s.PinnedFolders = normalized);
+    }
+
+    public void SetSearchResultsTransferMode(SearchResultsTransferMode mode)
+    {
+        _settingsManager.SaveSettings(s => s.SearchResultsTransferMode = mode);
+    }
+
+    public void SetMutedDroppedSongFolders(IEnumerable<string> folders)
+    {
+        var normalized = Normalize(folders);
+        _settingsManager.SaveSettings(s => s.MutedDroppedSongFolders = normalized);
+    }
+
+    public void SetThemeMode(string value)
+    {
+        _settingsManager.SaveSettings(s => s.ThemeMode = value);
+    }
+
+    public void SetAccentColor(string value)
+    {
+        _settingsManager.SaveSettings(s => s.AccentColor = value);
     }
 
     private static List<string> Normalize(IEnumerable<string> folders)

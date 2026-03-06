@@ -2,23 +2,23 @@ using SkiaSharp;
 
 namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 
-public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
+public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWaveformPaletteAware
 {
-    private static readonly SKColor WaveLineColor = new(255, 138, 61); // Matches WPF TertiaryColor (#FF8A3D).
-    private static readonly SKColor WaveBackgroundColor = new(34, 34, 34); // Matches playback wave panel background (#222222).
+    private static readonly SKColor DefaultWaveLineColor = new(255, 138, 61); // Matches default accent (#FF8A3D).
+    private static readonly SKColor DefaultWaveBackgroundColor = new(35, 35, 35); // Matches default dark panel (#232323).
 
     private SKBitmap? _bitmap;
     private SKCanvas? _canvas;
     private readonly SKPaint _linePaint;
-    private readonly SKColor _backgroundColor;
+    private SKColor _backgroundColor;
 
     public SkiaCanvas()
     {
         _linePaint = new SKPaint{
-            Color = WaveLineColor,
+            Color = DefaultWaveLineColor,
             StrokeWidth = 1
         };
-        _backgroundColor = WaveBackgroundColor;
+        _backgroundColor = DefaultWaveBackgroundColor;
     }
     
     public void DrawLine(SKPoint p1, SKPoint p2, float? stroakWidth = null)
@@ -69,5 +69,11 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>
     {
         _canvas?.Dispose();
         _bitmap?.Dispose();
+    }
+
+    public void UpdatePalette(SKColor lineColor, SKColor backgroundColor)
+    {
+        _linePaint.Color = lineColor;
+        _backgroundColor = backgroundColor;
     }
 }

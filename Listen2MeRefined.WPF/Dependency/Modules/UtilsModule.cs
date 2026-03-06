@@ -1,16 +1,19 @@
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
+using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
 using Listen2MeRefined.Infrastructure.ViewModels;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Versioning;
+using Listen2MeRefined.WPF.Utils.Theming;
 using Listen2MeRefined.WPF.Utils;
 using System.Windows;
 
@@ -20,7 +23,8 @@ public class UtilsModule : Module
     {
         builder
             .RegisterType<DatabaseSettingsManager<AppSettings>>()
-            .As<ISettingsManager<AppSettings>>();
+            .As<ISettingsManager<AppSettings>>()
+            .SingleInstance();
 
         builder
             .RegisterType<VersionChecker>()
@@ -32,6 +36,9 @@ public class UtilsModule : Module
         builder
             .RegisterType<AppSettingsWriter>()
             .As<IAppSettingsWriter>();
+        builder
+            .RegisterType<DroppedSongFolderPromptService>()
+            .As<IDroppedSongFolderPromptService>();
         builder
             .RegisterType<AppUpdateChecker>()
             .As<IAppUpdateChecker>();
@@ -60,10 +67,21 @@ public class UtilsModule : Module
         builder
             .RegisterType<WindowPositionPolicyService>()
             .As<IWindowPositionPolicyService>();
+        builder
+            .RegisterType<PlaylistLibraryService>()
+            .As<IPlaylistLibraryService>();
+        builder
+            .RegisterType<AppThemeService>()
+            .As<IAppThemeService>()
+            .SingleInstance();
 
         builder
             .RegisterType<MainWindowNavigationService>()
             .As<IMainWindowNavigationService>()
+            .SingleInstance();
+        builder
+            .RegisterType<ExternalAudioOpenService>()
+            .As<IExternalAudioOpenService>()
             .SingleInstance();
 
         builder.Register(ctx =>

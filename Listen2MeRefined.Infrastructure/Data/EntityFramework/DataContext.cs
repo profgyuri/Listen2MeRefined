@@ -15,6 +15,35 @@ public sealed class DataContext : DbContext
         modelBuilder.Entity<AudioModel>()
             .HasIndex(x => x.Path)
             .IsUnique();
+
+        modelBuilder.Entity<PlaylistModel>()
+            .Property(x => x.Name)
+            .UseCollation("NOCASE");
+
+        modelBuilder.Entity<PlaylistModel>()
+            .HasIndex(x => x.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<PlaylistModel>()
+            .HasMany(x => x.Songs)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "PlaylistSongs",
+                right => right
+                    .HasOne<AudioModel>()
+                    .WithMany()
+                    .HasForeignKey("SongId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                left => left
+                    .HasOne<PlaylistModel>()
+                    .WithMany()
+                    .HasForeignKey("PlaylistId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                join =>
+                {
+                    join.ToTable("PlaylistSongs");
+                    join.HasKey("PlaylistId", "SongId");
+                });
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -47,10 +47,13 @@ jobs:
             /o:"profgyuri" `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
             /d:sonar.cs.cobertura.reportsPaths="**/coverage.cobertura.xml"
-      
+
           dotnet build
-      
-          dotnet test --collect:"XPlat Code Coverage"
-      
+
+          dotnet test `
+            --collect:"XPlat Code Coverage" `
+            --results-directory "./coverage" `
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

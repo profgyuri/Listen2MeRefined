@@ -6,7 +6,7 @@ public class PlaylistModel : Model
     [Required]
     [MinLength(2)]
     [MaxLength(50)]
-    public string? Name { get; init; }
+    public string? Name { get; set; }
 
     public List<AudioModel> Songs { get; init; } = new();
 }
