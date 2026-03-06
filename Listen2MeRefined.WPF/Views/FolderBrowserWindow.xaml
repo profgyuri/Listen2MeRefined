@@ -14,8 +14,16 @@
         Height="520"
         Width="860"
         MinHeight="470"
-        MinWidth="760"
-        PreviewKeyDown="Window_PreviewKeyDown">
+        MinWidth="760">
+
+    <Window.InputBindings>
+        <KeyBinding Key="V" Modifiers="Ctrl" Command="{Binding NavigateToClipboardPathCommand}" />
+        <KeyBinding Key="Escape" Command="{x:Static SystemCommands.CloseWindowCommand}" />
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" Executed="CancelButton_Click" />
+    </Window.CommandBindings>
 
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />

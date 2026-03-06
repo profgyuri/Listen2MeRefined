@@ -10,13 +10,7 @@ public sealed class WpfClipboardService : IClipboardService
 {
     public string GetText()
     {
-        try
-        {
-            return Clipboard.GetText();
-        }
-        catch
-        {
-            return string.Empty;
-        }
+        try { return Clipboard.GetText(); }
+        catch { return string.Empty; }
     }
 }
