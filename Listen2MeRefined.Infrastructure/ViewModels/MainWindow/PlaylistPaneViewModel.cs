@@ -12,7 +12,8 @@ public partial class PlaylistPaneViewModel :
     INotificationHandler<PlaylistCreatedNotification>,
     INotificationHandler<PlaylistRenamedNotification>,
     INotificationHandler<PlaylistDeletedNotification>,
-    INotificationHandler<PlaylistMembershipChangedNotification>
+    INotificationHandler<PlaylistMembershipChangedNotification>,
+    INotificationHandler<PlaylistShuffledNotification>
 {
     private readonly ListsViewModel _lists;
     private readonly IAppSettingsReader _settingsReader;
@@ -359,6 +360,30 @@ public partial class PlaylistPaneViewModel :
         {
             _lists.ActivateNamedPlaylistQueue(notification.PlaylistId, tab.Songs);
         }
+    }
+
+    public Task Handle(PlaylistShuffledNotification notification, CancellationToken cancellationToken)
+    {
+        var tab = SelectedTab;
+        if (tab is null ||
+            _lists.ActiveNamedPlaylistId != tab.PlaylistId ||
+            tab.IsDefaultTab)   // Already handled by ListsViewModel.SyncDefaultPlaylistOrder
+        {
+            return Task.CompletedTask;
+        }
+
+        // Sync the named tab's Songs collection to match the shuffled _playList order
+        var target = _lists.PlayList;
+        var songs = tab.Songs;
+
+        for (int i = 0; i < target.Count; i++)
+        {
+            var currentPos = songs.IndexOf(target[i]);
+            if (currentPos >= 0 && currentPos != i)
+                songs.Move(currentPos, i);
+        }
+
+        return Task.CompletedTask;
     }
 
     private async Task RefreshAvailablePlaylistsAsync(CancellationToken ct = default)

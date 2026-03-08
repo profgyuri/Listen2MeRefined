@@ -17,7 +17,8 @@ public partial class ListsViewModel :
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
     INotificationHandler<QuickSearchResultsNotification>,
-    INotificationHandler<ExternalAudioFilesOpenedNotification>
+    INotificationHandler<ExternalAudioFilesOpenedNotification>,
+    INotificationHandler<PlaylistShuffledNotification>
 {
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
@@ -509,6 +510,22 @@ public partial class ListsViewModel :
         SearchResults.Clear();
         Extensions.AddRange(SearchResults, notification.Results);
         await Task.CompletedTask;
+    }
+
+    public async Task Handle(PlaylistShuffledNotification notification, CancellationToken cancellationToken)
+    {
+        await _ui.InvokeAsync(SyncDefaultPlaylistOrder, cancellationToken);
+    }
+    
+    private void SyncDefaultPlaylistOrder()
+    {
+        var target = _playList.Items;
+        for (int i = 0; i < target.Count; i++)
+        {
+            var currentPos = _defaultPlaylist.IndexOf(target[i]);
+            if (currentPos != i)
+                _defaultPlaylist.Move(currentPos, i);
+        }
     }
 
     private void AddUniqueToDefaultPlaylist(IEnumerable<AudioModel> songs)

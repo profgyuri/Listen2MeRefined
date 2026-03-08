@@ -175,6 +175,8 @@ public sealed partial class NAudioMusicPlayer :
             return;
         }
 
+        await _mediator.Publish(new PlaylistShuffledNotification());
+
         if (_currentSong is null)
         {
             await LoadSongAsync(shuffledCurrentTrack);
