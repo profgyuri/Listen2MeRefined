@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.IO;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Notifications;
@@ -18,7 +19,6 @@ public sealed partial class FolderBrowserViewModel :
     private readonly IClipboardService _clipboardService;
     private readonly List<string> _allFolders = new();
 
-    [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string _fullPath = "";
     [ObservableProperty] private string _selectedFolder = "";
     [ObservableProperty] private ObservableCollection<string> _folders = new();
@@ -29,6 +29,12 @@ public sealed partial class FolderBrowserViewModel :
     [ObservableProperty] private string _filterText = "";
     [ObservableProperty] private string _validationMessage = "";
     [ObservableProperty] private bool _hasValidationError;
+    
+    public FontFamily FontFamily
+    {
+        set => SetProperty(ref field, value);
+        get => field ??= new FontFamily("Segoe UI");
+    }
 
     public FolderBrowserViewModel(
         ILogger logger,
@@ -52,7 +58,7 @@ public sealed partial class FolderBrowserViewModel :
 
     protected override Task InitializeCoreAsync(CancellationToken ct)
     {
-        FontFamily = _settingsReader.GetFontFamily();
+        FontFamily = new FontFamily(_settingsReader.GetFontFamily());
         LoadQuickAccessCollections();
 
         var initialPath = _folderNavigationService.ResolveInitialPath(
@@ -327,7 +333,7 @@ public sealed partial class FolderBrowserViewModel :
         CancellationToken cancellationToken)
     {
         _logger.Information("[FolderBrowserViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamily = notification.FontFamily;
+        FontFamily = new FontFamily(notification.FontFamily);
         await Task.CompletedTask;
     }
 }

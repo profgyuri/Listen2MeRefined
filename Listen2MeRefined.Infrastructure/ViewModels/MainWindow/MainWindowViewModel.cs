@@ -1,3 +1,4 @@
+using System.Drawing;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
@@ -25,6 +26,12 @@ public sealed partial class MainWindowViewModel :
     public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
     public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
 
+    public FontFamily FontFamily
+    {
+        set => SetProperty(ref field, value);
+        get => field ??= new FontFamily("Segoe UI");
+    }
+
     [ObservableProperty] private AudioModel _song = new()
     {
         Artist = "Artist",
@@ -32,8 +39,7 @@ public sealed partial class MainWindowViewModel :
         Genre = "Genre",
         Path = ""
     };
-
-    [ObservableProperty] private string _fontFamily = "";
+    
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
     [ObservableProperty] private bool _isTaskStatusVisible;
@@ -219,7 +225,7 @@ public sealed partial class MainWindowViewModel :
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        return _ui.InvokeAsync<string>(() => FontFamily = notification.FontFamily, cancellationToken);
+        return _ui.InvokeAsync(() => FontFamily = new FontFamily(notification.FontFamily), cancellationToken);
     }
 
     public Task Handle(PlayerStateChangedNotification notification, CancellationToken cancellationToken)

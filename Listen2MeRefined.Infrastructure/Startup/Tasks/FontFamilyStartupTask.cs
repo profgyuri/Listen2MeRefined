@@ -20,10 +20,17 @@ public sealed class FontFamilyStartupTask : IStartupTask
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _mediator.Publish(new FontFamilyChangedNotification(_settingsManager.Settings.FontFamily), ct)
+        var fontFamily = _settingsManager.Settings.FontFamily;
+
+        if (string.IsNullOrWhiteSpace(fontFamily))
+        {
+            return;
+        }
+        
+        await _mediator.Publish(new FontFamilyChangedNotification(fontFamily), ct)
             .ConfigureAwait(false);
 
         _logger.Debug("[FontFamilyStartupTask] Font family notification published with value {FontFamily}.",
-            _settingsManager.Settings.FontFamily);
+            fontFamily);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Drawing;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Searching;
 
@@ -16,7 +17,6 @@ public partial class AdvancedSearchViewModel :
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
 
-    [ObservableProperty] private string _fontFamily = string.Empty;
     [ObservableProperty] private List<string> _columnName = [];
     [ObservableProperty] private List<string> _relation = [];
     [ObservableProperty] private string _selectedRelation = string.Empty;
@@ -73,6 +73,12 @@ public partial class AdvancedSearchViewModel :
             }
         }
     }
+    
+    public FontFamily FontFamily
+    {
+        set => SetProperty(ref field, value);
+        get => field ??= new FontFamily("Segoe UI");
+    }
 
     public AdvancedSearchViewModel(
         IMediator mediator,
@@ -98,7 +104,7 @@ public partial class AdvancedSearchViewModel :
 
         await Task.Run(() =>
         {
-            FontFamily = _settingsReader.GetFontFamily();
+            FontFamily = new FontFamily(_settingsReader.GetFontFamily());
             ColumnName = _criteriaService.GetColumnNames().ToList();
             SelectedColumnName = Enumerable.FirstOrDefault<string>(ColumnName) ?? string.Empty;
             MatchMode = SearchMatchMode.All;
@@ -295,7 +301,7 @@ public partial class AdvancedSearchViewModel :
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[AdvancedSearchViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamily = notification.FontFamily;
+        FontFamily = new FontFamily(notification.FontFamily);
         return Task.CompletedTask;
     }
 

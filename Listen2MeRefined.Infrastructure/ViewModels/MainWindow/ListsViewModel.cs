@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Drawing;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
@@ -40,7 +41,6 @@ public partial class ListsViewModel :
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
     private readonly ObservableCollection<AudioModel> _defaultPlaylist = new();
 
-    [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
@@ -53,6 +53,12 @@ public partial class ListsViewModel :
     public ObservableCollection<AudioModel> DefaultPlaylist => _defaultPlaylist;
     public int? ActiveNamedPlaylistId => _activeNamedPlaylistId;
     public bool IsDefaultPlaylistActive => _activeNamedPlaylistId is null;
+    
+    public FontFamily FontFamily
+    {
+        set => SetProperty(ref field, value);
+        get => field ??= new FontFamily("Segoe UI");
+    }
 
     public ListsViewModel(
         ILogger logger,
@@ -445,7 +451,7 @@ public partial class ListsViewModel :
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
-        FontFamily = notification.FontFamily;
+        FontFamily = new FontFamily(notification.FontFamily);
         await Task.CompletedTask;
     }
 

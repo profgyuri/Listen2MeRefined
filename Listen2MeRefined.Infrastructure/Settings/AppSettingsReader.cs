@@ -13,7 +13,10 @@ public sealed class AppSettingsReader : IAppSettingsReader
         _settingsManager = settingsManager;
     }
 
-    public string GetFontFamily() => _settingsManager.Settings.FontFamily;
+    public string GetFontFamily() {
+        var fontFamily = _settingsManager.Settings.FontFamily;
+        return string.IsNullOrWhiteSpace(fontFamily) ? "Segoe UI" : fontFamily;
+    }
     public string GetNewSongWindowPosition() => _settingsManager.Settings.NewSongWindowPosition;
     public string GetAudioOutputDeviceName() => _settingsManager.Settings.AudioOutputDeviceName;
     public IReadOnlyList<string> GetMusicFolders() => _settingsManager.Settings.MusicFolders.Select(x => x.FullPath).ToList();

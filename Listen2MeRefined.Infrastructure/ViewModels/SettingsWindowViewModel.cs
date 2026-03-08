@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Drawing;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
@@ -54,7 +55,6 @@ public sealed partial class SettingsWindowViewModel :
     private bool _isUpdatingFolderSelection;
     private readonly Dictionary<string, bool> _folderRecursionByPath = new(StringComparer.OrdinalIgnoreCase);
 
-    [ObservableProperty] private string _fontFamily = "";
     [ObservableProperty] private string? _selectedFolder = "";
     [ObservableProperty] private bool _selectedFolderIncludeSubdirectories;
     [ObservableProperty] private string _selectedFontFamily = "";
@@ -117,6 +117,12 @@ public sealed partial class SettingsWindowViewModel :
     }
 
     public bool DontScanOnStartup => !ScanOnStartup;
+    
+    public FontFamily FontFamily
+    {
+        set => SetProperty(ref field, value);
+        get => field ??= new FontFamily("Segoe UI");
+    }
 
     public SettingsWindowViewModel(
         ILogger logger,
@@ -184,7 +190,7 @@ public sealed partial class SettingsWindowViewModel :
 
         Folders = new(musicFolderRequests.Select(x => x.Path));
         var selectedFont = _settingsReader.GetFontFamily();
-        FontFamily = selectedFont;
+        FontFamily = new FontFamily(selectedFont);
         SelectedFontFamily = string.IsNullOrEmpty(selectedFont) ? "Segoe UI" : selectedFont;
 
         var selectedWindowPosition = _settingsReader.GetNewSongWindowPosition();
