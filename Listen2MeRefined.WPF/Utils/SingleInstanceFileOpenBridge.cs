@@ -4,7 +4,6 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using Autofac;
 using Listen2MeRefined.Application.Notifications;
 using MediatR;

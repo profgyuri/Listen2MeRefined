@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
-using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using SkiaSharp;
 

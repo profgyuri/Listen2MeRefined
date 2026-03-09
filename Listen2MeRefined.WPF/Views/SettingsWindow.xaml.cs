@@ -1,5 +1,3 @@
-using Listen2MeRefined.Infrastructure.ViewModels;
-
 namespace Listen2MeRefined.WPF.Views;
 
 using System.Windows;

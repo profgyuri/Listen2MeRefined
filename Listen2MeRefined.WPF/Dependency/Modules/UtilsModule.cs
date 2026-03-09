@@ -1,20 +1,20 @@
 using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Threading;
+using Listen2MeRefined.Application.Updating;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
-using Listen2MeRefined.Infrastructure.Settings.Playback;
-using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
-using Listen2MeRefined.Infrastructure.ViewModels;
+using Listen2MeRefined.Infrastructure.Startup;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
-using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
-using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Listen2MeRefined.WPF.Utils.Theming;
 using Listen2MeRefined.WPF.Utils;

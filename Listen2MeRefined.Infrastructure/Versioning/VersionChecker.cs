@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics;
+using Listen2MeRefined.Application.Updating;
+using Version = Listen2MeRefined.Application.Updating.Version;
 
 namespace Listen2MeRefined.Infrastructure.Versioning;
 

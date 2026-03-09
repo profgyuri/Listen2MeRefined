@@ -1,5 +1,4 @@
 using Listen2MeRefined.WPF.Views;
-using System.Windows;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Utils;

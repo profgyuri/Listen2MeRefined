@@ -1,6 +1,5 @@
 using Autofac;
 using Listen2MeRefined.Infrastructure.Startup;
-using Listen2MeRefined.Infrastructure.ViewModels;
 using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;

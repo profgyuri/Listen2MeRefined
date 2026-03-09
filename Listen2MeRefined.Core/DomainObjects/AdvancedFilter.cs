@@ -1,5 +1,4 @@
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Core.DomainObjects;
 

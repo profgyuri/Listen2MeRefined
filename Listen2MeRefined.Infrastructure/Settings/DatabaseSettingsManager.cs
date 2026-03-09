@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
@@ -5,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Listen2MeRefined.Infrastructure.Settings;
 
 public sealed class DatabaseSettingsManager<T> : ISettingsManager<T>
-    where T : Settings, new()
+    where T : Application.Settings.Settings, new()
 {
     private readonly IDbContextFactory<DataContext> _dataContextFactory;
     private readonly ILogger _logger;

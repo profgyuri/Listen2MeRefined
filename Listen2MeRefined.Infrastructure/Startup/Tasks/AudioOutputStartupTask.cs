@@ -1,4 +1,6 @@
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Infrastructure.Media;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;

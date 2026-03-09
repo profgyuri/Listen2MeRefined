@@ -3,12 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
-using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
-using Listen2MeRefined.Infrastructure.Playlist;
 
 namespace Listen2MeRefined.Infrastructure.Settings;
 
-public sealed class AppSettings : Settings
+public sealed class AppSettings : Application.Settings.Settings
 {
     [Key] public int Id { get; set; }
 

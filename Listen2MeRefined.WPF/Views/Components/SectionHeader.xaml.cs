@@ -3,7 +3,6 @@ namespace Listen2MeRefined.WPF.Views.Components;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using MaterialDesignThemes.Wpf;
 
 public partial class SectionHeader : UserControl

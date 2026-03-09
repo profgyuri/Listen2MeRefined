@@ -1,15 +1,13 @@
 using System.Collections;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
-using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.Settings;
-using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 using Listen2MeRefined.Infrastructure.ViewModels;
 using MediatR;
 using Moq;

@@ -1,3 +1,7 @@
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Startup;
+using Listen2MeRefined.Application.Utils;
+
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 
 public sealed class GlobalHookStartupTask : IStartupTask

@@ -1,4 +1,5 @@
 using Autofac;
+using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Infrastructure.Startup;
 using Listen2MeRefined.Infrastructure.Startup.Tasks;
 

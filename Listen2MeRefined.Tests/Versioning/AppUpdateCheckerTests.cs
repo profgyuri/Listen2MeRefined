@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Moq;
 using Serilog;

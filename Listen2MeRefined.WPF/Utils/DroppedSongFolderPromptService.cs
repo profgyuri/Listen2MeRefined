@@ -1,6 +1,5 @@
-using System.Windows;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.WPF.Views;
 
 namespace Listen2MeRefined.WPF.Utils;

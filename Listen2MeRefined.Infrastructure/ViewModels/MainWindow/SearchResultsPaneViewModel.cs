@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Core.Models;
-using Listen2MeRefined.Infrastructure.Playlist;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 

@@ -1,7 +1,7 @@
 using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Infrastructure.Scanning;
-using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 
