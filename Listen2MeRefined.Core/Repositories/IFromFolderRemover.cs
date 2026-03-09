@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+﻿namespace Listen2MeRefined.Core.Repositories;
 
 public interface IFromFolderRemover
 {

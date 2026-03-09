@@ -1,4 +1,5 @@
 using System.Drawing;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Notifications;

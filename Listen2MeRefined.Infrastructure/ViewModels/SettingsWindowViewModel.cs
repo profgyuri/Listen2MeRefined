@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Core.Repositories;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;

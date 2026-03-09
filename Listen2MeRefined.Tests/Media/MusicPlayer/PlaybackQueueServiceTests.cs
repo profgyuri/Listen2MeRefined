@@ -1,4 +1,4 @@
-using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 namespace Listen2MeRefined.Tests.Media.MusicPlayer;

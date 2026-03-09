@@ -1,3 +1,6 @@
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Models;
+
 namespace Listen2MeRefined.Infrastructure.ViewModels;
 
 public sealed record AdvancedSearchCriterion(

@@ -1,4 +1,7 @@
-namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Core.Repositories;
 
 /// <summary>
 /// Specialized repository contract for audio metadata queries used by scan workflows.

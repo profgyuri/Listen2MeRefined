@@ -1,7 +1,8 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Models;
 using System.ComponentModel.DataAnnotations;
 
-public class PlaylistModel : Model
+namespace Listen2MeRefined.Core.Models;
+
+public sealed class PlaylistModel : ModelBase
 {
     [Required]
     [MinLength(2)]

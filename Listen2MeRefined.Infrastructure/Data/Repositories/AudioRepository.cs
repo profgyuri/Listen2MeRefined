@@ -1,5 +1,8 @@
 ﻿using System.Text;
 using Dapper;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Core.Repositories;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 

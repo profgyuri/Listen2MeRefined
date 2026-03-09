@@ -1,7 +1,9 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+﻿using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Core.Repositories;
 
 public interface IDataRemover<T>
-    where T : Model
+    where T : ModelBase
 {
     /// <summary>
     ///     Removes a single <typeparamref name="T" /> item from the database asynchronously.

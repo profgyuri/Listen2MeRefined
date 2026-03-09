@@ -1,4 +1,5 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Infrastructure.Notifications;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 

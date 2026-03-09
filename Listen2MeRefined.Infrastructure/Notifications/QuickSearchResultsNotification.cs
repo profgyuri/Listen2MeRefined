@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Infrastructure.Notifications;
 
 public class QuickSearchResultsNotification : INotification
 {

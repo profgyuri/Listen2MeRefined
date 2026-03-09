@@ -1,3 +1,5 @@
+using Listen2MeRefined.Core.Models;
+
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 public sealed class PlaybackQueueService : IPlaybackQueueService

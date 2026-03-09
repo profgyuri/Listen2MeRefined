@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Notifications;
+﻿using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Infrastructure.Notifications;
 
 /// <summary>
 ///     Should be raised when the current song changes in the player.

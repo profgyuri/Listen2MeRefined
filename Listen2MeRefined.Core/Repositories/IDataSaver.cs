@@ -1,7 +1,9 @@
-﻿namespace Listen2MeRefined.Infrastructure.Data.Repositories;
+﻿using Listen2MeRefined.Core.Models;
+
+namespace Listen2MeRefined.Core.Repositories;
 
 public interface IDataSaver<in T>
-    where T: Model
+    where T: ModelBase
 {
     /// <summary>
     ///     Saves a single <typeparamref name="T" /> entity to the database asynchronously.

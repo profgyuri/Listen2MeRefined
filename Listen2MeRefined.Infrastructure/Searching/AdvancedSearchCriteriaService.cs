@@ -1,4 +1,6 @@
 using System.Globalization;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.ViewModels;
 
 namespace Listen2MeRefined.Infrastructure.Searching;

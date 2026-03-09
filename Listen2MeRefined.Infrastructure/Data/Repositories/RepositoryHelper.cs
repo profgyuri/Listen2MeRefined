@@ -1,5 +1,6 @@
 using System.Text;
 using Dapper;
+using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
@@ -15,7 +16,7 @@ internal static class RepositoryHelper
     internal static ParameterizedQuery GetParameterizedQueryWithSearchTerm<T>(
         string searchTerm,
         string tableName)
-        where T : Model
+        where T : ModelBase
     {
         var properties = GetProperties<T>().ToList();
 
@@ -45,7 +46,7 @@ internal static class RepositoryHelper
         T model,
         string tableName,
         bool exact)
-        where T : Model
+        where T : ModelBase
     {
         var properties = GetProperties<T>().ToList();
 
@@ -83,7 +84,7 @@ internal static class RepositoryHelper
     }
     
     private static IEnumerable<string> GetProperties<T>()
-        where T : Model
+        where T : ModelBase
     {
         var properties = typeof(T)
             .GetProperties()

@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Dapper.Contrib.Extensions;
+using Table = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
 
-namespace Listen2MeRefined.Infrastructure.Data.Models;
+namespace Listen2MeRefined.Core.Models;
 
-[System.ComponentModel.DataAnnotations.Schema.Table("Songs")]
-public sealed class AudioModel : Model
+[Table( "Songs")]
+public sealed class AudioModel : ModelBase
 {
     public string? Artist { get; set; }
 
@@ -18,15 +19,10 @@ public sealed class AudioModel : Model
     public short Bitrate { get; set; }
 
     [NotMapped, Computed]
-    public string Display
-    {
-        get
-        {
-            return string.IsNullOrEmpty(Artist)
-                ? $"{new FileInfo(Path!).Name}"
-                : string.Join(" - ", Artist, Title);
-        }
-    }
+    public string Display =>
+        string.IsNullOrEmpty(Artist)
+            ? $"{new FileInfo(Path!).Name}"
+            : string.Join(" - ", Artist, Title);
 
     public TimeSpan Length { get; set; }
     public string? Path { get; init; }

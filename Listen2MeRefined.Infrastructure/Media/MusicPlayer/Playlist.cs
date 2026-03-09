@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 

@@ -1,7 +1,6 @@
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Core.Repositories;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
-using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;

@@ -1,4 +1,5 @@
 using Ardalis.GuardClauses;
+using Listen2MeRefined.Core.Models;
 using File = TagLib.File;
 
 namespace Listen2MeRefined.Infrastructure.Scanning.Files;

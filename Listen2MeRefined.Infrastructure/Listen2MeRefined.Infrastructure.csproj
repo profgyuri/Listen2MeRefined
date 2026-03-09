@@ -39,4 +39,9 @@
         </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Listen2MeRefined.Application\Listen2MeRefined.Application.csproj" />
+      <ProjectReference Include="..\Listen2MeRefined.Core\Listen2MeRefined.Core.csproj" />
+    </ItemGroup>
+
 </Project>

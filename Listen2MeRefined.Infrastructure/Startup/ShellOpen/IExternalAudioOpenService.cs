@@ -1,4 +1,4 @@
-using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Startup.ShellOpen;
 

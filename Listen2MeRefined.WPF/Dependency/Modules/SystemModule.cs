@@ -1,3 +1,7 @@
+using System.Linq;
+using System.Windows.Media;
+using Autofac;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;
 using Listen2MeRefined.Infrastructure.Scanning.Files;
@@ -6,10 +10,6 @@ using Listen2MeRefined.Infrastructure.Utils;
 using Listen2MeRefined.WPF.Services;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
-using System.Linq;
-using System.Windows.Media;
-using Autofac;
-using Listen2MeRefined.Infrastructure.Data.Models;
 
 public class SystemModule : Module
 {
