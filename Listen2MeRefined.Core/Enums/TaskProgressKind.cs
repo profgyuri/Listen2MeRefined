@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
+namespace Listen2MeRefined.Core.Enums;
 
 public enum TaskProgressKind
 {

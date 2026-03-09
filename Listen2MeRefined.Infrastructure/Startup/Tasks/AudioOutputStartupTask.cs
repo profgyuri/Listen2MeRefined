@@ -1,5 +1,5 @@
+using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Infrastructure.Media;
-using Listen2MeRefined.Infrastructure.Notifications;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 

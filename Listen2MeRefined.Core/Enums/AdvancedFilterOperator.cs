@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Core.DomainObjects;
+namespace Listen2MeRefined.Core.Enums;
 
 public enum AdvancedFilterOperator
 {

@@ -1,6 +1,6 @@
+using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Infrastructure.Data;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
-using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;

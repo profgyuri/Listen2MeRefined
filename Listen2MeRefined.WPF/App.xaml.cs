@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF;
+﻿using Listen2MeRefined.Application.Notifications;
+
+namespace Listen2MeRefined.WPF;
 using System;
 using System.Threading;
 using System.Windows;
@@ -6,7 +8,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using Autofac;
 using Dapper;
-using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Utils;
 using Serilog;

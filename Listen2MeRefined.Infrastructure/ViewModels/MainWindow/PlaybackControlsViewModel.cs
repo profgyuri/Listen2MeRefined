@@ -1,6 +1,6 @@
+using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
-using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Settings.Playback;
 using SkiaSharp;
 

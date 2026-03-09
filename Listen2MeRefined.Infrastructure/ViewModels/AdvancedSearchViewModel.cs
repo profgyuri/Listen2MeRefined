@@ -1,7 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
-using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Infrastructure.Searching;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels;

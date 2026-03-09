@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
+using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
-using Listen2MeRefined.Infrastructure.Notifications;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels;
 

@@ -1,4 +1,4 @@
-using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Application.Notifications;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 

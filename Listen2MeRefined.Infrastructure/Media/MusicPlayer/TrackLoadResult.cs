@@ -1,14 +1,7 @@
+using Listen2MeRefined.Core.Enums;
 using NAudio.Wave;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-
-public enum TrackLoadStatus
-{
-    Success,
-    MissingFile,
-    UnsupportedFormat,
-    CorruptFile
-}
 
 /// <summary>
 /// Represents the result of attempting to load a track.

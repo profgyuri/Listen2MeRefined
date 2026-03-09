@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using Autofac;
-using Listen2MeRefined.Infrastructure.Notifications;
+using Listen2MeRefined.Application.Notifications;
 using MediatR;
 using Serilog;
 

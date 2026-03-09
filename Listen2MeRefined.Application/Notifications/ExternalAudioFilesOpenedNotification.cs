@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Listen2MeRefined.Infrastructure.Notifications;
+namespace Listen2MeRefined.Application.Notifications;
 
 public sealed class ExternalAudioFilesOpenedNotification : INotification
 {

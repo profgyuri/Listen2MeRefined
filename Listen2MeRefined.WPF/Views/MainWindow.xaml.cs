@@ -37,7 +37,7 @@ public sealed partial class MainWindow : Window
     private void CloseWindow()
     {
         _globalHook.Unregister();
-        Application.Current.Shutdown();
+        System.Windows.Application.Current.Shutdown();
     }
 
     private sealed class RelayCommand : ICommand

@@ -1,6 +1,7 @@
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+using Listen2MeRefined.Core.Enums;
+using MediatR;
 
-namespace Listen2MeRefined.Infrastructure.Notifications;
+namespace Listen2MeRefined.Application.Notifications;
 
 public class PlayerStateChangedNotification : INotification
 {

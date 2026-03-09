@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.Notifications;
+﻿using MediatR;
+
+namespace Listen2MeRefined.Application.Notifications;
 
 public sealed class FolderBrowserNotification : INotification
 {

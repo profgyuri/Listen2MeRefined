@@ -1,4 +1,5 @@
 using System.Windows;
+using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.WPF.Views;
 
@@ -12,7 +13,7 @@ public sealed class DroppedSongFolderPromptService : IDroppedSongFolderPromptSer
 
         var window = new AddDroppedSongFolderWindow
         {
-            Owner = Application.Current.MainWindow
+            Owner = System.Windows.Application.Current.MainWindow
         };
 
         window.SetFolderPath(folderPath);

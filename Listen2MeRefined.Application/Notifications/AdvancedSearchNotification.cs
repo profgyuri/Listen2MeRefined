@@ -1,8 +1,8 @@
 using Listen2MeRefined.Core.DomainObjects;
-using Listen2MeRefined.Core.Models;
-using Listen2MeRefined.Infrastructure.Searching;
+using Listen2MeRefined.Core.Enums;
+using MediatR;
 
-namespace Listen2MeRefined.Infrastructure.Notifications;
+namespace Listen2MeRefined.Application.Notifications;
 
 public sealed class AdvancedSearchNotification : INotification
 {

@@ -1,3 +1,4 @@
+using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using NAudio;
 using NAudio.Wave;

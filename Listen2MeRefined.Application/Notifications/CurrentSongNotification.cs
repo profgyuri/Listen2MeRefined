@@ -1,6 +1,7 @@
 ﻿using Listen2MeRefined.Core.Models;
+using MediatR;
 
-namespace Listen2MeRefined.Infrastructure.Notifications;
+namespace Listen2MeRefined.Application.Notifications;
 
 /// <summary>
 ///     Should be raised when the current song changes in the player.
