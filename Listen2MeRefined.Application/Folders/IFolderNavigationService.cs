@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.FolderBrowser;
+namespace Listen2MeRefined.Application.Folders;
 
 /// <summary>
 /// Encapsulates folder-browser navigation and filtering logic.

@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Enums;
 
 namespace Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;

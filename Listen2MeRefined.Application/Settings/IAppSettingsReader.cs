@@ -1,9 +1,7 @@
+using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
-using Listen2MeRefined.Infrastructure.Playlist;
-using Listen2MeRefined.Infrastructure.Scanning.Folders;
 
-namespace Listen2MeRefined.Infrastructure.Settings;
+namespace Listen2MeRefined.Application.Settings;
 
 /// <summary>
 /// Provides typed read access to persisted application settings.

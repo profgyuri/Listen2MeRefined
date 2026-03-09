@@ -1,5 +1,6 @@
 using System.Drawing;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Infrastructure.Searching;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;

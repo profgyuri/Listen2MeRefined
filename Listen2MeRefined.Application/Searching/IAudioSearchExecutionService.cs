@@ -2,7 +2,7 @@ using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 
-namespace Listen2MeRefined.Infrastructure.Searching;
+namespace Listen2MeRefined.Application.Searching;
 
 /// <summary>
 /// Executes quick and advanced audio searches against configured data sources.

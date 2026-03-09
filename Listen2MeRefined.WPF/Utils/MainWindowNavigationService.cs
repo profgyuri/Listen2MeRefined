@@ -8,7 +8,7 @@ public sealed class MainWindowNavigationService : IMainWindowNavigationService
 {
     public async Task OpenSettingsAsync()
     {
-        var window = Application.Current.MainWindow;
+        var window = System.Windows.Application.Current.MainWindow;
         if (window is null)
         {
             return;
@@ -19,7 +19,7 @@ public sealed class MainWindowNavigationService : IMainWindowNavigationService
 
     public async Task OpenAdvancedSearchAsync()
     {
-        var window = Application.Current.MainWindow;
+        var window = System.Windows.Application.Current.MainWindow;
         if (window is null)
         {
             return;

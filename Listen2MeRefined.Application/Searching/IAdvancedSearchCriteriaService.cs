@@ -1,8 +1,6 @@
 using Listen2MeRefined.Core.DomainObjects;
-using Listen2MeRefined.Core.Models;
-using Listen2MeRefined.Infrastructure.ViewModels;
 
-namespace Listen2MeRefined.Infrastructure.Searching;
+namespace Listen2MeRefined.Application.Searching;
 
 /// <summary>
 /// Provides metadata and validation logic for advanced-search criteria.

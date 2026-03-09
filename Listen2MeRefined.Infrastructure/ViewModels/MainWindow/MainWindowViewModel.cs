@@ -1,5 +1,6 @@
 using System.Drawing;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
@@ -107,13 +108,13 @@ public sealed partial class MainWindowViewModel :
         {
             _logger.Information("[MainWindowViewModel] Checking for latest version...");
             var status = await _appUpdateChecker.CheckForUpdatesAsync();
-            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
+            await _ui.InvokeAsync(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
 
-            _logger.Information<bool>("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
+            _logger.Information("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
         }
         else
         {
-            await _ui.InvokeAsync<bool>(() => IsUpdateAvailable = false, ct);
+            await _ui.InvokeAsync(() => IsUpdateAvailable = false, ct);
             _logger.Information("[MainWindowViewModel] Automatic update checks are disabled.");
         }
 

@@ -2,8 +2,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Infrastructure.Searching;
 
 namespace Listen2MeRefined.Infrastructure.ViewModels;
 
@@ -43,7 +44,7 @@ public partial class AdvancedSearchViewModel :
 
             if (Relation.Count > 0)
             {
-                SelectedRelation = Enumerable.First<string>(Relation);
+                SelectedRelation = Enumerable.First(Relation);
             }
 
             OnPropertyChanged();
@@ -107,7 +108,7 @@ public partial class AdvancedSearchViewModel :
         {
             FontFamily = new FontFamily(_settingsReader.GetFontFamily());
             ColumnName = _criteriaService.GetColumnNames().ToList();
-            SelectedColumnName = Enumerable.FirstOrDefault<string>(ColumnName) ?? string.Empty;
+            SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
             MatchMode = SearchMatchMode.All;
             ValidationMessage = string.Empty;
             SearchStatusMessage = "Add at least one filter to search.";

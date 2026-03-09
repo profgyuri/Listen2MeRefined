@@ -1,5 +1,7 @@
 using System.Collections;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;

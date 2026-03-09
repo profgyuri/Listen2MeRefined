@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Windows.Media;
 using Autofac;
+using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Media;

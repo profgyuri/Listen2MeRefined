@@ -1,6 +1,6 @@
 using Listen2MeRefined.Core.Enums;
 
-namespace Listen2MeRefined.Infrastructure.Scanning.Folders;
+namespace Listen2MeRefined.Application.Folders;
 
 /// <summary>
 /// Used to analyze the media files and save the metadata to the database.

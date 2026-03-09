@@ -1,3 +1,6 @@
+using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 using Listen2MeRefined.Infrastructure.Playlist;

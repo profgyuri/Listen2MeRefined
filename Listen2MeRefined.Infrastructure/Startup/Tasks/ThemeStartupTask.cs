@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.Settings;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;

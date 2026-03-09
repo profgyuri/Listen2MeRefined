@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Infrastructure.Scanning;
 using Listen2MeRefined.Infrastructure.Scanning.Folders;

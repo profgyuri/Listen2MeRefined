@@ -1,8 +1,6 @@
-using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Core.Models;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels;
+namespace Listen2MeRefined.Application.Searching;
 
 public sealed record AdvancedSearchCriterion(
     string Field,
