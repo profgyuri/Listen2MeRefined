@@ -44,8 +44,4 @@
       <ProjectReference Include="..\Listen2MeRefined.Core\Listen2MeRefined.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Notifications\" />
-    </ItemGroup>
-
 </Project>

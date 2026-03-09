@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Infrastructure.FolderBrowser;
+﻿using Listen2MeRefined.Application.Folders;
+
+namespace Listen2MeRefined.Infrastructure.FolderBrowser;
 
 public sealed class FolderBrowser : IFolderBrowser
 {

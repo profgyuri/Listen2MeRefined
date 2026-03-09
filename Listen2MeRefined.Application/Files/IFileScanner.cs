@@ -1,6 +1,6 @@
 ﻿using Listen2MeRefined.Core.Models;
 
-namespace Listen2MeRefined.Infrastructure.Scanning.Files;
+namespace Listen2MeRefined.Application.Files;
 
 public interface IFileScanner
 {

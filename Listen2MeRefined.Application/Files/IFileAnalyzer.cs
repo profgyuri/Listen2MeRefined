@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Scanning.Files;
+namespace Listen2MeRefined.Application.Files;
 
 /// <summary>
 /// Analyzes a file and produces a typed metadata model.

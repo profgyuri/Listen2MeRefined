@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Scanning.Files;
+namespace Listen2MeRefined.Application.Files;
 
 /// <summary>
 /// Enumerates supported file paths for a folder scan.

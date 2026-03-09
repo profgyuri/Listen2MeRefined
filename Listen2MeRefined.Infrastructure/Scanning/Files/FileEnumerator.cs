@@ -1,6 +1,7 @@
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using Listen2MeRefined.Application;
+using Listen2MeRefined.Application.Files;
 
 namespace Listen2MeRefined.Infrastructure.Scanning.Files;
 

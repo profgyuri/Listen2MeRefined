@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.FolderBrowser;
+namespace Listen2MeRefined.Application.Utils;
 
 /// <summary>
 ///     Provides read access to the system clipboard, abstracted for testability.

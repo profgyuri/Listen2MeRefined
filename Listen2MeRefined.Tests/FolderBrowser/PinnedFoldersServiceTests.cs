@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
 
 namespace Listen2MeRefined.Tests.FolderBrowser;
