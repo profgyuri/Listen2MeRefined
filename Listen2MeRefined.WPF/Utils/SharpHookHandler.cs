@@ -4,6 +4,7 @@ using Listen2MeRefined.WPF.Views;
 using SharpHook;
 using SharpHook.Data;
 using System.Windows.Forms;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.Settings;
 using Serilog;

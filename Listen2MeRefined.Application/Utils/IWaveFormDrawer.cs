@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
+namespace Listen2MeRefined.Application.Utils;
 
 public interface IWaveFormDrawer<TBitmap> 
     where TBitmap : class

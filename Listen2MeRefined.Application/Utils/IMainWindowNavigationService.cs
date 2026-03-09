@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+namespace Listen2MeRefined.Application.Utils;
 
 public interface IMainWindowNavigationService
 {

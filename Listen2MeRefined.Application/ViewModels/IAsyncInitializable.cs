@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.ViewModels;
+﻿namespace Listen2MeRefined.Application.ViewModels;
 
 public interface IAsyncInitializable
 {

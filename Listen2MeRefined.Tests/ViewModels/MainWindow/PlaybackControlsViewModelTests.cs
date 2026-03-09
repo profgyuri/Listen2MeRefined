@@ -1,11 +1,13 @@
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.Controls;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Utils;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 using Moq;
 using Serilog;
 using SkiaSharp;

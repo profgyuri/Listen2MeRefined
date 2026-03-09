@@ -1,17 +1,18 @@
 ﻿using System.Collections.ObjectModel;
-using System.Drawing;
-using Listen2MeRefined.Application;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Scanning.Files;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+namespace Listen2MeRefined.Application.ViewModels.Controls;
 
 public partial class ListsViewModel :
     ViewModelBase,
@@ -44,6 +45,7 @@ public partial class ListsViewModel :
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
     private readonly ObservableCollection<AudioModel> _defaultPlaylist = new();
 
+    [ObservableProperty] private string? _fontFamilyName = string.Empty;
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
@@ -56,12 +58,6 @@ public partial class ListsViewModel :
     public ObservableCollection<AudioModel> DefaultPlaylist => _defaultPlaylist;
     public int? ActiveNamedPlaylistId => _activeNamedPlaylistId;
     public bool IsDefaultPlaylistActive => _activeNamedPlaylistId is null;
-    
-    public FontFamily FontFamily
-    {
-        set => SetProperty(ref field, value);
-        get => field ??= new FontFamily("Segoe UI");
-    }
 
     public ListsViewModel(
         ILogger logger,
@@ -454,7 +450,7 @@ public partial class ListsViewModel :
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
-        FontFamily = new FontFamily(notification.FontFamily);
+        FontFamilyName = notification.FontFamily;
         await Task.CompletedTask;
     }
 

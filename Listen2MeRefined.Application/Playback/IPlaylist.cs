@@ -1,6 +1,6 @@
 using Listen2MeRefined.Core.Models;
 
-namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+namespace Listen2MeRefined.Application.Playback;
 
 public interface IPlaylist
 {

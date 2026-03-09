@@ -5,11 +5,10 @@ using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
-using Listen2MeRefined.Infrastructure.ViewModels;
 using MediatR;
 using Moq;
 using Serilog;
-using AdvancedSearchViewModel = Listen2MeRefined.Infrastructure.ViewModels.AdvancedSearchViewModel;
+using AdvancedSearchViewModel = Listen2MeRefined.Application.ViewModels.Windows.AdvancedSearchViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels;
 

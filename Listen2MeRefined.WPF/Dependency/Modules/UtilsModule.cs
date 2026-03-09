@@ -11,7 +11,6 @@ using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Startup;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;

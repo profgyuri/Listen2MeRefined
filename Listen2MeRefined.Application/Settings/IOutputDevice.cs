@@ -1,6 +1,6 @@
 using Listen2MeRefined.Core.DomainObjects;
 
-namespace Listen2MeRefined.Infrastructure.Media;
+namespace Listen2MeRefined.Application.Settings;
 
 public interface IOutputDevice
 {

@@ -1,13 +1,16 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Drawing;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels;
+namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public partial class AdvancedSearchViewModel :
     ViewModelBase,
@@ -20,6 +23,7 @@ public partial class AdvancedSearchViewModel :
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
 
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private List<string> _columnName = [];
     [ObservableProperty] private List<string> _relation = [];
     [ObservableProperty] private string _selectedRelation = string.Empty;
@@ -76,12 +80,6 @@ public partial class AdvancedSearchViewModel :
             }
         }
     }
-    
-    public FontFamily FontFamily
-    {
-        set => SetProperty(ref field, value);
-        get => field ??= new FontFamily("Segoe UI");
-    }
 
     public AdvancedSearchViewModel(
         IMediator mediator,
@@ -107,7 +105,7 @@ public partial class AdvancedSearchViewModel :
 
         await Task.Run(() =>
         {
-            FontFamily = new FontFamily(_settingsReader.GetFontFamily());
+            FontFamilyName = _settingsReader.GetFontFamily();
             ColumnName = _criteriaService.GetColumnNames().ToList();
             SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
             MatchMode = SearchMatchMode.All;
@@ -304,7 +302,7 @@ public partial class AdvancedSearchViewModel :
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[AdvancedSearchViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamily = new FontFamily(notification.FontFamily);
+        FontFamilyName = notification.FontFamily;
         return Task.CompletedTask;
     }
 

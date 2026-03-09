@@ -1,14 +1,18 @@
-using System.Drawing;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.Controls;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
-using Listen2MeRefined.Infrastructure.Startup;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public sealed partial class MainWindowViewModel :
     ViewModelBase,
@@ -21,7 +25,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IAppUpdateChecker _appUpdateChecker;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
-    private readonly StartupManager _startupManager;
+    private readonly IStartupManager _startupManager;
     private readonly IMainWindowNavigationService _navigationService;
 
     public SearchbarViewModel SearchbarViewModel { get; }
@@ -29,12 +33,6 @@ public sealed partial class MainWindowViewModel :
     public ListsViewModel ListsViewModel { get; }
     public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
     public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
-
-    public FontFamily FontFamily
-    {
-        set => SetProperty(ref field, value);
-        get => field ??= new FontFamily("Segoe UI");
-    }
 
     [ObservableProperty] private AudioModel _song = new()
     {
@@ -44,6 +42,7 @@ public sealed partial class MainWindowViewModel :
         Path = ""
     };
     
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private bool _canNavigateToAuxiliaryWindows = true;
     [ObservableProperty] private bool _isTaskStatusVisible;
@@ -62,7 +61,7 @@ public sealed partial class MainWindowViewModel :
         ListsViewModel listsViewModel,
         PlaylistPaneViewModel playlistPaneViewModel,
         SearchResultsPaneViewModel searchResultsPaneViewModel,
-        StartupManager startupManager,
+        IStartupManager startupManager,
         IMainWindowNavigationService navigationService)
     {
         _logger = logger;
@@ -229,7 +228,7 @@ public sealed partial class MainWindowViewModel :
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        return _ui.InvokeAsync(() => FontFamily = new FontFamily(notification.FontFamily), cancellationToken);
+        return _ui.InvokeAsync(() => FontFamilyName = notification.FontFamily, cancellationToken);
     }
 
     public Task Handle(PlayerStateChangedNotification notification, CancellationToken cancellationToken)

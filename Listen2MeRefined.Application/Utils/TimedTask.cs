@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Utils;
+﻿namespace Listen2MeRefined.Application.Utils;
 
 /// <summary>
 ///     Wrapper class for <see cref="PeriodicTimer" />.

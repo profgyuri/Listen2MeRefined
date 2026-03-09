@@ -1,8 +1,11 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Models;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels;
+namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public sealed partial class NewSongWindowViewModel :
     ViewModelBase,

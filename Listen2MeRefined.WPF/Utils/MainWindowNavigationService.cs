@@ -1,5 +1,5 @@
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.WPF.Views;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Utils;
 

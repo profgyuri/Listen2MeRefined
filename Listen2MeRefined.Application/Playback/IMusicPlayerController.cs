@@ -1,4 +1,4 @@
-﻿namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+﻿namespace Listen2MeRefined.Application.Playback;
 
 /// <summary>
 ///     Contract for controlling any media element.

@@ -1,10 +1,11 @@
+using Listen2MeRefined.Application.ViewModels.Controls;
+
 namespace Listen2MeRefined.WPF.Views.MainWindow;
 
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 public partial class SearchResultsPaneView : UserControl
 {

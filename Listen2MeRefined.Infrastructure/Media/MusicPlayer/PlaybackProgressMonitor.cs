@@ -1,3 +1,5 @@
+using Listen2MeRefined.Application.Playback;
+
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 public sealed class PlaybackProgressMonitor : IPlaybackProgressMonitor

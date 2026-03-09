@@ -7,7 +7,7 @@ using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
 using Serilog;
-using FolderBrowserViewModel = Listen2MeRefined.Infrastructure.ViewModels.FolderBrowserViewModel;
+using FolderBrowserViewModel = Listen2MeRefined.Application.ViewModels.Windows.FolderBrowserViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels;
 

@@ -1,13 +1,14 @@
 using System.Collections.ObjectModel;
-using System.Drawing;
-using Listen2MeRefined.Application;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
-using Listen2MeRefined.Infrastructure.FolderBrowser;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels;
+namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public sealed partial class FolderBrowserViewModel :
     ViewModelBase,
@@ -22,22 +23,17 @@ public sealed partial class FolderBrowserViewModel :
     private readonly IClipboardService _clipboardService;
     private readonly List<string> _allFolders = new();
 
-    [ObservableProperty] private string _fullPath = "";
-    [ObservableProperty] private string _selectedFolder = "";
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
+    [ObservableProperty] private string _fullPath = string.Empty;
+    [ObservableProperty] private string _selectedFolder = string.Empty;
     [ObservableProperty] private ObservableCollection<string> _folders = new();
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
     [ObservableProperty] private ObservableCollection<string> _drives = new();
-    [ObservableProperty] private string _selectedPinnedFolder = "";
-    [ObservableProperty] private string _selectedDrive = "";
-    [ObservableProperty] private string _filterText = "";
-    [ObservableProperty] private string _validationMessage = "";
+    [ObservableProperty] private string _selectedPinnedFolder = string.Empty;
+    [ObservableProperty] private string _selectedDrive = string.Empty;
+    [ObservableProperty] private string _filterText = string.Empty;
+    [ObservableProperty] private string _validationMessage = string.Empty;
     [ObservableProperty] private bool _hasValidationError;
-    
-    public FontFamily FontFamily
-    {
-        set => SetProperty(ref field, value);
-        get => field ??= new FontFamily("Segoe UI");
-    }
 
     public FolderBrowserViewModel(
         ILogger logger,
@@ -61,7 +57,7 @@ public sealed partial class FolderBrowserViewModel :
 
     protected override Task InitializeCoreAsync(CancellationToken ct)
     {
-        FontFamily = new FontFamily(_settingsReader.GetFontFamily());
+        FontFamilyName = _settingsReader.GetFontFamily();
         LoadQuickAccessCollections();
 
         var initialPath = _folderNavigationService.ResolveInitialPath(
@@ -336,7 +332,7 @@ public sealed partial class FolderBrowserViewModel :
         CancellationToken cancellationToken)
     {
         _logger.Information("[FolderBrowserViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamily = new FontFamily(notification.FontFamily);
+        FontFamilyName = notification.FontFamily;
         await Task.CompletedTask;
     }
 }

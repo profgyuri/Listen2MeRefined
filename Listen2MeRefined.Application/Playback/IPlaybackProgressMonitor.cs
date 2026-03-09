@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+namespace Listen2MeRefined.Application.Playback;
 
 /// <summary>
 /// Evaluates playback progress and determines when a track should automatically advance.

@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF.Utils;
+﻿using Listen2MeRefined.Application.ViewModels;
+
+namespace Listen2MeRefined.WPF.Utils;
 
 using System;
 using System.Threading.Tasks;

@@ -3,7 +3,7 @@ using Listen2MeRefined.Infrastructure.Startup.Tasks;
 
 namespace Listen2MeRefined.Infrastructure.Startup;
 
-public sealed class StartupManager
+public class StartupManager : IStartupManager
 {
     private readonly IDatabaseMigrationStartupTask _databaseMigrationStartupTask;
     private readonly IReadOnlyCollection<IStartupTask> _independentStartupTasks;

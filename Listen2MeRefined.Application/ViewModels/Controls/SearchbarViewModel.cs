@@ -1,8 +1,11 @@
-using System.Drawing;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+namespace Listen2MeRefined.Application.ViewModels.Controls;
 
 public partial class SearchbarViewModel :
     ViewModelBase,
@@ -12,13 +15,8 @@ public partial class SearchbarViewModel :
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IMediator _mediator;
 
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private string _searchTerm = "";
-
-    public FontFamily FontFamily
-    {
-        set => SetProperty(ref field, value);
-        get => field ??= new FontFamily("Segoe UI");
-    }
     
     public SearchbarViewModel(
         ILogger logger,
@@ -52,7 +50,7 @@ public partial class SearchbarViewModel :
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         _logger.Information("[SearchbarViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamily = new FontFamily(notification.FontFamily);
+        FontFamilyName = notification.FontFamily;
         return Task.CompletedTask;
     }
 }

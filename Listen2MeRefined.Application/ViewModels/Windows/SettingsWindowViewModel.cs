@@ -1,18 +1,21 @@
 using System.Collections.ObjectModel;
-using System.Drawing;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Application.Updating;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Core.Repositories;
-using Listen2MeRefined.Infrastructure.Media;
+using MediatR;
+using Serilog;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels;
+namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public sealed partial class SettingsWindowViewModel :
     ViewModelBase,
@@ -57,10 +60,11 @@ public sealed partial class SettingsWindowViewModel :
     private bool _isUpdatingFolderSelection;
     private readonly Dictionary<string, bool> _folderRecursionByPath = new(StringComparer.OrdinalIgnoreCase);
 
-    [ObservableProperty] private string? _selectedFolder = "";
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
+    [ObservableProperty] private string? _selectedFolder = string.Empty;
     [ObservableProperty] private bool _selectedFolderIncludeSubdirectories;
-    [ObservableProperty] private string _selectedFontFamily = "";
-    [ObservableProperty] private string _selectedNewSongWindowPosition = "";
+    [ObservableProperty] private string _selectedFontFamily = string.Empty;
+    [ObservableProperty] private string _selectedNewSongWindowPosition = string.Empty;
     [ObservableProperty] private AudioOutputDevice? _selectedAudioOutputDevice;
     [ObservableProperty] private ObservableCollection<string> _folders = new();
     [ObservableProperty] private ObservableCollection<string> _fontFamilies = new();
@@ -69,7 +73,7 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private bool _isClearMetadataButtonVisible = true;
     [ObservableProperty] private bool _isCancelClearMetadataButtonVisible;
     [ObservableProperty] private string _cancelClearMetadataButtonContent = "Cancel (5)";
-    [ObservableProperty] private string _updateAvailableText = "";
+    [ObservableProperty] private string _updateAvailableText = string.Empty;
     [ObservableProperty] private bool _isUpdateButtonVisible;
     [ObservableProperty] private bool _enableGlobalMediaKeys;
     [ObservableProperty] private bool _enableCornerNowPlayingPopup;
@@ -87,17 +91,17 @@ public sealed partial class SettingsWindowViewModel :
     [ObservableProperty] private TaskStatusCountBasis _selectedScanMilestoneBasis = TaskStatusCountBasis.Processed;
     [ObservableProperty] private bool _folderBrowserStartAtLastLocation = true;
     [ObservableProperty] private ObservableCollection<string> _pinnedFolders = new();
-    [ObservableProperty] private string? _selectedPinnedFolder = "";
+    [ObservableProperty] private string? _selectedPinnedFolder = string.Empty;
     [ObservableProperty] private ObservableCollection<string> _themeModes = new();
     [ObservableProperty] private ObservableCollection<string> _accentColors = new();
     [ObservableProperty] private string _selectedThemeMode = "Dark";
     [ObservableProperty] private string _selectedAccentColor = "Orange";
     [ObservableProperty] private ObservableCollection<PlaylistSummary> _playlists = new();
     [ObservableProperty] private PlaylistSummary? _selectedPlaylist;
-    [ObservableProperty] private string _playlistNameInput = "";
+    [ObservableProperty] private string _playlistNameInput = string.Empty;
     [ObservableProperty] private SearchResultsTransferMode _selectedSearchResultsTransferMode = SearchResultsTransferMode.Move;
     [ObservableProperty] private ObservableCollection<string> _mutedDroppedSongFolders = new();
-    [ObservableProperty] private string? _selectedMutedDroppedSongFolder = "";
+    [ObservableProperty] private string? _selectedMutedDroppedSongFolder = string.Empty;
 
     public ObservableCollection<TaskStatusCountBasis> ScanMilestoneBases { get; } =
         new(Enum.GetValues<TaskStatusCountBasis>());
@@ -119,12 +123,6 @@ public sealed partial class SettingsWindowViewModel :
     }
 
     public bool DontScanOnStartup => !ScanOnStartup;
-    
-    public FontFamily FontFamily
-    {
-        set => SetProperty(ref field, value);
-        get => field ??= new FontFamily("Segoe UI");
-    }
 
     public SettingsWindowViewModel(
         ILogger logger,
@@ -192,7 +190,7 @@ public sealed partial class SettingsWindowViewModel :
 
         Folders = new(musicFolderRequests.Select(x => x.Path));
         var selectedFont = _settingsReader.GetFontFamily();
-        FontFamily = new FontFamily(selectedFont);
+        FontFamilyName = selectedFont;
         SelectedFontFamily = string.IsNullOrEmpty(selectedFont) ? "Segoe UI" : selectedFont;
 
         var selectedWindowPosition = _settingsReader.GetNewSongWindowPosition();

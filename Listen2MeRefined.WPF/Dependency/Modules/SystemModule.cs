@@ -3,6 +3,7 @@ using System.Windows.Media;
 using Autofac;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.FolderBrowser;

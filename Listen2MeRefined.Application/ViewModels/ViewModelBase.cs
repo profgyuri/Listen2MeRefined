@@ -1,8 +1,10 @@
-﻿namespace Listen2MeRefined.Infrastructure.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace Listen2MeRefined.Application.ViewModels;
 
 public abstract class ViewModelBase : ObservableObject, IAsyncInitializable
 {
-    private readonly object _gate = new();
+    private readonly Lock _gate = new();
     private Task? _initializeTask;
 
     public Task InitializeAsync(CancellationToken ct = default)

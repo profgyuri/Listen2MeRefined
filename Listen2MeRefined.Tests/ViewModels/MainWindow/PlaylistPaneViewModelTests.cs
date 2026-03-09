@@ -1,6 +1,7 @@
 using System.Collections;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
@@ -8,13 +9,11 @@ using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Scanning.Files;
-using Listen2MeRefined.Infrastructure.ViewModels;
 using MediatR;
 using Moq;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.ListsViewModel;
-using PlaylistPaneViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.PlaylistPaneViewModel;
+using ListsViewModel = Listen2MeRefined.Application.ViewModels.Controls.ListsViewModel;
+using PlaylistPaneViewModel = Listen2MeRefined.Application.ViewModels.Controls.PlaylistPaneViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 

@@ -3,6 +3,7 @@ using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Application.Updating;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Core.Repositories;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
@@ -12,7 +13,7 @@ using Listen2MeRefined.Infrastructure.Utils;
 using MediatR;
 using Moq;
 using Serilog;
-using SettingsWindowViewModel = Listen2MeRefined.Infrastructure.ViewModels.SettingsWindowViewModel;
+using SettingsWindowViewModel = Listen2MeRefined.Application.ViewModels.Windows.SettingsWindowViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels;
 

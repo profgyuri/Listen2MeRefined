@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
+             xmlns:windows="clr-namespace:Listen2MeRefined.Application.ViewModels.Windows;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
+             d:DataContext="{d:DesignInstance windows:MainWindowViewModel}"
              d:DesignWidth="400">
     <Border Style="{DynamicResource ComponentTitleBarContainerBorder}">
         <Grid VerticalAlignment="Center">

@@ -1,6 +1,8 @@
 using Autofac;
+using Listen2MeRefined.Application.Startup;
+using Listen2MeRefined.Application.ViewModels.Controls;
+using Listen2MeRefined.Application.ViewModels.Windows;
 using Listen2MeRefined.Infrastructure.Startup;
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 
@@ -56,7 +58,7 @@ public class ViewModelsModule : Module
             .SingleInstance();
         builder
             .RegisterType<StartupManager>()
-            .AsSelf()
+            .As<IStartupManager>()
             .AsImplementedInterfaces()
             .SingleInstance();
     }

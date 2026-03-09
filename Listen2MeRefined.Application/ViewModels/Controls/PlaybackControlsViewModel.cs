@@ -1,10 +1,14 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Media.SoundWave;
+using Listen2MeRefined.Application.Utils;
+using MediatR;
+using Serilog;
 using SkiaSharp;
 
-namespace Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
+namespace Listen2MeRefined.Application.ViewModels.Controls;
 
 public partial class PlaybackControlsViewModel :
     ViewModelBase,
@@ -180,7 +184,7 @@ public partial class PlaybackControlsViewModel :
         ScheduleWaveformRedraw();
     }
 
-    internal Task WaitForPendingWaveformRedrawAsync() => _pendingWaveformRedrawTask;
+    public Task WaitForPendingWaveformRedrawAsync() => _pendingWaveformRedrawTask;
 
     [RelayCommand]
     private async Task PlayPause()

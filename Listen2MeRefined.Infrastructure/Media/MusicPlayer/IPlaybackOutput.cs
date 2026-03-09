@@ -1,3 +1,4 @@
+using Listen2MeRefined.Application.Playback;
 using NAudio.Wave;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;

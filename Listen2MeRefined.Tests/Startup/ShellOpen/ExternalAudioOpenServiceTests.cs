@@ -1,12 +1,11 @@
 using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Scanning.Files;
 using Listen2MeRefined.Infrastructure.Startup;
-using Listen2MeRefined.Infrastructure.ViewModels;
 using Moq;
 using Serilog;
 

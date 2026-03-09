@@ -1,6 +1,7 @@
+using Listen2MeRefined.Application.ViewModels.Controls;
+
 namespace Listen2MeRefined.WPF.Views.MainWindow;
 
-using Listen2MeRefined.Infrastructure.ViewModels.MainWindow;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;

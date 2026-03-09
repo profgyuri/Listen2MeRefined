@@ -1,3 +1,5 @@
+using Listen2MeRefined.Application.Utils;
+
 namespace Listen2MeRefined.WPF.Dependency.Modules;
 using Autofac;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;

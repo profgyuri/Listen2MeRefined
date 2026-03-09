@@ -1,4 +1,4 @@
-namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+namespace Listen2MeRefined.Application.Playback;
 
 public sealed record PlaybackOutputReconfigureResult(
     bool IsSuccess,

@@ -1,4 +1,5 @@
 using Autofac;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 namespace Listen2MeRefined.WPF.Dependency.Modules;
