@@ -21,7 +21,7 @@ public static class ViewModelsModule
             services.AddSingleton<ListsViewModel>();
             services.AddSingleton<PlaylistPaneViewModel>();
             services.AddSingleton<SearchResultsPaneViewModel>();
-            services.AddSingleton<FolderBrowserViewModel>();
+            services.AddTransient<FolderBrowserViewModel>();
             services.AddSingleton<SearchbarViewModel>();
             services.AddSingleton<PlaybackControlsViewModel>();
             
