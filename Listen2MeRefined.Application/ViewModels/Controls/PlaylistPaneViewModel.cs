@@ -19,7 +19,8 @@ public partial class PlaylistPaneViewModel :
     INotificationHandler<PlaylistRenamedNotification>,
     INotificationHandler<PlaylistDeletedNotification>,
     INotificationHandler<PlaylistMembershipChangedNotification>,
-    INotificationHandler<PlaylistShuffledNotification>
+    INotificationHandler<PlaylistShuffledNotification>,
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ListsViewModel _lists;
     private readonly IAppSettingsReader _settingsReader;
@@ -28,6 +29,7 @@ public partial class PlaylistPaneViewModel :
 
     private readonly HashSet<AudioModel> _selectedTabSongs = new();
 
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private ObservableCollection<PlaylistTabItem> _tabs = new();
     [ObservableProperty] private PlaylistTabItem? _selectedTab;
     [ObservableProperty] private ObservableCollection<PlaylistSummary> _availablePlaylists = new();
@@ -516,4 +518,10 @@ public partial class PlaylistPaneViewModel :
     }
 
     public sealed record PlaylistMenuState(int PlaylistId, string PlaylistName, bool IsChecked, bool AllowRemove);
+
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        FontFamilyName = notification.FontFamily;
+        return Task.CompletedTask;
+    }
 }

@@ -9,6 +9,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance windows:NewSongWindowViewModel}"
         Style="{DynamicResource BasicWindow}"
+        FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
         Topmost="{Binding IsTopmost}"
         ResizeMode="NoResize"
         FontSize="15"

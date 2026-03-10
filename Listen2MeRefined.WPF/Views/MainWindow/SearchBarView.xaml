@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:controls="clr-namespace:Listen2MeRefined.Application.ViewModels.Controls;assembly=Listen2MeRefined.Application"
+             FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:SearchbarViewModel}">
     <Border Style="{DynamicResource BorderContainer}"

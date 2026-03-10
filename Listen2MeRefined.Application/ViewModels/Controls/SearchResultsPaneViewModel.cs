@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
@@ -8,12 +9,16 @@ using MediatR;
 
 namespace Listen2MeRefined.Application.ViewModels.Controls;
 
-public partial class SearchResultsPaneViewModel : ViewModelBase
+public partial class SearchResultsPaneViewModel : 
+    ViewModelBase,
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly ListsViewModel _lists;
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IMediator _mediator;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
+    
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
 
     public ObservableCollection<AudioModel> SearchResults => _lists.SearchResults;
     public IRelayCommand SendSelectedToPlaylistCommand => _lists.SendSelectedToPlaylistCommand;
@@ -133,5 +138,11 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
             .Where(x => !string.IsNullOrWhiteSpace(x.Path))
             .Distinct()
             .ToArray();
+    }
+
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        FontFamilyName = notification.FontFamily;
+        return Task.CompletedTask;
     }
 }

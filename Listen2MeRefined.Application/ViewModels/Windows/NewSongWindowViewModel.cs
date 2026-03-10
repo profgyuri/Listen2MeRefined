@@ -10,8 +10,10 @@ namespace Listen2MeRefined.Application.ViewModels.Windows;
 public sealed partial class NewSongWindowViewModel :
     ViewModelBase,
     INotificationHandler<NewSongWindowPositionChangedNotification>,
-    INotificationHandler<CurrentSongNotification>
+    INotificationHandler<CurrentSongNotification>,
+    INotificationHandler<FontFamilyChangedNotification>
 {
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private AudioModel _song = new()
     {
         Artist = "Artist",
@@ -59,6 +61,12 @@ public sealed partial class NewSongWindowViewModel :
     {
         _logger.Information("[NewSongWindowViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
         Song = notification.Audio;
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    {
+        FontFamilyName = notification.FontFamily;
         return Task.CompletedTask;
     }
 }

@@ -10,6 +10,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance windows:FolderBrowserViewModel}"
         Style="{DynamicResource BasicWindow}"
+        FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
         Title="Folder Browser"
         Height="520"
         Width="860"

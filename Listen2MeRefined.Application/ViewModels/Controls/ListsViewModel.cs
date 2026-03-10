@@ -23,6 +23,8 @@ public partial class ListsViewModel :
     INotificationHandler<ExternalAudioFilesOpenedNotification>,
     INotificationHandler<PlaylistShuffledNotification>
 {
+    private Guid _guid = Guid.NewGuid();
+    
     private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
@@ -506,7 +508,7 @@ public partial class ListsViewModel :
 
         SwitchToSearchResultsTab();
         SearchResults.Clear();
-        Extensions.AddRange(SearchResults, notification.Results);
+        SearchResults.AddRange(notification.Results);
         await Task.CompletedTask;
     }
 

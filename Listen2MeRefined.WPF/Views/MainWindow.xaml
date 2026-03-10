@@ -10,6 +10,7 @@
         d:DataContext="{d:DesignInstance windows:MainWindowViewModel}"
         Style="{DynamicResource BasicWindow}"
         WindowStartupLocation="Manual"
+        FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
         Title="{Binding Song.Display}"
         MinHeight="502" MinWidth="1030"
         Height="752" Width="1030">

@@ -4,6 +4,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
         Style="{DynamicResource BasicWindow}"
+        FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
         Title="Add music folder"
         Height="280"
         Width="520"

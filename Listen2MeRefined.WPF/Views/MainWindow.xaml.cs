@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Windows;
-using Listen2MeRefined.Infrastructure.Utils;
 
 namespace Listen2MeRefined.WPF;
 

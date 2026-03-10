@@ -9,6 +9,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance windows:AdvancedSearchViewModel}"
         Style="{DynamicResource BasicWindow}"
+        FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
         ResizeMode="CanResizeWithGrip"
         MinHeight="460"
         MinWidth="640"

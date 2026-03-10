@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance windows:SettingsWindowViewModel}"
         Style="{DynamicResource BasicWindow}"
-        FontFamily="{Binding SelectedFontFamily}"
+        FontFamily="{Binding SelectedFontFamily, Converter={StaticResource StringToFontFamily}}"
         ResizeMode="NoResize"
         Title="Settings"
         Height="620"

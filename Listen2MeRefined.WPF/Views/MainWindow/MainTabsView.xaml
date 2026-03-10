@@ -6,6 +6,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance controls:ListsViewModel}"
+             FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow"
              xmlns:controls="clr-namespace:Listen2MeRefined.Application.ViewModels.Controls;assembly=Listen2MeRefined.Application">
     <TabControl Margin="0,20,10,14"

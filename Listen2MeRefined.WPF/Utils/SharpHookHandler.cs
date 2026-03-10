@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.WPF.Views;
 using SharpHook;
 using SharpHook.Data;

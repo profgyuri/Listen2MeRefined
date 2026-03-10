@@ -1,61 +1,20 @@
 ﻿using Listen2MeRefined.Application.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Listen2MeRefined.WPF;
-using Autofac;
-using Listen2MeRefined.WPF.Dependency;
+
 using Listen2MeRefined.WPF.Views;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
 internal static class WindowManager
 {
-    /// <summary>
-    ///     Shows a window registered in the dependency framework.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal static void ShowMainWindow<T>()
-        where T : Window
-    {
-        var scope = IocContainer.GetContainer().BeginLifetimeScope();
+    private static IServiceProvider _services = null!;
 
-        try
-        {
-            var window = scope.Resolve<T>();
-
-            Application.Current.MainWindow = window;
-            window.Closed += (_, __) => scope.Dispose();
-
-            if (window.DataContext is IAsyncInitializable init)
-            {
-                async void Handler(object? sender, EventArgs e)
-                {
-                    window.ContentRendered -= Handler;
-
-                    try
-                    {
-                        await init.InitializeAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.ToString(), "Initialization failed");
-                        window.Close();
-                    }
-                }
-
-                window.ContentRendered += Handler;
-            }
-
-            window.Show();
-        }
-        catch
-        {
-            scope.Dispose();
-            throw;
-        }
-    }
-
+    internal static void Initialize(IServiceProvider services)
+        => _services = services;
+    
     /// <summary>
     ///     Shows a window registered in the dependency framework.
     /// </summary>
@@ -70,18 +29,11 @@ internal static class WindowManager
     bool isModal = true,
     CancellationToken ct = default)
     where T : Window
-{
-    var scope = IocContainer.GetContainer().BeginLifetimeScope();
-
-    try
     {
-        var window = scope.Resolve<T>();
+        var window = _services.GetRequiredService<T>();
 
         window.Left = left - window.Width / 2;
         window.Top  = top  - window.Height / 2;
-
-        // Ensure scope survives for modeless windows
-        window.Closed += (_, __) => scope.Dispose();
 
         if (window.DataContext is IAsyncInitializable init)
             await init.InitializeAsync(ct); // keep on UI thread
@@ -95,12 +47,6 @@ internal static class WindowManager
         window.Show();
         return null;
     }
-    catch
-    {
-        scope.Dispose();
-        throw;
-    }
-}
 
     /// <summary>
     ///     Shows the New Song Window when the mouse coordinates are in a corner.
@@ -113,8 +59,7 @@ internal static class WindowManager
         int y,
         int triggerAreaSize = 10)
     {
-        using var scope = IocContainer.GetContainer().BeginLifetimeScope();
-        var window = scope.Resolve<NewSongWindow>();
+        var window = _services.GetRequiredService<NewSongWindow>();
 
         if (x <= triggerAreaSize)
         {
