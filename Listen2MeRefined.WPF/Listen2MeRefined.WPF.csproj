@@ -39,4 +39,12 @@
         <ProjectReference Include="..\Listen2MeRefined.Infrastructure\Listen2MeRefined.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Page Update="MainWindow.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
+
 </Project>
