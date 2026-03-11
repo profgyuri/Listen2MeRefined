@@ -87,6 +87,7 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object, 
             Mock.Of<IMediator>(), 
             settingsReader.Object);
+        await pane.InitializeAsync();
         await pane.RemoveSelectedFromActiveTabCommand.ExecuteAsync(null);
 
         Assert.Empty(lists.DefaultPlaylist);
@@ -118,6 +119,7 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object, 
             Mock.Of<IMediator>(), 
             settingsReader.Object);
+        await pane.InitializeAsync();
         await pane.Handle(new PlaylistCreatedNotification(42, "Road Trip"), CancellationToken.None);
 
         Assert.Equal(2, pane.Tabs.Count);
@@ -149,7 +151,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMessenger>(),
             lists, 
             playlistLibrary.Object, 
-            Mock.Of<IMediator>(), 
+            mediator.Object, 
             settingsReader.Object);
         var first = new AudioModel { Title = "First", Path = "a.mp3" };
         var second = new AudioModel { Title = "Second", Path = "b.mp3" };
