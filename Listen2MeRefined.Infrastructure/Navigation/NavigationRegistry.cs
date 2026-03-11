@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
+using Listen2MeRefined.Application.Navigation;
 
-namespace Listen2MeRefined.Application.Navigation;
+namespace Listen2MeRefined.Infrastructure.Navigation;
 
 /// <summary>
 /// Stores route-to-view model mappings.

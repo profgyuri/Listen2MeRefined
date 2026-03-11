@@ -1,9 +1,9 @@
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
-namespace Listen2MeRefined.Application.Navigation;
+namespace Listen2MeRefined.Infrastructure.Navigation;
 
 /// <summary>
 /// Performs asynchronous VM-first navigation.
