@@ -18,12 +18,7 @@ public static class ViewModelsModule
             services.AddSingleton<AdvancedSearchViewModel>();
             services.AddSingleton<CornerWindowViewModel>();
             services.AddSingleton<SettingsWindowViewModel>();
-            services.AddSingleton<ListsViewModel>();
-            services.AddSingleton<PlaylistPaneViewModel>();
-            services.AddSingleton<SearchResultsPaneViewModel>();
             services.AddTransient<FolderBrowserViewModel>();
-            services.AddSingleton<SearchbarViewModel>();
-            services.AddSingleton<PlaybackControlsViewModel>();
             
             services.AddSingleton<IWaveformViewportAware>(sp => sp.GetRequiredService<PlaybackControlsViewModel>());
             services.AddSingleton<INotificationHandler<CurrentSongNotification>>(sp =>
