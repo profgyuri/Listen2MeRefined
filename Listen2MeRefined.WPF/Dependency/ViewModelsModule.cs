@@ -16,7 +16,7 @@ public static class ViewModelsModule
         {
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<AdvancedSearchViewModel>();
-            services.AddSingleton<NewSongWindowViewModel>();
+            services.AddSingleton<CornerWindowViewModel>();
             services.AddSingleton<SettingsWindowViewModel>();
             services.AddSingleton<ListsViewModel>();
             services.AddSingleton<PlaylistPaneViewModel>();
@@ -44,11 +44,11 @@ public static class ViewModelsModule
                 sp.GetRequiredService<AdvancedSearchViewModel>());
             
             services.AddSingleton<INotificationHandler<NewSongWindowPositionChangedNotification>>(sp =>
-                sp.GetRequiredService<NewSongWindowViewModel>());
+                sp.GetRequiredService<CornerWindowViewModel>());
             services.AddSingleton<INotificationHandler<CurrentSongNotification>>(sp =>
-                sp.GetRequiredService<NewSongWindowViewModel>());
+                sp.GetRequiredService<CornerWindowViewModel>());
             services.AddSingleton<INotificationHandler<FontFamilyChangedNotification>>(sp =>
-                sp.GetRequiredService<NewSongWindowViewModel>());
+                sp.GetRequiredService<CornerWindowViewModel>());
             
             services.AddSingleton<INotificationHandler<FolderBrowserNotification>>(sp =>
                 sp.GetRequiredService<SettingsWindowViewModel>());

@@ -1,4 +1,4 @@
-<UserControl x:Class="Listen2MeRefined.WPF.Views.MainWindow.SearchResultsPaneView"
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Widgets.SearchResultsPaneView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:dd="urn:gong-wpf-dragdrop"

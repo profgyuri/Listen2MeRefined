@@ -6,9 +6,9 @@ using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Navigation;
 using Serilog;
 
-namespace Listen2MeRefined.Application.ViewModels;
+namespace Listen2MeRefined.Application.ViewModels.Shells;
 
-public sealed partial class ShellViewModel : ViewModelBase
+public abstract partial class ShellViewModelBase : ViewModelBase
 {
     private readonly INavigationService _navigationService;
     private readonly NavigationState _navigationState;
@@ -18,10 +18,10 @@ public sealed partial class ShellViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _currentRoute = string.Empty;
-    
-    public ShellViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
+
+    protected ShellViewModelBase(
+        IErrorHandler errorHandler,
+        ILogger logger,
         IMessenger messenger,
         INavigationService navigationService,
         NavigationState navigationState) : base(errorHandler, logger, messenger)
@@ -32,23 +32,19 @@ public sealed partial class ShellViewModel : ViewModelBase
         CurrentViewModel = _navigationState.CurrentViewModel;
         _navigationState.PropertyChanged += OnNavigationStateChanged;
     }
-    
+
     [RelayCommand]
     private Task NavigateAsync(string route) =>
         ExecuteSafeAsync(
             ct => _navigationService.NavigateAsync(route, cancellationToken: ct),
             $"Navigate({route})");
-    
+
     private void OnNavigationStateChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(NavigationState.CurrentRoute))
-        {
             CurrentRoute = _navigationState.CurrentRoute;
-        }
 
         if (e.PropertyName == nameof(NavigationState.CurrentViewModel))
-        {
             CurrentViewModel = _navigationState.CurrentViewModel;
-        }
     }
 }

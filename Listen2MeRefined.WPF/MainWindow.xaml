@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:Listen2MeRefined.WPF.Views.MainWindow"
         xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
-        xmlns:viewModels="clr-namespace:Listen2MeRefined.Application.ViewModels;assembly=Listen2MeRefined.Application"
+        xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
+        xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModels:ShellViewModel}"
+        d:DataContext="{d:DesignInstance shells:MainShellViewModelViewModel}"
         Style="{DynamicResource BasicWindow}"
         WindowStartupLocation="Manual"
         MinHeight="502" MinWidth="1030"
@@ -55,14 +55,14 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <views:TrackInfoView />
-                    <views:PlaybackControlsView Grid.Column="1" />
+                    <widgets:TrackInfoView />
+                    <widgets:PlaybackControlsView Grid.Column="1" />
                 </Grid>
 
-                <views:MainTabsView DataContext="{Binding ListsViewModel}" Grid.Row="1" />
+                <widgets:MainTabsView DataContext="{Binding ListsViewModel}" Grid.Row="1" />
 
-                <views:PlaylistPaneView DataContext="{Binding PlaylistPaneViewModel}" Grid.Row="1" Grid.Column="1" />
-                <views:SearchBarView DataContext="{Binding SearchbarViewModel}" Grid.Row="2" Grid.ColumnSpan="2" />
+                <widgets:PlaylistPaneView DataContext="{Binding PlaylistPaneViewModel}" Grid.Row="1" Grid.Column="1" />
+                <widgets:SearchBarView DataContext="{Binding SearchbarViewModel}" Grid.Row="2" Grid.ColumnSpan="2" />
             </Grid>
         </Grid>
     </Border>

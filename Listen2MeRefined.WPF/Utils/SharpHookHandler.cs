@@ -41,7 +41,7 @@ internal sealed class SharpHookHandler : IGlobalHook
     private bool _handlersAttached;
     private bool _runLoopStarted;
     private Point _lastMousePosition;
-    private NewSongWindow? _window;
+    private CornerWindow? _window;
 
     public SharpHookHandler(
         ILogger logger,

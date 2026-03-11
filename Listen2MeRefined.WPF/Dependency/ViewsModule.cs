@@ -12,7 +12,7 @@ public static class ViewsModule
         {
             services.AddSingleton<MainWindow>();
             services.AddSingleton<SettingsWindow>();
-            services.AddSingleton<NewSongWindow>();
+            services.AddSingleton<CornerWindow>();
             services.AddTransient<FolderBrowserWindow>();
             services.AddTransient<AdvancedSearchWindow>();
         });

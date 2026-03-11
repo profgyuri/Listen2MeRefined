@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Application.ViewModels.Windows;
 
 namespace Listen2MeRefined.WPF;
@@ -18,7 +19,7 @@ public sealed partial class MainWindow : Window
     public ICommand ToggleWindowStateCommand { get; }
 
     public MainWindow(
-        ShellViewModel viewModel,
+        MainShellViewModelViewModel viewModelViewModel,
         IGlobalHook globalHook)
     {
         _globalHook = globalHook;
@@ -32,7 +33,7 @@ public sealed partial class MainWindow : Window
                 : WindowState.Maximized);
 
         InitializeComponent();
-        DataContext = viewModel;
+        DataContext = viewModelViewModel;
     }
 
     private void CloseWindow()

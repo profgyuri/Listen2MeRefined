@@ -9,7 +9,7 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Windows;
 
-public sealed partial class NewSongWindowViewModel :
+public sealed partial class CornerWindowViewModel :
     ViewModelBase,
     INotificationHandler<NewSongWindowPositionChangedNotification>,
     INotificationHandler<CurrentSongNotification>,
@@ -29,7 +29,7 @@ public sealed partial class NewSongWindowViewModel :
 
     public bool IsTopmost { get; set; }
 
-    public NewSongWindowViewModel(
+    public CornerWindowViewModel(
         IAppSettingsReader settingsReader,
         IWindowPositionPolicyService windowPositionPolicyService,
         IErrorHandler errorHandler,

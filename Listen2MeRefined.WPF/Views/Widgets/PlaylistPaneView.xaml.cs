@@ -1,12 +1,11 @@
-using Listen2MeRefined.Application.ViewModels.Controls;
-
-namespace Listen2MeRefined.WPF.Views.MainWindow;
-
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using Listen2MeRefined.Application.ViewModels.Controls;
+
+namespace Listen2MeRefined.WPF.Views.Widgets;
 
 public partial class PlaylistPaneView : UserControl
 {
@@ -54,7 +53,7 @@ public partial class PlaylistPaneView : UserControl
         e.Handled = true;
     }
 
-    private static int ResolveDropIndex(ListView listView, Point point)
+    private static int ResolveDropIndex(ListView listView, System.Windows.Point point)
     {
         var item = FindAncestor<ListViewItem>(listView.InputHitTest(point) as DependencyObject);
         if (item is null)
@@ -63,7 +62,7 @@ public partial class PlaylistPaneView : UserControl
         }
 
         var index = listView.ItemContainerGenerator.IndexFromContainer(item);
-        var positionWithinItem = point.Y - item.TranslatePoint(new Point(0, 0), listView).Y;
+        var positionWithinItem = point.Y - item.TranslatePoint(new System.Windows.Point(0, 0), listView).Y;
         return positionWithinItem > item.ActualHeight / 2 ? index + 1 : index;
     }
 

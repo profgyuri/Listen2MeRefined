@@ -54,12 +54,12 @@ internal static class WindowManager
     /// <param name="x">X parameter of mouse position.</param>
     /// <param name="y">Y parameter of mouse position.</param>
     /// <returns>The instance of the New Song Window.</returns>
-    internal static NewSongWindow ShowNewSongWindow(
+    internal static CornerWindow ShowNewSongWindow(
         int x,
         int y,
         int triggerAreaSize = 10)
     {
-        var window = _services.GetRequiredService<NewSongWindow>();
+        var window = _services.GetRequiredService<CornerWindow>();
 
         if (x <= triggerAreaSize)
         {
@@ -98,7 +98,7 @@ internal static class WindowManager
     /// <summary>
     ///     Closes the new song window, when the mouse coordinates are no longer in a corner.
     /// </summary>
-    internal static void CloseNewSongWindow(NewSongWindow? window)
+    internal static void CloseNewSongWindow(CornerWindow? window)
     {
         window?.Hide();
     }
