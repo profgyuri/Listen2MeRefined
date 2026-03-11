@@ -23,11 +23,10 @@ public abstract partial class ShellViewModelBase : ViewModelBase
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        INavigationService navigationService,
-        NavigationState navigationState) : base(errorHandler, logger, messenger)
+        ShellContext shellContext) : base(errorHandler, logger, messenger)
     {
-        _navigationService = navigationService;
-        _navigationState = navigationState;
+        _navigationService = shellContext.NavigationService;
+        _navigationState = shellContext.NavigationState;
         CurrentRoute = _navigationState.CurrentRoute;
         CurrentViewModel = _navigationState.CurrentViewModel;
         _navigationState.PropertyChanged += OnNavigationStateChanged;

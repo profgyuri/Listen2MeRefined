@@ -11,8 +11,7 @@ public class FolderBrowserShellViewModel : ShellViewModelBase
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger, 
-        INavigationService navigationService, 
-        NavigationState navigationState) : base(errorHandler, logger, messenger, navigationService, navigationState)
+        IShellContextFactory context) : base(errorHandler, logger, messenger, context.Create())
     {
     }
 }

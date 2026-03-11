@@ -21,9 +21,10 @@ public static class NavigationModule
             services.AddSingleton(moduleCatalogOptions);
             
             services.AddSingleton<INavigationRegistry, NavigationRegistry>();
-            services.AddSingleton<NavigationState>();
-            services.AddSingleton<IInitializationTracker, InitializationTracker>();
-            services.AddSingleton<INavigationService, NavigationService>();
+            services.AddTransient<NavigationState>();
+            services.AddTransient<IInitializationTracker, InitializationTracker>();
+            services.AddTransient<INavigationService, NavigationService>();
+            services.AddSingleton<IShellContextFactory, ShellContextFactory>();
         });
         
         return builder;
