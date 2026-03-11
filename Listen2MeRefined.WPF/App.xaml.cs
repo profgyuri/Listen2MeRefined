@@ -4,11 +4,14 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Dapper;
+using Listen2MeRefined.Application.Modules;
+using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Utils;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Listen2MeRefined.WPF;
@@ -42,28 +45,14 @@ public sealed partial class App : System.Windows.Application
             _host = CreateHostBuilder().Build();
             await _host.StartAsync().ConfigureAwait(true);
             
-            WindowManager.Initialize(_host.Services);
+            if (ProcessFileOpenForwarding(e)) return;
+            
+            RegisterNavigation(_host.Services);
             
             var window = _host.Services.GetRequiredService<MainWindow>();
             window.Show();
-
-            _singleInstanceFileOpenBridge = new SingleInstanceFileOpenBridge(Log.Logger, _host.Services.GetRequiredService<IMediator>());
-            if (!_singleInstanceFileOpenBridge.IsPrimaryInstance)
-            {
-                using var forwardTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
-                var forwarded = _singleInstanceFileOpenBridge
-                    .ForwardToPrimaryAsync(e.Args, forwardTimeout.Token)
-                    .GetAwaiter()
-                    .GetResult();
-
-                if (!forwarded)
-                {
-                    Log.Logger.Warning("[App] Failed to forward shell-open args to primary instance");
-                }
-
-                Shutdown(0);
-                return;
-            }
+            
+            await NavigateToDefaultRouteAsync().ConfigureAwait(true);
 
             if (e.Args.Length > 0)
             {
@@ -76,6 +65,41 @@ public sealed partial class App : System.Windows.Application
             Log.Fatal(ex, "Application startup failed.");
             Shutdown(-1);
         }
+    }
+
+    private async Task NavigateToDefaultRouteAsync()
+    {
+        var navigationService = _host!.Services.GetRequiredService<INavigationService>();
+        var navigationOptions = _host.Services.GetRequiredService<IOptions<NavigationOptions>>().Value;
+        await navigationService.NavigateAsync(navigationOptions.DefaultRoute).ConfigureAwait(true);
+    }
+
+    /// <summary>
+    /// Forward file open args to the primary instance.
+    /// </summary>
+    /// <param name="e">Startup event arguments.</param>
+    /// <returns><see langword="False"/> if the current instance is the primary;
+    /// otherwise <see langword="True"/>, if the args were forwarded.</returns>"/>
+    private bool ProcessFileOpenForwarding(StartupEventArgs e)
+    {
+        _singleInstanceFileOpenBridge = 
+            new SingleInstanceFileOpenBridge(Log.Logger, _host!.Services.GetRequiredService<IMediator>());
+        if (_singleInstanceFileOpenBridge.IsPrimaryInstance) return false;
+        
+        using var forwardTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
+        var forwarded = _singleInstanceFileOpenBridge
+            .ForwardToPrimaryAsync(e.Args, forwardTimeout.Token)
+            .GetAwaiter()
+            .GetResult();
+
+        if (!forwarded)
+        {
+            Log.Logger.Warning("[App] Failed to forward shell-open args to primary instance");
+        }
+
+        Shutdown(0);
+        return true;
+
     }
 
     private static IHostBuilder CreateHostBuilder()
@@ -99,10 +123,36 @@ public sealed partial class App : System.Windows.Application
         return builder;
     }
 
-    protected override void OnExit(ExitEventArgs e)
+    protected override async void OnExit(ExitEventArgs e)
     {
         _singleInstanceFileOpenBridge?.Dispose();
+        
+        if (_host is not null)
+        {
+            try
+            {
+                await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
+            }
+            finally
+            {
+                _host.Dispose();
+            }
+        }
+        
+        await Log.CloseAndFlushAsync();
+        
         base.OnExit(e);
+    }
+    
+    private static void RegisterNavigation(IServiceProvider services)
+    {
+        var moduleCatalog = services.GetRequiredService<IModuleCatalog>();
+        var navigationRegistry = services.GetRequiredService<INavigationRegistry>();
+
+        foreach (var module in moduleCatalog.LoadModules())
+        {
+            module.RegisterNavigation(navigationRegistry);
+        }
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

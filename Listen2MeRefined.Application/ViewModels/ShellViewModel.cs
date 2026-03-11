@@ -1,0 +1,54 @@
+using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Navigation;
+using Serilog;
+
+namespace Listen2MeRefined.Application.ViewModels;
+
+public sealed partial class ShellViewModel : ViewModelBase
+{
+    private readonly INavigationService _navigationService;
+    private readonly NavigationState _navigationState;
+
+    [ObservableProperty]
+    private object? _currentViewModel;
+
+    [ObservableProperty]
+    private string _currentRoute = string.Empty;
+    
+    public ShellViewModel(
+        IErrorHandler errorHandler, 
+        ILogger logger, 
+        IMessenger messenger,
+        INavigationService navigationService,
+        NavigationState navigationState) : base(errorHandler, logger, messenger)
+    {
+        _navigationService = navigationService;
+        _navigationState = navigationState;
+        CurrentRoute = _navigationState.CurrentRoute;
+        CurrentViewModel = _navigationState.CurrentViewModel;
+        _navigationState.PropertyChanged += OnNavigationStateChanged;
+    }
+    
+    [RelayCommand]
+    private Task NavigateAsync(string route) =>
+        ExecuteSafeAsync(
+            ct => _navigationService.NavigateAsync(route, cancellationToken: ct),
+            $"Navigate({route})");
+    
+    private void OnNavigationStateChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(NavigationState.CurrentRoute))
+        {
+            CurrentRoute = _navigationState.CurrentRoute;
+        }
+
+        if (e.PropertyName == nameof(NavigationState.CurrentViewModel))
+        {
+            CurrentViewModel = _navigationState.CurrentViewModel;
+        }
+    }
+}

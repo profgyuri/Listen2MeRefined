@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels;
 using Listen2MeRefined.Application.ViewModels.Windows;
 
 namespace Listen2MeRefined.WPF;
@@ -17,7 +18,7 @@ public sealed partial class MainWindow : Window
     public ICommand ToggleWindowStateCommand { get; }
 
     public MainWindow(
-        MainWindowViewModel viewModel,
+        ShellViewModel viewModel,
         IGlobalHook globalHook)
     {
         _globalHook = globalHook;
