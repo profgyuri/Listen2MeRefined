@@ -1,4 +1,6 @@
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Application.ViewModels.Windows;
+using Listen2MeRefined.WPF.Utils.Navigation;
 
 namespace Listen2MeRefined.WPF.Views;
 
@@ -10,12 +12,15 @@ using System.Windows.Input;
 /// </summary>
 public sealed partial class SettingsWindow : Window
 {
+    private readonly IWindowManager _windowManager;
+    
     private bool _isLoadedOnce;
 
     public ICommand HideWindowCommand { get; }
 
-    public SettingsWindow(SettingsWindowViewModel viewModel)
+    public SettingsWindow(SettingsWindowViewModel viewModel, IWindowManager windowManager)
     {
+        _windowManager = windowManager;
         HideWindowCommand = new RelayCommand(_ => Hide());
         InitializeComponent();
 
@@ -51,7 +56,7 @@ public sealed partial class SettingsWindow : Window
         object sender,
         RoutedEventArgs e)
     {
-        await WindowManager.ShowWindowAsync<FolderBrowserWindow>(Left + Width / 2, Top + Height / 2);
+        await _windowManager.ShowWindowAsync<FolderBrowserWindow, FolderBrowserShellViewModel>("folderBrowser", Left + Width / 2, Top + Height / 2);
     }
 
     private void CloseButton_Click(

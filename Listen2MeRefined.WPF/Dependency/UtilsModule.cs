@@ -15,6 +15,7 @@ using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Startup;
 using Listen2MeRefined.Infrastructure.Versioning;
 using Listen2MeRefined.WPF.Utils;
+using Listen2MeRefined.WPF.Utils.Navigation;
 using Listen2MeRefined.WPF.Utils.Theming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

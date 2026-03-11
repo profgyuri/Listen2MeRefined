@@ -1,11 +1,7 @@
-﻿using Listen2MeRefined.Application.Utils;
+﻿using System.Windows.Threading;
+using Listen2MeRefined.Application.Utils;
 
-namespace Listen2MeRefined.WPF.Utils;
-
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Threading;
+namespace Listen2MeRefined.WPF.Utils.Navigation;
 
 public sealed class WpfUiDispatcher : IUiDispatcher
 {

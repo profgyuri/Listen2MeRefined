@@ -109,9 +109,9 @@ public sealed partial class App : System.Windows.Application
         builder
             .ConfigureDataAccess()
             .ConfigureLogger()
+            .ConfigureNavigation()
             .ConfigureModules()
             .ConfigureMusicPlayer()
-            .ConfigureNavigation()
             .ConfigureStartup()
             .ConfigureSystem()
             .ConfigureUtils()

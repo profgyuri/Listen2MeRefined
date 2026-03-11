@@ -5,7 +5,9 @@ using SharpHook.Data;
 using System.Windows.Forms;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Infrastructure.Settings;
+using Listen2MeRefined.WPF.Utils.Navigation;
 using Serilog;
 using IGlobalHook = Listen2MeRefined.Application.Utils.IGlobalHook;
 using Timer = System.Threading.Timer;
@@ -32,6 +34,7 @@ internal sealed class SharpHookHandler : IGlobalHook
     private readonly ILogger _logger;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly ISettingsManager<AppSettings> _settingsManager;
+    private readonly IWindowManager _windowManager;
     private readonly Timer _mouseDebounceTimer;
     private readonly object _registrationGate = new();
     private readonly int _width = Screen.PrimaryScreen!.Bounds.Width;
@@ -46,12 +49,14 @@ internal sealed class SharpHookHandler : IGlobalHook
     public SharpHookHandler(
         ILogger logger,
         IMusicPlayerController musicPlayerController,
-        ISettingsManager<AppSettings> settingsManager)
+        ISettingsManager<AppSettings> settingsManager, 
+        IWindowManager windowManager)
     {
         _hook = new TaskPoolGlobalHook();
         _logger = logger;
         _musicPlayerController = musicPlayerController;
         _settingsManager = settingsManager;
+        _windowManager = windowManager;
         _mouseDebounceTimer = new Timer(CheckMousePosition, null, Timeout.Infinite, Timeout.Infinite);
     }
 
@@ -135,7 +140,7 @@ internal sealed class SharpHookHandler : IGlobalHook
             {
                 try
                 {
-                    _window = WindowManager.ShowNewSongWindow(pos.X, pos.Y, triggerSize);
+                    _window = _windowManager.ShowCornerWindow(pos.X, pos.Y, triggerSize);
                 }
                 catch (Exception ex)
                 {
@@ -205,7 +210,7 @@ internal sealed class SharpHookHandler : IGlobalHook
         {
             try
             {
-                WindowManager.CloseNewSongWindow(_window);
+                _windowManager.CloseCornerWindow(_window);
             }
             catch (Exception ex)
             {
