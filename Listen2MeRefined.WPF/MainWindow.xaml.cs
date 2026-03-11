@@ -19,7 +19,7 @@ public sealed partial class MainWindow : Window
     public ICommand ToggleWindowStateCommand { get; }
 
     public MainWindow(
-        MainShellViewModelViewModel viewModelViewModel,
+        MainShellViewModel viewModel,
         IGlobalHook globalHook)
     {
         _globalHook = globalHook;
@@ -33,7 +33,7 @@ public sealed partial class MainWindow : Window
                 : WindowState.Maximized);
 
         InitializeComponent();
-        DataContext = viewModelViewModel;
+        DataContext = viewModel;
     }
 
     private void CloseWindow()

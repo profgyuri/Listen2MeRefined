@@ -5,9 +5,9 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Shells;
 
-public sealed class MainShellViewModelViewModel : ShellViewModelBase
+public sealed class MainShellViewModel : ShellViewModelBase
 {
-    public MainShellViewModelViewModel(
+    public MainShellViewModel(
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger, 

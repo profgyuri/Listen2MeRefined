@@ -7,7 +7,7 @@
         xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
         xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance shells:MainShellViewModelViewModel}"
+        d:DataContext="{d:DesignInstance shells:MainShellViewModel}"
         Style="{DynamicResource BasicWindow}"
         WindowStartupLocation="Manual"
         MinHeight="502" MinWidth="1030"

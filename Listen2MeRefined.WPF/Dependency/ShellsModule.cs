@@ -1,6 +1,7 @@
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Controls;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Application.ViewModels.Windows;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,16 +9,25 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class ViewModelsModule
+public static class ShellsModule
 {
-    internal static IHostBuilder ConfigureViewModels(this IHostBuilder builder)
+    internal static IHostBuilder ConfigureShells(this IHostBuilder builder)
     {
         builder.ConfigureServices(services =>
         {
+            services.AddTransient<MainShellViewModel>();
             services.AddSingleton<MainWindowViewModel>();
+            
+            services.AddSingleton<AdvancedSearchShellViewModel>();
             services.AddSingleton<AdvancedSearchViewModel>();
+            
+            services.AddSingleton<CornerWindowShellViewModel>();
             services.AddSingleton<CornerWindowViewModel>();
+            
+            services.AddSingleton<SettingsShellViewModel>();
             services.AddSingleton<SettingsWindowViewModel>();
+            
+            services.AddTransient<FolderBrowserShellViewModel>();
             services.AddTransient<FolderBrowserViewModel>();
             
             services.AddSingleton<IWaveformViewportAware>(sp => sp.GetRequiredService<PlaybackControlsViewModel>());

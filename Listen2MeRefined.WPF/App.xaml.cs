@@ -115,7 +115,7 @@ public sealed partial class App : System.Windows.Application
             .ConfigureStartup()
             .ConfigureSystem()
             .ConfigureUtils()
-            .ConfigureViewModels()
+            .ConfigureShells()
             .ConfigureViews()
             .ConfigureWaveForm()
             .ConfigureWrappers();

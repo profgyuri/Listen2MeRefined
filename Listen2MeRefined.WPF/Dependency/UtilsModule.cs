@@ -48,6 +48,7 @@ public static class UtilsModule
             services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();
             services.AddSingleton<IErrorHandler, LoggingErrorHandler>();
             services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
+            services.AddTransient<IWindowManager, WindowManager>();
             services.AddSingleton<IUiDispatcher>(_ => new WpfUiDispatcher(System.Windows.Application.Current.Dispatcher));
         });
         

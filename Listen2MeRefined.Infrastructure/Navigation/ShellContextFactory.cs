@@ -10,13 +10,13 @@ namespace Listen2MeRefined.Infrastructure.Navigation;
 /// </summary>
 public sealed class ShellContextFactory : IShellContextFactory
 {
-    private readonly NavigationRegistry _registry;
+    private readonly INavigationRegistry _registry;
     private readonly IServiceProvider _services;
     private readonly IErrorHandler _errorHandler;
     private readonly ILogger _logger;
 
     public ShellContextFactory(
-        NavigationRegistry registry, 
+        INavigationRegistry registry, 
         IServiceProvider services,
         IErrorHandler errorHandler,
         ILogger logger)
