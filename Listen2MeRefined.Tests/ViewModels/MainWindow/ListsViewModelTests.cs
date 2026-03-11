@@ -13,7 +13,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using MediatR;
 using Moq;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Application.ViewModels.Controls.ListsViewModel;
+using ListsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.ListsViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 

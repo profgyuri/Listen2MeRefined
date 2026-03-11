@@ -14,7 +14,7 @@ using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
 
-namespace Listen2MeRefined.Application.ViewModels.Controls;
+namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class ListsViewModel :
     ViewModelBase,
@@ -186,7 +186,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        Logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
+        Logger.Debug<int>("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
         await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
     }
 
@@ -196,7 +196,7 @@ public partial class ListsViewModel :
         var transferMode = _settingsReader.GetSearchResultsTransferMode();
         if (!_selectedSearchResults.Any())
         {
-            Logger.Debug("[ListsViewModel] Sending all {Count} search results to the default tab", SearchResults.Count);
+            Logger.Debug<int>("[ListsViewModel] Sending all {Count} search results to the default tab", SearchResults.Count);
             SendAllToDefaultPlaylist(transferMode);
             return;
         }
@@ -259,7 +259,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        Logger.Information("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
+        Logger.Information<string?>("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
         var selectedSongIndex = PlayList.IndexOf(SelectedSong);
         var newIndex = _currentSongIndex + 1;
 
@@ -281,7 +281,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        Logger.Information("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
+        Logger.Information<string?>("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
         var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
         var index = PlayList.IndexOf(SelectedSong);
         if (index >= 0)
@@ -509,7 +509,7 @@ public partial class ListsViewModel :
 
         SwitchToSearchResultsTab();
         SearchResults.Clear();
-        SearchResults.AddRange(notification.Results);
+        Extensions.AddRange(SearchResults, notification.Results);
         await Task.CompletedTask;
     }
 

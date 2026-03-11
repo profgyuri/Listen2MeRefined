@@ -7,7 +7,7 @@ using Listen2MeRefined.Application.Searching;
 using MediatR;
 using Serilog;
 
-namespace Listen2MeRefined.Application.ViewModels.Controls;
+namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class SearchbarViewModel :
     ViewModelBase,

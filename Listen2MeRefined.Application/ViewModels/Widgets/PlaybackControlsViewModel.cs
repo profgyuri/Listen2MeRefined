@@ -10,7 +10,7 @@ using MediatR;
 using Serilog;
 using SkiaSharp;
 
-namespace Listen2MeRefined.Application.ViewModels.Controls;
+namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class PlaybackControlsViewModel :
     ViewModelBase,
@@ -58,7 +58,7 @@ public partial class PlaybackControlsViewModel :
         }
     }
 
-    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
+    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds((double)TotalTime);
     public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
     public float Volume

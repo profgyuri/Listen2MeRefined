@@ -13,7 +13,7 @@ using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
 
-namespace Listen2MeRefined.Application.ViewModels.Controls;
+namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class PlaylistPaneViewModel :
     ViewModelBase,
@@ -89,7 +89,7 @@ public partial class PlaylistPaneViewModel :
             return;
         }
 
-        var existing = Tabs.FirstOrDefault(x => x.PlaylistId == playlist.Id);
+        var existing = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == playlist.Id);
         if (existing is not null)
         {
             SelectedTab = existing;
@@ -117,7 +117,7 @@ public partial class PlaylistPaneViewModel :
 
         if (wasSelected)
         {
-            SelectedTab = Tabs.FirstOrDefault(x => x.IsDefaultTab) ?? Tabs.FirstOrDefault();
+            SelectedTab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ?? Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
         }
 
         if (!wasActiveSource)
@@ -156,7 +156,7 @@ public partial class PlaylistPaneViewModel :
                 return;
             }
 
-            var existingPaths = tab.Songs.Select(x => x.Path).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            var existingPaths = Enumerable.Select<AudioModel, string>(tab.Songs, x => x.Path).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             tab.Songs.Clear();
             await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, existingPaths);
             await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
@@ -313,7 +313,7 @@ public partial class PlaylistPaneViewModel :
     {
         await RefreshAvailablePlaylistsAsync(cancellationToken);
 
-        var existing = Tabs.FirstOrDefault(x => x.PlaylistId == notification.PlaylistId);
+        var existing = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == notification.PlaylistId);
         if (existing is not null)
         {
             existing.Header = notification.Name;
@@ -330,7 +330,7 @@ public partial class PlaylistPaneViewModel :
     public async Task Handle(PlaylistRenamedNotification notification, CancellationToken cancellationToken)
     {
         await RefreshAvailablePlaylistsAsync(cancellationToken);
-        var tab = Tabs.FirstOrDefault(x => x.PlaylistId == notification.PlaylistId);
+        var tab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == notification.PlaylistId);
         if (tab is not null)
         {
             tab.Header = notification.Name;
@@ -341,7 +341,7 @@ public partial class PlaylistPaneViewModel :
     {
         await RefreshAvailablePlaylistsAsync(cancellationToken);
 
-        var tab = Tabs.FirstOrDefault(x => x.PlaylistId == notification.PlaylistId);
+        var tab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == notification.PlaylistId);
         if (tab is null)
         {
             return;
@@ -349,7 +349,7 @@ public partial class PlaylistPaneViewModel :
 
         var wasActiveSource = _lists.ActiveNamedPlaylistId == notification.PlaylistId;
         Tabs.Remove(tab);
-        SelectedTab ??= Tabs.FirstOrDefault(x => x.IsDefaultTab) ?? Tabs.FirstOrDefault();
+        SelectedTab ??= Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ?? Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
 
         if (wasActiveSource)
         {
@@ -359,7 +359,7 @@ public partial class PlaylistPaneViewModel :
 
     public async Task Handle(PlaylistMembershipChangedNotification notification, CancellationToken cancellationToken)
     {
-        var tab = Tabs.FirstOrDefault(x => x.PlaylistId == notification.PlaylistId);
+        var tab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == notification.PlaylistId);
         if (tab is null)
         {
             return;
@@ -407,8 +407,8 @@ public partial class PlaylistPaneViewModel :
 
     private AudioModel[] GetSelectedSongsForContext()
     {
-        var currentTabPaths = SelectedTab?.Songs
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
+        var currentTabPaths = Enumerable
+            .Where<AudioModel>(SelectedTab?.Songs, x => !string.IsNullOrWhiteSpace(x.Path))
             .Select(x => x.Path!)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 

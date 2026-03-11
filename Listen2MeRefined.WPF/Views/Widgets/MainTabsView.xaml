@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance controls:ListsViewModel}"
+             d:DataContext="{d:DesignInstance widgetViewModels:ListsViewModel}"
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
-             xmlns:controls="clr-namespace:Listen2MeRefined.Application.ViewModels.Controls;assembly=Listen2MeRefined.Application"
-             xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets">
+             xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
+             xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
     <TabControl Margin="0,20,10,14"
                 Background="Transparent"
                 BorderThickness="0"

@@ -10,7 +10,7 @@ using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
 
-namespace Listen2MeRefined.Application.ViewModels.Controls;
+namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class SearchResultsPaneViewModel : 
     ViewModelBase,

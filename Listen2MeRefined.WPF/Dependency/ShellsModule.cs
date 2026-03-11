@@ -1,7 +1,7 @@
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Utils;
-using Listen2MeRefined.Application.ViewModels.Controls;
 using Listen2MeRefined.Application.ViewModels.Shells;
+using Listen2MeRefined.Application.ViewModels.Widgets;
 using Listen2MeRefined.Application.ViewModels.Windows;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

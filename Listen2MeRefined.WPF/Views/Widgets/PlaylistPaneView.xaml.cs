@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using Listen2MeRefined.Application.ViewModels.Controls;
+using Listen2MeRefined.Application.ViewModels.Widgets;
 
 namespace Listen2MeRefined.WPF.Views.Widgets;
 

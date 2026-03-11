@@ -14,8 +14,8 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using MediatR;
 using Moq;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Application.ViewModels.Controls.ListsViewModel;
-using PlaylistPaneViewModel = Listen2MeRefined.Application.ViewModels.Controls.PlaylistPaneViewModel;
+using ListsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.ListsViewModel;
+using PlaylistPaneViewModel = Listen2MeRefined.Application.ViewModels.Widgets.PlaylistPaneViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 

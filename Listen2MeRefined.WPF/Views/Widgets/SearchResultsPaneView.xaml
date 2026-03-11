@@ -6,11 +6,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance controls:SearchResultsPaneViewModel}"
+             d:DataContext="{d:DesignInstance widgetViewModels:SearchResultsPaneViewModel}"
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
-             xmlns:controls="clr-namespace:Listen2MeRefined.Application.ViewModels.Controls;assembly=Listen2MeRefined.Application">
+             xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
     <Border Style="{DynamicResource BorderContainer}"
             Margin="0,8,0,0" >
         <Grid>

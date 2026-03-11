@@ -8,11 +8,15 @@ using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Application.Utils;
-using Listen2MeRefined.Application.ViewModels.Controls;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
+using ListsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.ListsViewModel;
+using PlaybackControlsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.PlaybackControlsViewModel;
+using PlaylistPaneViewModel = Listen2MeRefined.Application.ViewModels.Widgets.PlaylistPaneViewModel;
+using SearchbarViewModel = Listen2MeRefined.Application.ViewModels.Widgets.SearchbarViewModel;
+using SearchResultsPaneViewModel = Listen2MeRefined.Application.ViewModels.Widgets.SearchResultsPaneViewModel;
 
 namespace Listen2MeRefined.Application.ViewModels.Windows;
 
