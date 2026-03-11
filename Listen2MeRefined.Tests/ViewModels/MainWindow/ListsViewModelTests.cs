@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
@@ -129,6 +131,9 @@ public class ListsViewModelTests
     public async Task HandleAdvancedSearchNotification_UsesMatchModeAndPublishesCompletion()
     {
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
@@ -148,7 +153,9 @@ public class ListsViewModelTests
         var ui = new Mock<IUiDispatcher>();
 
         var vm = new ListsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            Mock.Of<IMessenger>(),
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
@@ -186,6 +193,9 @@ public class ListsViewModelTests
     public async Task HandleExternalFileDropAsync_InsertsScannedSongsAtDropIndex()
     {
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
@@ -200,7 +210,9 @@ public class ListsViewModelTests
         var ui = new Mock<IUiDispatcher>();
 
         var vm = new ListsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            Mock.Of<IMessenger>(),
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
@@ -240,6 +252,9 @@ public class ListsViewModelTests
     public async Task HandleExternalFileDropAsync_WhenUserChoosesDontAskAgain_PersistsPreference()
     {
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
@@ -256,7 +271,9 @@ public class ListsViewModelTests
         var uiDispatcher = new Mock<IUiDispatcher>();
 
         var vm = new ListsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            Mock.Of<IMessenger>(),
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
@@ -290,6 +307,9 @@ public class ListsViewModelTests
     public async Task HandleExternalFileDropAsync_WhenNamedQueueIsActive_AddsOnlyToDefaultPlaylist()
     {
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
@@ -306,7 +326,9 @@ public class ListsViewModelTests
         var uiDispatcher = new Mock<IUiDispatcher>();
 
         var vm = new ListsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            Mock.Of<IMessenger>(),
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
@@ -348,6 +370,9 @@ public class ListsViewModelTests
         SearchResultsTransferMode transferMode = SearchResultsTransferMode.Move)
     {
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
@@ -367,7 +392,9 @@ public class ListsViewModelTests
         var ui = new Mock<IUiDispatcher>();
 
         return new ListsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            Mock.Of<IMessenger>(),
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,

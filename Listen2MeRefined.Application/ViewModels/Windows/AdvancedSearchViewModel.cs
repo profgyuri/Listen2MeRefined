@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
@@ -18,7 +20,6 @@ public partial class AdvancedSearchViewModel :
     INotificationHandler<AdvancedSearchCompletedNotification>
 {
     private readonly IMediator _mediator;
-    private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
@@ -83,23 +84,24 @@ public partial class AdvancedSearchViewModel :
 
     public AdvancedSearchViewModel(
         IMediator mediator,
+        IErrorHandler errorHandler,
         ILogger logger,
+        IMessenger messenger,
         IUiDispatcher ui,
         IAppSettingsReader settingsReader,
-        IAdvancedSearchCriteriaService criteriaService)
+        IAdvancedSearchCriteriaService criteriaService) : base(errorHandler, logger, messenger)
     {
         _mediator = mediator;
-        _logger = logger;
         _ui = ui;
         _settingsReader = settingsReader;
         _criteriaService = criteriaService;
         SelectedColumnName = string.Empty;
         Criterias.CollectionChanged += OnCriteriasChanged;
 
-        _logger.Debug("[AdvancedSearchViewModel] initialized");
+        Logger.Debug("[AdvancedSearchViewModel] initialized");
     }
 
-    protected override async Task InitializeCoreAsync(CancellationToken ct)
+    public override async Task InitializeAsync(CancellationToken ct = default)
     {
         await _ui.InvokeAsync(() => Criterias.Clear(), ct);
 
@@ -115,7 +117,7 @@ public partial class AdvancedSearchViewModel :
             HasSearchResults = false;
         }, ct);
 
-        _logger.Debug("[AdvancedSearchViewModel] Finished InitializeCoreAsync");
+        Logger.Debug("[AdvancedSearchViewModel] Finished InitializeCoreAsync");
     }
 
     [RelayCommand(CanExecute = nameof(CanAddCriteria))]
@@ -125,7 +127,7 @@ public partial class AdvancedSearchViewModel :
         if (!result.Success || result.Criterion is null)
         {
             ValidationMessage = result.ErrorMessage;
-            _logger.Warning("[AdvancedSearchViewModel] Cannot add criteria. {Error}", result.ErrorMessage);
+            Logger.Warning("[AdvancedSearchViewModel] Cannot add criteria. {Error}", result.ErrorMessage);
             return;
         }
 
@@ -134,7 +136,7 @@ public partial class AdvancedSearchViewModel :
         ValidationMessage = string.Empty;
         SearchStatusMessage = $"{Criterias.Count} filter(s) ready.";
 
-        _logger.Debug("[AdvancedSearchViewModel] Added criteria: {@Filter}", result.Criterion);
+        Logger.Debug("[AdvancedSearchViewModel] Added criteria: {@Filter}", result.Criterion);
         InputText = string.Empty;
     }
 
@@ -157,7 +159,7 @@ public partial class AdvancedSearchViewModel :
         SearchStatusMessage = Criterias.Count == 0
             ? "Add at least one filter to search."
             : $"{Criterias.Count} filter(s) ready.";
-        _logger.Debug("[AdvancedSearchViewModel] Deleted criteria: {Criteria}", target.Display);
+        Logger.Debug("[AdvancedSearchViewModel] Deleted criteria: {Criteria}", target.Display);
     }
 
     [RelayCommand(CanExecute = nameof(CanEditCriteria))]
@@ -220,7 +222,7 @@ public partial class AdvancedSearchViewModel :
         SearchStatusMessage = "Searching...";
         var filters = _criteriaService.BuildFilters(Criterias).ToList();
 
-        _logger.Information("Starting advanced search with these filters: {@Filters}", filters);
+        Logger.Information("Starting advanced search with these filters: {@Filters}", filters);
         await _mediator.Publish(new AdvancedSearchNotification(filters, MatchMode));
 
         if (SearchStatusMessage == "Searching...")
@@ -301,7 +303,7 @@ public partial class AdvancedSearchViewModel :
 
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[AdvancedSearchViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
+        Logger.Information("[AdvancedSearchViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         FontFamilyName = notification.FontFamily;
         return Task.CompletedTask;
     }

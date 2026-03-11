@@ -35,7 +35,7 @@ internal static class WindowManager
         window.Left = left - window.Width / 2;
         window.Top  = top  - window.Height / 2;
 
-        if (window.DataContext is IAsyncInitializable init)
+        if (window.DataContext is IInitializeAsync init)
             await init.InitializeAsync(ct); // keep on UI thread
 
         if (isModal)

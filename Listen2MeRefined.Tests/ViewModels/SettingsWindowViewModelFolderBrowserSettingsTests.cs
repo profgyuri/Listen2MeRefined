@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
@@ -199,9 +201,16 @@ public sealed class SettingsWindowViewModelFolderBrowserSettingsTests
         var appThemeService = new Mock<IAppThemeService>();
         appThemeService.Setup(x => x.GetThemeModes()).Returns(["Dark", "Light"]);
         appThemeService.Setup(x => x.GetAccentColors()).Returns(["Orange", "Blue", "Green"]);
+        
+        var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
 
         return new SettingsWindowViewModel(
-            Mock.Of<ILogger>(),
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            Mock.Of<IMessenger>(),
             Mock.Of<IRepository<AudioModel>>(),
             Mock.Of<IMediator>(),
             new FontFamilies(["Segoe UI"]),

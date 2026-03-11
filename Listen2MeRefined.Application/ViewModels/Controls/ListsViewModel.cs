@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
@@ -23,9 +25,6 @@ public partial class ListsViewModel :
     INotificationHandler<ExternalAudioFilesOpenedNotification>,
     INotificationHandler<PlaylistShuffledNotification>
 {
-    private Guid _guid = Guid.NewGuid();
-    
-    private readonly ILogger _logger;
     private readonly IMediator _mediator;
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IFileScanner _fileScanner;
@@ -62,7 +61,9 @@ public partial class ListsViewModel :
     public bool IsDefaultPlaylistActive => _activeNamedPlaylistId is null;
 
     public ListsViewModel(
+        IErrorHandler errorHandler,
         ILogger logger,
+        IMessenger messenger,
         IMediator mediator,
         IAudioSearchExecutionService audioSearchExecutionService,
         IFileScanner fileScanner,
@@ -71,9 +72,9 @@ public partial class ListsViewModel :
         IPlaylist playList,
         IAppSettingsWriter settingsWriter,
         IDroppedSongFolderPromptService droppedSongFolderPromptService,
-        IExternalAudioOpenService externalAudioOpenService, IUiDispatcher ui)
+        IExternalAudioOpenService externalAudioOpenService, 
+        IUiDispatcher ui) : base(errorHandler, logger, messenger)
     {
-        _logger = logger;
         _mediator = mediator;
         _audioSearchExecutionService = audioSearchExecutionService;
         _fileScanner = fileScanner;
@@ -85,7 +86,7 @@ public partial class ListsViewModel :
         _settingsWriter = settingsWriter;
         _droppedSongFolderPromptService = droppedSongFolderPromptService;
 
-        _logger.Debug("[ListsViewModel] Class initialized");
+        Logger.Debug("[ListsViewModel] Class initialized");
     }
 
     public async Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
@@ -185,7 +186,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        _logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
+        Logger.Debug("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
         await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
     }
 
@@ -195,12 +196,12 @@ public partial class ListsViewModel :
         var transferMode = _settingsReader.GetSearchResultsTransferMode();
         if (!_selectedSearchResults.Any())
         {
-            _logger.Debug("[ListsViewModel] Sending all {Count} search results to the default tab", SearchResults.Count);
+            Logger.Debug("[ListsViewModel] Sending all {Count} search results to the default tab", SearchResults.Count);
             SendAllToDefaultPlaylist(transferMode);
             return;
         }
 
-        _logger.Debug("[ListsViewModel] Sending {Count} selected search results to the default tab", _selectedSearchResults.Count);
+        Logger.Debug("[ListsViewModel] Sending {Count} selected search results to the default tab", _selectedSearchResults.Count);
         AddUniqueToDefaultPlaylist(_selectedSearchResults);
 
         if (transferMode == SearchResultsTransferMode.Move)
@@ -232,12 +233,12 @@ public partial class ListsViewModel :
     {
         if (_selectedPlaylistItems.Count == 0)
         {
-            _logger.Debug($"[ListsViewModel] Removing all items from playlist");
+            Logger.Debug($"[ListsViewModel] Removing all items from playlist");
             ClearPlaylist();
             return;
         }
 
-        _logger.Debug($"[ListsViewModel] Removing selected items from playlist");
+        Logger.Debug($"[ListsViewModel] Removing selected items from playlist");
         foreach (var item in _selectedPlaylistItems)
         {
             PlayList.Remove(item);
@@ -258,7 +259,7 @@ public partial class ListsViewModel :
             return;
         }
 
-        _logger.Information<string?>("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
+        Logger.Information("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
         var selectedSongIndex = PlayList.IndexOf(SelectedSong);
         var newIndex = _currentSongIndex + 1;
 
@@ -268,7 +269,7 @@ public partial class ListsViewModel :
         }
 
         PlayList.Move(selectedSongIndex, newIndex);
-        _logger.Debug("[ListsViewModel] Moved song from index {OldIndex} to {NewIndex}", selectedSongIndex, newIndex);
+        Logger.Debug("[ListsViewModel] Moved song from index {OldIndex} to {NewIndex}", selectedSongIndex, newIndex);
     }
 
     [RelayCommand]
@@ -276,11 +277,11 @@ public partial class ListsViewModel :
     {
         if (SelectedSong is null)
         {
-            _logger.Warning("[ListsViewModel] No song selected to scan");
+            Logger.Warning("[ListsViewModel] No song selected to scan");
             return;
         }
 
-        _logger.Information<string?>("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
+        Logger.Information("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
         var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
         var index = PlayList.IndexOf(SelectedSong);
         if (index >= 0)
@@ -294,7 +295,7 @@ public partial class ListsViewModel :
     [RelayCommand]
     private void SwitchToSongMenuTab()
     {
-        _logger.Verbose("[ListsViewModel] Switching to Song Menu tab");
+        Logger.Verbose("[ListsViewModel] Switching to Song Menu tab");
         IsSearchResultsTabVisible = false;
         IsSongMenuTabVisible = true;
     }
@@ -302,7 +303,7 @@ public partial class ListsViewModel :
     [RelayCommand]
     public void SwitchToSearchResultsTab()
     {
-        _logger.Verbose("[ListsViewModel] Switching to Search Results tab");
+        Logger.Verbose("[ListsViewModel] Switching to Search Results tab");
         IsSearchResultsTabVisible = true;
         IsSongMenuTabVisible = false;
     }
@@ -446,19 +447,19 @@ public partial class ListsViewModel :
 
     partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
     {
-        _logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
+        Logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
     }
     
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
+        Logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
         FontFamilyName = notification.FontFamily;
         await Task.CompletedTask;
     }
 
     public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
+        Logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
         _externalAudioOpenService.SetCurrentSong(notification.Audio);
         SelectedSong = notification.Audio;
         _currentSongIndex = PlayList.IndexOf(SelectedSong);
@@ -467,21 +468,21 @@ public partial class ListsViewModel :
 
     public Task Handle(ExternalAudioFilesOpenedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[ListsViewModel] Handling {Count} shell-opened audio file(s)", notification.Paths.Count);
+        Logger.Information("[ListsViewModel] Handling {Count} shell-opened audio file(s)", notification.Paths.Count);
         return _externalAudioOpenService.OpenAsync(notification.Paths, cancellationToken);
     }
 
     public async Task Handle(AdvancedSearchNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchMode: {MatchMode})",
+        Logger.Information("[ListsViewModel] Performing advanced search with {@Filters} filters (MatchMode: {MatchMode})",
             notification.Filters, notification.MatchMode);
         var result =
             (await _audioSearchExecutionService.ExecuteAdvancedSearchAsync(notification.Filters, notification.MatchMode)).ToArray();
 
-        _logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
+        Logger.Information("[ListsViewModel] Advanced search returned {Count} results", result.Length);
         if (result.Length > 0)
         {
-            _logger.Verbose(
+            Logger.Verbose(
                 "[ListsViewModel] First {Shown} results are: {@Results}",
                 Math.Min(5, result.Length),
                 result.Take(5));
@@ -497,10 +498,10 @@ public partial class ListsViewModel :
     {
         var result = notification.Results.ToArray();
 
-        _logger.Information("[ListsViewModel] Received quick search results with {Count} results", result.Length);
+        Logger.Information("[ListsViewModel] Received quick search results with {Count} results", result.Length);
         if (result.Length > 0)
         {
-            _logger.Verbose(
+            Logger.Verbose(
                 "[ListsViewModel] First {Shown} results are: {@Results}",
                 Math.Min(5, result.Length),
                 result.Take(5));

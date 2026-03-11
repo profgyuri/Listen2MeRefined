@@ -56,7 +56,7 @@ public static class ViewModelInitialization
         if (!fe.IsLoaded)
             return;
 
-        if (fe.DataContext is not IAsyncInitializable init)
+        if (fe.DataContext is not IInitializeAsync init)
             return;
 
         try

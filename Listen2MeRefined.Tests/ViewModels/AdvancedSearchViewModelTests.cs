@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
@@ -91,6 +93,9 @@ public class AdvancedSearchViewModelTests
     {
         var mediator = new Mock<IMediator>();
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var settings = new Mock<ISettingsManager<AppSettings>>();
         var ui = new Mock<IUiDispatcher>();
         settings.SetupGet(s => s.Settings).Returns(new AppSettings { FontFamily = "Segoe UI" });
@@ -99,7 +104,9 @@ public class AdvancedSearchViewModelTests
 
         var vm = new AdvancedSearchViewModel(
             mediator.Object,
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            Mock.Of<IMessenger>(),
             ui.Object,
             settingsReadService,
             criteriaService);

@@ -3,12 +3,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Models;
 using MediatR;
+using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Controls;
 
@@ -54,24 +57,26 @@ public partial class PlaylistPaneViewModel :
     public IRelayCommand SwitchToSongMenuTabCommand => _lists.SwitchToSongMenuTabCommand;
 
     public PlaylistPaneViewModel(
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger,
         ListsViewModel lists,
         IPlaylistLibraryService playlistLibraryService,
         IMediator mediator,
-        IAppSettingsReader settingsReader)
+        IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
     {
         _lists = lists;
         _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
         _lists.PropertyChanged += ListsOnPropertyChanged;
-
-        var defaultTab = new PlaylistTabItem("Default", null, _lists.DefaultPlaylist);
-        Tabs = new ObservableCollection<PlaylistTabItem> { defaultTab };
-        SelectedTab = defaultTab;
     }
 
-    protected override async Task InitializeCoreAsync(CancellationToken ct)
+    public override async Task InitializeAsync(CancellationToken ct = default)
     {
+        var defaultTab = new PlaylistTabItem("Default", null, _lists.DefaultPlaylist);
+        Tabs = [defaultTab];
+        SelectedTab = defaultTab;
         await RefreshAvailablePlaylistsAsync(ct);
         IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
     }

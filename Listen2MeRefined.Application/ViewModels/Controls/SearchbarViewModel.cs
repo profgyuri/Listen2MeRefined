@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
 using MediatR;
@@ -19,9 +21,11 @@ public partial class SearchbarViewModel :
     [ObservableProperty] private string _searchTerm = "";
     
     public SearchbarViewModel(
+        IErrorHandler errorHandler,
         ILogger logger,
+        IMessenger messenger,
         IAudioSearchExecutionService audioSearchExecutionService,
-        IMediator mediator)
+        IMediator mediator) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
         _audioSearchExecutionService = audioSearchExecutionService;

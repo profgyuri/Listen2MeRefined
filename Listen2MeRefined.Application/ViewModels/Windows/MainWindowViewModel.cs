@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Startup;
@@ -20,7 +22,6 @@ public sealed partial class MainWindowViewModel :
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<PlayerStateChangedNotification>
 {
-    private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
     private readonly IAppUpdateChecker _appUpdateChecker;
     private readonly IAppSettingsReader _settingsReader;
@@ -51,7 +52,9 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private PlayerState _playerState = PlayerState.Stopped;
 
     public MainWindowViewModel(
+        IErrorHandler errorHandler,
         ILogger logger,
+        IMessenger messenger,
         IUiDispatcher ui,
         IAppUpdateChecker appUpdateChecker,
         IAppSettingsReader settingsReader,
@@ -62,9 +65,8 @@ public sealed partial class MainWindowViewModel :
         PlaylistPaneViewModel playlistPaneViewModel,
         SearchResultsPaneViewModel searchResultsPaneViewModel,
         IStartupManager startupManager,
-        IMainWindowNavigationService navigationService)
+        IMainWindowNavigationService navigationService) : base(errorHandler, logger, messenger)
     {
-        _logger = logger;
         _ui = ui;
         _appUpdateChecker = appUpdateChecker;
         _settingsReader = settingsReader;
@@ -80,12 +82,12 @@ public sealed partial class MainWindowViewModel :
         _backgroundTaskStatusService.SnapshotChanged += BackgroundTaskStatusServiceOnSnapshotChanged;
         ApplyTaskSnapshot(_backgroundTaskStatusService.GetSnapshot());
 
-        _logger.Debug("[MainWindowViewModel] Class initialized");
+        logger.Debug("[MainWindowViewModel] Class initialized");
     }
 
-    protected override async Task InitializeCoreAsync(CancellationToken ct)
+    public override async Task InitializeAsync(CancellationToken ct = default)
     {
-        _logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
+        Logger.Debug("[MainWindowViewModel] Starting InitializeCoreAsync...");
         
         try
         {
@@ -95,30 +97,30 @@ public sealed partial class MainWindowViewModel :
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
-            _logger.Information("[MainWindowViewModel] StartupManager.StartAsync was canceled.");
+            Logger.Information("[MainWindowViewModel] StartupManager.StartAsync was canceled.");
             throw;
         }
         catch (Exception ex)
         {
-            _logger.Fatal(ex, "[MainWindowViewModel] StartupManager.StartAsync failed");
+            Logger.Fatal(ex, "[MainWindowViewModel] StartupManager.StartAsync failed");
             throw;
         }
         
         if (_settingsReader.GetAutoCheckUpdatesOnStartup())
         {
-            _logger.Information("[MainWindowViewModel] Checking for latest version...");
+            Logger.Information("[MainWindowViewModel] Checking for latest version...");
             var status = await _appUpdateChecker.CheckForUpdatesAsync();
             await _ui.InvokeAsync(() => IsUpdateAvailable = status.IsUpdateAvailable, ct);
 
-            _logger.Information("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
+            Logger.Information("[MainWindowViewModel] Version check completed. Update available: {IsUpdateAvailable}", IsUpdateAvailable);
         }
         else
         {
             await _ui.InvokeAsync(() => IsUpdateAvailable = false, ct);
-            _logger.Information("[MainWindowViewModel] Automatic update checks are disabled.");
+            Logger.Information("[MainWindowViewModel] Automatic update checks are disabled.");
         }
 
-        _logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
+        Logger.Debug("[MainWindowViewModel] Finished InitializeCoreAsync");
     }
 
     [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
@@ -221,19 +223,19 @@ public sealed partial class MainWindowViewModel :
     
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
-        return _ui.InvokeAsync<AudioModel>(() => Song = notification.Audio, cancellationToken);
+        Logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
+        return _ui.InvokeAsync(() => Song = notification.Audio, cancellationToken);
     }
 
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
+        Logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         return _ui.InvokeAsync(() => FontFamilyName = notification.FontFamily, cancellationToken);
     }
 
     public Task Handle(PlayerStateChangedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[MainWindowViewModel] Received PlayerStateChangedNotification: {PlayerState}", notification.PlayerState);
+        Logger.Information("[MainWindowViewModel] Received PlayerStateChangedNotification: {PlayerState}", notification.PlayerState);
         PlayerState = notification.PlayerState;
         return Task.CompletedTask;
     }

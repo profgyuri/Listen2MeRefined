@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
@@ -113,9 +115,16 @@ public sealed class SettingsWindowViewModelThemeSettingsTests
         playlistLibraryService
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<PlaylistSummary>());
+        
+        var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
 
         var viewModel = new SettingsWindowViewModel(
-            Mock.Of<ILogger>(),
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            Mock.Of<IMessenger>(),
             Mock.Of<IRepository<AudioModel>>(),
             Mock.Of<IMediator>(),
             new FontFamilies(["Segoe UI"]),

@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
@@ -43,6 +45,8 @@ public static class UtilsModule
             services.AddSingleton<IAppThemeService, AppThemeService>();
             services.AddSingleton<IMainWindowNavigationService, MainWindowNavigationService>();
             services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();
+            services.AddSingleton<IErrorHandler, LoggingErrorHandler>();
+            services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
             services.AddSingleton<IUiDispatcher>(_ => new WpfUiDispatcher(System.Windows.Application.Current.Dispatcher));
         });
         

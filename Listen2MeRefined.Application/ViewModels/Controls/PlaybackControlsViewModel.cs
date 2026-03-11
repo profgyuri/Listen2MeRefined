@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
@@ -102,13 +104,15 @@ public partial class PlaybackControlsViewModel :
                     : "VolumeHigh";
 
     public PlaybackControlsViewModel(
+        IErrorHandler errorHandler,
         ILogger logger,
+        IMessenger messenger,
         IWaveFormDrawer<SKBitmap> waveFormDrawer,
         IMusicPlayerController musicPlayerController,
         IPlaybackDefaultsService playbackDefaultsService,
         TimedTask timedTask,
         Func<TimeSpan, CancellationToken, Task>? delayAsync = null,
-        TimeSpan? waveformResizeDebounce = null)
+        TimeSpan? waveformResizeDebounce = null) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
         _waveFormDrawer = waveFormDrawer;
@@ -121,7 +125,7 @@ public partial class PlaybackControlsViewModel :
         _logger.Debug("[PlayerControlsViewModel] initialized");
     }
 
-    protected override async Task InitializeCoreAsync(CancellationToken ct)
+    public override async Task InitializeAsync(CancellationToken ct = default)
     {
         ApplyStartupPlaybackDefaults();
 

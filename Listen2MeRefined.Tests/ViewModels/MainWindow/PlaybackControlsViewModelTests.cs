@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
@@ -178,7 +180,9 @@ public class PlaybackControlsViewModelTests
         var timedTask = new TimedTask();
         var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
         var viewModel = new PlaybackControlsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger,
+            Mock.Of<IMessenger>(),
             waveFormDrawer.Object,
             musicPlayer.Object,
             playbackDefaultsService,
@@ -226,7 +230,9 @@ public class PlaybackControlsViewModelTests
         var timedTask = new TimedTask();
         var playbackDefaultsService = new PlaybackDefaultsService(settingsManager.Object);
         var viewModel = new PlaybackControlsViewModel(
+            Mock.Of<IErrorHandler>(),
             logger,
+            Mock.Of<IMessenger>(),
             waveFormDrawer.Object,
             musicPlayer.Object,
             playbackDefaultsService,

@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
@@ -286,7 +288,9 @@ public sealed class FolderBrowserViewModelTests
         var pinnedFoldersService = new PinnedFoldersService(folderBrowser);
 
         return new FolderBrowserViewModel(
+            Mock.Of<IErrorHandler>(),
             Mock.Of<ILogger>(),
+            Mock.Of<IMessenger>(),
             mediator.Object,
             folderNavigationService,
             pinnedFoldersService,

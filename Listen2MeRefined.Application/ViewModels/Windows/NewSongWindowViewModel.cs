@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Models;
@@ -24,34 +26,34 @@ public sealed partial class NewSongWindowViewModel :
 
     private readonly IAppSettingsReader _settingsReader;
     private readonly IWindowPositionPolicyService _windowPositionPolicyService;
-    private readonly ILogger _logger;
 
     public bool IsTopmost { get; set; }
 
     public NewSongWindowViewModel(
         IAppSettingsReader settingsReader,
         IWindowPositionPolicyService windowPositionPolicyService,
-        ILogger logger)
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger) : base(errorHandler, logger, messenger)
     {
         _settingsReader = settingsReader;
         _windowPositionPolicyService = windowPositionPolicyService;
-        _logger = logger;
 
-        _logger.Debug("[NewSongWindowViewModel] initialized");
+        Logger.Debug("[NewSongWindowViewModel] initialized");
     }
 
-    protected override Task InitializeCoreAsync(CancellationToken ct)
+    public override Task InitializeAsync(CancellationToken ct = default)
     {
         IsTopmost = _windowPositionPolicyService.IsTopmost(_settingsReader.GetNewSongWindowPosition());
 
-        _logger.Debug("[NewSongWindowViewModel] Finished InitializeCoreAsync");
-
-        return base.InitializeCoreAsync(ct);
+        Logger.Debug("[NewSongWindowViewModel] Finished InitializeCoreAsync");
+        
+        return Task.CompletedTask;
     }
 
     public Task Handle(NewSongWindowPositionChangedNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[NewSongWindowViewModel] Received NewSongWindowPositionChangedNotification: {Position}", notification.Position);
+        Logger.Information("[NewSongWindowViewModel] Received NewSongWindowPositionChangedNotification: {Position}", notification.Position);
         IsTopmost = _windowPositionPolicyService.IsTopmost(notification.Position);
         OnPropertyChanged(nameof(IsTopmost));
         return Task.CompletedTask;
@@ -59,7 +61,7 @@ public sealed partial class NewSongWindowViewModel :
 
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
-        _logger.Information("[NewSongWindowViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
+        Logger.Information("[NewSongWindowViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
         Song = notification.Audio;
         return Task.CompletedTask;
     }

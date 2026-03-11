@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
@@ -36,13 +38,15 @@ public sealed partial class FolderBrowserViewModel :
     [ObservableProperty] private bool _hasValidationError;
 
     public FolderBrowserViewModel(
+        IErrorHandler errorHandler,
         ILogger logger,
+        IMessenger messenger,
         IMediator mediator,
         IFolderNavigationService folderNavigationService,
         IPinnedFoldersService pinnedFoldersService,
         IAppSettingsReader settingsReader,
         IAppSettingsWriter settingsWriter,
-        IClipboardService clipboardService)
+        IClipboardService clipboardService) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
         _mediator = mediator;
@@ -55,7 +59,7 @@ public sealed partial class FolderBrowserViewModel :
         _logger.Debug("[FolderBrowserViewModel] initialized");
     }
 
-    protected override Task InitializeCoreAsync(CancellationToken ct)
+    public override Task InitializeAsync(CancellationToken ct = default)
     {
         FontFamilyName = _settingsReader.GetFontFamily();
         LoadQuickAccessCollections();
@@ -141,7 +145,7 @@ public sealed partial class FolderBrowserViewModel :
 
         // A trailing backslash confuses Path.GetDirectoryName – strip it unless it
         // is the root of a drive (e.g. "C:\").
-        if (text.EndsWith('\\') && !Path.GetPathRoot(text).Equals(text, StringComparison.OrdinalIgnoreCase))
+        if (text.EndsWith('\\') && !Path.GetPathRoot(text)!.Equals(text, StringComparison.OrdinalIgnoreCase))
         {
             text = text.TrimEnd('\\');
         }
@@ -221,7 +225,7 @@ public sealed partial class FolderBrowserViewModel :
         if (isFullPathInvalid)
         {
             SetValidationError("Please select a valid folder before confirming.");
-            _logger.Warning<string>("[FolderBrowserViewModel] Full path is invalid or does not exist: {FullPath}", candidatePath);
+            _logger.Warning("[FolderBrowserViewModel] Full path is invalid or does not exist: {FullPath}", candidatePath);
             return false;
         }
 
@@ -229,7 +233,7 @@ public sealed partial class FolderBrowserViewModel :
         FullPath = candidatePath;
         _settingsWriter.SetLastBrowsedFolder(candidatePath);
 
-        _logger.Debug<string>("[FolderBrowserViewModel] Publishing full path: {FullPath}", candidatePath);
+        _logger.Debug("[FolderBrowserViewModel] Publishing full path: {FullPath}", candidatePath);
         var notification = new FolderBrowserNotification(candidatePath);
         await _mediator.Publish(notification);
         return true;
@@ -286,7 +290,7 @@ public sealed partial class FolderBrowserViewModel :
 
         if (!string.IsNullOrWhiteSpace(FullPath))
         {
-            _logger.Information<string>("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
+            _logger.Information("[FolderBrowserViewModel] Changing directory to {FullPath}", FullPath);
             _settingsWriter.SetLastBrowsedFolder(FullPath);
         }
 
