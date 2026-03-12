@@ -10,7 +10,7 @@ namespace Listen2MeRefined.Application.ViewModels.Shells;
 
 public abstract partial class ShellViewModelBase : ViewModelBase
 {
-    private readonly INavigationService _navigationService;
+    protected readonly INavigationService NavigationService;
     private readonly NavigationState _navigationState;
 
     [ObservableProperty]
@@ -25,7 +25,7 @@ public abstract partial class ShellViewModelBase : ViewModelBase
         IMessenger messenger,
         ShellContext shellContext) : base(errorHandler, logger, messenger)
     {
-        _navigationService = shellContext.NavigationService;
+        NavigationService = shellContext.NavigationService;
         _navigationState = shellContext.NavigationState;
         CurrentRoute = _navigationState.CurrentRoute;
         CurrentViewModel = _navigationState.CurrentViewModel;
@@ -35,7 +35,7 @@ public abstract partial class ShellViewModelBase : ViewModelBase
     [RelayCommand]
     private Task NavigateAsync(string route) =>
         ExecuteSafeAsync(
-            ct => _navigationService.NavigateAsync(route, cancellationToken: ct),
+            ct => NavigationService.NavigateAsync(route, cancellationToken: ct),
             $"Navigate({route})");
 
     private void OnNavigationStateChanged(object? sender, PropertyChangedEventArgs e)

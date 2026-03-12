@@ -6,6 +6,8 @@ using System.Windows.Threading;
 using Dapper;
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Utils;
 using MediatR;
@@ -51,8 +53,8 @@ public sealed partial class App : System.Windows.Application
             
             var window = _host.Services.GetRequiredService<MainShellView>();
             window.Show();
-            
-            await NavigateToDefaultRouteAsync().ConfigureAwait(true);
+
+            await _host.Services.GetRequiredService<MainShellViewModel>().EnsureInitializedAsync();
 
             if (e.Args.Length > 0)
             {
@@ -65,13 +67,6 @@ public sealed partial class App : System.Windows.Application
             Log.Fatal(ex, "Application startup failed.");
             Shutdown(-1);
         }
-    }
-
-    private async Task NavigateToDefaultRouteAsync()
-    {
-        var navigationService = _host!.Services.GetRequiredService<INavigationService>();
-        var navigationOptions = _host.Services.GetRequiredService<IOptions<NavigationOptions>>().Value;
-        await navigationService.NavigateAsync(navigationOptions.DefaultRoute).ConfigureAwait(true);
     }
 
     /// <summary>
