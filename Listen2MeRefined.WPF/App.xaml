@@ -15,9 +15,25 @@
                 <ResourceDictionary Source="Styles/ControlStyles.xaml" />
                 <ResourceDictionary Source="Styles/ComponentStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Default Home Views -->
             <DataTemplate DataType="{x:Type defaultHomeViewModels:MainShellDefaultHomeViewViewModel}">
                 <defaultHomeViews:MainShellDefaultHomeView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:CornerShellDefaultHomeViewViewModel}">
+                <defaultHomeViews:CornerShellDefaultHomeView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:FolderBrowserShellDefaultHomeViewViewModel}">
+                <defaultHomeViews:FolderBrowserShellDefaultHomeView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:SettingsShellDefaultHomeViewViewModel}">
+                <defaultHomeViews:SettingsShellDefaultHomeView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:AdvancedSearchShellDefaultHomeViewViewModel}">
+                <defaultHomeViews:AdvancedSearchShellDefaultHomeView/>
+            </DataTemplate>
+            
+            <!-- Widgets -->
             <DataTemplate DataType="{x:Type widgetViewModels:ListsViewModel}">
                 <widgets:MainTabsView/>
             </DataTemplate>
@@ -33,6 +49,7 @@
             <DataTemplate DataType="{x:Type widgetViewModels:SearchResultsPaneViewModel}">
                 <widgets:SearchResultsPaneView/>
             </DataTemplate>
+            
             <wpf:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <wpf:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter" />
             <wpf:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter" />
