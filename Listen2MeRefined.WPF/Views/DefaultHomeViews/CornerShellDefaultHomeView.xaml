@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance defaultHomeViewModels:CornerShellDefaultHomeViewViewModel}"
+             d:DataContext="{d:DesignInstance defaultHomeViewModels:CornerShellDefaultHomeViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         

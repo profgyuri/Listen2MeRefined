@@ -10,6 +10,7 @@ using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.Utils;
+using Listen2MeRefined.WPF.Views.Shells;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,7 +52,7 @@ public sealed partial class App : System.Windows.Application
             
             RegisterNavigation(_host.Services);
             
-            var window = _host.Services.GetRequiredService<MainShellView>();
+            var window = _host.Services.GetRequiredService<MainShell>();
             window.Show();
 
             await _host.Services.GetRequiredService<MainShellViewModel>().EnsureInitializedAsync();

@@ -4,9 +4,9 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 
-public class SettingsShellDefaultHomeViewViewModel : ViewModelBase
+public class FolderBrowserShellDefaultHomeViewModel : ViewModelBase
 {
-    public SettingsShellDefaultHomeViewViewModel(
+    public FolderBrowserShellDefaultHomeViewModel(
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger) : base(errorHandler, logger, messenger)

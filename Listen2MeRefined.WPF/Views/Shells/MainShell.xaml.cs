@@ -1,16 +1,14 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using Listen2MeRefined.Application.Utils;
-using Listen2MeRefined.Application.ViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
-using Listen2MeRefined.Application.ViewModels.Windows;
 
-namespace Listen2MeRefined.WPF;
+namespace Listen2MeRefined.WPF.Views.Shells;
 
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
 /// </summary>
-public sealed partial class MainShellView : Window
+public sealed partial class MainShell : Window
 {
     private readonly IGlobalHook _globalHook;
 
@@ -18,7 +16,7 @@ public sealed partial class MainShellView : Window
     public ICommand MinimizeWindowCommand { get; }
     public ICommand ToggleWindowStateCommand { get; }
 
-    public MainShellView(
+    public MainShell(
         MainShellViewModel viewModel,
         IGlobalHook globalHook)
     {

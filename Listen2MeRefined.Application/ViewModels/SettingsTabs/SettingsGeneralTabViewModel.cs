@@ -2,11 +2,11 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Serilog;
 
-namespace Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
+namespace Listen2MeRefined.Application.ViewModels.SettingsTabs;
 
-public class AdvancedSearchShellDefaultHomeViewViewModel : ViewModelBase
+public class SettingsGeneralTabViewModel : ViewModelBase
 {
-    public AdvancedSearchShellDefaultHomeViewViewModel(
+    public SettingsGeneralTabViewModel(
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger) : base(errorHandler, logger, messenger)

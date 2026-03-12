@@ -4,9 +4,9 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 
-public class CornerShellDefaultHomeViewViewModel : ViewModelBase
+public class CornerShellDefaultHomeViewModel : ViewModelBase
 {
-    public CornerShellDefaultHomeViewViewModel(
+    public CornerShellDefaultHomeViewModel(
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger) : base(errorHandler, logger, messenger)

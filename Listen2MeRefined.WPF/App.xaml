@@ -6,7 +6,9 @@
              xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
-             xmlns:defaultHomeViews="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews">
+             xmlns:defaultHomeViews="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
+             xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
+             xmlns:settingsTabs1="clr-namespace:Listen2MeRefined.WPF.Views.SettingsTabs">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,19 +19,19 @@
             </ResourceDictionary.MergedDictionaries>
             
             <!-- Default Home Views -->
-            <DataTemplate DataType="{x:Type defaultHomeViewModels:MainShellDefaultHomeViewViewModel}">
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:MainShellDefaultHomeViewModel}">
                 <defaultHomeViews:MainShellDefaultHomeView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type defaultHomeViewModels:CornerShellDefaultHomeViewViewModel}">
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:CornerShellDefaultHomeViewModel}">
                 <defaultHomeViews:CornerShellDefaultHomeView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type defaultHomeViewModels:FolderBrowserShellDefaultHomeViewViewModel}">
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:FolderBrowserShellDefaultHomeViewModel}">
                 <defaultHomeViews:FolderBrowserShellDefaultHomeView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type defaultHomeViewModels:SettingsShellDefaultHomeViewViewModel}">
-                <defaultHomeViews:SettingsShellDefaultHomeView/>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsGeneralTabViewModel}">
+                <settingsTabs1:SettingsGeneralTabView/>
             </DataTemplate>
-            <DataTemplate DataType="{x:Type defaultHomeViewModels:AdvancedSearchShellDefaultHomeViewViewModel}">
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:AdvancedSearchShellDefaultHomeViewModel}">
                 <defaultHomeViews:AdvancedSearchShellDefaultHomeView/>
             </DataTemplate>
             
