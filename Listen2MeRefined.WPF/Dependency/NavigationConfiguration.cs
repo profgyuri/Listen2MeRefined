@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class NavigationModule
+public static class NavigationConfiguration
 {
     internal static IHostBuilder ConfigureNavigation(this IHostBuilder builder)
     {

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class DataAccessModule
+public static class DataAccessConfiguration
 {
     internal static IHostBuilder ConfigureDataAccess(this IHostBuilder builder)
     {

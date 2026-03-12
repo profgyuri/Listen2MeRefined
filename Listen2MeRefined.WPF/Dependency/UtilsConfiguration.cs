@@ -22,7 +22,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class UtilsModule
+public static class UtilsConfiguration
 {
     internal static IHostBuilder ConfigureUtils(this IHostBuilder builder)
     {

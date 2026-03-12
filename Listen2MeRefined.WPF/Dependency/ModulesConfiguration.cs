@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class ModulesModule
+public static class ModulesConfiguration
 {
     internal static IHostBuilder ConfigureModules(this IHostBuilder builder)
     {

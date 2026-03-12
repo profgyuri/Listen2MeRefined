@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class StartupModule
+public static class StartupConfiguration
 {
     internal static IHostBuilder ConfigureStartup(this IHostBuilder builder)
     {

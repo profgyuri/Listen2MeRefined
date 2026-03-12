@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class MusicPlayerModule
+public static class MusicPlayerConfiguration
 {
     internal static IHostBuilder ConfigureMusicPlayer(this IHostBuilder builder)
     {

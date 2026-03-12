@@ -5,7 +5,7 @@ using Serilog.Core;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class LoggerModule
+public static class LoggerConfiguration
 {
     internal static IHostBuilder ConfigureLogger(this IHostBuilder builder)
     {
@@ -19,7 +19,7 @@ public static class LoggerModule
     
     private static Logger CreateLogger()
     {
-        var config = new LoggerConfiguration();
+        var config = new Serilog.LoggerConfiguration();
         const string seqConnection = "http://192.168.0.22:5341";
 
         config

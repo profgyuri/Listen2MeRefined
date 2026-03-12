@@ -7,7 +7,7 @@ using SkiaSharp;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class WaveFormModule
+public static class WaveFormConfiguration
 {
     internal static IHostBuilder ConfigureWaveForm(this IHostBuilder builder)
     {

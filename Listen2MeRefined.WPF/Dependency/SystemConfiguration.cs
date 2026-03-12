@@ -15,7 +15,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class SystemModule
+public static class SystemConfiguration
 {
     internal static IHostBuilder ConfigureSystem(this IHostBuilder builder)
     {

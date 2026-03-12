@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Listen2MeRefined.WPF.Dependency;
 
-public static class WrappersModule
+public static class WrappersConfiguration
 {
     internal static IHostBuilder ConfigureWrappers(this IHostBuilder builder)
     {
