@@ -14,4 +14,11 @@ public class AdvancedSearchShellViewModel : ShellViewModelBase
         IShellContextFactory context) : base(errorHandler, logger, messenger, context.Create())
     {
     }
+
+    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        await NavigationService.NavigateAsync("home", cancellationToken: cancellationToken).ConfigureAwait(true);
+        
+        await base.InitializeAsync(cancellationToken);
+    }
 }
