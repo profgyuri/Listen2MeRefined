@@ -4,7 +4,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
-             xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
+             xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application"
+             xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
+             xmlns:defaultHomeViews="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,6 +15,9 @@
                 <ResourceDictionary Source="Styles/ControlStyles.xaml" />
                 <ResourceDictionary Source="Styles/ComponentStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:MainShellDefaultHomeViewViewModel}">
+                <defaultHomeViews:MainShellDefaultHomeView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type widgetViewModels:ListsViewModel}">
                 <widgets:MainTabsView/>
             </DataTemplate>

@@ -49,7 +49,7 @@ public sealed partial class App : System.Windows.Application
             
             RegisterNavigation(_host.Services);
             
-            var window = _host.Services.GetRequiredService<MainWindow>();
+            var window = _host.Services.GetRequiredService<MainShellView>();
             window.Show();
             
             await NavigateToDefaultRouteAsync().ConfigureAwait(true);
@@ -115,8 +115,6 @@ public sealed partial class App : System.Windows.Application
             .ConfigureStartup()
             .ConfigureSystem()
             .ConfigureUtils()
-            .ConfigureShells()
-            .ConfigureViews()
             .ConfigureWaveForm()
             .ConfigureWrappers();
         

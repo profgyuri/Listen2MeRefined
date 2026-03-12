@@ -10,7 +10,7 @@ namespace Listen2MeRefined.WPF;
 /// <summary>
 ///     Interaction logic for MainWindow.xaml
 /// </summary>
-public sealed partial class MainWindow : Window
+public sealed partial class MainShellView : Window
 {
     private readonly IGlobalHook _globalHook;
 
@@ -18,7 +18,7 @@ public sealed partial class MainWindow : Window
     public ICommand MinimizeWindowCommand { get; }
     public ICommand ToggleWindowStateCommand { get; }
 
-    public MainWindow(
+    public MainShellView(
         MainShellViewModel viewModel,
         IGlobalHook globalHook)
     {

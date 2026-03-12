@@ -40,7 +40,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Page Update="MainWindow.xaml">
+      <Page Update="MainShellView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Views\DefaultHomeViews\MainShellDefaultHomeView.xaml">
         <Generator>MSBuild:Compile</Generator>
         <XamlRuntime>Wpf</XamlRuntime>
         <SubType>Designer</SubType>

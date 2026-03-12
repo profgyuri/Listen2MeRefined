@@ -15,5 +15,5 @@ public sealed class ModuleCatalogOptions
     /// Gets or sets assembly name prefixes considered during scanning.
     /// </summary>
     /// <value>An array of prefixes. The default is <c>UtilityCollection.</c>.</value>
-    public string[] ScanAssemblyPrefixes { get; set; } = ["Listen2MeRefined."];
+    public string[] ScanAssemblyPrefixes { get; set; } = ["Listen2Me"];
 }

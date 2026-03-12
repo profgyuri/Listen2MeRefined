@@ -1,4 +1,4 @@
-﻿<Window x:Class="Listen2MeRefined.WPF.MainWindow"
+﻿<Window x:Class="Listen2MeRefined.WPF.MainShellView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -38,7 +38,8 @@
                                  CloseCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CloseWindowCommand}"
                                  IsUpdateAvailableFeedbackVisible="False"/>
 
-            <Grid Grid.Row="1" Margin="10">
+            <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>
+           <!-- <Grid Grid.Row="1" Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" MinHeight="150" />
@@ -63,7 +64,7 @@
 
                 <widgets:PlaylistPaneView DataContext="{Binding PlaylistPaneViewModel}" Grid.Row="1" Grid.Column="1" />
                 <widgets:SearchBarView DataContext="{Binding SearchbarViewModel}" Grid.Row="2" Grid.ColumnSpan="2" />
-            </Grid>
+            </Grid>-->
         </Grid>
     </Border>
 </Window>
