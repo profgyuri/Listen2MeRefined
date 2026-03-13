@@ -1,5 +1,6 @@
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Views.DefaultHomeViews;
@@ -24,5 +25,10 @@ public class AdvancedSearchModule : IModule
     public void RegisterNavigation(INavigationRegistry registry)
     {
         registry.Register<AdvancedSearchShellDefaultHomeViewModel>("advancedSearch/home");
+    }
+
+    public void RegisterWindows(IWindowRegistry registry)
+    {
+        registry.Register<AdvancedSearchShellViewModel, AdvancedSearchShell>();
     }
 }

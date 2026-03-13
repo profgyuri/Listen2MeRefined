@@ -1,5 +1,6 @@
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.SettingsTabs;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Views.SettingsTabs;
@@ -44,5 +45,10 @@ public class SettingsModule : IModule
         registry.Register<SettingsLibraryTabViewModel>("settings/library");
         registry.Register<SettingsPlaybackTabViewModel>("settings/playback");
         registry.Register<SettingsPlaylistsTabViewModel>("settings/playlists");
+    }
+
+    public void RegisterWindows(IWindowRegistry registry)
+    {
+        registry.Register<SettingsShellViewModel, SettingsShell>();
     }
 }

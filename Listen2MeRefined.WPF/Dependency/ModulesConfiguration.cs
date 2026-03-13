@@ -1,4 +1,6 @@
 using Listen2MeRefined.Application.Modules;
+using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -11,7 +13,10 @@ public static class ModulesConfiguration
     {
         builder.ConfigureServices(services =>
         {
-            var moduleCatalogOptions = services.BuildServiceProvider().GetRequiredService<ModuleCatalogOptions>();
+            var provider = services.BuildServiceProvider();
+            var moduleCatalogOptions = provider.GetRequiredService<ModuleCatalogOptions>();
+            var navigationRegistry = provider.GetRequiredService<INavigationRegistry>();
+            var windowRegistry = provider.GetRequiredService<IWindowRegistry>();
             var discoveredModules =
                 ModuleCatalog.DiscoverModules(
                     moduleCatalogOptions,
@@ -19,6 +24,8 @@ public static class ModulesConfiguration
             foreach (var module in discoveredModules)
             {
                 module.RegisterServices(services);
+                module.RegisterNavigation(navigationRegistry);
+                module.RegisterWindows(windowRegistry);
             }
 
             services.AddSingleton<IModuleCatalog>(new ModuleCatalog(discoveredModules));

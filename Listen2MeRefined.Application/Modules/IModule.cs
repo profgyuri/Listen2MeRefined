@@ -1,4 +1,5 @@
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Listen2MeRefined.Application.Modules;
@@ -24,4 +25,10 @@ public interface IModule
     /// </summary>
     /// <param name="registry">The navigation registry.</param>
     void RegisterNavigation(INavigationRegistry registry);
+    
+    /// <summary>
+    /// Pairs module windows with their view models.
+    /// </summary>
+    /// <param name="registry">The window registry.</param>   
+    void RegisterWindows(IWindowRegistry registry) { }
 }

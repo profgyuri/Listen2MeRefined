@@ -51,9 +51,6 @@ public sealed partial class App : System.Windows.Application
             
             if (ProcessFileOpenForwarding(e)) return;
             
-            RegisterNavigation(_host.Services);
-            ConfigureWindowRegistry(_host.Services);
-            
             var windowManager = _host.Services.GetRequiredService<IWindowManager>();
             await windowManager.ShowMainWindowAsync<MainShellViewModel>();
 
@@ -136,28 +133,6 @@ public sealed partial class App : System.Windows.Application
         await Log.CloseAndFlushAsync();
         
         base.OnExit(e);
-    }
-    
-    private static void RegisterNavigation(IServiceProvider services)
-    {
-        var moduleCatalog = services.GetRequiredService<IModuleCatalog>();
-        var navigationRegistry = services.GetRequiredService<INavigationRegistry>();
-
-        foreach (var module in moduleCatalog.LoadModules())
-        {
-            module.RegisterNavigation(navigationRegistry);
-        }
-    }
-
-    private static void ConfigureWindowRegistry(IServiceProvider services)
-    {
-        var windowRegistry = services.GetRequiredService<IWindowRegistry>();
-        
-        windowRegistry.Register<MainShellViewModel, MainShell>();
-        windowRegistry.Register<AdvancedSearchShellViewModel, AdvancedSearchShell>();
-        windowRegistry.Register<SettingsShellViewModel, SettingsShell>();
-        windowRegistry.Register<FolderBrowserShellViewModel, FolderBrowserShell>();
-        windowRegistry.Register<CornerWindowShellViewModel, CornerWindowShell>();
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
