@@ -5,10 +5,35 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.Shells"
         xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
+        xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance shells:AdvancedSearchShellViewModel}"
-        Title="AdvancedSearchShellView" Height="450" Width="800">
-    <Grid>
-        <ContentControl Content="{Binding CurrentViewModel}" />
-    </Grid>
+        Title="AdvancedSearchShellView" Height="450" Width="800"
+        PreviewKeyDown="AdvancedSearchShell_OnPreviewKeyDown">
+    <WindowChrome.WindowChrome>
+        <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
+    </WindowChrome.WindowChrome>
+
+    <Border BorderThickness="2"
+            BorderBrush="{DynamicResource TertiaryBrush}"
+            Background="{DynamicResource PrimaryBrush}"
+            CornerRadius="0,0,8,8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=40}" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <components:TitleBar Grid.Row="0"
+                                 CenterText="Advanced Search"
+                                 ShowSettingsButton="False"
+                                 ShowMinimizeButton="False"
+                                 ShowMaximizeButton="True"
+                                 ShowCloseButton="True" />
+            
+            <ContentControl Grid.Row="1"
+                            Content="{Binding CurrentViewModel}"/>
+
+        </Grid>
+    </Border>
 </Window>

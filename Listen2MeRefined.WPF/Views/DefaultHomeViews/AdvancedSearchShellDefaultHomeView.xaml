@@ -6,10 +6,229 @@
              xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance defaultHomeViewModels:AdvancedSearchShellDefaultHomeViewModel}"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        
-    </Grid>
+             d:DesignHeight="450" d:DesignWidth="600" >
+    <UserControl.InputBindings>
+        <KeyBinding Key="Enter" Modifiers="Ctrl" Command="{Binding SearchCommand}" />
+    </UserControl.InputBindings>
+    <Border Style="{DynamicResource BorderContainer}"
+            Margin="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <components:SectionHeader Grid.Row="0"
+                                          Title="Advanced Search Filters"
+                                          Subtitle="Enter adds filter, Ctrl+Enter searches, Delete removes selected filter."
+                                          ShowSubtitle="True"
+                                          IconKind="Tune" />
+
+                <Border Grid.Row="2"
+                        Style="{DynamicResource DarkBorderContainer}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.ColumnSpan="4"
+                                   Style="{DynamicResource AdvancedSearchToolbarLabelText}"
+                                   Text="New Filter" />
+
+                        <ComboBox x:Name="TableColumnName"
+                                  Grid.Row="1"
+                                  Grid.Column="0"
+                                  ItemsSource="{Binding ColumnName}"
+                                  SelectedItem="{Binding SelectedColumnName}"
+                                  Style="{DynamicResource CustomComboBox}"
+                                  Margin="0,6,6,0" />
+
+                        <ComboBox x:Name="Relation"
+                                  Grid.Row="1"
+                                  Grid.Column="1"
+                                  ItemsSource="{Binding Relation}"
+                                  SelectedItem="{Binding SelectedRelation}"
+                                  Style="{DynamicResource CustomComboBox}"
+                                  Margin="0,6,6,0" />
+
+                        <Border Grid.Row="1"
+                                Grid.Column="2"
+                                Margin="0,6,6,0"
+                                Background="{DynamicResource PrimaryLightBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="8,0">
+                            <TextBox x:Name="GeneralInput"
+                                     Style="{DynamicResource AdvancedSearchTextBoxStyle}"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}"
+                                     materialDesign:TextFieldAssist.SuffixText="{Binding RangeSuffixText}">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Enter" Command="{Binding AddCriteriaCommand}" />
+                                    <KeyBinding Key="Enter" Modifiers="Ctrl" Command="{Binding SearchCommand}" />
+                                </TextBox.InputBindings>
+                            </TextBox>
+                        </Border>
+
+                        <Button x:Name="AddCriteria"
+                                Grid.Row="1"
+                                Grid.Column="3"
+                                Margin="0,6,0,0"
+                                Style="{DynamicResource ComponentQuickActionButton}"
+                                ToolTip="Add Filter"
+                                Command="{Binding AddCriteriaCommand}"
+                                Content="{materialDesign:PackIcon Kind=Plus, Size=20}"
+                                Click="AddCriteriaButton_Click" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="4"
+                        Style="{DynamicResource DarkBorderContainer}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Style="{DynamicResource AdvancedSearchToolbarTitleText}"
+                                   Text="Filters" />
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="1"
+                                   Style="{DynamicResource AdvancedSearchToolbarLabelText}"
+                                   Text="{Binding Criterias.Count, StringFormat={}{0} total}" />
+
+                        <ListView x:Name="SearchCriterias"
+                                  Grid.Row="2"
+                                  Grid.ColumnSpan="2"
+                                  ItemsSource="{Binding Criterias}"
+                                  SelectedItem="{Binding SelectedCriteria}"
+                                  ItemContainerStyle="{DynamicResource AdvancedSearchCriteriaListItem}"
+                                  Style="{DynamicResource AdvancedSearchCriteriaListView}">
+                            <ListView.InputBindings>
+                                <KeyBinding Key="Delete" Command="{Binding DeleteItemCommand}" />
+                            </ListView.InputBindings>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding Display}"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{DynamicResource SecondaryBrush}" />
+
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
+                                            <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
+                                                    ToolTip="Edit"
+                                                    Command="{Binding DataContext.EditCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Click="EditCriteriaButton_Click"
+                                                    Content="{materialDesign:PackIcon Kind=Pencil, Size=14}" />
+                                            <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
+                                                    ToolTip="Duplicate"
+                                                    Command="{Binding DataContext.DuplicateCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="{materialDesign:PackIcon Kind=ContentCopy, Size=14}" />
+                                            <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
+                                                    ToolTip="Remove"
+                                                    Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    Content="{materialDesign:PackIcon Kind=DeleteOutline, Size=14}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="0"
+                                Orientation="Vertical">
+                        <TextBlock Foreground="{DynamicResource ValidationErrorBrush}"
+                                   Text="{Binding ValidationMessage}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Margin="0,2,0,0"
+                                   Foreground="{DynamicResource SecondaryDarkBrush}"
+                                   Text="{Binding SearchStatusMessage}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <RadioButton GroupName="MatchModeGroup"
+                                     Style="{DynamicResource MaterialDesignTabRadioButton}"
+                                     Foreground="{DynamicResource TertiaryBrush}"
+                                     BorderBrush="{DynamicResource TertiaryBrush}"
+                                     IsChecked="{Binding IsMatchAll, Mode=TwoWay}"
+                                     Content="Match All" />
+                        <RadioButton GroupName="MatchModeGroup"
+                                     Style="{DynamicResource MaterialDesignTabRadioButton}"
+                                     Foreground="{DynamicResource TertiaryBrush}"
+                                     BorderBrush="{DynamicResource TertiaryBrush}"
+                                     IsChecked="{Binding IsMatchAny, Mode=TwoWay}"
+                                     Content="Match Any" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1"
+                                Grid.ColumnSpan="2"
+                                Margin="0,8,0,0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button Content="Clear All"
+                                Command="{Binding ClearAllCommand}"
+                                Style="{DynamicResource InteractionButton}"
+                                Margin="0,0,8,0"
+                                MinWidth="92" />
+                        <Button Content="Search"
+                                Command="{Binding SearchCommand}"
+                                Style="{DynamicResource InteractionButton}"
+                                Margin="0,0,8,0"
+                                MinWidth="92" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+    </Border>
 </UserControl>

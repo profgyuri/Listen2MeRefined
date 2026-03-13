@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Serilog;
@@ -137,7 +138,7 @@ public abstract class ViewModelBase : ObservableObject, IInitializeAsync, IDispo
     /// <returns>A task representing the asynchronous operation.</returns>
     protected async Task ExecuteSafeAsync(
         Func<CancellationToken, Task> action,
-        string context,
+        [CallerMemberName] string context = "",
         CancellationToken cancellationToken = default)
     {
         try

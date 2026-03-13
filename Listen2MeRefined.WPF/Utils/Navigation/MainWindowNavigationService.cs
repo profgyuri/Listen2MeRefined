@@ -32,6 +32,6 @@ public sealed class MainWindowNavigationService : IMainWindowNavigationService
             return;
         }
 
-        await _windowManager.ShowWindowAsync<AdvancedSearchWindow, AdvancedSearchShellViewModel>("advancedSearch", window.Left + window.Width / 2, window.Top + window.Height / 2);
+        //await _windowManager.ShowWindowAsync<AdvancedSearchWindow, AdvancedSearchShellViewModel>("advancedSearch", window.Left + window.Width / 2, window.Top + window.Height / 2);
     }
 }
