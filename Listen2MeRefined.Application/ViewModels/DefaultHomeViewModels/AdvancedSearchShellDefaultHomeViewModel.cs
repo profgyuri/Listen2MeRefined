@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
 using MediatR;
@@ -19,6 +20,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
 {
     private readonly IMediator _mediator;
     private readonly IUiDispatcher _ui;
+    private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
     
     [ObservableProperty] private string _fontFamilyName = string.Empty;
@@ -85,11 +87,31 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
         IMessenger messenger, 
         IMediator mediator, 
         IUiDispatcher ui, 
-        IAdvancedSearchCriteriaService criteriaService) : base(errorHandler, logger, messenger)
+        IAdvancedSearchCriteriaService criteriaService, 
+        IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
     {
         _mediator = mediator;
         _ui = ui;
         _criteriaService = criteriaService;
+        _settingsReader = settingsReader;
+    }
+    
+    public override async Task InitializeAsync(CancellationToken ct = default)
+    {
+        await _ui.InvokeAsync(() =>
+        {
+            Criterias.Clear();
+            FontFamilyName = _settingsReader.GetFontFamily();
+            ColumnName = _criteriaService.GetColumnNames().ToList();
+            SelectedColumnName = ColumnName.FirstOrDefault() ?? string.Empty;
+            MatchMode = SearchMatchMode.All;
+            ValidationMessage = string.Empty;
+            SearchStatusMessage = "Add at least one filter to search.";
+            LastSearchResultCount = 0;
+            HasSearchResults = false;
+        }, ct);
+
+        Logger.Debug("[AdvancedSearchViewModel] Finished InitializeCoreAsync");
     }
     
     [RelayCommand(CanExecute = nameof(CanAddCriteria))]

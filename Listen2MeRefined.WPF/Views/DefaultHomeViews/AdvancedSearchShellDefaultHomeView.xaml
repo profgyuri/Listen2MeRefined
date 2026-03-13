@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
@@ -122,6 +121,7 @@
                                    Text="{Binding Criterias.Count, StringFormat={}{0} total}" />
 
                         <ListView x:Name="SearchCriterias"
+                                  Grid.Column="0"
                                   Grid.Row="2"
                                   Grid.ColumnSpan="2"
                                   ItemsSource="{Binding Criterias}"
@@ -149,18 +149,18 @@
                                                     VerticalAlignment="Center">
                                             <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
                                                     ToolTip="Edit"
-                                                    Command="{Binding DataContext.EditCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{Binding DataContext.EditCriteriaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
                                                     Click="EditCriteriaButton_Click"
                                                     Content="{materialDesign:PackIcon Kind=Pencil, Size=14}" />
                                             <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
                                                     ToolTip="Duplicate"
-                                                    Command="{Binding DataContext.DuplicateCriteriaCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{Binding DataContext.DuplicateCriteriaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
                                                     Content="{materialDesign:PackIcon Kind=ContentCopy, Size=14}" />
                                             <Button Style="{DynamicResource AdvancedSearchMiniActionButton}"
                                                     ToolTip="Remove"
-                                                    Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Command="{Binding DataContext.DeleteItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
                                                     Content="{materialDesign:PackIcon Kind=DeleteOutline, Size=14}" />
                                         </StackPanel>
@@ -213,6 +213,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="1"
+                                Grid.Column="0"
                                 Grid.ColumnSpan="2"
                                 Margin="0,8,0,0"
                                 Orientation="Horizontal"
