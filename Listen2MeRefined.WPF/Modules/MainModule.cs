@@ -23,6 +23,6 @@ public class MainModule : IModule
 
     public void RegisterNavigation(INavigationRegistry registry)
     {
-        registry.Register<MainShellDefaultHomeViewModel>("home");
+        registry.Register<MainShellDefaultHomeViewModel>("main/home");
     }
 }
