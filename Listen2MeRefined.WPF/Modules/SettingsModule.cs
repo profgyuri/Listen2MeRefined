@@ -38,11 +38,11 @@ public class SettingsModule : IModule
 
     public void RegisterNavigation(INavigationRegistry registry)
     {
-        registry.Register<SettingsAdvancedTabViewModel>("advanced");
-        registry.Register<SettingsGeneralTabViewModel>("general");
-        registry.Register<SettingsHooksAndAlertsTabViewModel>("hooksAndAlerts");
-        registry.Register<SettingsLibraryTabViewModel>("library");
-        registry.Register<SettingsPlaybackTabViewModel>("playback");
-        registry.Register<SettingsPlaylistsTabViewModel>("playlists");
+        registry.Register<SettingsAdvancedTabViewModel>("settings/advanced");
+        registry.Register<SettingsGeneralTabViewModel>("settings/general");
+        registry.Register<SettingsHooksAndAlertsTabViewModel>("settings/hooksAndAlerts");
+        registry.Register<SettingsLibraryTabViewModel>("settings/library");
+        registry.Register<SettingsPlaybackTabViewModel>("settings/playback");
+        registry.Register<SettingsPlaylistsTabViewModel>("settings/playlists");
     }
 }

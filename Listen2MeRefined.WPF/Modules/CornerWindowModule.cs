@@ -23,6 +23,6 @@ public class CornerWindowModule : IModule
 
     public void RegisterNavigation(INavigationRegistry registry)
     {
-        registry.Register<CornerShellDefaultHomeViewModel>("home");
+        registry.Register<CornerShellDefaultHomeViewModel>("corner/home");
     }
 }

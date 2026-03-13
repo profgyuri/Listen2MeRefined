@@ -23,6 +23,6 @@ public class AdvancedSearchModule : IModule
 
     public void RegisterNavigation(INavigationRegistry registry)
     {
-        registry.Register<AdvancedSearchShellDefaultHomeViewModel>("home");
+        registry.Register<AdvancedSearchShellDefaultHomeViewModel>("advancedSearch/home");
     }
 }

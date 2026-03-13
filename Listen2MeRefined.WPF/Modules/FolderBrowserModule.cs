@@ -23,6 +23,6 @@ public class FolderBrowserModule : IModule
 
     public void RegisterNavigation(INavigationRegistry registry)
     {
-        registry.Register<FolderBrowserShellDefaultHomeViewModel>("home");
+        registry.Register<FolderBrowserShellDefaultHomeViewModel>("folderBrowser/home");
     }
 }

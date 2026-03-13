@@ -17,7 +17,7 @@ public class SettingsShellViewModel : ShellViewModelBase
     
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        await NavigationService.NavigateAsync("general", cancellationToken: cancellationToken).ConfigureAwait(true);
+        await NavigationService.NavigateAsync("settings/general", cancellationToken: cancellationToken).ConfigureAwait(true);
         
         await base.InitializeAsync(cancellationToken);
     }
