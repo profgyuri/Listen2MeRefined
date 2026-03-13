@@ -117,26 +117,24 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
     [RelayCommand(CanExecute = nameof(CanAddCriteria))]
     private async Task AddCriteria()
     {
-        await ExecuteSafeAsync(async ct =>
+        await ExecuteSafeAsync(_ =>
         {
             var result = _criteriaService.BuildCriterion(SelectedColumnName, SelectedRelation, InputText);
             if (!result.Success || result.Criterion is null)
             {
                 ValidationMessage = result.ErrorMessage;
                 Logger.Warning("[AdvancedSearchViewModel] Cannot add criteria. {Error}", result.ErrorMessage);
-                return;
+                return Task.CompletedTask;
             }
 
-            await _ui.InvokeAsync(() =>
-            {
-                Criterias.Add(result.Criterion);
-                SelectedCriteria = result.Criterion;
-                ValidationMessage = string.Empty;
-                SearchStatusMessage = $"{Criterias.Count} filter(s) ready.";
-                InputText = string.Empty;
-            }, ct);
+            Criterias.Add(result.Criterion);
+            SelectedCriteria = result.Criterion;
+            ValidationMessage = string.Empty;
+            SearchStatusMessage = $"{Criterias.Count} filter(s) ready.";
+            InputText = string.Empty;
 
             Logger.Debug("[AdvancedSearchViewModel] Added criteria: {@Filter}", result.Criterion);
+            return Task.CompletedTask;
         });
     }
     

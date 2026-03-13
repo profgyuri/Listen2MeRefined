@@ -3,6 +3,7 @@ using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Searching;
@@ -10,7 +11,6 @@ using Listen2MeRefined.Infrastructure.Settings;
 using MediatR;
 using Moq;
 using Serilog;
-using AdvancedSearchViewModel = Listen2MeRefined.Application.ViewModels.Windows.AdvancedSearchViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels;
 
@@ -43,6 +43,7 @@ public class AdvancedSearchViewModelTests
         var criterion = Assert.Single(vm.Criterias);
         Assert.Equal("00:03:05", criterion.NormalizedValue);
         Assert.Equal("03:05", criterion.RawValue);
+        Assert.Equal(string.Empty, vm.InputText);
     }
 
     [Fact]
@@ -89,7 +90,7 @@ public class AdvancedSearchViewModelTests
         Assert.Contains("Found 4 result(s).", vm.SearchStatusMessage);
     }
 
-    private static async Task<(AdvancedSearchViewModel ViewModel, Mock<IMediator> Mediator)> CreateViewModelAsync()
+    private static async Task<(AdvancedSearchShellDefaultHomeViewModel ViewModel, Mock<IMediator> Mediator)> CreateViewModelAsync()
     {
         var mediator = new Mock<IMediator>();
         var logger = new Mock<ILogger>();
@@ -102,14 +103,14 @@ public class AdvancedSearchViewModelTests
         var settingsReadService = new AppSettingsReader(settings.Object);
         var criteriaService = new AdvancedSearchCriteriaService();
 
-        var vm = new AdvancedSearchViewModel(
-            mediator.Object,
+        var vm = new AdvancedSearchShellDefaultHomeViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
             Mock.Of<IMessenger>(),
+            mediator.Object,
             ui.Object,
-            settingsReadService,
-            criteriaService);
+            criteriaService,
+            settingsReadService);
         await vm.InitializeAsync();
         return (vm, mediator);
     }
