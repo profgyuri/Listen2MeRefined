@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Dapper;
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Dependency;
@@ -51,11 +52,10 @@ public sealed partial class App : System.Windows.Application
             if (ProcessFileOpenForwarding(e)) return;
             
             RegisterNavigation(_host.Services);
+            ConfigureWindowRegistry(_host.Services);
             
-            var window = _host.Services.GetRequiredService<MainShell>();
-            window.Show();
-
-            await _host.Services.GetRequiredService<MainShellViewModel>().EnsureInitializedAsync();
+            var windowManager = _host.Services.GetRequiredService<IWindowManager>();
+            await windowManager.ShowMainWindowAsync<MainShellViewModel>();
 
             if (e.Args.Length > 0)
             {
@@ -147,6 +147,17 @@ public sealed partial class App : System.Windows.Application
         {
             module.RegisterNavigation(navigationRegistry);
         }
+    }
+
+    private static void ConfigureWindowRegistry(IServiceProvider services)
+    {
+        var windowRegistry = services.GetRequiredService<IWindowRegistry>();
+        
+        windowRegistry.Register<MainShellViewModel, MainShell>();
+        windowRegistry.Register<AdvancedSearchShellViewModel, AdvancedSearchShell>();
+        windowRegistry.Register<SettingsShellViewModel, SettingsShell>();
+        windowRegistry.Register<FolderBrowserShellViewModel, FolderBrowserShell>();
+        windowRegistry.Register<CornerWindowShellViewModel, CornerWindowShell>();
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

@@ -1,84 +1,216 @@
-﻿using System.Windows;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
-using Listen2MeRefined.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Listen2MeRefined.WPF.Utils.Navigation;
 
-internal class WindowManager : IWindowManager
+public sealed class WindowManager : IWindowManager
 {
-    private readonly IServiceProvider _services;
-    private readonly IShellContextFactory _shellContextFactory;
-
-    public WindowManager(IServiceProvider services, IShellContextFactory shellContextFactory)
-    {
-        _services = services;
-        _shellContextFactory = shellContextFactory;
-    }
-    
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger _logger;
+    private readonly IUiDispatcher _ui;
+    private readonly IWindowRegistry _windowRegistry;
+ 
     /// <summary>
-    /// Shows a window of type <typeparamref name="TWindow"/> with its own shell context,
-    /// navigating to the specified route on open.
+    /// Live window registry keyed by shell ViewModel reference.
     /// </summary>
-    public async Task<bool?> ShowWindowAsync<TWindow, TShellViewModel>(
-        string initialRoute,
-        double left,
-        double top,
-        bool isModal = true,
-        CancellationToken ct = default)
-        where TWindow : Window
+    private readonly ConcurrentDictionary<object, WindowDescriptor> _openWindows = new(ReferenceEqualityComparer.Instance);
+ 
+    public WindowManager(
+        IServiceProvider serviceProvider,
+        ILogger logger, 
+        IUiDispatcher ui, 
+        IWindowRegistry windowRegistry)
+    {
+        _serviceProvider = serviceProvider;
+        _logger = logger;
+        _ui = ui;
+        _windowRegistry = windowRegistry;
+    }
+ 
+    public async Task ShowMainWindowAsync<TShellViewModel>(
+        CancellationToken cancellationToken = default)
         where TShellViewModel : ShellViewModelBase
     {
-        var shellContext = _shellContextFactory.Create();
-        var shellVm = ActivatorUtilities.CreateInstance<TShellViewModel>(_services, shellContext);
-        var window = ActivatorUtilities.CreateInstance<TWindow>(_services, shellVm);
-
-        window.Left = left - window.Width / 2;
-        window.Top  = top  - window.Height / 2;
-
-        await shellContext.NavigationService
-            .NavigateAsync(initialRoute, cancellationToken: ct)
-            .ConfigureAwait(true);
-
-        if (isModal)
-            return window.ShowDialog();
-
-        window.Show();
-        return null;
+        _logger.Information(
+            "Showing main window for ShellVM={ShellVMType}", typeof(TShellViewModel).Name);
+ 
+        await _ui.InvokeAsync(async () =>
+        {
+            var (window, shellVm, context) = BuildWindow<TShellViewModel>();
+ 
+            System.Windows.Application.Current.MainWindow = (Window)window;
+ 
+            Register(window, shellVm, context);
+            ((Window)window).Show();
+ 
+            await RunInitializationAsync(shellVm, context, (Window)window, cancellationToken)
+                .ConfigureAwait(false);
+        }, cancellationToken);
     }
-
-    /// <summary>
-    /// Shows the NewSongWindow in the nearest screen corner based on mouse position.
-    /// </summary>
-    public CornerWindow ShowCornerWindow(int x, int y, int triggerAreaSize = 10)
+ 
+    public async Task<bool?> ShowWindowAsync<TShellViewModel>(
+        WindowShowOptions options,
+        CancellationToken cancellationToken = default)
+        where TShellViewModel : ShellViewModelBase
     {
-        var window = _services.GetRequiredService<CornerWindow>();
-
-        window.Left = x <= SystemParameters.PrimaryScreenWidth / 2
-            ? 0
-            : SystemParameters.PrimaryScreenWidth - window.Width;
-
-        window.Top = y <= SystemParameters.PrimaryScreenHeight / 2
-            ? 0
-            : SystemParameters.WorkArea.Height - window.Height;
-
-        if (x <= triggerAreaSize)
-            window.Left = 0;
-        else if (x >= SystemParameters.PrimaryScreenWidth - triggerAreaSize)
-            window.Left = SystemParameters.PrimaryScreenWidth - window.Width;
-
-        if (y <= triggerAreaSize)
-            window.Top = 0;
-        else if (y >= SystemParameters.PrimaryScreenHeight - triggerAreaSize)
-            window.Top = SystemParameters.WorkArea.Height - window.Height;
-
-        window.Show();
-        return window;
+        _logger.Information(
+            "Showing window for ShellVM={ShellVMType} Modal={IsModal}",
+            typeof(TShellViewModel).Name, options.IsModal);
+ 
+        bool? dialogResult = null;
+ 
+        var (window, shellVm, context) = BuildWindow<TShellViewModel>();
+        var wpfWindow = (Window)window;
+ 
+        ApplyPosition(wpfWindow, options);
+        Register(window, shellVm, context);
+ 
+        await RunInitializationAsync(shellVm, context, wpfWindow, cancellationToken)
+            .ConfigureAwait(false);
+ 
+        if (options.IsModal)
+        {
+            dialogResult = wpfWindow.ShowDialog();
+        }
+        else
+        {
+            wpfWindow.Show();
+        }
+ 
+        return dialogResult;
     }
+ 
+    public void CloseWindow<TShellViewModel>() where TShellViewModel : ShellViewModelBase
+    {
+        var descriptor = _openWindows.Values
+            .FirstOrDefault(d => d.ShellViewModel is TShellViewModel);
 
+        if (descriptor is null)
+        {
+            _logger.Warning("CloseWindow<{Type}>: no open window found.", typeof(TShellViewModel).Name);
+            return;
+        }
+
+        _ui.InvokeAsync(() => ((Window)descriptor.Window).Close());
+    }
+ 
+    public bool IsOpen<TShellViewModel>() where TShellViewModel : ShellViewModelBase
+        => _openWindows.Values.Any(d => d.ShellViewModel is TShellViewModel);
+ 
+    private (object window, TShellViewModel shellVm, ShellContext context) BuildWindow<TShellViewModel>()
+        where TShellViewModel : ShellViewModelBase
+    {
+        var shellVm = _serviceProvider.GetRequiredService<TShellViewModel>();
+        var context = shellVm.ShellContext;
+
+        var windowType = _windowRegistry.Resolve<TShellViewModel>();
+        var window = (Window)ActivatorUtilities.CreateInstance(_serviceProvider, windowType, shellVm);
+        window.DataContext = shellVm;
+
+        return (window, shellVm, context);
+    }
+ 
+    private void Register(object window, object shellVm, ShellContext context)
+    {
+        var descriptor = new WindowDescriptor(window, shellVm, context);
+        _openWindows[shellVm] = descriptor;
+ 
+        ((Window)window).Closed += (_, _) =>
+        {
+            _openWindows.TryRemove(shellVm, out _);
+            _logger.Information(
+                "Window closed and unregistered. ShellVM={ShellVMType}",
+                shellVm.GetType().Name);
+ 
+            if (shellVm is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        };
+    }
+ 
     /// <summary>
-    ///     Closes the new song window when the mouse coordinates are no longer in a corner.
+    /// Runs async initialization on the shell ViewModel (and therefore its
+    /// current content ViewModel) after the window is shown.  Closes the
+    /// window and logs on failure.
     /// </summary>
-    public void CloseCornerWindow(CornerWindow? window) => window?.Hide();
+    private async Task RunInitializationAsync(
+        object shellVm,
+        ShellContext context,
+        Window window,
+        CancellationToken cancellationToken)
+    {
+        if (shellVm is not IInitializeAsync initializable)
+        {
+            return;
+        }
+ 
+        try
+        {
+            await context.InitializationTracker
+                .EnsureInitializedAsync(initializable, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.Warning(
+                "Initialization was cancelled for {ShellVM}.", shellVm.GetType().Name);
+ 
+            await _ui.InvokeAsync(window.Close, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(
+                ex,
+                "Initialization failed for {ShellVM}. The window will be closed.",
+                shellVm.GetType().Name);
+ 
+            await _ui.InvokeAsync(() =>
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    $"Initialization failed — {shellVm.GetType().Name}",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+ 
+                window.Close();
+            }, cancellationToken);
+        }
+    }
+ 
+    /// <summary>
+    /// Positions <paramref name="window"/> according to <paramref name="options"/>.
+    /// </summary>
+    private static void ApplyPosition(Window window, WindowShowOptions options)
+    {
+        if (options.CentreOnMainWindow && System.Windows.Application.Current.MainWindow is { } main)
+        {
+            // Defer until layout pass so Width/Height are known.
+            window.SourceInitialized += (_, _) =>
+            {
+                window.Left = main.Left + (main.Width  - window.ActualWidth)  / 2;
+                window.Top  = main.Top  + (main.Height - window.ActualHeight) / 2;
+            };
+            return;
+        }
+ 
+        if (options.Left.HasValue && options.Top.HasValue)
+        {
+            window.SourceInitialized += (_, _) =>
+            {
+                window.Left = options.Left.Value - window.ActualWidth  / 2;
+                window.Top  = options.Top.Value  - window.ActualHeight / 2;
+            };
+        }
+    }
 }
+ 

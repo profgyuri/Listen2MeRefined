@@ -12,6 +12,8 @@ public abstract partial class ShellViewModelBase : ViewModelBase
 {
     protected readonly INavigationService NavigationService;
     private readonly NavigationState _navigationState;
+    
+    public ShellContext ShellContext { get; }
 
     [ObservableProperty]
     private object? _currentViewModel;
@@ -25,6 +27,7 @@ public abstract partial class ShellViewModelBase : ViewModelBase
         IMessenger messenger,
         ShellContext shellContext) : base(errorHandler, logger, messenger)
     {
+        ShellContext = shellContext;
         NavigationService = shellContext.NavigationService;
         _navigationState = shellContext.NavigationState;
         CurrentRoute = _navigationState.CurrentRoute;

@@ -1,3 +1,5 @@
+using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Application.ViewModels.Windows;
 using Listen2MeRefined.WPF.Utils.Navigation;
@@ -56,7 +58,7 @@ public sealed partial class SettingsWindow : Window
         object sender,
         RoutedEventArgs e)
     {
-        await _windowManager.ShowWindowAsync<FolderBrowserWindow, FolderBrowserShellViewModel>("folderBrowser", Left + Width / 2, Top + Height / 2);
+        //await _windowManager.ShowWindowAsync<FolderBrowserWindow, FolderBrowserShellViewModel>("folderBrowser", Left + Width / 2, Top + Height / 2);
     }
 
     private void CloseButton_Click(

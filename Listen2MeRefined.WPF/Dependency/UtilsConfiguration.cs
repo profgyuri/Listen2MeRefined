@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
@@ -44,11 +46,11 @@ public static class UtilsConfiguration
             services.AddTransient<IWindowPositionPolicyService, WindowPositionPolicyService>();
             services.AddTransient<IPlaylistLibraryService, PlaylistLibraryService>();
             services.AddSingleton<IAppThemeService, AppThemeService>();
-            services.AddSingleton<IMainWindowNavigationService, MainWindowNavigationService>();
             services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();
             services.AddSingleton<IErrorHandler, LoggingErrorHandler>();
             services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
             services.AddSingleton<IWindowManager, WindowManager>();
+            services.AddSingleton<IWindowRegistry, WindowRegistry>();
             services.AddSingleton<IUiDispatcher>(_ => new WpfUiDispatcher(System.Windows.Application.Current.Dispatcher));
         });
         

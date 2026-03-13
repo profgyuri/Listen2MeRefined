@@ -3,8 +3,11 @@ using Listen2MeRefined.WPF.Views;
 using SharpHook;
 using SharpHook.Data;
 using System.Windows.Forms;
+using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.WPF.Utils.Navigation;
@@ -35,6 +38,7 @@ internal sealed class SharpHookHandler : IGlobalHook
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly IWindowManager _windowManager;
+    private readonly IUiDispatcher _ui;
     private readonly Timer _mouseDebounceTimer;
     private readonly object _registrationGate = new();
     private readonly int _width = Screen.PrimaryScreen!.Bounds.Width;
@@ -50,13 +54,15 @@ internal sealed class SharpHookHandler : IGlobalHook
         ILogger logger,
         IMusicPlayerController musicPlayerController,
         ISettingsManager<AppSettings> settingsManager, 
-        IWindowManager windowManager)
+        IWindowManager windowManager,
+        IUiDispatcher ui)
     {
         _hook = new TaskPoolGlobalHook();
         _logger = logger;
         _musicPlayerController = musicPlayerController;
         _settingsManager = settingsManager;
         _windowManager = windowManager;
+        _ui = ui;
         _mouseDebounceTimer = new Timer(CheckMousePosition, null, Timeout.Infinite, Timeout.Infinite);
     }
 
@@ -136,11 +142,12 @@ internal sealed class SharpHookHandler : IGlobalHook
         var triggerSize = GetTriggerAreaSizePx();
         if (IsMouseInCorner(pos.X, pos.Y, triggerSize))
         {
-            System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+            _ui.InvokeAsync(() =>
             {
                 try
                 {
-                    _window = _windowManager.ShowCornerWindow(pos.X, pos.Y, triggerSize);
+                    var options = WindowShowOptions.At(pos.X, pos.Y);
+                    _windowManager.ShowWindowAsync<CornerWindowShellViewModel>(options);
                 }
                 catch (Exception ex)
                 {
@@ -210,7 +217,7 @@ internal sealed class SharpHookHandler : IGlobalHook
         {
             try
             {
-                _windowManager.CloseCornerWindow(_window);
+                _windowManager.CloseWindow<CornerWindowShellViewModel>();
             }
             catch (Exception ex)
             {
