@@ -4,18 +4,12 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Dapper;
-using Listen2MeRefined.Application.Modules;
-using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
-using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Dependency;
-using Listen2MeRefined.WPF.Utils;
-using Listen2MeRefined.WPF.Views.Shells;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Listen2MeRefined.WPF;

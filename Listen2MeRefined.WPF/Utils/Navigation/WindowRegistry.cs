@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.Shells;

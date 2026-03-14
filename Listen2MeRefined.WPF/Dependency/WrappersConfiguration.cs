@@ -1,7 +1,6 @@
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Windows;
 using Listen2MeRefined.Infrastructure.Startup;
-using Listen2MeRefined.WPF.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
-using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
@@ -16,7 +15,6 @@ using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Startup;
 using Listen2MeRefined.Infrastructure.Versioning;
-using Listen2MeRefined.WPF.Utils;
 using Listen2MeRefined.WPF.Utils.Navigation;
 using Listen2MeRefined.WPF.Utils.Theming;
 using Microsoft.Extensions.DependencyInjection;
