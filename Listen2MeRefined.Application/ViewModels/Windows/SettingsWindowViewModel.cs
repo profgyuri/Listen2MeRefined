@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
@@ -253,6 +254,7 @@ public sealed partial class SettingsWindowViewModel :
         Logger.Information("[SettingsWindowViewModel] Font family changed to: {FontFamily}", value);
         _settingsWriter.SetFontFamily(value);
         _ = _mediator.Publish(new FontFamilyChangedNotification(value));
+        Messenger.Send(new FontFamilyChangedMessage(value));
     }
 
     partial void OnSelectedAudioOutputDeviceChanged(AudioOutputDevice? value)

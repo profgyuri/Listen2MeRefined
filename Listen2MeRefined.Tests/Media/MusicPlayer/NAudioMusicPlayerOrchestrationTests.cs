@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
@@ -48,7 +49,8 @@ public class NAudioMusicPlayerOrchestrationTests
             queue.Object,
             loader.Object,
             output.Object,
-            new PlaybackProgressMonitor());
+            new PlaybackProgressMonitor(),
+            Mock.Of<IMessenger>());
 
         await player.PlayPauseAsync();
         player.CurrentTime = 1200;
@@ -87,7 +89,8 @@ public class NAudioMusicPlayerOrchestrationTests
             queue.Object,
             loader.Object,
             output.Object,
-            new PlaybackProgressMonitor());
+            new PlaybackProgressMonitor(),
+            Mock.Of<IMessenger>());
 
         await player.PlayPauseAsync();
         await player.PlayPauseAsync();
@@ -134,7 +137,8 @@ public class NAudioMusicPlayerOrchestrationTests
             queue.Object,
             loader.Object,
             output.Object,
-            new PlaybackProgressMonitor());
+            new PlaybackProgressMonitor(),
+            Mock.Of<IMessenger>());
 
         await player.PlayPauseAsync();
 
@@ -172,7 +176,8 @@ public class NAudioMusicPlayerOrchestrationTests
             queue.Object,
             loader.Object,
             output.Object,
-            new PlaybackProgressMonitor());
+            new PlaybackProgressMonitor(),
+            Mock.Of<IMessenger>());
 
         await player.PlayPauseAsync();
 
@@ -206,7 +211,8 @@ public class NAudioMusicPlayerOrchestrationTests
             queue.Object,
             loader.Object,
             output.Object,
-            new PlaybackProgressMonitor());
+            new PlaybackProgressMonitor(),
+            Mock.Of<IMessenger>());
 
         await player.PlayPauseAsync();
         player.CurrentTime = 1234;

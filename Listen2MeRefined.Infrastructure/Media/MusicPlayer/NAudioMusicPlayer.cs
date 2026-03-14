@@ -1,4 +1,6 @@
-﻿using Listen2MeRefined.Application.Notifications;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
@@ -25,6 +27,7 @@ public sealed partial class NAudioMusicPlayer :
     private readonly ITrackLoader _trackLoader;
     private readonly IPlaybackOutput _playbackOutput;
     private readonly IPlaybackProgressMonitor _playbackProgressMonitor;
+    private readonly IMessenger _messenger;
 
     private const int TimeCheckInterval = 500;
 
@@ -62,7 +65,8 @@ public sealed partial class NAudioMusicPlayer :
         IPlaybackQueueService playbackQueueService,
         ITrackLoader trackLoader,
         IPlaybackOutput playbackOutput,
-        IPlaybackProgressMonitor playbackProgressMonitor)
+        IPlaybackProgressMonitor playbackProgressMonitor, 
+        IMessenger messenger)
     {
         _logger = logger;
         _mediator = mediator;
@@ -70,6 +74,7 @@ public sealed partial class NAudioMusicPlayer :
         _trackLoader = trackLoader;
         _playbackOutput = playbackOutput;
         _playbackProgressMonitor = playbackProgressMonitor;
+        _messenger = messenger;
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), () => CheckPlaybackProgressAsync().GetAwaiter().GetResult());
         _logger.Debug("[NAudioMMusicPlayer] initialized");
@@ -283,6 +288,7 @@ public sealed partial class NAudioMusicPlayer :
         _fileReader = loadResult.Reader;
 
         await _mediator.Publish(new CurrentSongNotification(_currentSong));
+        _messenger.Send(new CurrentSongChangedMessage(_currentSong));
 
         _playbackProgressMonitor.Reset();
 
@@ -342,7 +348,7 @@ public sealed partial class NAudioMusicPlayer :
 
     private void SetState(PlayerState newState)
     {
-        _mediator.Publish(new PlayerStateChangedNotification(newState));
+        _messenger.Send(new PlayerStateChangedMessage(newState));
         _state = newState;
     }
 }

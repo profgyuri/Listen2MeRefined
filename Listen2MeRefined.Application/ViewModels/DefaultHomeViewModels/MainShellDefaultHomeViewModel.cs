@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.ViewModels.Widgets;
 using Serilog;
 
@@ -28,5 +29,14 @@ public class MainShellDefaultHomeViewModel : ViewModelBase
         PlaylistPaneViewModel = playlistPaneViewModel;
         SearchResultsPaneViewModel = searchResultsPaneViewModel;
         SearchbarViewModel = searchbarViewModel;
+    }
+
+    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        await TrackInfoViewModel.EnsureInitializedAsync(cancellationToken);
+        await PlaybackControlsViewModel.EnsureInitializedAsync(cancellationToken);
+        await PlaylistPaneViewModel.EnsureInitializedAsync(cancellationToken);
+        await SearchResultsPaneViewModel.EnsureInitializedAsync(cancellationToken);
+        await SearchbarViewModel.EnsureInitializedAsync(cancellationToken);
     }
 }

@@ -11,22 +11,14 @@ using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Core.Enums;
-using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.ListsViewModel;
-using PlaybackControlsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.PlaybackControlsViewModel;
-using PlaylistPaneViewModel = Listen2MeRefined.Application.ViewModels.Widgets.PlaylistPaneViewModel;
-using SearchbarViewModel = Listen2MeRefined.Application.ViewModels.Widgets.SearchbarViewModel;
-using SearchResultsPaneViewModel = Listen2MeRefined.Application.ViewModels.Widgets.SearchResultsPaneViewModel;
 
 namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public sealed partial class MainWindowViewModel :
     ViewModelBase,
-    INotificationHandler<FontFamilyChangedNotification>,
-    INotificationHandler<CurrentSongNotification>,
-    INotificationHandler<PlayerStateChangedNotification>
+    INotificationHandler<FontFamilyChangedNotification>
 {
     private readonly IUiDispatcher _ui;
     private readonly IAppUpdateChecker _appUpdateChecker;
@@ -34,20 +26,6 @@ public sealed partial class MainWindowViewModel :
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IStartupManager _startupManager;
     private readonly IWindowManager _windowManager;
-
-    public SearchbarViewModel SearchbarViewModel { get; }
-    public PlaybackControlsViewModel PlaybackControlsViewModel { get; }
-    public ListsViewModel ListsViewModel { get; }
-    public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
-    public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
-
-    [ObservableProperty] private AudioModel _song = new()
-    {
-        Artist = "Artist",
-        Title = "Title",
-        Genre = "Genre",
-        Path = ""
-    };
     
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private bool _isUpdateAvailable;
@@ -55,7 +33,6 @@ public sealed partial class MainWindowViewModel :
     [ObservableProperty] private bool _isTaskStatusVisible;
     [ObservableProperty] private string _taskStatusText = "";
     [ObservableProperty] private string _taskStatusTooltip = "";
-    [ObservableProperty] private PlayerState _playerState = PlayerState.Stopped;
 
     public MainWindowViewModel(
         IErrorHandler errorHandler,
@@ -65,11 +42,6 @@ public sealed partial class MainWindowViewModel :
         IAppUpdateChecker appUpdateChecker,
         IAppSettingsReader settingsReader,
         IBackgroundTaskStatusService backgroundTaskStatusService,
-        SearchbarViewModel searchbarViewModel,
-        PlaybackControlsViewModel playbackControlsViewModel,
-        ListsViewModel listsViewModel,
-        PlaylistPaneViewModel playlistPaneViewModel,
-        SearchResultsPaneViewModel searchResultsPaneViewModel,
         IStartupManager startupManager, 
         IWindowManager windowManager) : base(errorHandler, logger, messenger)
     {
@@ -80,11 +52,6 @@ public sealed partial class MainWindowViewModel :
         _startupManager = startupManager;
         _windowManager = windowManager;
 
-        SearchbarViewModel = searchbarViewModel;
-        PlaybackControlsViewModel = playbackControlsViewModel;
-        ListsViewModel = listsViewModel;
-        PlaylistPaneViewModel = playlistPaneViewModel;
-        SearchResultsPaneViewModel = searchResultsPaneViewModel;
         _backgroundTaskStatusService.SnapshotChanged += BackgroundTaskStatusServiceOnSnapshotChanged;
         ApplyTaskSnapshot(_backgroundTaskStatusService.GetSnapshot());
 
@@ -98,8 +65,6 @@ public sealed partial class MainWindowViewModel :
         try
         {
             await _startupManager.StartAsync(ct);
-            await PlaylistPaneViewModel.InitializeAsync(ct);
-            await PlaybackControlsViewModel.InitializeAsync(ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -145,7 +110,7 @@ public sealed partial class MainWindowViewModel :
         await NavigateAuxiliaryAsync(async () =>
         {
             await _windowManager.ShowWindowAsync<AdvancedSearchShellViewModel>(WindowShowOptions.CenteredOnMainWindow());
-            ListsViewModel.SwitchToSearchResultsTab();
+            //ListsViewModel.SwitchToSearchResultsTab();
         });
     }
 
@@ -226,23 +191,10 @@ public sealed partial class MainWindowViewModel :
             ? fallbackText
             : task.Message!;
     }
-    
-    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        Logger.Information("[MainWindowViewModel] Received CurrentSongNotification: {Audio}", notification.Audio);
-        return _ui.InvokeAsync(() => Song = notification.Audio, cancellationToken);
-    }
 
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         Logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
         return _ui.InvokeAsync(() => FontFamilyName = notification.FontFamily, cancellationToken);
-    }
-
-    public Task Handle(PlayerStateChangedNotification notification, CancellationToken cancellationToken)
-    {
-        Logger.Information("[MainWindowViewModel] Received PlayerStateChangedNotification: {PlayerState}", notification.PlayerState);
-        PlayerState = notification.PlayerState;
-        return Task.CompletedTask;
     }
 }
