@@ -10,6 +10,31 @@
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Orange">Test succeeded!</TextBlock>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="150" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <ContentControl Content="{Binding TrackInfoViewModel}" Grid.Column="0"/>
+                <ContentControl Content="{Binding PlaybackControlsViewModel}" Grid.Column="1"/>
+            </Grid>
+            
+            <ContentControl Content="{Binding SearchResultsPaneViewModel}" Grid.Row="1" Grid.Column="0"/>
+            <ContentControl Content="{Binding PlaylistPaneViewModel}" Grid.Row="1" Grid.Column="1"/>
+            <ContentControl Content="{Binding SearchbarViewModel}" Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" />
+            
+        </Grid>
     </Grid>
 </UserControl>
