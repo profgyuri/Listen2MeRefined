@@ -2,12 +2,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using MediatR;
@@ -31,7 +33,7 @@ public sealed partial class MainWindowViewModel :
     private readonly IAppSettingsReader _settingsReader;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IStartupManager _startupManager;
-    private readonly IMainWindowNavigationService _navigationService;
+    private readonly IWindowManager _windowManager;
 
     public SearchbarViewModel SearchbarViewModel { get; }
     public PlaybackControlsViewModel PlaybackControlsViewModel { get; }
@@ -68,15 +70,15 @@ public sealed partial class MainWindowViewModel :
         ListsViewModel listsViewModel,
         PlaylistPaneViewModel playlistPaneViewModel,
         SearchResultsPaneViewModel searchResultsPaneViewModel,
-        IStartupManager startupManager,
-        IMainWindowNavigationService navigationService) : base(errorHandler, logger, messenger)
+        IStartupManager startupManager, 
+        IWindowManager windowManager) : base(errorHandler, logger, messenger)
     {
         _ui = ui;
         _appUpdateChecker = appUpdateChecker;
         _settingsReader = settingsReader;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _startupManager = startupManager;
-        _navigationService = navigationService;
+        _windowManager = windowManager;
 
         SearchbarViewModel = searchbarViewModel;
         PlaybackControlsViewModel = playbackControlsViewModel;
@@ -133,7 +135,7 @@ public sealed partial class MainWindowViewModel :
         await NavigateAuxiliaryAsync(async () =>
         {
             IsUpdateAvailable = false;
-            await _navigationService.OpenSettingsAsync();
+            await _windowManager.ShowWindowAsync<SettingsShellViewModel>(WindowShowOptions.CenteredOnMainWindow());
         });
     }
 
@@ -142,7 +144,7 @@ public sealed partial class MainWindowViewModel :
     {
         await NavigateAuxiliaryAsync(async () =>
         {
-            await _navigationService.OpenAdvancedSearchAsync();
+            await _windowManager.ShowWindowAsync<AdvancedSearchShellViewModel>(WindowShowOptions.CenteredOnMainWindow());
             ListsViewModel.SwitchToSearchResultsTab();
         });
     }
