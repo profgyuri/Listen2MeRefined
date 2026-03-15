@@ -41,6 +41,7 @@ public sealed partial class App : System.Windows.Application
         try
         {
             _host = CreateHostBuilder().Build();
+            _host.ConfigureModuleNavigation();
             await _host.StartAsync().ConfigureAwait(true);
             
             if (ProcessFileOpenForwarding(e)) return;

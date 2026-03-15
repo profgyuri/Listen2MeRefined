@@ -1,6 +1,7 @@
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -11,26 +12,38 @@ public static class ModulesConfiguration
 {
     internal static IHostBuilder ConfigureModules(this IHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices((context, services) =>
         {
-            var provider = services.BuildServiceProvider();
-            var moduleCatalogOptions = provider.GetRequiredService<ModuleCatalogOptions>();
-            var navigationRegistry = provider.GetRequiredService<INavigationRegistry>();
-            var windowRegistry = provider.GetRequiredService<IWindowRegistry>();
-            var discoveredModules =
-                ModuleCatalog.DiscoverModules(
-                    moduleCatalogOptions,
-                    Log.Logger.ForContext<ModuleCatalog>());
+            var moduleCatalogOptions = context.Configuration
+                .GetSection("Modules")
+                .Get<ModuleCatalogOptions>() ?? new ModuleCatalogOptions();
+
+            var discoveredModules = ModuleCatalog.DiscoverModules(
+                moduleCatalogOptions,
+                Log.Logger.ForContext<ModuleCatalog>());
+
+            // Only register services here — no registry calls yet
             foreach (var module in discoveredModules)
-            {
                 module.RegisterServices(services);
-                module.RegisterNavigation(navigationRegistry);
-                module.RegisterWindows(windowRegistry);
-            }
 
             services.AddSingleton<IModuleCatalog>(new ModuleCatalog(discoveredModules));
         });
-        
+
         return builder;
+    }
+
+    internal static IHost ConfigureModuleNavigation(this IHost host)
+    {
+        var catalog = host.Services.GetRequiredService<IModuleCatalog>();
+        var navigationRegistry = host.Services.GetRequiredService<INavigationRegistry>();
+        var windowRegistry = host.Services.GetRequiredService<IWindowRegistry>();
+
+        foreach (var module in catalog.LoadModules())
+        {
+            module.RegisterNavigation(navigationRegistry);
+            module.RegisterWindows(windowRegistry);
+        }
+        
+        return host;
     }
 }
