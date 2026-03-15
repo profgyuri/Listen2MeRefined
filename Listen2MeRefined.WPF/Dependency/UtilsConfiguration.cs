@@ -40,6 +40,7 @@ public static class UtilsConfiguration
             services.AddTransient<IPinnedFoldersService, PinnedFoldersService>();
             services.AddTransient<IAdvancedSearchCriteriaService, AdvancedSearchCriteriaService>();
             services.AddTransient<IAudioSearchExecutionService, AudioSearchExecutionService>();
+            services.AddTransient<ISearchResultsTransferService, SearchResultsTransferService>();
             services.AddTransient<IPlaybackDefaultsService, PlaybackDefaultsService>();
             services.AddTransient<IWindowPositionPolicyService, WindowPositionPolicyService>();
             services.AddTransient<IPlaylistLibraryService, PlaylistLibraryService>();

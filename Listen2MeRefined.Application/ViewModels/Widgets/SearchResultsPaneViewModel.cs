@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Core.Models;
@@ -15,22 +17,27 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 public partial class SearchResultsPaneViewModel : ViewModelBase
 {
     private readonly ListsViewModel _lists;
+    private readonly IAppSettingsReader _settingsReader;
+    private readonly ISearchResultsTransferService _searchResultsTransferService;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     
     public SongContextMenuViewModel SongContextMenuViewModel { get; }
-    public IRelayCommand SendSelectedToPlaylistCommand => _lists.SendSelectedToPlaylistCommand;
 
     public SearchResultsPaneViewModel(
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
         ListsViewModel lists,
+        IAppSettingsReader settingsReader,
+        ISearchResultsTransferService searchResultsTransferService,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
         _lists = lists;
+        _settingsReader = settingsReader;
+        _searchResultsTransferService = searchResultsTransferService;
         SongContextMenuViewModel = songContextMenuViewModel;
     }
 
@@ -38,12 +45,43 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<QuickSearchExecutedMessage>(OnQuickSearchExecutedMessage);
+        RegisterMessage<SearchResultsUpdatedMessage>(OnSearchResultsUpdatedMessage);
         
+        await _lists.EnsureInitializedAsync(cancellationToken);
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
         
         Logger.Debug("[SearchResultsPaneViewModel] Finished InitializeCoreAsync");
         await base.InitializeAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Transfers selected search results (or all results when none are selected) into the default playlist.
+    /// </summary>
+    [RelayCommand]
+    private async Task SendSelectedToPlaylist()
+    {
+        await ExecuteSafeAsync(_ =>
+        {
+            var transferMode = _settingsReader.GetSearchResultsTransferMode();
+            var decision = _searchResultsTransferService.ResolveTransfer(
+                SearchResults,
+                _selectedSearchResults,
+                transferMode);
+
+            Logger.Debug(
+                "[SearchResultsPaneViewModel] Sending {AddCount} song(s) to playlist from {ResultCount} visible result(s)",
+                decision.SongsToAdd.Count,
+                SearchResults.Count);
+
+            if (decision.SongsToAdd.Count > 0)
+            {
+                Messenger.Send(new SearchResultsToPlaylistRequestedMessage(decision.SongsToAdd));
+            }
+
+            ApplyTransferDecision(decision);
+            return Task.CompletedTask;
+        });
     }
 
     [RelayCommand]
@@ -57,7 +95,6 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
                 _selectedSearchResults.Add(song);
             }
 
-            _lists.AddSelectedSearchResults(selectedSongs);
             PublishSongContextSelectionChanged();
             
             return Task.CompletedTask;
@@ -75,7 +112,6 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
                 _selectedSearchResults.Remove(song);
             }
 
-            _lists.RemoveSelectedSearchResults(selectedSongs);
             PublishSongContextSelectionChanged();
 
             return Task.CompletedTask;
@@ -84,7 +120,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
     public IReadOnlyCollection<AudioModel> GetDirectSongContextSelection() => _selectedSearchResults.ToArray();
 
-    public IReadOnlyCollection<AudioModel> GetFallbackSongContextSelection() => _lists.GetSelectedSearchResults();
+    public IReadOnlyCollection<AudioModel> GetFallbackSongContextSelection() => [];
 
     public int? GetSongContextActivePlaylistId() => _lists.ActiveNamedPlaylistId;
     
@@ -107,8 +143,47 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
                 result.Take(5));
         }
 
+        ApplySearchResultsUpdate(result);
+    }
+
+    private void OnSearchResultsUpdatedMessage(SearchResultsUpdatedMessage message)
+    {
+        var result = message.Value.ToArray();
+        Logger.Information("[SearchResultsPaneViewModel] Received external search results with {Count} results", result.Length);
+        ApplySearchResultsUpdate(result);
+    }
+
+    /// <summary>
+    /// Applies a full search-result refresh and resets local selection state.
+    /// </summary>
+    /// <param name="results">The replacement result set to display.</param>
+    private void ApplySearchResultsUpdate(IReadOnlyList<AudioModel> results)
+    {
         SearchResults.Clear();
-        SearchResults.AddRange(message.Value);
+        SearchResults.AddRange(results);
+        _selectedSearchResults.Clear();
+        PublishSongContextSelectionChanged();
+    }
+
+    /// <summary>
+    /// Applies transfer-side effects to the pane state after playlist dispatch.
+    /// </summary>
+    /// <param name="decision">The transfer decision produced by the transfer service.</param>
+    private void ApplyTransferDecision(SearchResultsTransferDecision decision)
+    {
+        if (decision.SongsToRemove.Count > 0)
+        {
+            foreach (var song in decision.SongsToRemove)
+            {
+                SearchResults.Remove(song);
+            }
+        }
+
+        if (decision.ClearSelection)
+        {
+            _selectedSearchResults.Clear();
+        }
+
         PublishSongContextSelectionChanged();
     }
 

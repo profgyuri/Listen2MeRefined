@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Searching;
@@ -20,59 +21,34 @@ namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 public class ListsViewModelTests
 {
     [Fact]
-    public void SendSelectedToPlaylist_MovesOnlySelectedSearchResults()
+    public async Task SearchResultsToPlaylistRequestedMessage_AddsSongsToDefaultPlaylist()
     {
-        var vm = CreateViewModel(out _);
+        var messenger = new WeakReferenceMessenger();
+        var vm = CreateViewModel(out _, messenger);
         var first = new AudioModel { Title = "First", Path = "a" };
         var second = new AudioModel { Title = "Second", Path = "b" };
+        await vm.EnsureInitializedAsync();
+        messenger.Send(new SearchResultsToPlaylistRequestedMessage([first, second]));
 
-        vm.SearchResults.Add(first);
-        vm.SearchResults.Add(second);
-        vm.AddSelectedSearchResults([first]);
-
-        vm.SendSelectedToPlaylistCommand.Execute(null);
-
-        Assert.Single(vm.PlayList);
+        Assert.Equal(2, vm.PlayList.Count);
         Assert.Contains(first, vm.PlayList);
-        Assert.DoesNotContain(first, vm.SearchResults);
-        Assert.Contains(second, vm.SearchResults);
+        Assert.Contains(second, vm.PlayList);
     }
 
     [Fact]
-    public void SendSelectedToPlaylist_CopyMode_LeavesSearchResultsUntouched()
+    public async Task SearchResultsToPlaylistRequestedMessage_DoesNotDuplicatePathEntriesInDefaultPlaylist()
     {
-        var vm = CreateViewModel(out _, SearchResultsTransferMode.Copy);
-        var first = new AudioModel { Title = "First", Path = "a" };
-        var second = new AudioModel { Title = "Second", Path = "b" };
-
-        vm.SearchResults.Add(first);
-        vm.SearchResults.Add(second);
-        vm.AddSelectedSearchResults([first]);
-
-        vm.SendSelectedToPlaylistCommand.Execute(null);
-
-        Assert.Single(vm.PlayList);
-        Assert.Contains(first, vm.PlayList);
-        Assert.Contains(first, vm.SearchResults);
-        Assert.Contains(second, vm.SearchResults);
-    }
-
-    [Fact]
-    public void SendSelectedToPlaylist_DoesNotDuplicatePathEntriesInDefaultPlaylist()
-    {
-        var vm = CreateViewModel(out _, SearchResultsTransferMode.Copy);
+        var messenger = new WeakReferenceMessenger();
+        var vm = CreateViewModel(out _, messenger);
         var first = new AudioModel { Title = "First", Path = "a" };
         var duplicateByPath = new AudioModel { Title = "First Duplicate", Path = "a" };
+        await vm.EnsureInitializedAsync();
+        messenger.Send(new SearchResultsToPlaylistRequestedMessage([first]));
+        messenger.Send(new SearchResultsToPlaylistRequestedMessage([duplicateByPath]));
 
-        vm.SearchResults.Add(first);
-        vm.SendSelectedToPlaylistCommand.Execute(null);
-
-        vm.SearchResults.Clear();
-        vm.SearchResults.Add(duplicateByPath);
-        vm.SendSelectedToPlaylistCommand.Execute(null);
-
-        Assert.Single(vm.DefaultPlaylist);
         Assert.Single(vm.PlayList);
+        Assert.Contains(first, vm.PlayList);
+        Assert.Single(vm.DefaultPlaylist);
         Assert.Equal("a", vm.DefaultPlaylist[0].Path);
     }
 
@@ -120,6 +96,7 @@ public class ListsViewModelTests
         logger
             .Setup(x => x.ForContext(It.IsAny<Type>()))
             .Returns(logger.Object);
+        var messenger = new WeakReferenceMessenger();
         var mediator = new Mock<IMediator>();
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
@@ -141,7 +118,7 @@ public class ListsViewModelTests
         var vm = new ListsViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
-            Mock.Of<IMessenger>(),
+            messenger,
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,
@@ -152,6 +129,10 @@ public class ListsViewModelTests
             prompt.Object,
             externalAudioOpenService.Object,
             ui.Object);
+
+        SearchResultsUpdatedMessage? publishedMessage = null;
+        var recipient = new object();
+        messenger.Register<object, SearchResultsUpdatedMessage>(recipient, (_, message) => publishedMessage = message);
 
         SearchMatchMode? capturedMatchMode = null;
         audioSearchExecutionService
@@ -169,6 +150,8 @@ public class ListsViewModelTests
             CancellationToken.None);
 
         Assert.Equal(SearchMatchMode.Any, capturedMatchMode);
+        Assert.NotNull(publishedMessage);
+        Assert.Empty(publishedMessage!.Value);
         mediator.Verify(
             x => x.Publish(It.Is<AdvancedSearchCompletedNotification>(n => n.ResultCount == 0), It.IsAny<CancellationToken>()),
             Times.Once);
@@ -353,6 +336,7 @@ public class ListsViewModelTests
 
     private static ListsViewModel CreateViewModel(
         out Mock<IMusicPlayerController> playerController,
+        IMessenger? messenger = null,
         SearchResultsTransferMode transferMode = SearchResultsTransferMode.Move)
     {
         var logger = new Mock<ILogger>();
@@ -380,7 +364,7 @@ public class ListsViewModelTests
         return new ListsViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
-            Mock.Of<IMessenger>(),
+            messenger ?? Mock.Of<IMessenger>(),
             mediator.Object,
             audioSearchExecutionService.Object,
             scanner.Object,

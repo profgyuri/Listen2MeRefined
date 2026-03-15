@@ -78,9 +78,9 @@ public class PlaylistPaneViewModelTests
 
         var songOne = new AudioModel { Title = "One", Path = "one.mp3" };
         var songTwo = new AudioModel { Title = "Two", Path = "two.mp3" };
-        lists.SearchResults.Add(songOne);
-        lists.SearchResults.Add(songTwo);
-        lists.SendSelectedToPlaylistCommand.Execute(null);
+        lists.DefaultPlaylist.Add(songOne);
+        lists.DefaultPlaylist.Add(songTwo);
+        lists.ActivateDefaultPlaylistQueue();
 
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);

@@ -50,6 +50,8 @@ public class SongContextMenuViewModelTests
             logger.Object,
             messenger,
             lists,
+            CreateSettingsReader(),
+            Mock.Of<ISearchResultsTransferService>(),
             songContextMenuVm);
 
         searchVm.SearchResultsSelectionAddedCommand.Execute(new ArrayList
@@ -100,6 +102,8 @@ public class SongContextMenuViewModelTests
             logger.Object,
             messenger,
             lists,
+            CreateSettingsReader(),
+            Mock.Of<ISearchResultsTransferService>(),
             songContextMenuVm);
 
         await searchVm.InitializeAsync();
@@ -157,5 +161,16 @@ public class SongContextMenuViewModelTests
             prompt.Object,
             externalAudioOpenService.Object,
             ui.Object);
+    }
+
+    private static IAppSettingsReader CreateSettingsReader()
+    {
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
+        settingsReader
+            .Setup(x => x.GetSearchResultsTransferMode())
+            .Returns(SearchResultsTransferMode.Move);
+        return settingsReader.Object;
     }
 }

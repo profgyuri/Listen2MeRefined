@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Searching;
@@ -41,14 +42,12 @@ public partial class ListsViewModel :
 
     private int _currentSongIndex = -1;
     private int? _activeNamedPlaylistId;
-    private readonly HashSet<AudioModel> _selectedSearchResults = new();
     private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
     private readonly ObservableCollection<AudioModel> _defaultPlaylist = new();
 
     [ObservableProperty] private string? _fontFamilyName = string.Empty;
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
-    [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     
     public ObservableCollection<AudioModel> PlayList => 
         _playList.Items as ObservableCollection<AudioModel> ??
@@ -84,6 +83,12 @@ public partial class ListsViewModel :
         _droppedSongFolderPromptService = droppedSongFolderPromptService;
 
         Logger.Debug("[ListsViewModel] Class initialized");
+    }
+
+    public override Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
+        return base.InitializeAsync(cancellationToken);
     }
 
     public async Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
@@ -188,44 +193,6 @@ public partial class ListsViewModel :
     }
 
     [RelayCommand]
-    private void SendSelectedToPlaylist()
-    {
-        var transferMode = _settingsReader.GetSearchResultsTransferMode();
-        if (!_selectedSearchResults.Any())
-        {
-            Logger.Debug<int>("[ListsViewModel] Sending all {Count} search results to the default tab", SearchResults.Count);
-            SendAllToDefaultPlaylist(transferMode);
-            return;
-        }
-
-        Logger.Debug("[ListsViewModel] Sending {Count} selected search results to the default tab", _selectedSearchResults.Count);
-        AddUniqueToDefaultPlaylist(_selectedSearchResults);
-
-        if (transferMode == SearchResultsTransferMode.Move)
-        {
-            while (_selectedSearchResults.Count > 0)
-            {
-                var toRemove = _selectedSearchResults.First();
-                SearchResults.Remove(toRemove);
-                _selectedSearchResults.Remove(toRemove);
-            }
-            return;
-        }
-
-        _selectedSearchResults.Clear();
-    }
-
-    private void SendAllToDefaultPlaylist(SearchResultsTransferMode transferMode)
-    {
-        AddUniqueToDefaultPlaylist(SearchResults);
-        if (transferMode == SearchResultsTransferMode.Move)
-        {
-            SearchResults.Clear();
-        }
-        _selectedSearchResults.Clear();
-    }
-
-    [RelayCommand]
     private void RemoveSelectedFromPlaylist()
     {
         if (_selectedPlaylistItems.Count == 0)
@@ -287,11 +254,6 @@ public partial class ListsViewModel :
         }
 
         SelectedSong = scanned;
-    }
-
-    public IReadOnlyCollection<AudioModel> GetSelectedSearchResults()
-    {
-        return _selectedSearchResults.ToArray();
     }
 
     public bool IsSongInActiveQueue(AudioModel? song)
@@ -368,22 +330,6 @@ public partial class ListsViewModel :
         }
     }
 
-    public void AddSelectedSearchResults(IEnumerable<AudioModel> songs)
-    {
-        foreach (var song in songs)
-        {
-            _selectedSearchResults.Add(song);
-        }
-    }
-
-    public void RemoveSelectedSearchResults(IEnumerable<AudioModel> songs)
-    {
-        foreach (var song in songs)
-        {
-            _selectedSearchResults.Remove(song);
-        }
-    }
-
     public void AddSelectedPlaylistItems(IEnumerable<AudioModel> songs)
     {
         foreach (var song in songs)
@@ -398,6 +344,23 @@ public partial class ListsViewModel :
         {
             _selectedPlaylistItems.Remove(song);
         }
+    }
+
+    /// <summary>
+    /// Handles search-result transfer requests and appends eligible songs to the default playlist.
+    /// </summary>
+    /// <param name="message">The message that carries songs requested for transfer.</param>
+    private void OnSearchResultsToPlaylistRequestedMessage(SearchResultsToPlaylistRequestedMessage message)
+    {
+        if (message.Value.Count == 0)
+        {
+            return;
+        }
+
+        Logger.Debug(
+            "[ListsViewModel] Received request to add {Count} search result song(s) to default playlist",
+            message.Value.Count);
+        AddUniqueToDefaultPlaylist(message.Value);
     }
     
     private bool CanJumpToSelectedSong()
@@ -424,11 +387,6 @@ public partial class ListsViewModel :
     partial void OnSelectedSongChanged(AudioModel? value)
     {
         _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
-    }
-
-    partial void OnSearchResultsChanged(ObservableCollection<AudioModel> value)
-    {
-        Logger.Debug("[ListsViewModel] Search results changed with {Count} results", value.Count);
     }
     
     public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
@@ -469,8 +427,7 @@ public partial class ListsViewModel :
                 result.Take(5));
         }
 
-        SearchResults.Clear();
-        SearchResults.AddRange(result);
+        Messenger.Send(new SearchResultsUpdatedMessage(result));
         await _mediator.Publish(new AdvancedSearchCompletedNotification(result.Length), cancellationToken);
     }
 
