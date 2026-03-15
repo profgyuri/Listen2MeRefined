@@ -10,7 +10,7 @@ namespace Listen2MeRefined.WPF.Dependency;
 
 public static class ModulesConfiguration
 {
-    internal static IHostBuilder ConfigureModules(this IHostBuilder builder)
+    internal static IHostBuilder ConfigureModuleServices(this IHostBuilder builder)
     {
         builder.ConfigureServices((context, services) =>
         {

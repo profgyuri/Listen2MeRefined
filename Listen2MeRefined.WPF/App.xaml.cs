@@ -104,7 +104,7 @@ public sealed partial class App : System.Windows.Application
             .ConfigureUtils()
             .ConfigureWaveForm()
             .ConfigureWrappers()
-            .ConfigureModules();
+            .ConfigureModuleServices();
         
         return builder;
     }
