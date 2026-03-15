@@ -5,10 +5,8 @@ namespace Listen2MeRefined.WPF.Views.Widgets;
 
 public partial class TrackInfoView : UserControl
 {
-    public TrackInfoView(TrackInfoViewModel viewModel)
+    public TrackInfoView()
     {
         InitializeComponent();
-        
-        DataContext = viewModel;
     }
 }

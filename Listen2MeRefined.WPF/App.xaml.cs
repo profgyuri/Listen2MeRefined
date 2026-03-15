@@ -97,13 +97,13 @@ public sealed partial class App : System.Windows.Application
             .ConfigureDataAccess()
             .ConfigureLogger()
             .ConfigureNavigation()
-            .ConfigureModules()
             .ConfigureMusicPlayer()
             .ConfigureStartup()
             .ConfigureSystem()
             .ConfigureUtils()
             .ConfigureWaveForm()
-            .ConfigureWrappers();
+            .ConfigureWrappers()
+            .ConfigureModules();
         
         return builder;
     }

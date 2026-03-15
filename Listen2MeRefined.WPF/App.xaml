@@ -51,6 +51,9 @@
             <DataTemplate DataType="{x:Type widgetViewModels:SearchResultsPaneViewModel}">
                 <widgets:SearchResultsPaneView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:TrackInfoViewModel}">
+                <widgets:TrackInfoView/>
+            </DataTemplate>
             
             <wpf:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <wpf:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter" />
