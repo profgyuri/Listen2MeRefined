@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
 
@@ -7,13 +9,16 @@ public sealed class SongContextMenuService : ISongContextMenuService
 {
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
 
     public SongContextMenuService(
         IPlaylistLibraryService playlistLibraryService,
-        IMediator mediator)
+        IMediator mediator,
+        IMessenger messenger)
     {
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
+        _messenger = messenger;
     }
 
     public async Task<IReadOnlyList<PlaylistMembershipInfo>> GetContextMenuPlaylistsAsync(
@@ -55,6 +60,7 @@ public sealed class SongContextMenuService : ISongContextMenuService
         {
             await _playlistLibraryService.AddSongsByPathAsync(playlistId, normalizedPaths, ct);
             await _mediator.Publish(new PlaylistMembershipChangedNotification(playlistId), ct);
+            _messenger.Send(new PlaylistMembershipChangedMessage(new PlaylistMembershipChangedMessageData(playlistId)));
             return;
         }
 
@@ -65,6 +71,7 @@ public sealed class SongContextMenuService : ISongContextMenuService
 
         await _playlistLibraryService.RemoveSongsByPathAsync(playlistId, normalizedPaths, ct);
         await _mediator.Publish(new PlaylistMembershipChangedNotification(playlistId), ct);
+        _messenger.Send(new PlaylistMembershipChangedMessage(new PlaylistMembershipChangedMessageData(playlistId)));
     }
 
     public async Task AddToNewPlaylistAsync(
@@ -84,6 +91,8 @@ public sealed class SongContextMenuService : ISongContextMenuService
 
         await _mediator.Publish(new PlaylistCreatedNotification(created.Id, created.Name), ct);
         await _mediator.Publish(new PlaylistMembershipChangedNotification(created.Id), ct);
+        _messenger.Send(new PlaylistCreatedMessage(new PlaylistCreatedMessageData(created.Id, created.Name)));
+        _messenger.Send(new PlaylistMembershipChangedMessage(new PlaylistMembershipChangedMessageData(created.Id)));
     }
 
     private static IReadOnlyList<string> NormalizePaths(IEnumerable<string> selectedSongPaths)

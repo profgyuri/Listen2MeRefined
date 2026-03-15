@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Infrastructure.Playlist;
@@ -16,7 +17,10 @@ public class SongContextMenuServiceTests
             .Setup(x => x.GetMembershipBySongPathAsync("song-a.mp3", It.IsAny<CancellationToken>()))
             .ReturnsAsync([new PlaylistMembershipInfo(10, "Gym", true)]);
 
-        var sut = new SongContextMenuService(playlistLibrary.Object, Mock.Of<IMediator>());
+        var sut = new SongContextMenuService(
+            playlistLibrary.Object,
+            Mock.Of<IMediator>(),
+            new WeakReferenceMessenger());
 
         var result = await sut.GetContextMenuPlaylistsAsync(["song-a.mp3"], activePlaylistId: null);
 
@@ -36,7 +40,10 @@ public class SongContextMenuServiceTests
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync([new PlaylistSummary(1, "One"), new PlaylistSummary(2, "Two")]);
 
-        var sut = new SongContextMenuService(playlistLibrary.Object, Mock.Of<IMediator>());
+        var sut = new SongContextMenuService(
+            playlistLibrary.Object,
+            Mock.Of<IMediator>(),
+            new WeakReferenceMessenger());
 
         var result = await sut.GetContextMenuPlaylistsAsync(["song-a.mp3", "song-b.mp3"], activePlaylistId: 2);
 
@@ -50,7 +57,10 @@ public class SongContextMenuServiceTests
     {
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         var mediator = new Mock<IMediator>();
-        var sut = new SongContextMenuService(playlistLibrary.Object, mediator.Object);
+        var sut = new SongContextMenuService(
+            playlistLibrary.Object,
+            mediator.Object,
+            new WeakReferenceMessenger());
 
         await sut.TogglePlaylistMembershipAsync(
             playlistId: 12,
@@ -75,7 +85,10 @@ public class SongContextMenuServiceTests
             .Setup(x => x.CreatePlaylistAsync("Fresh", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PlaylistSummary(55, "Fresh"));
 
-        var sut = new SongContextMenuService(playlistLibrary.Object, mediator.Object);
+        var sut = new SongContextMenuService(
+            playlistLibrary.Object,
+            mediator.Object,
+            new WeakReferenceMessenger());
 
         await sut.AddToNewPlaylistAsync("Fresh", ["a.mp3", "b.mp3"]);
 

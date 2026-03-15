@@ -140,7 +140,7 @@
                 </ListView.InputBindings>
 
                 <ListView.ContextMenu>
-                    <contextMenus:SongContextMenu DataContext="{Binding SongContextMenuViewModel}" />
+                    <contextMenus:SongContextMenu DataContext="{Binding PlacementTarget.DataContext.SongContextMenuViewModel, RelativeSource={RelativeSource Self}}" />
                 </ListView.ContextMenu>
 
                 <ListView.ItemTemplate>

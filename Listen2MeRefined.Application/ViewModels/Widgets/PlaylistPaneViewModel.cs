@@ -78,6 +78,9 @@ public partial class PlaylistPaneViewModel :
 
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
+        RegisterMessage<PlaylistCreatedMessage>(OnPlaylistCreatedMessage);
+        RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
+
         var defaultTab = new PlaylistTabItem("Default", null, _lists.DefaultPlaylist);
         Tabs = [defaultTab];
         SelectedTab = defaultTab;
@@ -441,6 +444,19 @@ public partial class PlaylistPaneViewModel :
         _lists.RemoveSelectedPlaylistItems(_selectedTabSongs);
         _selectedTabSongs.Clear();
         PublishSongContextSelectionChanged();
+    }
+
+    private void OnPlaylistCreatedMessage(PlaylistCreatedMessage message)
+    {
+        var payload = message.Value;
+        _ = ExecuteSafeAsync(ct =>
+            Handle(new PlaylistCreatedNotification(payload.PlaylistId, payload.Name), ct));
+    }
+
+    private void OnPlaylistMembershipChangedMessage(PlaylistMembershipChangedMessage message)
+    {
+        _ = ExecuteSafeAsync(ct =>
+            Handle(new PlaylistMembershipChangedNotification(message.Value.PlaylistId), ct));
     }
 
     public sealed class PlaylistTabItem : ObservableObject
