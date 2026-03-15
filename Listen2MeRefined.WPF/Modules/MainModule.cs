@@ -1,6 +1,7 @@
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
+using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Application.ViewModels.Widgets;
@@ -40,6 +41,8 @@ public class MainModule : IModule
         
         services.AddTransient<ListsViewModel>();
         services.AddTransient<MainTabsView>();
+        
+        services.AddTransient<SongContextMenuViewModel>();
     }
 
     public void RegisterNavigation(INavigationRegistry registry)

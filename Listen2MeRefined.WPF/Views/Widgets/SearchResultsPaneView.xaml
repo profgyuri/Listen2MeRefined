@@ -9,6 +9,7 @@
              d:DataContext="{d:DesignInstance widgetViewModels:SearchResultsPaneViewModel}"
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
+             xmlns:contextMenus="clr-namespace:Listen2MeRefined.WPF.Views.ContextMenus"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
     <Border Style="{DynamicResource BorderContainer}"
@@ -44,8 +45,7 @@
                     <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
                 </ListView.InputBindings>
                 <ListView.ContextMenu>
-                    <ContextMenu Opened="SongContextMenuOnOpened"
-                                 Style="{DynamicResource PlaylistContextMenuStyle}" />
+                    <contextMenus:SongContextMenu DataContext="{Binding SongContextMenuViewModel}" />
                 </ListView.ContextMenu>
                 <ListView.ItemTemplate>
                     <DataTemplate>

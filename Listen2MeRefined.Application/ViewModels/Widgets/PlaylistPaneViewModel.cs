@@ -5,10 +5,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
@@ -38,6 +40,7 @@ public partial class PlaylistPaneViewModel :
     [ObservableProperty] private ObservableCollection<PlaylistSummary> _availablePlaylists = new();
     [ObservableProperty] private bool _isCompactPlaylistView;
 
+    public SongContextMenuViewModel SongContextMenuViewModel { get; }
     public ObservableCollection<AudioModel> PlayList => _lists.PlayList;
 
     public AudioModel? SelectedSong
@@ -62,12 +65,14 @@ public partial class PlaylistPaneViewModel :
         ListsViewModel lists,
         IPlaylistLibraryService playlistLibraryService,
         IMediator mediator,
-        IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
+        IAppSettingsReader settingsReader,
+        SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
         _lists = lists;
         _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
+        SongContextMenuViewModel = songContextMenuViewModel;
         _lists.PropertyChanged += ListsOnPropertyChanged;
     }
 
@@ -78,6 +83,8 @@ public partial class PlaylistPaneViewModel :
         SelectedTab = defaultTab;
         await RefreshAvailablePlaylistsAsync(ct);
         IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
+        SongContextMenuViewModel.SetHost(this);
+        await SongContextMenuViewModel.EnsureInitializedAsync(ct);
     }
 
     [RelayCommand]
@@ -155,7 +162,10 @@ public partial class PlaylistPaneViewModel :
                 return;
             }
 
-            var existingPaths = Enumerable.Select<AudioModel, string>(tab.Songs, x => x.Path).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            var existingPaths = tab.Songs
+                .Where(x => !string.IsNullOrWhiteSpace(x.Path))
+                .Select(x => x.Path!)
+                .ToArray();
             tab.Songs.Clear();
             await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, existingPaths);
             await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
@@ -227,6 +237,7 @@ public partial class PlaylistPaneViewModel :
         }
 
         _lists.AddSelectedPlaylistItems(items.Cast<AudioModel>());
+        PublishSongContextSelectionChanged();
     }
 
     [RelayCommand]
@@ -238,74 +249,7 @@ public partial class PlaylistPaneViewModel :
         }
 
         _lists.RemoveSelectedPlaylistItems(items.Cast<AudioModel>());
-    }
-
-    public async Task<IReadOnlyList<PlaylistMenuState>> GetSongContextMenuPlaylistsAsync()
-    {
-        var selectedSongs = GetSelectedSongsForContext();
-        if (selectedSongs.Length == 0)
-        {
-            return Array.Empty<PlaylistMenuState>();
-        }
-
-        if (selectedSongs.Length == 1 && !string.IsNullOrWhiteSpace(selectedSongs[0].Path))
-        {
-            var singleMembership = await _playlistLibraryService.GetMembershipBySongPathAsync(selectedSongs[0].Path!);
-            return singleMembership
-                .Select(x => new PlaylistMenuState(x.PlaylistId, x.PlaylistName, x.ContainsSong, AllowRemove: true))
-                .ToArray();
-        }
-
-        var playlists = await _playlistLibraryService.GetAllPlaylistsAsync();
-        return playlists
-            .Select(x =>
-            {
-                var isCurrentNamed = SelectedTab is { IsDefaultTab: false } && SelectedTab.PlaylistId == x.Id;
-                return new PlaylistMenuState(x.Id, x.Name, isCurrentNamed, AllowRemove: isCurrentNamed);
-            })
-            .ToArray();
-    }
-
-    public async Task TogglePlaylistMembershipAsync(int playlistId, bool shouldContain, bool allowRemove)
-    {
-        var selectedSongs = GetSelectedSongsForContext();
-        if (selectedSongs.Length == 0)
-        {
-            return;
-        }
-
-        var paths = selectedSongs.Select(x => x.Path).ToArray();
-        if (shouldContain)
-        {
-            await _playlistLibraryService.AddSongsByPathAsync(playlistId, paths);
-        }
-        else
-        {
-            if (!allowRemove)
-            {
-                return;
-            }
-
-            await _playlistLibraryService.RemoveSongsByPathAsync(playlistId, paths);
-        }
-
-        await _mediator.Publish(new PlaylistMembershipChangedNotification(playlistId));
-    }
-
-    public async Task AddToNewPlaylistFromContextAsync(string name)
-    {
-        var selectedSongs = GetSelectedSongsForContext();
-        if (selectedSongs.Length == 0)
-        {
-            return;
-        }
-
-        var created = await _playlistLibraryService.CreatePlaylistAsync(name);
-        await _playlistLibraryService.AddSongsByPathAsync(created.Id, selectedSongs.Select(x => x.Path));
-
-        await RefreshAvailablePlaylistsAsync();
-        await _mediator.Publish(new PlaylistCreatedNotification(created.Id, created.Name));
-        await _mediator.Publish(new PlaylistMembershipChangedNotification(created.Id));
+        PublishSongContextSelectionChanged();
     }
 
     public async Task Handle(PlaylistCreatedNotification notification, CancellationToken cancellationToken)
@@ -404,10 +348,18 @@ public partial class PlaylistPaneViewModel :
         AvailablePlaylists = new ObservableCollection<PlaylistSummary>(allPlaylists);
     }
 
+    public IReadOnlyCollection<AudioModel> GetSelectedTabSongContextSelection() => _selectedTabSongs.ToArray();
+
+    public IReadOnlyCollection<AudioModel> GetCurrentTabSongContextSelection() =>
+        SelectedTab?.Songs?.ToArray() ?? Array.Empty<AudioModel>();
+
+    public int? GetSongContextActivePlaylistId() =>
+        SelectedTab is { IsDefaultTab: false } ? SelectedTab.PlaylistId : null;
+
     private AudioModel[] GetSelectedSongsForContext()
     {
-        var currentTabPaths = Enumerable
-            .Where<AudioModel>(SelectedTab?.Songs, x => !string.IsNullOrWhiteSpace(x.Path))
+        var currentTabPaths = (SelectedTab?.Songs ?? Enumerable.Empty<AudioModel>())
+            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
             .Select(x => x.Path!)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -471,6 +423,7 @@ public partial class PlaylistPaneViewModel :
         if (e.PropertyName == nameof(ListsViewModel.SelectedSong))
         {
             OnPropertyChanged(nameof(SelectedSong));
+            PublishSongContextSelectionChanged();
         }
         else if (e.PropertyName == nameof(ListsViewModel.SelectedIndex))
         {
@@ -487,6 +440,7 @@ public partial class PlaylistPaneViewModel :
 
         _lists.RemoveSelectedPlaylistItems(_selectedTabSongs);
         _selectedTabSongs.Clear();
+        PublishSongContextSelectionChanged();
     }
 
     public sealed class PlaylistTabItem : ObservableObject
@@ -521,11 +475,14 @@ public partial class PlaylistPaneViewModel :
         }
     }
 
-    public sealed record PlaylistMenuState(int PlaylistId, string PlaylistName, bool IsChecked, bool AllowRemove);
-
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         FontFamilyName = notification.FontFamily;
         return Task.CompletedTask;
+    }
+
+    private void PublishSongContextSelectionChanged()
+    {
+        Messenger.Send(new SongContextMenuSelectionChangedMessage(this));
     }
 }

@@ -5,11 +5,9 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Notifications;
-using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Core.Models;
-using MediatR;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
@@ -17,13 +15,12 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 public partial class SearchResultsPaneViewModel : ViewModelBase
 {
     private readonly ListsViewModel _lists;
-    private readonly IPlaylistLibraryService _playlistLibraryService;
-    private readonly IMediator _mediator;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
     
+    public SongContextMenuViewModel SongContextMenuViewModel { get; }
     public IRelayCommand SendSelectedToPlaylistCommand => _lists.SendSelectedToPlaylistCommand;
 
     public SearchResultsPaneViewModel(
@@ -31,21 +28,22 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         ILogger logger,
         IMessenger messenger,
         ListsViewModel lists,
-        IPlaylistLibraryService playlistLibraryService,
-        IMediator mediator) : base(errorHandler, logger, messenger)
+        SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
         _lists = lists;
-        _playlistLibraryService = playlistLibraryService;
-        _mediator = mediator;
+        SongContextMenuViewModel = songContextMenuViewModel;
     }
 
-    public override Task InitializeAsync(CancellationToken cancellationToken = default)
+    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<QuickSearchExecutedMessage>(OnQuickSearchExecutedMessage);
         
+        SongContextMenuViewModel.SetHost(this);
+        await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
+        
         Logger.Debug("[SearchResultsPaneViewModel] Finished InitializeCoreAsync");
-        return base.InitializeAsync(cancellationToken);
+        await base.InitializeAsync(cancellationToken);
     }
 
     [RelayCommand]
@@ -58,6 +56,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         }
 
         _lists.AddSelectedSearchResults(selectedSongs);
+        PublishSongContextSelectionChanged();
     }
 
     [RelayCommand]
@@ -70,90 +69,14 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         }
 
         _lists.RemoveSelectedSearchResults(selectedSongs);
+        PublishSongContextSelectionChanged();
     }
 
-    public async Task<IReadOnlyList<PlaylistPaneViewModel.PlaylistMenuState>> GetSongContextMenuPlaylistsAsync()
-    {
-        var selectedSongs = GetSelectedSongsForContext();
-        if (selectedSongs.Length == 0)
-        {
-            return Array.Empty<PlaylistPaneViewModel.PlaylistMenuState>();
-        }
+    public IReadOnlyCollection<AudioModel> GetDirectSongContextSelection() => _selectedSearchResults.ToArray();
 
-        if (selectedSongs.Length == 1 && !string.IsNullOrWhiteSpace(selectedSongs[0].Path))
-        {
-            var singleMembership = await _playlistLibraryService.GetMembershipBySongPathAsync(selectedSongs[0].Path!);
-            return singleMembership
-                .Select(x => new PlaylistPaneViewModel.PlaylistMenuState(x.PlaylistId, x.PlaylistName, x.ContainsSong, AllowRemove: true))
-                .ToArray();
-        }
+    public IReadOnlyCollection<AudioModel> GetFallbackSongContextSelection() => _lists.GetSelectedSearchResults();
 
-        var playlists = await _playlistLibraryService.GetAllPlaylistsAsync();
-        return playlists
-            .Select(x =>
-            {
-                var isCurrentNamed = _lists.ActiveNamedPlaylistId == x.Id;
-                return new PlaylistPaneViewModel.PlaylistMenuState(x.Id, x.Name, isCurrentNamed, AllowRemove: isCurrentNamed);
-            })
-            .ToArray();
-    }
-
-    public async Task TogglePlaylistMembershipAsync(int playlistId, bool shouldContain, bool allowRemove)
-    {
-        var selectedSongs = GetSelectedSongsForContext();
-        if (selectedSongs.Length == 0)
-        {
-            return;
-        }
-
-        var paths = selectedSongs.Select(x => x.Path).ToArray();
-        if (shouldContain)
-        {
-            await _playlistLibraryService.AddSongsByPathAsync(playlistId, paths);
-        }
-        else
-        {
-            if (!allowRemove)
-            {
-                return;
-            }
-
-            await _playlistLibraryService.RemoveSongsByPathAsync(playlistId, paths);
-        }
-
-        await _mediator.Publish(new PlaylistMembershipChangedNotification(playlistId));
-    }
-
-    public async Task AddToNewPlaylistFromContextAsync(string name)
-    {
-        var selectedSongs = GetSelectedSongsForContext();
-        if (selectedSongs.Length == 0)
-        {
-            return;
-        }
-
-        var created = await _playlistLibraryService.CreatePlaylistAsync(name);
-        await _playlistLibraryService.AddSongsByPathAsync(created.Id, selectedSongs.Select(x => x.Path));
-
-        await _mediator.Publish(new PlaylistCreatedNotification(created.Id, created.Name));
-        await _mediator.Publish(new PlaylistMembershipChangedNotification(created.Id));
-    }
-
-    private AudioModel[] GetSelectedSongsForContext()
-    {
-        if (_selectedSearchResults.Count > 0)
-        {
-            return _selectedSearchResults
-                .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-                .Distinct()
-                .ToArray();
-        }
-
-        return _lists.GetSelectedSearchResults()
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-            .Distinct()
-            .ToArray();
-    }
+    public int? GetSongContextActivePlaylistId() => _lists.ActiveNamedPlaylistId;
     
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
@@ -176,5 +99,11 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
         SearchResults.Clear();
         SearchResults.AddRange(message.Value);
+        PublishSongContextSelectionChanged();
+    }
+
+    private void PublishSongContextSelectionChanged()
+    {
+        Messenger.Send(new SongContextMenuSelectionChangedMessage(this));
     }
 }
