@@ -5,13 +5,13 @@ using Listen2MeRefined.Application.Playlist;
 
 namespace Listen2MeRefined.Infrastructure.Playlist;
 
-public sealed class SongContextMenuService : ISongContextMenuService
+public sealed class PlaylistMembership : IPlaylistMembership
 {
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IMediator _mediator;
     private readonly IMessenger _messenger;
 
-    public SongContextMenuService(
+    public PlaylistMembership(
         IPlaylistLibraryService playlistLibraryService,
         IMediator mediator,
         IMessenger messenger)
@@ -21,7 +21,7 @@ public sealed class SongContextMenuService : ISongContextMenuService
         _messenger = messenger;
     }
 
-    public async Task<IReadOnlyList<PlaylistMembershipInfo>> GetContextMenuPlaylistsAsync(
+    public async Task<IReadOnlyList<PlaylistMembershipInfo>> GetPlaylistMembershipInfoAsync(
         IReadOnlyList<string> selectedSongPaths,
         int? activePlaylistId,
         CancellationToken ct = default)

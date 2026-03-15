@@ -125,7 +125,7 @@ public class ListsViewModelTests
         var scanner = new Mock<IFileScanner>();
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
@@ -186,7 +186,7 @@ public class ListsViewModelTests
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
@@ -245,7 +245,7 @@ public class ListsViewModelTests
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
@@ -300,7 +300,7 @@ public class ListsViewModelTests
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
         var scanner = new Mock<IFileScanner>();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
@@ -364,7 +364,7 @@ public class ListsViewModelTests
         var scanner = new Mock<IFileScanner>();
         var settingsReader = new Mock<IAppSettingsReader>();
         playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         var settingsWriter = new Mock<IAppSettingsWriter>();

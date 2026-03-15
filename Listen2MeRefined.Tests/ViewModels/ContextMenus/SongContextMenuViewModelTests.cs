@@ -25,13 +25,13 @@ public class SongContextMenuViewModelTests
     {
         var logger = CreateLogger();
         var messenger = new WeakReferenceMessenger();
-        var contextMenuService = new Mock<ISongContextMenuService>();
+        var contextMenuService = new Mock<IPlaylistMembership>();
         var selectionService = new Mock<ISongContextSelectionService>();
         selectionService
             .Setup(x => x.ResolveSearchSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>()))
             .Returns(["a.mp3"]);
         contextMenuService
-            .Setup(x => x.GetContextMenuPlaylistsAsync(
+            .Setup(x => x.GetPlaylistMembershipInfoAsync(
                 It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<int?>(),
                 It.IsAny<CancellationToken>()))
@@ -63,7 +63,7 @@ public class SongContextMenuViewModelTests
         Assert.Single(songContextMenuVm.Playlists);
         Assert.Equal("Workout", songContextMenuVm.Playlists[0].PlaylistName);
         contextMenuService.Verify(
-            x => x.GetContextMenuPlaylistsAsync(
+            x => x.GetPlaylistMembershipInfoAsync(
                 It.Is<IReadOnlyList<string>>(paths => paths.SequenceEqual(new[] { "a.mp3" })),
                 It.IsAny<int?>(),
                 It.IsAny<CancellationToken>()),
@@ -75,13 +75,13 @@ public class SongContextMenuViewModelTests
     {
         var logger = CreateLogger();
         var messenger = new WeakReferenceMessenger();
-        var contextMenuService = new Mock<ISongContextMenuService>();
+        var contextMenuService = new Mock<IPlaylistMembership>();
         var selectionService = new Mock<ISongContextSelectionService>();
         selectionService
             .Setup(x => x.ResolveSearchSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>()))
             .Returns(["a.mp3", "b.mp3"]);
         contextMenuService
-            .Setup(x => x.GetContextMenuPlaylistsAsync(
+            .Setup(x => x.GetPlaylistMembershipInfoAsync(
                 It.IsAny<IReadOnlyList<string>>(),
                 It.IsAny<int?>(),
                 It.IsAny<CancellationToken>()))
@@ -130,7 +130,7 @@ public class SongContextMenuViewModelTests
         var scanner = new Mock<IFileScanner>();
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         var settingsWriter = new Mock<IAppSettingsWriter>();

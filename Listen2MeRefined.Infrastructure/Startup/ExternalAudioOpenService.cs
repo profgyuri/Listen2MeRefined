@@ -16,7 +16,7 @@ public sealed class ExternalAudioOpenService : IExternalAudioOpenService
 
     private readonly ILogger _logger;
     private readonly IFileAnalyzer<AudioModel> _audioFileAnalyzer;
-    private readonly IPlaylist _playlist;
+    private readonly IPlaylistQueue _playlistQueue;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IUiDispatcher _ui;
@@ -26,14 +26,14 @@ public sealed class ExternalAudioOpenService : IExternalAudioOpenService
     public ExternalAudioOpenService(
         ILogger logger,
         IFileAnalyzer<AudioModel> audioFileAnalyzer,
-        IPlaylist playlist,
+        IPlaylistQueue playlistQueue,
         IMusicPlayerController musicPlayerController,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         IUiDispatcher ui)
     {
         _logger = logger;
         _audioFileAnalyzer = audioFileAnalyzer;
-        _playlist = playlist;
+        _playlistQueue = playlistQueue;
         _musicPlayerController = musicPlayerController;
         _backgroundTaskStatusService = backgroundTaskStatusService;
         _ui = ui;
@@ -70,7 +70,7 @@ public sealed class ExternalAudioOpenService : IExternalAudioOpenService
     {
         var insertionBaseIndex = ResolveInsertionBaseIndex();
         var insertIndex = insertionBaseIndex + 1;
-        if (_playlist.Count == 0)
+        if (_playlistQueue.Count == 0)
         {
             insertIndex = 0;
         }
@@ -114,7 +114,7 @@ public sealed class ExternalAudioOpenService : IExternalAudioOpenService
                 continue;
             }
 
-            _playlist.Items.Insert(insertIndex, analyzed);
+            _playlistQueue.Items.Insert(insertIndex, analyzed);
             insertedIndices.Add(insertIndex);
             insertIndex++;
         }
@@ -132,7 +132,7 @@ public sealed class ExternalAudioOpenService : IExternalAudioOpenService
 
     private int ResolveInsertionBaseIndex()
     {
-        if (_playlist.Count == 0)
+        if (_playlistQueue.Count == 0)
         {
             return -1;
         }
@@ -158,9 +158,9 @@ public sealed class ExternalAudioOpenService : IExternalAudioOpenService
             return -1;
         }
 
-        for (var i = 0; i < _playlist.Count; i++)
+        for (var i = 0; i < _playlistQueue.Count; i++)
         {
-            if (string.Equals(_playlist[i].Path, path, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(_playlistQueue[i].Path, path, StringComparison.OrdinalIgnoreCase))
             {
                 return i;
             }

@@ -175,7 +175,7 @@ public class PlaylistPaneViewModelTests
         var scanner = new Mock<IFileScanner>();
         var settingsReader = new Mock<IAppSettingsReader>();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         var settingsWriter = new Mock<IAppSettingsWriter>();
@@ -210,7 +210,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IErrorHandler>(),
             logger,
             messenger,
-            Mock.Of<ISongContextMenuService>(),
+            Mock.Of<IPlaylistMembership>(),
             Mock.Of<ISongContextSelectionService>());
     }
 }

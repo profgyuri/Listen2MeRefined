@@ -28,7 +28,7 @@ public partial class ListsViewModel :
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly IFileScanner _fileScanner;
     private readonly IMusicPlayerController _musicPlayerController;
-    private readonly IPlaylist _playList;
+    private readonly IPlaylistQueue _playList;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
@@ -66,7 +66,7 @@ public partial class ListsViewModel :
         IFileScanner fileScanner,
         IAppSettingsReader settingsReader,
         IMusicPlayerController musicPlayerController,
-        IPlaylist playList,
+        IPlaylistQueue playList,
         IAppSettingsWriter settingsWriter,
         IDroppedSongFolderPromptService droppedSongFolderPromptService,
         IExternalAudioOpenService externalAudioOpenService, 

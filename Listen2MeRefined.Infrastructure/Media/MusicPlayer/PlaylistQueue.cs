@@ -5,11 +5,11 @@ using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
-public sealed class Playlist : IPlaylist
+public sealed class PlaylistQueue : IPlaylistQueue
 {
     private readonly ObservableCollection<AudioModel> _items = [];
 
-    public Playlist()
+    public PlaylistQueue()
     {
         _items.CollectionChanged += OnItemsCollectionChanged;
     }

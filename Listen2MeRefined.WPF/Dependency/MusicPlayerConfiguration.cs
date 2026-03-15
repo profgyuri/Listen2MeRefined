@@ -15,7 +15,7 @@ public static class MusicPlayerConfiguration
             services.AddSingleton<ITrackLoader, NAudioTrackLoader>();
             services.AddSingleton<IPlaybackOutput, WaveOutPlaybackOutput>();
             services.AddSingleton<IPlaybackProgressMonitor, PlaybackProgressMonitor>();
-            services.AddSingleton<IPlaylist, Playlist>();
+            services.AddSingleton<IPlaylistQueue, PlaylistQueue>();
             services.AddSingleton<IPlaybackQueueService, PlaybackQueueService>();
         });
         

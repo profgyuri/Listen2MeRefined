@@ -11,7 +11,7 @@ namespace Listen2MeRefined.Application.ViewModels.ContextMenus;
 
 public partial class SongContextMenuViewModel : ViewModelBase
 {
-    private readonly ISongContextMenuService _songContextMenuService;
+    private readonly IPlaylistMembership _playlistMembership;
     private readonly ISongContextSelectionService _songContextSelectionService;
     private ViewModelBase? _hostViewModel;
     private bool _isMenuOpen;
@@ -22,10 +22,10 @@ public partial class SongContextMenuViewModel : ViewModelBase
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        ISongContextMenuService songContextMenuService,
+        IPlaylistMembership playlistMembership,
         ISongContextSelectionService songContextSelectionService) : base(errorHandler, logger, messenger)
     {
-        _songContextMenuService = songContextMenuService;
+        _playlistMembership = playlistMembership;
         _songContextSelectionService = songContextSelectionService;
     }
 
@@ -62,7 +62,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
             return;
         }
 
-        await _songContextMenuService.TogglePlaylistMembershipAsync(
+        await _playlistMembership.TogglePlaylistMembershipAsync(
             playlist.PlaylistId,
             context.SelectedSongPaths,
             shouldContain,
@@ -86,7 +86,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
             return;
         }
 
-        await _songContextMenuService.AddToNewPlaylistAsync(normalizedName, context.SelectedSongPaths, ct);
+        await _playlistMembership.AddToNewPlaylistAsync(normalizedName, context.SelectedSongPaths, ct);
         await RefreshAsync(ct);
     }
 
@@ -99,7 +99,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
             return;
         }
 
-        var playlistStates = await _songContextMenuService.GetContextMenuPlaylistsAsync(
+        var playlistStates = await _playlistMembership.GetPlaylistMembershipInfoAsync(
             context.SelectedSongPaths,
             context.ActivePlaylistId,
             ct);

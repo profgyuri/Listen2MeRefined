@@ -43,7 +43,7 @@ public static class UtilsConfiguration
             services.AddTransient<IPlaybackDefaultsService, PlaybackDefaultsService>();
             services.AddTransient<IWindowPositionPolicyService, WindowPositionPolicyService>();
             services.AddTransient<IPlaylistLibraryService, PlaylistLibraryService>();
-            services.AddTransient<ISongContextMenuService, SongContextMenuService>();
+            services.AddTransient<IPlaylistMembership, PlaylistMembership>();
             services.AddTransient<ISongContextSelectionService, SongContextSelectionService>();
             services.AddSingleton<IAppThemeService, AppThemeService>();
             services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();

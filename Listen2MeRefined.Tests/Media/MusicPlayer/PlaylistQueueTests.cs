@@ -4,7 +4,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
-public class PlaylistTests
+public class PlaylistQueueTests
 {
     [Fact]
     public void Move_WhenCurrentItemIsMoved_UpdatesCurrentIndexToNewPosition()
@@ -40,9 +40,9 @@ public class PlaylistTests
         Assert.Equal(1, playlist.CurrentIndex);
     }
 
-    private static Playlist CreatePlaylistWith3Tracks()
+    private static PlaylistQueue CreatePlaylistWith3Tracks()
     {
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         playlist.Items.Add(new AudioModel { Title = "A", Path = "a" });
         playlist.Items.Add(new AudioModel { Title = "B", Path = "b" });
         playlist.Items.Add(new AudioModel { Title = "C", Path = "c" });

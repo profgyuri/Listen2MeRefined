@@ -99,13 +99,13 @@ public sealed class ExternalAudioOpenServiceTests
         out Mock<IFileAnalyzer<AudioModel>> analyzer,
         out Mock<IMusicPlayerController> player,
         out Mock<IBackgroundTaskStatusService> status,
-        out Playlist playlist,
+        out PlaylistQueue playlistQueue,
         out Mock<IUiDispatcher> ui)
     {
         analyzer = new Mock<IFileAnalyzer<AudioModel>>();
         player = new Mock<IMusicPlayerController>();
         status = new Mock<IBackgroundTaskStatusService>();
-        playlist = new Playlist();
+        playlistQueue = new PlaylistQueue();
         ui = new Mock<IUiDispatcher>();
 
         ui.Setup(x => x.InvokeAsync(It.IsAny<Action>(), It.IsAny<CancellationToken>()))
@@ -118,7 +118,7 @@ public sealed class ExternalAudioOpenServiceTests
         return new ExternalAudioOpenService(
             Mock.Of<ILogger>(),
             analyzer.Object,
-            playlist,
+            playlistQueue,
             player.Object,
             status.Object,
             ui.Object);
