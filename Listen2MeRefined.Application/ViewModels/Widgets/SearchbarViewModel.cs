@@ -44,25 +44,31 @@ public partial class SearchbarViewModel : ViewModelBase
     [RelayCommand]
     private async Task QuickSearch()
     {
-        _logger.Information("[SearchbarViewModel] Searching for \'{SearchTerm}\'", SearchTerm);
-        var result = (await _audioSearchExecutionService.ExecuteQuickSearchAsync(SearchTerm)).ToArray();
-        _logger.Information("[SearchbarViewModel] Found {ResultCount} results", result.Length);
-        if (result.Length > 0)
+        await ExecuteSafeAsync(async ct =>
         {
-            _logger.Verbose(
-                "[SearchbarViewModel] First {Shown} results are: {@Results}",
-                Math.Min(5, result.Length),
-                result.Take(5));
-        }
+            _logger.Information("[SearchbarViewModel] Searching for \'{SearchTerm}\'", SearchTerm);
+            var result = (await _audioSearchExecutionService.ExecuteQuickSearchAsync(SearchTerm)).ToArray();
+            _logger.Information("[SearchbarViewModel] Found {ResultCount} results", result.Length);
+            if (result.Length > 0)
+            {
+                _logger.Verbose(
+                    "[SearchbarViewModel] First {Shown} results are: {@Results}",
+                    Math.Min(5, result.Length),
+                    result.Take(5));
+            }
 
-        Messenger.Send(new QuickSearchExecutedMessage(result));
+            Messenger.Send(new QuickSearchExecutedMessage(result));
+        });
     }
 
     [RelayCommand]
     private async Task OpenAdvancedSearchWindow()
     {
-        Logger.Information("[SearchbarViewModel] Opening advanced search window");
-        await _windowManager.ShowWindowAsync<AdvancedSearchShellViewModel>(WindowShowOptions.CenteredOnMainWindow());
+        await ExecuteSafeAsync(async ct =>
+        {
+            Logger.Information("[SearchbarViewModel] Opening advanced search window");
+            await _windowManager.ShowWindowAsync<AdvancedSearchShellViewModel>(WindowShowOptions.CenteredOnMainWindow(), ct);
+        });
     }
     
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)

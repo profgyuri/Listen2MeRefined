@@ -47,29 +47,39 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void SearchResultsSelectionAdded(IList items)
+    private async Task SearchResultsSelectionAdded(IList items)
     {
-        var selectedSongs = items.Cast<AudioModel>().ToArray();
-        foreach (var song in selectedSongs)
+        await ExecuteSafeAsync(_ =>
         {
-            _selectedSearchResults.Add(song);
-        }
+            var selectedSongs = items.Cast<AudioModel>().ToArray();
+            foreach (var song in selectedSongs)
+            {
+                _selectedSearchResults.Add(song);
+            }
 
-        _lists.AddSelectedSearchResults(selectedSongs);
-        PublishSongContextSelectionChanged();
+            _lists.AddSelectedSearchResults(selectedSongs);
+            PublishSongContextSelectionChanged();
+            
+            return Task.CompletedTask;
+        });
     }
 
     [RelayCommand]
-    private void SearchResultsSelectionRemoved(IList items)
+    private async Task SearchResultsSelectionRemoved(IList items)
     {
-        var selectedSongs = items.Cast<AudioModel>().ToArray();
-        foreach (var song in selectedSongs)
+        await ExecuteSafeAsync(_ =>
         {
-            _selectedSearchResults.Remove(song);
-        }
+            var selectedSongs = items.Cast<AudioModel>().ToArray();
+            foreach (var song in selectedSongs)
+            {
+                _selectedSearchResults.Remove(song);
+            }
 
-        _lists.RemoveSelectedSearchResults(selectedSongs);
-        PublishSongContextSelectionChanged();
+            _lists.RemoveSelectedSearchResults(selectedSongs);
+            PublishSongContextSelectionChanged();
+
+            return Task.CompletedTask;
+        });
     }
 
     public IReadOnlyCollection<AudioModel> GetDirectSongContextSelection() => _selectedSearchResults.ToArray();
