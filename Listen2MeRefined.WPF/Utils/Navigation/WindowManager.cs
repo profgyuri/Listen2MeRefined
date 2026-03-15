@@ -96,7 +96,6 @@ public sealed class WindowManager : IWindowManager
 
         if (descriptor is null)
         {
-            _logger.Warning("CloseWindow<{Type}>: no open window found.", typeof(TShellViewModel).Name);
             return;
         }
 

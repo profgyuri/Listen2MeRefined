@@ -4,17 +4,17 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class SearchResultsPaneViewModel : 
-    ViewModelBase,
-    INotificationHandler<FontFamilyChangedNotification>
+public partial class SearchResultsPaneViewModel : ViewModelBase
 {
     private readonly ListsViewModel _lists;
     private readonly IPlaylistLibraryService _playlistLibraryService;
@@ -22,8 +22,8 @@ public partial class SearchResultsPaneViewModel :
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     
     [ObservableProperty] private string _fontFamilyName = string.Empty;
-
-    public ObservableCollection<AudioModel> SearchResults => _lists.SearchResults;
+    [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
+    
     public IRelayCommand SendSelectedToPlaylistCommand => _lists.SendSelectedToPlaylistCommand;
 
     public SearchResultsPaneViewModel(
@@ -37,6 +37,14 @@ public partial class SearchResultsPaneViewModel :
         _lists = lists;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
+    }
+
+    public override Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        RegisterMessage<QuickSearchExecutedMessage>(OnQuickSearchExecutedMessage);
+        
+        return base.InitializeAsync(cancellationToken);
     }
 
     [RelayCommand]
@@ -145,10 +153,27 @@ public partial class SearchResultsPaneViewModel :
             .Distinct()
             .ToArray();
     }
-
-    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    
+    private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
-        FontFamilyName = notification.FontFamily;
-        return Task.CompletedTask;
+        Logger.Debug("[SearchResultsPaneViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
+        FontFamilyName = message.Value;
+    }
+    
+    private void OnQuickSearchExecutedMessage(QuickSearchExecutedMessage message)
+    {
+        var result = message.Value.ToArray();
+
+        Logger.Information("[SearchResultsPaneViewModel] Received quick search results with {Count} results", result.Length);
+        if (result.Length > 0)
+        {
+            Logger.Verbose(
+                "[SearchResultsPaneViewModel] First {Shown} results are: {@Results}",
+                Math.Min(5, result.Length),
+                result.Take(5));
+        }
+
+        SearchResults.Clear();
+        SearchResults.AddRange(message.Value);
     }
 }

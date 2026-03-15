@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
 using MediatR;
@@ -37,7 +38,7 @@ public partial class SearchbarViewModel :
     [RelayCommand]
     private async Task QuickSearch()
     {
-        _logger.Information<string>("[SearchbarViewModel] Searching for \'{SearchTerm}\'", SearchTerm);
+        _logger.Information("[SearchbarViewModel] Searching for \'{SearchTerm}\'", SearchTerm);
         var result = (await _audioSearchExecutionService.ExecuteQuickSearchAsync(SearchTerm)).ToArray();
         _logger.Information("[SearchbarViewModel] Found {ResultCount} results", result.Length);
         if (result.Length > 0)
@@ -48,7 +49,7 @@ public partial class SearchbarViewModel :
                 result.Take(5));
         }
 
-        await _mediator.Publish(new QuickSearchResultsNotification(result));
+        Messenger.Send(new QuickSearchExecutedMessage(result));
     }
 
     public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)

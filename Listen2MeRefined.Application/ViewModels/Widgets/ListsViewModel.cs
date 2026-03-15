@@ -21,7 +21,6 @@ public partial class ListsViewModel :
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
-    INotificationHandler<QuickSearchResultsNotification>,
     INotificationHandler<ExternalAudioFilesOpenedNotification>,
     INotificationHandler<PlaylistShuffledNotification>
 {
@@ -492,25 +491,6 @@ public partial class ListsViewModel :
         SearchResults.Clear();
         SearchResults.AddRange(result);
         await _mediator.Publish(new AdvancedSearchCompletedNotification(result.Length), cancellationToken);
-    }
-
-    public async Task Handle(QuickSearchResultsNotification notification, CancellationToken cancellationToken)
-    {
-        var result = notification.Results.ToArray();
-
-        Logger.Information("[ListsViewModel] Received quick search results with {Count} results", result.Length);
-        if (result.Length > 0)
-        {
-            Logger.Verbose(
-                "[ListsViewModel] First {Shown} results are: {@Results}",
-                Math.Min(5, result.Length),
-                result.Take(5));
-        }
-
-        SwitchToSearchResultsTab();
-        SearchResults.Clear();
-        Extensions.AddRange(SearchResults, notification.Results);
-        await Task.CompletedTask;
     }
 
     public async Task Handle(PlaylistShuffledNotification notification, CancellationToken cancellationToken)

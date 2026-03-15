@@ -55,7 +55,7 @@
                     ToolTip="Quick Search"
                     Content="{materialDesign:PackIcon Kind=Search,Size=18}" />
             <Button Grid.Column="2"
-                    Command="{Binding DataContext.OpenAdvancedSearchWindowCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Command="{Binding DataContext.OpenAdvancedSearchWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Style="{DynamicResource SearchBarActionButton}"
                     ToolTip="Advanced Search"
                     Content="{materialDesign:PackIcon Kind=Tune,Size=18}" />
