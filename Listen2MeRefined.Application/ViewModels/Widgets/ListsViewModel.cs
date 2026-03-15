@@ -49,8 +49,6 @@ public partial class ListsViewModel :
     [ObservableProperty] private AudioModel? _selectedSong;
     [ObservableProperty] private int _selectedIndex = -1;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
-    [ObservableProperty] private bool _isSearchResultsTabVisible = true;
-    [ObservableProperty] private bool _isSongMenuTabVisible;
     
     public ObservableCollection<AudioModel> PlayList => 
         _playList.Items as ObservableCollection<AudioModel> ??
@@ -291,22 +289,6 @@ public partial class ListsViewModel :
         SelectedSong = scanned;
     }
 
-    [RelayCommand]
-    private void SwitchToSongMenuTab()
-    {
-        Logger.Verbose("[ListsViewModel] Switching to Song Menu tab");
-        IsSearchResultsTabVisible = false;
-        IsSongMenuTabVisible = true;
-    }
-
-    [RelayCommand]
-    public void SwitchToSearchResultsTab()
-    {
-        Logger.Verbose("[ListsViewModel] Switching to Search Results tab");
-        IsSearchResultsTabVisible = true;
-        IsSongMenuTabVisible = false;
-    }
-
     public IReadOnlyCollection<AudioModel> GetSelectedSearchResults()
     {
         return _selectedSearchResults.ToArray();
@@ -487,7 +469,6 @@ public partial class ListsViewModel :
                 result.Take(5));
         }
 
-        SwitchToSearchResultsTab();
         SearchResults.Clear();
         SearchResults.AddRange(result);
         await _mediator.Publish(new AdvancedSearchCompletedNotification(result.Length), cancellationToken);

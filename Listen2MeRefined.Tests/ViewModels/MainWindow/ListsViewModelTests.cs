@@ -95,20 +95,6 @@ public class ListsViewModelTests
     }
 
     [Fact]
-    public void SwitchTabCommands_ToggleVisibleTabFlags()
-    {
-        var vm = CreateViewModel(out _);
-
-        vm.SwitchToSongMenuTabCommand.Execute(null);
-        Assert.True(vm.IsSongMenuTabVisible);
-        Assert.False(vm.IsSearchResultsTabVisible);
-
-        vm.SwitchToSearchResultsTabCommand.Execute(null);
-        Assert.True(vm.IsSearchResultsTabVisible);
-        Assert.False(vm.IsSongMenuTabVisible);
-    }
-
-    [Fact]
     public async Task JumpToSelectedSongCommand_RequiresSelectedIndex()
     {
         var vm = CreateViewModel(out var playerController);

@@ -54,7 +54,6 @@ public partial class PlaylistPaneViewModel :
 
     public IRelayCommand RemoveSelectedFromPlaylistCommand => _lists.RemoveSelectedFromPlaylistCommand;
     public IAsyncRelayCommand JumpToSelectedSongCommand => _lists.JumpToSelectedSongCommand;
-    public IRelayCommand SwitchToSongMenuTabCommand => _lists.SwitchToSongMenuTabCommand;
 
     public PlaylistPaneViewModel(
         IErrorHandler errorHandler,
