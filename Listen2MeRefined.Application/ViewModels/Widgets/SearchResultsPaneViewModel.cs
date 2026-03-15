@@ -44,6 +44,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<QuickSearchExecutedMessage>(OnQuickSearchExecutedMessage);
         
+        Logger.Debug("[SearchResultsPaneViewModel] Finished InitializeCoreAsync");
         return base.InitializeAsync(cancellationToken);
     }
 

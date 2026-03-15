@@ -3,20 +3,18 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Searching;
-using MediatR;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class SearchbarViewModel :
-    ViewModelBase,
-    INotificationHandler<FontFamilyChangedNotification>
+public partial class SearchbarViewModel : ViewModelBase
 {
     private readonly ILogger _logger;
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
-    private readonly IMediator _mediator;
+    private readonly IWindowManager _windowManager;
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private string _searchTerm = "";
@@ -25,14 +23,22 @@ public partial class SearchbarViewModel :
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        IAudioSearchExecutionService audioSearchExecutionService,
-        IMediator mediator) : base(errorHandler, logger, messenger)
+        IAudioSearchExecutionService audioSearchExecutionService, 
+        IWindowManager windowManager) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
         _audioSearchExecutionService = audioSearchExecutionService;
-        _mediator = mediator;
-
+        _windowManager = windowManager;
+        
         _logger.Debug("[SearchbarViewModel] initialized");
+    }
+
+    public override Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        
+        Logger.Debug("[SearchbarViewModel] Finished InitializeCoreAsync");
+        return base.InitializeAsync(cancellationToken);
     }
 
     [RelayCommand]
@@ -52,10 +58,16 @@ public partial class SearchbarViewModel :
         Messenger.Send(new QuickSearchExecutedMessage(result));
     }
 
-    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    [RelayCommand]
+    private async Task OpenAdvancedSearchWindow()
     {
-        _logger.Information("[SearchbarViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamilyName = notification.FontFamily;
-        return Task.CompletedTask;
+        Logger.Information("[SearchbarViewModel] Opening advanced search window");
+        await _windowManager.ShowWindowAsync<AdvancedSearchShellViewModel>(WindowShowOptions.CenteredOnMainWindow());
+    }
+    
+    private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
+    {
+        Logger.Debug("[SearchbarViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
+        FontFamilyName = message.Value;
     }
 }

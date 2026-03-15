@@ -16,9 +16,7 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Windows;
 
-public sealed partial class MainWindowViewModel :
-    ViewModelBase,
-    INotificationHandler<FontFamilyChangedNotification>
+public sealed partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IUiDispatcher _ui;
     private readonly IAppUpdateChecker _appUpdateChecker;
@@ -104,20 +102,9 @@ public sealed partial class MainWindowViewModel :
         });
     }
 
-    [RelayCommand(CanExecute = nameof(CanNavigateToAuxiliaryWindows))]
-    private async Task OpenAdvancedSearchWindow()
-    {
-        await NavigateAuxiliaryAsync(async () =>
-        {
-            await _windowManager.ShowWindowAsync<AdvancedSearchShellViewModel>(WindowShowOptions.CenteredOnMainWindow());
-            //ListsViewModel.SwitchToSearchResultsTab();
-        });
-    }
-
     partial void OnCanNavigateToAuxiliaryWindowsChanged(bool value)
     {
         OpenSettingsWindowCommand.NotifyCanExecuteChanged();
-        OpenAdvancedSearchWindowCommand.NotifyCanExecuteChanged();
     }
 
     private async Task NavigateAuxiliaryAsync(Func<Task> action)
@@ -190,11 +177,5 @@ public sealed partial class MainWindowViewModel :
         return string.IsNullOrWhiteSpace(task.Message)
             ? fallbackText
             : task.Message!;
-    }
-
-    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
-    {
-        Logger.Information("[MainWindowViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        return _ui.InvokeAsync(() => FontFamilyName = notification.FontFamily, cancellationToken);
     }
 }
