@@ -1,16 +1,13 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
-using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
-using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
-using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
-using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using MediatR;
 using Serilog;
@@ -22,39 +19,34 @@ public partial class ListsViewModel :
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>,
     INotificationHandler<AdvancedSearchNotification>,
-    INotificationHandler<ExternalAudioFilesOpenedNotification>,
-    INotificationHandler<PlaylistShuffledNotification>
+    INotificationHandler<ExternalAudioFilesOpenedNotification>
 {
     private readonly IMediator _mediator;
     private readonly IAudioSearchExecutionService _audioSearchExecutionService;
-    private readonly IFileScanner _fileScanner;
-    private readonly IMusicPlayerController _musicPlayerController;
-    private readonly IPlaylistQueue _playList;
+    private readonly IPlaylistQueueState _playlistQueueState;
+    private readonly IPlaylistQueueRoutingService _playlistQueueRoutingService;
+    private readonly IExternalDropImportService _externalDropImportService;
+    private readonly IPlaybackContextSyncService _playbackContextSyncService;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
-    private readonly IAppSettingsReader _settingsReader;
-    private readonly IAppSettingsWriter _settingsWriter;
-    private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
-    private readonly IUiDispatcher _ui;
-
-    private static readonly HashSet<string> SupportedExtensions = new(
-        GlobalConstants.SupportedExtensions,
-        StringComparer.OrdinalIgnoreCase);
-
-    private int _currentSongIndex = -1;
-    private int? _activeNamedPlaylistId;
-    private readonly HashSet<AudioModel> _selectedPlaylistItems = new();
-    private readonly ObservableCollection<AudioModel> _defaultPlaylist = new();
 
     [ObservableProperty] private string? _fontFamilyName = string.Empty;
-    [ObservableProperty] private AudioModel? _selectedSong;
-    [ObservableProperty] private int _selectedIndex = -1;
-    
-    public ObservableCollection<AudioModel> PlayList => 
-        _playList.Items as ObservableCollection<AudioModel> ??
-        throw new InvalidOperationException("PlayList is not an ObservableCollection");
-    public ObservableCollection<AudioModel> DefaultPlaylist => _defaultPlaylist;
-    public int? ActiveNamedPlaylistId => _activeNamedPlaylistId;
-    public bool IsDefaultPlaylistActive => _activeNamedPlaylistId is null;
+
+    public ObservableCollection<AudioModel> PlayList => _playlistQueueState.PlayList;
+    public ObservableCollection<AudioModel> DefaultPlaylist => _playlistQueueState.DefaultPlaylist;
+    public int? ActiveNamedPlaylistId => _playlistQueueState.ActiveNamedPlaylistId;
+    public bool IsDefaultPlaylistActive => _playlistQueueState.IsDefaultPlaylistActive;
+
+    public AudioModel? SelectedSong
+    {
+        get => _playlistQueueState.SelectedSong;
+        set => _playlistQueueState.SelectedSong = value;
+    }
+
+    public int SelectedIndex
+    {
+        get => _playlistQueueState.SelectedIndex;
+        set => _playlistQueueState.SelectedIndex = value;
+    }
 
     public ListsViewModel(
         IErrorHandler errorHandler,
@@ -62,347 +54,45 @@ public partial class ListsViewModel :
         IMessenger messenger,
         IMediator mediator,
         IAudioSearchExecutionService audioSearchExecutionService,
-        IFileScanner fileScanner,
-        IAppSettingsReader settingsReader,
-        IMusicPlayerController musicPlayerController,
-        IPlaylistQueue playList,
-        IAppSettingsWriter settingsWriter,
-        IDroppedSongFolderPromptService droppedSongFolderPromptService,
-        IExternalAudioOpenService externalAudioOpenService, 
-        IUiDispatcher ui) : base(errorHandler, logger, messenger)
+        IPlaylistQueueState playlistQueueState,
+        IPlaylistQueueRoutingService playlistQueueRoutingService,
+        IExternalDropImportService externalDropImportService,
+        IPlaybackContextSyncService playbackContextSyncService,
+        IExternalAudioOpenService externalAudioOpenService) : base(errorHandler, logger, messenger)
     {
         _mediator = mediator;
         _audioSearchExecutionService = audioSearchExecutionService;
-        _fileScanner = fileScanner;
-        _musicPlayerController = musicPlayerController;
-        _playList = playList;
+        _playlistQueueState = playlistQueueState;
+        _playlistQueueRoutingService = playlistQueueRoutingService;
+        _externalDropImportService = externalDropImportService;
+        _playbackContextSyncService = playbackContextSyncService;
         _externalAudioOpenService = externalAudioOpenService;
-        _ui = ui;
-        _settingsReader = settingsReader;
-        _settingsWriter = settingsWriter;
-        _droppedSongFolderPromptService = droppedSongFolderPromptService;
+        _playlistQueueState.PropertyChanged += PlaylistQueueStateOnPropertyChanged;
 
         Logger.Debug("[ListsViewModel] Class initialized");
     }
 
-    public override Task InitializeAsync(CancellationToken cancellationToken = default)
-    {
-        RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
-        return base.InitializeAsync(cancellationToken);
-    }
-
-    public async Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
-    {
-        var supportedFiles = droppedPaths
-            .Where(x => !string.IsNullOrWhiteSpace(x) && File.Exists(x))
-            .Where(x => SupportedExtensions.Contains(Path.GetExtension(x)))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (supportedFiles.Count == 0)
-        {
-            return;
-        }
-
-        var folders = supportedFiles
-            .Select(Path.GetDirectoryName)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Select(x => x!)
-            .Distinct(StringComparer.OrdinalIgnoreCase);
-
-        await PromptAndPersistMissingMusicFoldersAsync(folders, ct);
-
-        var scannedSongs = new List<AudioModel>(supportedFiles.Count);
-        foreach (var file in supportedFiles)
-        {
-            var scanned = await _fileScanner.ScanAsync(file, ct);
-            scannedSongs.Add(scanned);
-        }
-
-        var defaultTargetIndex = Math.Clamp(insertIndex, 0, _defaultPlaylist.Count);
-        foreach (var song in scannedSongs)
-        {
-            _defaultPlaylist.Insert(defaultTargetIndex, song);
-            defaultTargetIndex++;
-        }
-
-        if (!IsDefaultPlaylistActive)
-        {
-            return;
-        }
-
-        var playListTargetIndex = Math.Clamp(insertIndex, 0, PlayList.Count);
-        foreach (var song in scannedSongs)
-        {
-            PlayList.Insert(playListTargetIndex, song);
-            playListTargetIndex++;
-        }
-    }
-
-    private async Task PromptAndPersistMissingMusicFoldersAsync(IEnumerable<string> folders, CancellationToken ct)
-    {
-        var existing = _settingsReader.GetMusicFolders();
-        var toAdd = existing.ToList();
-        var mutedFolders = _settingsReader.GetMutedDroppedSongFolders().ToList();
-        var changed = false;
-        var mutedChanged = false;
-
-        foreach (var folder in folders)
-        {
-            if (existing.Contains(folder, StringComparer.OrdinalIgnoreCase) ||
-                toAdd.Contains(folder, StringComparer.OrdinalIgnoreCase) ||
-                mutedFolders.Contains(folder, StringComparer.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var decision = await _droppedSongFolderPromptService.PromptAsync(folder, ct);
-            if (decision == AddDroppedSongFolderDecision.AddFolder)
-            {
-                toAdd.Add(folder);
-                changed = true;
-            }
-            else if (decision == AddDroppedSongFolderDecision.SkipAndDontAskAgain)
-            {
-                mutedFolders.Add(folder);
-                mutedChanged = true;
-            }
-        }
-
-        if (changed)
-        {
-            _settingsWriter.SetMusicFolders(toAdd);
-        }
-
-        if (mutedChanged)
-        {
-            _settingsWriter.SetMutedDroppedSongFolders(mutedFolders);
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
-    public async Task JumpToSelectedSong()
-    {
-        if (!CanJumpToSelectedSong())
-        {
-            return;
-        }
-
-        Logger.Debug<int>("[ListsViewModel] Jumping to selected index {Index} in playlist", SelectedIndex);
-        await _musicPlayerController.JumpToIndexAsync(SelectedIndex);
-    }
-
-    [RelayCommand]
-    private void RemoveSelectedFromPlaylist()
-    {
-        if (_selectedPlaylistItems.Count == 0)
-        {
-            Logger.Debug($"[ListsViewModel] Removing all items from playlist");
-            ClearPlaylist();
-            return;
-        }
-
-        Logger.Debug($"[ListsViewModel] Removing selected items from playlist");
-        foreach (var item in _selectedPlaylistItems)
-        {
-            PlayList.Remove(item);
-            if (IsDefaultPlaylistActive)
-            {
-                _defaultPlaylist.Remove(item);
-            }
-        }
-
-        _selectedPlaylistItems.Clear();
-    }
-
-    [RelayCommand]
-    private void SetSelectedSongAsNext()
-    {
-        if (SelectedSong is null || PlayList.Count <= 1 || !IsSongInActiveQueue(SelectedSong))
-        {
-            return;
-        }
-
-        Logger.Information<string?>("[ListsViewModel] Setting {Title} as next song", SelectedSong.Title);
-        var selectedSongIndex = PlayList.IndexOf(SelectedSong);
-        var newIndex = _currentSongIndex + 1;
-
-        if (newIndex >= PlayList.Count)
-        {
-            newIndex = 0;
-        }
-
-        PlayList.Move(selectedSongIndex, newIndex);
-        Logger.Debug("[ListsViewModel] Moved song from index {OldIndex} to {NewIndex}", selectedSongIndex, newIndex);
-    }
-
-    [RelayCommand]
-    private async Task ScanSelectedSong()
-    {
-        if (SelectedSong is null)
-        {
-            Logger.Warning("[ListsViewModel] No song selected to scan");
-            return;
-        }
-
-        Logger.Information<string?>("[ListsViewModel] Scanning {Title}", SelectedSong.Title);
-        var scanned = await _fileScanner.ScanAsync(SelectedSong.Path!);
-        var index = PlayList.IndexOf(SelectedSong);
-        if (index >= 0)
-        {
-            PlayList[index] = scanned;
-        }
-
-        SelectedSong = scanned;
-    }
-
-    public bool IsSongInActiveQueue(AudioModel? song)
-    {
-        if (song is null || string.IsNullOrWhiteSpace(song.Path))
-        {
-            return false;
-        }
-
-        return PlayList.Any(x =>
-            !string.IsNullOrWhiteSpace(x.Path) &&
-            x.Path.Equals(song.Path, StringComparison.OrdinalIgnoreCase));
-    }
-
-    public void ActivateDefaultPlaylistQueue()
-    {
-        ReplacePlaybackQueue(_defaultPlaylist);
-        _activeNamedPlaylistId = null;
-    }
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default) =>
+        _externalDropImportService.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
 
     public void ActivateNamedPlaylistQueue(int playlistId, IEnumerable<AudioModel> songs)
     {
-        ReplacePlaybackQueue(songs);
-        _activeNamedPlaylistId = playlistId;
+        _playlistQueueRoutingService.ActivateNamedPlaylistQueue(playlistId, songs);
     }
 
-    public bool SwitchActiveQueueToDefaultPreservingCurrentSong()
-    {
-        var currentSongPath = SelectedSong?.Path;
-        ReplacePlaybackQueue(_defaultPlaylist);
-        _activeNamedPlaylistId = null;
-
-        var index = IndexOfPath(PlayList, currentSongPath);
-        if (index < 0)
-        {
-            return false;
-        }
-
-        _playList.CurrentIndex = index;
-        SelectedIndex = index;
-        return true;
-    }
-
-    public void SwitchActiveQueueToDefaultAndStop()
-    {
-        ReplacePlaybackQueue(_defaultPlaylist);
-        _activeNamedPlaylistId = null;
-        _musicPlayerController.Stop();
-    }
-
-    public void RemoveFromDefaultPlaylist(IEnumerable<AudioModel> songs)
-    {
-        var candidates = songs
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-            .Select(x => x.Path!)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        if (candidates.Count == 0)
-        {
-            return;
-        }
-
-        var toRemove = _defaultPlaylist
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path) && candidates.Contains(x.Path!))
-            .ToArray();
-
-        foreach (var song in toRemove)
-        {
-            _defaultPlaylist.Remove(song);
-            if (IsDefaultPlaylistActive)
-            {
-                PlayList.Remove(song);
-            }
-        }
-    }
-
-    public void AddSelectedPlaylistItems(IEnumerable<AudioModel> songs)
-    {
-        foreach (var song in songs)
-        {
-            _selectedPlaylistItems.Add(song);
-        }
-    }
-
-    public void RemoveSelectedPlaylistItems(IEnumerable<AudioModel> songs)
-    {
-        foreach (var song in songs)
-        {
-            _selectedPlaylistItems.Remove(song);
-        }
-    }
-
-    /// <summary>
-    /// Handles search-result transfer requests and appends eligible songs to the default playlist.
-    /// </summary>
-    /// <param name="message">The message that carries songs requested for transfer.</param>
-    private void OnSearchResultsToPlaylistRequestedMessage(SearchResultsToPlaylistRequestedMessage message)
-    {
-        if (message.Value.Count == 0)
-        {
-            return;
-        }
-
-        Logger.Debug(
-            "[ListsViewModel] Received request to add {Count} search result song(s) to default playlist",
-            message.Value.Count);
-        AddUniqueToDefaultPlaylist(message.Value);
-    }
-    
-    private bool CanJumpToSelectedSong()
-    {
-        return SelectedIndex > -1 && IsSongInActiveQueue(SelectedSong);
-    }
-    
-    private void ClearPlaylist()
-    {
-        if (IsDefaultPlaylistActive)
-        {
-            _defaultPlaylist.Clear();
-        }
-
-        PlayList.Clear();
-        _selectedPlaylistItems.Clear();
-    }
-
-    partial void OnSelectedIndexChanged(int value)
-    {
-        _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
-    }
-
-    partial void OnSelectedSongChanged(AudioModel? value)
-    {
-        _ui.InvokeAsync(() => JumpToSelectedSongCommand.NotifyCanExecuteChanged());
-    }
-    
-    public async Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
+    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
     {
         Logger.Information("[ListsViewModel] Font family changed to {FontFamily}", notification.FontFamily);
         FontFamilyName = notification.FontFamily;
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
-    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
+    public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
     {
         Logger.Information("[ListsViewModel] Current song changed to {@Audio}", notification.Audio);
         _externalAudioOpenService.SetCurrentSong(notification.Audio);
-        SelectedSong = notification.Audio;
-        _currentSongIndex = PlayList.IndexOf(SelectedSong);
-        await Task.CompletedTask;
+        _playbackContextSyncService.SetCurrentSong(notification.Audio);
+        return Task.CompletedTask;
     }
 
     public Task Handle(ExternalAudioFilesOpenedNotification notification, CancellationToken cancellationToken)
@@ -431,96 +121,20 @@ public partial class ListsViewModel :
         await _mediator.Publish(new AdvancedSearchCompletedNotification(result.Length), cancellationToken);
     }
 
-    public async Task Handle(PlaylistShuffledNotification notification, CancellationToken cancellationToken)
+    private void PlaylistQueueStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        await _ui.InvokeAsync(SyncDefaultPlaylistOrder, cancellationToken);
-    }
-    
-    private void SyncDefaultPlaylistOrder()
-    {
-        var target = _playList.Items;
-        for (int i = 0; i < target.Count; i++)
+        if (e.PropertyName == nameof(IPlaylistQueueState.SelectedSong))
         {
-            var currentPos = _defaultPlaylist.IndexOf(target[i]);
-            if (currentPos != i)
-                _defaultPlaylist.Move(currentPos, i);
+            OnPropertyChanged(nameof(SelectedSong));
         }
-    }
-
-    private void AddUniqueToDefaultPlaylist(IEnumerable<AudioModel> songs)
-    {
-        var existingPaths = _defaultPlaylist
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-            .Select(x => x.Path!)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var song in songs)
+        else if (e.PropertyName == nameof(IPlaylistQueueState.SelectedIndex))
         {
-            if (string.IsNullOrWhiteSpace(song.Path) || existingPaths.Contains(song.Path))
-            {
-                continue;
-            }
-
-            _defaultPlaylist.Add(song);
-            existingPaths.Add(song.Path);
-            if (IsDefaultPlaylistActive && !PlayList.Any(x =>
-                    !string.IsNullOrWhiteSpace(x.Path) &&
-                    x.Path!.Equals(song.Path, StringComparison.OrdinalIgnoreCase)))
-            {
-                PlayList.Add(song);
-            }
+            OnPropertyChanged(nameof(SelectedIndex));
         }
-    }
-
-    private void ReplacePlaybackQueue(IEnumerable<AudioModel> songs)
-    {
-        var uniquePaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var uniqueSongs = songs
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path) && uniquePaths.Add(x.Path!))
-            .ToArray();
-
-        PlayList.Clear();
-        PlayList.AddRange(uniqueSongs);
-
-        if (PlayList.Count == 0)
+        else if (e.PropertyName == nameof(IPlaylistQueueState.ActiveNamedPlaylistId))
         {
-            _playList.CurrentIndex = 0;
-            _currentSongIndex = -1;
-            return;
+            OnPropertyChanged(nameof(ActiveNamedPlaylistId));
+            OnPropertyChanged(nameof(IsDefaultPlaylistActive));
         }
-
-        var currentPath = SelectedSong?.Path;
-        var matchingIndex = IndexOfPath(PlayList, currentPath);
-        if (matchingIndex >= 0)
-        {
-            _playList.CurrentIndex = matchingIndex;
-            _currentSongIndex = matchingIndex;
-            return;
-        }
-
-        _playList.CurrentIndex = 0;
-        _currentSongIndex = 0;
-    }
-
-    private static int IndexOfPath(IEnumerable<AudioModel> songs, string? path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return -1;
-        }
-
-        var index = 0;
-        foreach (var song in songs)
-        {
-            if (!string.IsNullOrWhiteSpace(song.Path) &&
-                song.Path.Equals(path, StringComparison.OrdinalIgnoreCase))
-            {
-                return index;
-            }
-
-            index++;
-        }
-
-        return -1;
     }
 }

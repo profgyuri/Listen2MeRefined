@@ -21,7 +21,8 @@
 
         <TabItem Header="Song Menu" IsSelected="{Binding IsSongMenuTabVisible}" Cursor="Hand">
             <Border Style="{DynamicResource BorderContainer}"
-                    Margin="0,8,0,0">
+                    Margin="0,8,0,0"
+                    DataContext="{Binding DataContext.PlaylistPaneViewModel, RelativeSource={RelativeSource AncestorType=Window}}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -77,7 +78,7 @@
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <materialDesign:PackIcon Kind="DeleteOutline" Width="18" Height="18" Foreground="{DynamicResource TertiaryBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
                                 <Button Style="{DynamicResource MainTabsActionButton}"
-                                        Command="{Binding DataContext.PlaylistPaneViewModel.RemoveSelectedFromActiveTabCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Command="{Binding RemoveSelectedFromActiveTabCommand}"
                                         Content="Remove From Playlist"
                                         Margin="0" />
                             </StackPanel>

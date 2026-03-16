@@ -27,61 +27,73 @@ public partial class PlaylistPaneViewModel :
     INotificationHandler<PlaylistShuffledNotification>,
     INotificationHandler<FontFamilyChangedNotification>
 {
-    private readonly ListsViewModel _lists;
+    private readonly IPlaylistQueueState _playlistQueueState;
+    private readonly IPlaylistQueueRoutingService _playlistQueueRoutingService;
+    private readonly IDefaultPlaylistService _defaultPlaylistService;
+    private readonly IPlaybackQueueActionsService _playbackQueueActionsService;
+    private readonly IExternalDropImportService _externalDropImportService;
+    private readonly IPlaylistSelectionService _playlistSelectionService;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IMediator _mediator;
-
-    private readonly HashSet<AudioModel> _selectedTabSongs = new();
+    private readonly HashSet<AudioModel> _selectedTabSongs = [];
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
-    [ObservableProperty] private ObservableCollection<PlaylistTabItem> _tabs = new();
+    [ObservableProperty] private ObservableCollection<PlaylistTabItem> _tabs = [];
     [ObservableProperty] private PlaylistTabItem? _selectedTab;
-    [ObservableProperty] private ObservableCollection<PlaylistSummary> _availablePlaylists = new();
+    [ObservableProperty] private ObservableCollection<PlaylistSummary> _availablePlaylists = [];
     [ObservableProperty] private bool _isCompactPlaylistView;
 
     public SongContextMenuViewModel SongContextMenuViewModel { get; }
-    public ObservableCollection<AudioModel> PlayList => _lists.PlayList;
+    public ObservableCollection<AudioModel> PlayList => _playlistQueueState.PlayList;
 
     public AudioModel? SelectedSong
     {
-        get => _lists.SelectedSong;
-        set => _lists.SelectedSong = value;
+        get => _playlistQueueState.SelectedSong;
+        set => _playlistQueueState.SelectedSong = value;
     }
 
     public int SelectedIndex
     {
-        get => _lists.SelectedIndex;
-        set => _lists.SelectedIndex = value;
+        get => _playlistQueueState.SelectedIndex;
+        set => _playlistQueueState.SelectedIndex = value;
     }
-
-    public IRelayCommand RemoveSelectedFromPlaylistCommand => _lists.RemoveSelectedFromPlaylistCommand;
-    public IAsyncRelayCommand JumpToSelectedSongCommand => _lists.JumpToSelectedSongCommand;
 
     public PlaylistPaneViewModel(
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        ListsViewModel lists,
+        IPlaylistQueueState playlistQueueState,
+        IPlaylistQueueRoutingService playlistQueueRoutingService,
+        IDefaultPlaylistService defaultPlaylistService,
+        IPlaybackQueueActionsService playbackQueueActionsService,
+        IExternalDropImportService externalDropImportService,
+        IPlaylistSelectionService playlistSelectionService,
         IPlaylistLibraryService playlistLibraryService,
         IMediator mediator,
         IAppSettingsReader settingsReader,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
-        _lists = lists;
+        _playlistQueueState = playlistQueueState;
+        _playlistQueueRoutingService = playlistQueueRoutingService;
+        _defaultPlaylistService = defaultPlaylistService;
+        _playbackQueueActionsService = playbackQueueActionsService;
+        _externalDropImportService = externalDropImportService;
+        _playlistSelectionService = playlistSelectionService;
         _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
         _mediator = mediator;
         SongContextMenuViewModel = songContextMenuViewModel;
-        _lists.PropertyChanged += ListsOnPropertyChanged;
+        _playlistQueueState.PropertyChanged += PlaylistQueueStateOnPropertyChanged;
     }
 
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
         RegisterMessage<PlaylistCreatedMessage>(OnPlaylistCreatedMessage);
         RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
+        RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
 
-        var defaultTab = new PlaylistTabItem("Default", null, _lists.DefaultPlaylist);
+        var defaultTab = new PlaylistTabItem("Default", null, _playlistQueueState.DefaultPlaylist);
         Tabs = [defaultTab];
         SelectedTab = defaultTab;
         await RefreshAvailablePlaylistsAsync(ct);
@@ -120,13 +132,13 @@ public partial class PlaylistPaneViewModel :
         }
 
         var wasSelected = ReferenceEquals(SelectedTab, tab);
-        var wasActiveSource = _lists.ActiveNamedPlaylistId == tab.PlaylistId;
-
+        var wasActiveSource = _playlistQueueState.ActiveNamedPlaylistId == tab.PlaylistId;
         Tabs.Remove(tab);
 
         if (wasSelected)
         {
-            SelectedTab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ?? Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
+            SelectedTab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ??
+                          Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
         }
 
         if (!wasActiveSource)
@@ -134,13 +146,16 @@ public partial class PlaylistPaneViewModel :
             return;
         }
 
-        var canContinue = _lists.SwitchActiveQueueToDefaultPreservingCurrentSong();
+        var canContinue = _playlistQueueRoutingService.SwitchActiveQueueToDefaultPreservingCurrentSong();
         if (!canContinue)
         {
-            _lists.SwitchActiveQueueToDefaultAndStop();
+            _playlistQueueRoutingService.SwitchActiveQueueToDefaultAndStop();
         }
     }
 
+    /// <summary>
+    /// Removes selected songs from the active tab, or clears the tab when there is no explicit selection.
+    /// </summary>
     [RelayCommand]
     private async Task RemoveSelectedFromActiveTab()
     {
@@ -150,12 +165,16 @@ public partial class PlaylistPaneViewModel :
             return;
         }
 
-        var selectedSongs = GetSelectedSongsForContext();
+        var selectedSongs = _playlistSelectionService.ResolveSelectedSongs(
+            _selectedTabSongs,
+            tab.Songs,
+            SelectedSong);
+
         if (selectedSongs.Length == 0)
         {
             if (tab.IsDefaultTab)
             {
-                _lists.RemoveFromDefaultPlaylist(_lists.DefaultPlaylist.ToArray());
+                _defaultPlaylistService.RemoveFromDefaultPlaylist(_playlistQueueState.DefaultPlaylist.ToArray());
                 _selectedTabSongs.Clear();
                 return;
             }
@@ -177,7 +196,7 @@ public partial class PlaylistPaneViewModel :
 
         if (tab.IsDefaultTab)
         {
-            _lists.RemoveFromDefaultPlaylist(selectedSongs);
+            _defaultPlaylistService.RemoveFromDefaultPlaylist(selectedSongs);
             _selectedTabSongs.Clear();
             return;
         }
@@ -193,15 +212,36 @@ public partial class PlaylistPaneViewModel :
             tab.Songs.Remove(song);
         }
 
-        if (_lists.ActiveNamedPlaylistId == tab.PlaylistId)
+        if (_playlistQueueState.ActiveNamedPlaylistId == tab.PlaylistId)
         {
-            _lists.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
+            _playlistQueueRoutingService.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
         }
 
         _selectedTabSongs.Clear();
         await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
     }
 
+    [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
+    private Task JumpToSelectedSong()
+    {
+        return _playbackQueueActionsService.JumpToSelectedSongAsync();
+    }
+
+    [RelayCommand]
+    private void SetSelectedSongAsNext()
+    {
+        _playbackQueueActionsService.SetSelectedSongAsNext();
+    }
+
+    [RelayCommand]
+    private Task ScanSelectedSong()
+    {
+        return _playbackQueueActionsService.ScanSelectedSongAsync();
+    }
+
+    /// <summary>
+    /// Activates the selected tab as playback source and jumps to the currently selected song.
+    /// </summary>
     [RelayCommand]
     private async Task PlaySelectedFromActiveTab()
     {
@@ -213,45 +253,45 @@ public partial class PlaylistPaneViewModel :
 
         if (tab.IsDefaultTab)
         {
-            _lists.ActivateDefaultPlaylistQueue();
+            _playlistQueueRoutingService.ActivateDefaultPlaylistQueue();
         }
         else if (tab.PlaylistId is not null)
         {
-            _lists.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
+            _playlistQueueRoutingService.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
         }
 
-        var jumpIndex = IndexOfSongByPath(_lists.PlayList, SelectedSong.Path);
+        var jumpIndex = IndexOfSongByPath(_playlistQueueState.PlayList, SelectedSong.Path);
         if (jumpIndex < 0)
         {
             return;
         }
 
-        _lists.SelectedIndex = jumpIndex;
-        _lists.SelectedSong = _lists.PlayList[jumpIndex];
-        await _lists.JumpToSelectedSong();
+        _playlistQueueState.SelectedIndex = jumpIndex;
+        _playlistQueueState.SelectedSong = _playlistQueueState.PlayList[jumpIndex];
+        await _playbackQueueActionsService.JumpToSelectedSongAsync();
     }
 
     [RelayCommand]
     private void PlaylistSelectionAdded(IList items)
     {
-        foreach (var song in items.Cast<AudioModel>())
+        var songs = items.Cast<AudioModel>().ToArray();
+        foreach (var song in songs)
         {
             _selectedTabSongs.Add(song);
         }
 
-        _lists.AddSelectedPlaylistItems(items.Cast<AudioModel>());
         PublishSongContextSelectionChanged();
     }
 
     [RelayCommand]
     private void PlaylistSelectionRemoved(IList items)
     {
-        foreach (var song in items.Cast<AudioModel>())
+        var songs = items.Cast<AudioModel>().ToArray();
+        foreach (var song in songs)
         {
             _selectedTabSongs.Remove(song);
         }
 
-        _lists.RemoveSelectedPlaylistItems(items.Cast<AudioModel>());
         PublishSongContextSelectionChanged();
     }
 
@@ -293,13 +333,14 @@ public partial class PlaylistPaneViewModel :
             return;
         }
 
-        var wasActiveSource = _lists.ActiveNamedPlaylistId == notification.PlaylistId;
+        var wasActiveSource = _playlistQueueState.ActiveNamedPlaylistId == notification.PlaylistId;
         Tabs.Remove(tab);
-        SelectedTab ??= Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ?? Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
+        SelectedTab ??= Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ??
+                        Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
 
         if (wasActiveSource)
         {
-            _lists.SwitchActiveQueueToDefaultAndStop();
+            _playlistQueueRoutingService.SwitchActiveQueueToDefaultAndStop();
         }
     }
 
@@ -315,31 +356,34 @@ public partial class PlaylistPaneViewModel :
         tab.Songs.Clear();
         tab.Songs.AddRange(songs);
 
-        if (_lists.ActiveNamedPlaylistId == notification.PlaylistId)
+        if (_playlistQueueState.ActiveNamedPlaylistId == notification.PlaylistId)
         {
-            _lists.ActivateNamedPlaylistQueue(notification.PlaylistId, tab.Songs);
+            _playlistQueueRoutingService.ActivateNamedPlaylistQueue(notification.PlaylistId, tab.Songs);
         }
     }
 
     public Task Handle(PlaylistShuffledNotification notification, CancellationToken cancellationToken)
     {
+        _playlistQueueRoutingService.SyncDefaultPlaylistOrder();
+
         var tab = SelectedTab;
         if (tab is null ||
-            _lists.ActiveNamedPlaylistId != tab.PlaylistId ||
-            tab.IsDefaultTab)   // Already handled by ListsViewModel.SyncDefaultPlaylistOrder
+            _playlistQueueState.ActiveNamedPlaylistId != tab.PlaylistId ||
+            tab.IsDefaultTab)
         {
             return Task.CompletedTask;
         }
 
-        // Sync the named tab's Songs collection to match the shuffled _playList order
-        var target = _lists.PlayList;
+        var target = _playlistQueueState.PlayList;
         var songs = tab.Songs;
 
         for (int i = 0; i < target.Count; i++)
         {
             var currentPos = songs.IndexOf(target[i]);
             if (currentPos >= 0 && currentPos != i)
+            {
                 songs.Move(currentPos, i);
+            }
         }
 
         return Task.CompletedTask;
@@ -359,61 +403,8 @@ public partial class PlaylistPaneViewModel :
     public int? GetSongContextActivePlaylistId() =>
         SelectedTab is { IsDefaultTab: false } ? SelectedTab.PlaylistId : null;
 
-    private AudioModel[] GetSelectedSongsForContext()
-    {
-        var currentTabPaths = (SelectedTab?.Songs ?? Enumerable.Empty<AudioModel>())
-            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-            .Select(x => x.Path!)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        if (_selectedTabSongs.Count > 0)
-        {
-            var selectedSongs = _selectedTabSongs
-                .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-                .Where(x => currentTabPaths is null || currentTabPaths.Contains(x.Path!))
-                .Distinct()
-                .ToArray();
-
-            if (selectedSongs.Length > 0)
-            {
-                return selectedSongs;
-            }
-        }
-
-        if (SelectedSong is not null
-            && !string.IsNullOrWhiteSpace(SelectedSong.Path)
-            && (currentTabPaths is null || currentTabPaths.Contains(SelectedSong.Path)))
-        {
-            return new[] { SelectedSong };
-        }
-
-        return Array.Empty<AudioModel>();
-    }
-
-    private static int IndexOfSongByPath(IEnumerable<AudioModel> songs, string? path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return -1;
-        }
-
-        var index = 0;
-        foreach (var song in songs)
-        {
-            if (!string.IsNullOrWhiteSpace(song.Path)
-                && song.Path.Equals(path, StringComparison.OrdinalIgnoreCase))
-            {
-                return index;
-            }
-
-            index++;
-        }
-
-        return -1;
-    }
-
-    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
-        => _lists.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+    public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default) =>
+        _externalDropImportService.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
 
     public Task Handle(PlaylistViewModeChangedNotification notification, CancellationToken cancellationToken)
     {
@@ -421,16 +412,18 @@ public partial class PlaylistPaneViewModel :
         return Task.CompletedTask;
     }
 
-    private void ListsOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void PlaylistQueueStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ListsViewModel.SelectedSong))
+        if (e.PropertyName == nameof(IPlaylistQueueState.SelectedSong))
         {
             OnPropertyChanged(nameof(SelectedSong));
             PublishSongContextSelectionChanged();
+            JumpToSelectedSongCommand.NotifyCanExecuteChanged();
         }
-        else if (e.PropertyName == nameof(ListsViewModel.SelectedIndex))
+        else if (e.PropertyName == nameof(IPlaylistQueueState.SelectedIndex))
         {
             OnPropertyChanged(nameof(SelectedIndex));
+            JumpToSelectedSongCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -441,7 +434,6 @@ public partial class PlaylistPaneViewModel :
             return;
         }
 
-        _lists.RemoveSelectedPlaylistItems(_selectedTabSongs);
         _selectedTabSongs.Clear();
         PublishSongContextSelectionChanged();
     }
@@ -457,6 +449,11 @@ public partial class PlaylistPaneViewModel :
     {
         _ = ExecuteSafeAsync(ct =>
             Handle(new PlaylistMembershipChangedNotification(message.Value.PlaylistId), ct));
+    }
+
+    private void OnSearchResultsToPlaylistRequestedMessage(SearchResultsToPlaylistRequestedMessage message)
+    {
+        _defaultPlaylistService.AddSearchResultsToDefaultPlaylist(message.Value);
     }
 
     public sealed class PlaylistTabItem : ObservableObject
@@ -497,8 +494,35 @@ public partial class PlaylistPaneViewModel :
         return Task.CompletedTask;
     }
 
+    private static int IndexOfSongByPath(IEnumerable<AudioModel> songs, string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return -1;
+        }
+
+        var index = 0;
+        foreach (var song in songs)
+        {
+            if (!string.IsNullOrWhiteSpace(song.Path) &&
+                song.Path.Equals(path, StringComparison.OrdinalIgnoreCase))
+            {
+                return index;
+            }
+
+            index++;
+        }
+
+        return -1;
+    }
+
     private void PublishSongContextSelectionChanged()
     {
         Messenger.Send(new SongContextMenuSelectionChangedMessage(this));
+    }
+
+    private bool CanJumpToSelectedSong()
+    {
+        return _playbackQueueActionsService.CanJumpToSelectedSong();
     }
 }

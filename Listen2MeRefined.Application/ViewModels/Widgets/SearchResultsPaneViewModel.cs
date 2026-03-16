@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
@@ -16,7 +17,7 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class SearchResultsPaneViewModel : ViewModelBase
 {
-    private readonly ListsViewModel _lists;
+    private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IAppSettingsReader _settingsReader;
     private readonly ISearchResultsTransferService _searchResultsTransferService;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
@@ -30,12 +31,12 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        ListsViewModel lists,
+        IPlaylistQueueState playlistQueueState,
         IAppSettingsReader settingsReader,
         ISearchResultsTransferService searchResultsTransferService,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
-        _lists = lists;
+        _playlistQueueState = playlistQueueState;
         _settingsReader = settingsReader;
         _searchResultsTransferService = searchResultsTransferService;
         SongContextMenuViewModel = songContextMenuViewModel;
@@ -47,7 +48,6 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         RegisterMessage<QuickSearchExecutedMessage>(OnQuickSearchExecutedMessage);
         RegisterMessage<SearchResultsUpdatedMessage>(OnSearchResultsUpdatedMessage);
         
-        await _lists.EnsureInitializedAsync(cancellationToken);
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
         
@@ -122,7 +122,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
     public IReadOnlyCollection<AudioModel> GetFallbackSongContextSelection() => [];
 
-    public int? GetSongContextActivePlaylistId() => _lists.ActiveNamedPlaylistId;
+    public int? GetSongContextActivePlaylistId() => _playlistQueueState.ActiveNamedPlaylistId;
     
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
