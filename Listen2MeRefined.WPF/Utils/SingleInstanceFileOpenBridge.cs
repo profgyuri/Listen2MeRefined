@@ -1,11 +1,11 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Listen2MeRefined.Application.Notifications;
-using MediatR;
 using Serilog;
 
 namespace Listen2MeRefined.WPF.Utils;
@@ -19,7 +19,7 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
     private const int RetryDelayMs = 200;
 
     private readonly ILogger _logger;
-    private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
     private readonly Mutex _mutex;
     private readonly bool _isPrimaryInstance;
     private readonly CancellationTokenSource _shutdown = new();
@@ -28,10 +28,10 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
     /// Initializes single-instance coordination and starts pipe listening in the primary instance.
     /// </summary>
     /// <param name="logger">Logger used for bridge diagnostics.</param>
-    public SingleInstanceFileOpenBridge(ILogger logger, IMediator mediator)
+    public SingleInstanceFileOpenBridge(ILogger logger, IMessenger messenger)
     {
         _logger = logger;
-        _mediator = mediator;
+        _messenger = messenger;
         _mutex = new Mutex(true, MutexName, out var createdNew);
         _isPrimaryInstance = createdNew;
 
@@ -137,7 +137,7 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
                     "[SingleInstanceFileOpenBridge] Received {Count} forwarded path(s) from secondary instance",
                     paths.Length);
 
-                await _mediator.Publish(new ExternalAudioFilesOpenedNotification(paths), ct).ConfigureAwait(false);
+                _messenger.Send(new ExternalAudioFilesOpenedMessage(paths));
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {

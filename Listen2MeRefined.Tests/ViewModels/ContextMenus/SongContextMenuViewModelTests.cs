@@ -48,6 +48,7 @@ public class SongContextMenuViewModelTests
             messenger,
             queueState,
             CreateSettingsReader(),
+            Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
             songContextMenuVm);
 
@@ -100,6 +101,7 @@ public class SongContextMenuViewModelTests
             messenger,
             queueState,
             CreateSettingsReader(),
+            Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
             songContextMenuVm);
 

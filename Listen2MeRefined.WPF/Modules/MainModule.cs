@@ -39,9 +39,6 @@ public class MainModule : IModule
         services.AddTransient<PlaybackControlsViewModel>();
         services.AddTransient<PlaybackControlsView>();
         
-        services.AddTransient<ListsViewModel>();
-        services.AddTransient<MainTabsView>();
-        
         services.AddTransient<SongContextMenuViewModel>();
     }
 

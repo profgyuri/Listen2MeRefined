@@ -7,6 +7,7 @@ using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Application.ViewModels.Widgets;
+using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
@@ -33,6 +34,7 @@ public class SearchResultsPaneViewModelTests
             messenger,
             queueState,
             settingsReader.Object,
+            Mock.Of<IAudioSearchExecutionService>(),
             transferService.Object,
             contextMenu);
 
@@ -79,6 +81,7 @@ public class SearchResultsPaneViewModelTests
             messenger,
             queueState,
             CreateSettingsReader(SearchResultsTransferMode.Move).Object,
+            Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
             contextMenu);
 
@@ -93,6 +96,55 @@ public class SearchResultsPaneViewModelTests
         Assert.Single(vm.SearchResults);
         Assert.Same(replacement, vm.SearchResults[0]);
         Assert.Empty(vm.GetDirectSongContextSelection());
+    }
+
+    [Fact]
+    public async Task AdvancedSearchRequestedMessage_ExecutesAndPublishesUpdatedResultsAndCompletion()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueState = CreateQueueState();
+        var contextMenu = CreateSongContextMenuViewModel(logger.Object, messenger);
+        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
+        var vm = new SearchResultsPaneViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            messenger,
+            queueState,
+            CreateSettingsReader(SearchResultsTransferMode.Move).Object,
+            audioSearchExecutionService.Object,
+            Mock.Of<ISearchResultsTransferService>(),
+            contextMenu);
+        await vm.EnsureInitializedAsync();
+
+        var expected = new AudioModel { Title = "Result", Path = "result.mp3" };
+        SearchMatchMode? capturedMatchMode = null;
+        audioSearchExecutionService
+            .Setup(x => x.ExecuteAdvancedSearchAsync(It.IsAny<IEnumerable<AdvancedFilter>>(), It.IsAny<SearchMatchMode>()))
+            .Callback<IEnumerable<AdvancedFilter>, SearchMatchMode>((_, mode) => capturedMatchMode = mode)
+            .ReturnsAsync([expected]);
+
+        SearchResultsUpdatedMessage? updated = null;
+        AdvancedSearchCompletedMessage? completed = null;
+        var recipient = new object();
+        messenger.Register<object, SearchResultsUpdatedMessage>(recipient, (_, message) => updated = message);
+        messenger.Register<object, AdvancedSearchCompletedMessage>(recipient, (_, message) => completed = message);
+
+        messenger.Send(new AdvancedSearchRequestedMessage(new AdvancedSearchRequestedMessageData(
+            [new AdvancedFilter(nameof(AudioModel.Title), AdvancedFilterOperator.Contains, "rock")],
+            SearchMatchMode.Any)));
+
+        for (var i = 0; i < 20 && (updated is null || completed is null); i++)
+        {
+            await Task.Delay(25);
+        }
+
+        Assert.Equal(SearchMatchMode.Any, capturedMatchMode);
+        Assert.NotNull(updated);
+        Assert.Single(updated!.Value);
+        Assert.Same(expected, updated.Value[0]);
+        Assert.NotNull(completed);
+        Assert.Equal(1, completed!.Value);
     }
 
     private static PlaylistQueueState CreateQueueState() => new(new PlaylistQueue());

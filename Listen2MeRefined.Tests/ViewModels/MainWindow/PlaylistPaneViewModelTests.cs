@@ -5,7 +5,6 @@ using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
-using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
@@ -17,22 +16,21 @@ using Listen2MeRefined.Infrastructure.Playlist;
 using MediatR;
 using Moq;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Application.ViewModels.Widgets.ListsViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
 public class PlaylistPaneViewModelTests
 {
     [Fact]
-    public async Task CurrentSongNotification_PropagatesSelectedSongChangeToPlaylistPane()
+    public async Task CurrentSongChangedMessage_PropagatesSelectedSongChangeToPlaylistPane()
     {
         var logger = CreateLogger();
         var messenger = new WeakReferenceMessenger();
         var queueServices = CreateQueueServices(logger.Object);
-        var lists = CreateListsViewModel(logger.Object, messenger, queueServices);
         var pane = CreatePane(logger.Object, messenger, queueServices);
         var song = new AudioModel { Title = "Current", Path = "song.mp3" };
         queueServices.State.PlayList.Add(song);
+        await pane.InitializeAsync();
 
         var changed = false;
         pane.PropertyChanged += (_, e) =>
@@ -43,7 +41,7 @@ public class PlaylistPaneViewModelTests
             }
         };
 
-        await lists.Handle(new CurrentSongNotification(song), CancellationToken.None);
+        messenger.Send(new CurrentSongChangedMessage(song));
 
         Assert.True(changed);
         Assert.Same(song, pane.SelectedSong);
@@ -97,6 +95,8 @@ public class PlaylistPaneViewModelTests
             queueServices.DropImportService,
             new PlaylistSelectionService(),
             playlistLibrary.Object,
+            queueServices.PlaybackContextSyncService,
+            Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IMediator>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -133,6 +133,8 @@ public class PlaylistPaneViewModelTests
             queueServices.DropImportService,
             new PlaylistSelectionService(),
             playlistLibrary.Object,
+            queueServices.PlaybackContextSyncService,
+            Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IMediator>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -161,6 +163,36 @@ public class PlaylistPaneViewModelTests
     }
 
     [Fact]
+    public async Task ExternalAudioFilesOpenedMessage_ForwardsPathsToExternalAudioOpenService()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
+        var pane = CreatePane(logger.Object, messenger, queueServices, externalAudioOpenService.Object);
+        await pane.InitializeAsync();
+
+        var paths = new[] { "a.mp3", "b.mp3" };
+        messenger.Send(new ExternalAudioFilesOpenedMessage(paths));
+
+        for (var i = 0; i < 20; i++)
+        {
+            if (externalAudioOpenService.Invocations.Count > 0)
+            {
+                break;
+            }
+
+            await Task.Delay(25);
+        }
+
+        externalAudioOpenService.Verify(
+            x => x.OpenAsync(
+                It.Is<IReadOnlyList<string>>(value => value.SequenceEqual(paths)),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
     public async Task JumpToSelectedSongCommand_UsesCoordinatorSelectionAndJumps()
     {
         var logger = CreateLogger();
@@ -183,7 +215,11 @@ public class PlaylistPaneViewModelTests
         playerController.Verify(x => x.JumpToIndexAsync(1), Times.Once);
     }
 
-    private static PlaylistPaneViewModel CreatePane(ILogger logger, IMessenger messenger, QueueServices queueServices)
+    private static PlaylistPaneViewModel CreatePane(
+        ILogger logger,
+        IMessenger messenger,
+        QueueServices queueServices,
+        IExternalAudioOpenService? externalAudioOpenService = null)
     {
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
@@ -203,24 +239,11 @@ public class PlaylistPaneViewModelTests
             queueServices.DropImportService,
             new PlaylistSelectionService(),
             playlistLibrary.Object,
+            queueServices.PlaybackContextSyncService,
+            externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IMediator>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger, messenger));
-    }
-
-    private static ListsViewModel CreateListsViewModel(ILogger logger, IMessenger messenger, QueueServices queueServices)
-    {
-        return new ListsViewModel(
-            Mock.Of<IErrorHandler>(),
-            logger,
-            messenger,
-            Mock.Of<IMediator>(),
-            Mock.Of<IAudioSearchExecutionService>(),
-            queueServices.State,
-            queueServices.RoutingService,
-            queueServices.DropImportService,
-            queueServices.PlaybackContextSyncService,
-            Mock.Of<IExternalAudioOpenService>());
     }
 
     private static QueueServices CreateQueueServices(

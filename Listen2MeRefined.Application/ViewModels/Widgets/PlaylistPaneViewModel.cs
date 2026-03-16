@@ -35,6 +35,8 @@ public partial class PlaylistPaneViewModel :
     private readonly IPlaylistSelectionService _playlistSelectionService;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IPlaylistLibraryService _playlistLibraryService;
+    private readonly IPlaybackContextSyncService _playbackContextSyncService;
+    private readonly IExternalAudioOpenService _externalAudioOpenService;
     private readonly IMediator _mediator;
     private readonly HashSet<AudioModel> _selectedTabSongs = [];
 
@@ -70,6 +72,8 @@ public partial class PlaylistPaneViewModel :
         IExternalDropImportService externalDropImportService,
         IPlaylistSelectionService playlistSelectionService,
         IPlaylistLibraryService playlistLibraryService,
+        IPlaybackContextSyncService playbackContextSyncService,
+        IExternalAudioOpenService externalAudioOpenService,
         IMediator mediator,
         IAppSettingsReader settingsReader,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
@@ -82,6 +86,8 @@ public partial class PlaylistPaneViewModel :
         _playlistSelectionService = playlistSelectionService;
         _settingsReader = settingsReader;
         _playlistLibraryService = playlistLibraryService;
+        _playbackContextSyncService = playbackContextSyncService;
+        _externalAudioOpenService = externalAudioOpenService;
         _mediator = mediator;
         SongContextMenuViewModel = songContextMenuViewModel;
         _playlistQueueState.PropertyChanged += PlaylistQueueStateOnPropertyChanged;
@@ -92,6 +98,8 @@ public partial class PlaylistPaneViewModel :
         RegisterMessage<PlaylistCreatedMessage>(OnPlaylistCreatedMessage);
         RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
         RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
+        RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
+        RegisterMessage<ExternalAudioFilesOpenedMessage>(OnExternalAudioFilesOpenedMessage);
 
         var defaultTab = new PlaylistTabItem("Default", null, _playlistQueueState.DefaultPlaylist);
         Tabs = [defaultTab];
@@ -454,6 +462,21 @@ public partial class PlaylistPaneViewModel :
     private void OnSearchResultsToPlaylistRequestedMessage(SearchResultsToPlaylistRequestedMessage message)
     {
         _defaultPlaylistService.AddSearchResultsToDefaultPlaylist(message.Value);
+    }
+
+    private void OnCurrentSongChangedMessage(CurrentSongChangedMessage message)
+    {
+        Logger.Information("[PlaylistPaneViewModel] Current song changed to {@Audio}", message.Value);
+        _externalAudioOpenService.SetCurrentSong(message.Value);
+        _playbackContextSyncService.SetCurrentSong(message.Value);
+    }
+
+    private void OnExternalAudioFilesOpenedMessage(ExternalAudioFilesOpenedMessage message)
+    {
+        Logger.Information(
+            "[PlaylistPaneViewModel] Handling {Count} shell-opened audio file(s)",
+            message.Value.Count);
+        _ = ExecuteSafeAsync(ct => _externalAudioOpenService.OpenAsync(message.Value, ct));
     }
 
     public sealed class PlaylistTabItem : ObservableObject

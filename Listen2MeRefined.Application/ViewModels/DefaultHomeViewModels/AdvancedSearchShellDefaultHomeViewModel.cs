@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
@@ -15,10 +16,8 @@ namespace Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 
 public partial class AdvancedSearchShellDefaultHomeViewModel : 
     ViewModelBase,
-    INotificationHandler<FontFamilyChangedNotification>,
-    INotificationHandler<AdvancedSearchCompletedNotification>
+    INotificationHandler<FontFamilyChangedNotification>
 {
-    private readonly IMediator _mediator;
     private readonly IUiDispatcher _ui;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
@@ -85,12 +84,10 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger, 
-        IMediator mediator, 
         IUiDispatcher ui, 
         IAdvancedSearchCriteriaService criteriaService, 
         IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
     {
-        _mediator = mediator;
         _ui = ui;
         _criteriaService = criteriaService;
         _settingsReader = settingsReader;
@@ -110,6 +107,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
             LastSearchResultCount = 0;
             HasSearchResults = false;
         }, ct);
+        RegisterMessage<AdvancedSearchCompletedMessage>(OnAdvancedSearchCompletedMessage);
 
         Logger.Debug("[AdvancedSearchViewModel] Finished InitializeCoreAsync");
     }
@@ -250,7 +248,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
             var filters = _criteriaService.BuildFilters(Criterias).ToList();
 
             Logger.Information("Starting advanced search with these filters: {@Filters}", filters);
-            await _mediator.Publish(new AdvancedSearchNotification(filters, MatchMode), ct);
+            Messenger.Send(new AdvancedSearchRequestedMessage(new AdvancedSearchRequestedMessageData(filters, MatchMode)));
 
             await _ui.InvokeAsync(() =>
             {
@@ -334,13 +332,12 @@ public partial class AdvancedSearchShellDefaultHomeViewModel :
         return Task.CompletedTask;
     }
 
-    public Task Handle(AdvancedSearchCompletedNotification notification, CancellationToken cancellationToken)
+    private void OnAdvancedSearchCompletedMessage(AdvancedSearchCompletedMessage message)
     {
-        LastSearchResultCount = notification.ResultCount;
-        HasSearchResults = notification.ResultCount > 0;
-        SearchStatusMessage = notification.ResultCount > 0
-            ? $"Found {notification.ResultCount} result(s)."
+        LastSearchResultCount = message.Value;
+        HasSearchResults = message.Value > 0;
+        SearchStatusMessage = message.Value > 0
+            ? $"Found {message.Value} result(s)."
             : "No matches found. Adjust filters and try again.";
-        return Task.CompletedTask;
     }
 }

@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
         xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
-        xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance shells:MainShellViewModel}"
         Style="{DynamicResource BasicWindow}"
@@ -39,32 +38,6 @@
                                  IsUpdateAvailableFeedbackVisible="False"/>
 
             <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>
-           <!-- <Grid Grid.Row="1" Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" MinHeight="150" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Grid Grid.ColumnSpan="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <widgets:TrackInfoView />
-                    <widgets:PlaybackControlsView Grid.Column="1" />
-                </Grid>
-
-                <widgets:MainTabsView DataContext="{Binding ListsViewModel}" Grid.Row="1" />
-
-                <widgets:PlaylistPaneView DataContext="{Binding PlaylistPaneViewModel}" Grid.Row="1" Grid.Column="1" />
-                <widgets:SearchBarView DataContext="{Binding SearchbarViewModel}" Grid.Row="2" Grid.ColumnSpan="2" />
-            </Grid>-->
         </Grid>
     </Border>
 </Window>

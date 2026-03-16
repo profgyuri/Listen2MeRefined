@@ -1,4 +1,5 @@
-﻿using Listen2MeRefined.Application.Notifications;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -7,7 +8,6 @@ using Dapper;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Dependency;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -51,8 +51,8 @@ public sealed partial class App : System.Windows.Application
 
             if (e.Args.Length > 0)
             {
-                var mediator = _host.Services.GetRequiredService<IMediator>();
-                await mediator.Publish(new ExternalAudioFilesOpenedNotification(e.Args));
+                var messenger = _host.Services.GetRequiredService<IMessenger>();
+                messenger.Send(new ExternalAudioFilesOpenedMessage(e.Args));
             }
         }
         catch (Exception ex)
@@ -71,7 +71,7 @@ public sealed partial class App : System.Windows.Application
     private bool ProcessFileOpenForwarding(StartupEventArgs e)
     {
         _singleInstanceFileOpenBridge = 
-            new SingleInstanceFileOpenBridge(Log.Logger, _host!.Services.GetRequiredService<IMediator>());
+            new SingleInstanceFileOpenBridge(Log.Logger, _host!.Services.GetRequiredService<IMessenger>());
         if (_singleInstanceFileOpenBridge.IsPrimaryInstance) return false;
         
         using var forwardTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));

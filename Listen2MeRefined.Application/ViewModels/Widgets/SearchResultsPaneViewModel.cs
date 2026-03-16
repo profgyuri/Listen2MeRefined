@@ -19,6 +19,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 {
     private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IAppSettingsReader _settingsReader;
+    private readonly IAudioSearchExecutionService _audioSearchExecutionService;
     private readonly ISearchResultsTransferService _searchResultsTransferService;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
     
@@ -33,11 +34,13 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         IMessenger messenger,
         IPlaylistQueueState playlistQueueState,
         IAppSettingsReader settingsReader,
+        IAudioSearchExecutionService audioSearchExecutionService,
         ISearchResultsTransferService searchResultsTransferService,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
         _playlistQueueState = playlistQueueState;
         _settingsReader = settingsReader;
+        _audioSearchExecutionService = audioSearchExecutionService;
         _searchResultsTransferService = searchResultsTransferService;
         SongContextMenuViewModel = songContextMenuViewModel;
     }
@@ -47,6 +50,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<QuickSearchExecutedMessage>(OnQuickSearchExecutedMessage);
         RegisterMessage<SearchResultsUpdatedMessage>(OnSearchResultsUpdatedMessage);
+        RegisterMessage<AdvancedSearchRequestedMessage>(OnAdvancedSearchRequestedMessage);
         
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
@@ -151,6 +155,33 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         var result = message.Value.ToArray();
         Logger.Information("[SearchResultsPaneViewModel] Received external search results with {Count} results", result.Length);
         ApplySearchResultsUpdate(result);
+    }
+
+    private void OnAdvancedSearchRequestedMessage(AdvancedSearchRequestedMessage message)
+    {
+        _ = ExecuteSafeAsync(async _ =>
+        {
+            var payload = message.Value;
+            Logger.Information(
+                "[SearchResultsPaneViewModel] Performing advanced search with {@Filters} filters (MatchMode: {MatchMode})",
+                payload.Filters,
+                payload.MatchMode);
+            var result = (
+                await _audioSearchExecutionService.ExecuteAdvancedSearchAsync(payload.Filters, payload.MatchMode))
+                .ToArray();
+
+            Logger.Information("[SearchResultsPaneViewModel] Advanced search returned {Count} results", result.Length);
+            if (result.Length > 0)
+            {
+                Logger.Verbose(
+                    "[SearchResultsPaneViewModel] First {Shown} results are: {@Results}",
+                    Math.Min(5, result.Length),
+                    result.Take(5));
+            }
+
+            Messenger.Send(new SearchResultsUpdatedMessage(result));
+            Messenger.Send(new AdvancedSearchCompletedMessage(result.Length));
+        });
     }
 
     /// <summary>
