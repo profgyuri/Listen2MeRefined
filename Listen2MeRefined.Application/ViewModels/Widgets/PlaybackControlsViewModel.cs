@@ -3,11 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
-using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
-using MediatR;
 using Serilog;
 using SkiaSharp;
 
@@ -18,24 +15,15 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     private const float VolumeEpsilon = 0.0001f;
     private const int DefaultWaveFormWidth = 480;
     private const int DefaultWaveFormHeight = 70;
-    private const int MinimumWaveFormWidth = 64;
-    private const int MinimumWaveFormHeight = 24;
-    private const int ResizeNoiseThreshold = 2;
-    private static readonly TimeSpan WaveformResizeDebounce = TimeSpan.FromMilliseconds(120);
 
     private readonly ILogger _logger;
-    private readonly IWaveFormDrawer<SKBitmap> _waveFormDrawer;
+    private readonly IWaveformRenderer _waveformRenderer;
+    private readonly IWaveformViewportPolicy _waveformViewportPolicy;
+    private readonly IWaveformResizeScheduler _waveformResizeScheduler;
+    private readonly IPlaybackVolumeSetter _playbackVolumeSetter;
     private readonly IMusicPlayerController _musicPlayerController;
-    private readonly IPlaybackDefaultsService _playbackDefaultsService;
     private readonly TimedTask _timedTask;
-    private readonly SemaphoreSlim _waveformRenderLock = new(1, 1);
-    private readonly Func<TimeSpan, CancellationToken, Task> _delayAsync;
-    private readonly TimeSpan _waveformResizeDebounce;
-    private float _lastNonZeroVolume = 0.7f;
-    private int _waveformResizeRequestId;
     private string? _currentTrackPath;
-    private CancellationTokenSource? _waveformResizeCts;
-    private Task _pendingWaveformRedrawTask = Task.CompletedTask;
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
@@ -56,7 +44,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         }
     }
 
-    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds((double)TotalTime);
+    public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
     public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
     public float Volume
@@ -64,61 +52,43 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         get => _musicPlayerController.Volume;
         set
         {
-            var clampedValue = Math.Clamp(value, 0f, 1f);
-            var previousVolume = _musicPlayerController.Volume;
-            if (Math.Abs(previousVolume - clampedValue) < VolumeEpsilon)
+            var previousMutedState = IsMuted;
+            var change = _playbackVolumeSetter.SetVolume(value);
+            if (!change.HasVolumeChanged)
             {
                 return;
             }
 
-            _musicPlayerController.Volume = clampedValue;
-            if (clampedValue > VolumeEpsilon)
+            if (previousMutedState != change.IsMuted)
             {
-                _lastNonZeroVolume = clampedValue;
+                SetMuted(change.IsMuted);
             }
 
-            if (IsMuted && clampedValue > VolumeEpsilon)
-            {
-                SetMuted(false);
-            }
-            else if (!IsMuted && clampedValue <= VolumeEpsilon)
-            {
-                SetMuted(true);
-            }
-
-            _playbackDefaultsService.PersistPlaybackDefaults(clampedValue, IsMuted);
             OnPropertyChanged();
             OnPropertyChanged(nameof(VolumeIconKind));
         }
     }
 
-    public string VolumeIconKind =>
-        IsMuted || Volume <= VolumeEpsilon
-            ? "VolumeOff"
-            : Volume < 0.34f
-                ? "VolumeLow"
-                : Volume < 0.67f
-                    ? "VolumeMedium"
-                    : "VolumeHigh";
+    public string VolumeIconKind => _playbackVolumeSetter.GetVolumeIconKind();
 
     public PlaybackControlsViewModel(
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        IWaveFormDrawer<SKBitmap> waveFormDrawer,
+        IWaveformRenderer waveformRenderer,
+        IWaveformViewportPolicy waveformViewportPolicy,
+        IWaveformResizeScheduler waveformResizeScheduler,
+        IPlaybackVolumeSetter playbackVolumeSetter,
         IMusicPlayerController musicPlayerController,
-        IPlaybackDefaultsService playbackDefaultsService,
-        TimedTask timedTask,
-        Func<TimeSpan, CancellationToken, Task>? delayAsync = null,
-        TimeSpan? waveformResizeDebounce = null) : base(errorHandler, logger, messenger)
+        TimedTask timedTask) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
-        _waveFormDrawer = waveFormDrawer;
+        _waveformRenderer = waveformRenderer;
+        _waveformViewportPolicy = waveformViewportPolicy;
+        _waveformResizeScheduler = waveformResizeScheduler;
+        _playbackVolumeSetter = playbackVolumeSetter;
         _musicPlayerController = musicPlayerController;
-        _playbackDefaultsService = playbackDefaultsService;
         _timedTask = timedTask;
-        _delayAsync = delayAsync ?? Task.Delay;
-        _waveformResizeDebounce = waveformResizeDebounce ?? WaveformResizeDebounce;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
     }
@@ -141,10 +111,6 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
 
         OnPropertyChanged(nameof(Volume));
         SetMuted(Volume <= VolumeEpsilon);
-        if (Volume > VolumeEpsilon)
-        {
-            _lastNonZeroVolume = Volume;
-        }
 
         OnPropertyChanged(nameof(VolumeIconKind));
         OnPropertyChanged(nameof(IsMuted));
@@ -156,7 +122,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
             WaveFormHeight = DefaultWaveFormHeight;
         }
 
-        _waveFormDrawer.SetSize(WaveFormWidth, WaveFormHeight);
+        _waveformRenderer.SetSize(WaveFormWidth, WaveFormHeight);
         if (string.IsNullOrWhiteSpace(_currentTrackPath))
         {
             await DrawPlaceholderLineAsync(ct);
@@ -169,28 +135,33 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
     }
 
+    /// <summary>
+    /// Updates the waveform viewport dimensions and schedules a redraw when the change is meaningful.
+    /// </summary>
+    /// <param name="availableWidth">The available viewport width.</param>
+    /// <param name="availableHeight">The available viewport height.</param>
     public void UpdateWaveformViewport(double availableWidth, double availableHeight)
     {
-        var normalizedViewport = NormalizeViewport(availableWidth, availableHeight);
+        var normalizedViewport = _waveformViewportPolicy.TryNormalizeViewport(availableWidth, availableHeight);
         if (normalizedViewport is null)
         {
             return;
         }
 
         var (width, height) = normalizedViewport.Value;
-        if (HasNoMeaningfulViewportChange(width, height))
+        if (!_waveformViewportPolicy.HasMeaningfulChange(WaveFormWidth, WaveFormHeight, width, height))
         {
             return;
         }
 
         WaveFormWidth = width;
         WaveFormHeight = height;
-        _waveFormDrawer.SetSize(width, height);
+        _waveformRenderer.SetSize(width, height);
 
         ScheduleWaveformRedraw();
     }
 
-    public Task WaitForPendingWaveformRedrawAsync() => _pendingWaveformRedrawTask;
+    public Task WaitForPendingWaveformRedrawAsync() => _waveformResizeScheduler.PendingTask;
 
     [RelayCommand]
     private async Task PlayPause()
@@ -230,74 +201,21 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     [RelayCommand]
     private void ToggleMute()
     {
-        if (IsMuted)
-        {
-            var restoredVolume = _lastNonZeroVolume > VolumeEpsilon ? _lastNonZeroVolume : 0.7f;
-            _musicPlayerController.Volume = restoredVolume;
-            SetMuted(false);
-            _playbackDefaultsService.PersistPlaybackDefaults(restoredVolume, isMuted: false);
-            OnPropertyChanged(nameof(Volume));
-            OnPropertyChanged(nameof(VolumeIconKind));
-            return;
-        }
-
-        var currentVolume = Volume;
-        if (currentVolume > VolumeEpsilon)
-        {
-            _lastNonZeroVolume = currentVolume;
-        }
-
-        _musicPlayerController.Volume = 0f;
-        SetMuted(true);
-        _playbackDefaultsService.PersistPlaybackDefaults(0f, isMuted: true);
+        var change = _playbackVolumeSetter.ToggleMute();
+        SetMuted(change.IsMuted);
         OnPropertyChanged(nameof(Volume));
         OnPropertyChanged(nameof(VolumeIconKind));
     }
 
-    private static (int Width, int Height)? NormalizeViewport(double availableWidth, double availableHeight)
-    {
-        if (double.IsNaN(availableWidth) || double.IsInfinity(availableWidth) || availableWidth <= 0)
-        {
-            return null;
-        }
-
-        if (double.IsNaN(availableHeight) || double.IsInfinity(availableHeight) || availableHeight <= 0)
-        {
-            return null;
-        }
-
-        var width = Math.Max(MinimumWaveFormWidth, (int)Math.Round(availableWidth));
-        var height = Math.Max(MinimumWaveFormHeight, (int)Math.Round(availableHeight));
-        return (width, height);
-    }
-
-    private bool HasNoMeaningfulViewportChange(int width, int height)
-    {
-        return Math.Abs(WaveFormWidth - width) <= ResizeNoiseThreshold
-            && Math.Abs(WaveFormHeight - height) <= ResizeNoiseThreshold;
-    }
-
     private void ScheduleWaveformRedraw()
     {
-        var cancellationTokenSource = new CancellationTokenSource();
-        var previous = Interlocked.Exchange(ref _waveformResizeCts, cancellationTokenSource);
-        previous?.Cancel();
-        previous?.Dispose();
-
-        var requestId = Interlocked.Increment(ref _waveformResizeRequestId);
-        _pendingWaveformRedrawTask = RedrawWaveformAfterDebounceAsync(requestId, cancellationTokenSource.Token);
+        _ = _waveformResizeScheduler.ScheduleResizeAsync(RedrawWaveformAsync);
     }
 
-    private async Task RedrawWaveformAfterDebounceAsync(int requestId, CancellationToken cancellationToken)
+    private async Task RedrawWaveformAsync(CancellationToken cancellationToken)
     {
         try
         {
-            await _delayAsync(_waveformResizeDebounce, cancellationToken);
-            if (requestId != _waveformResizeRequestId || cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
-
             var trackPath = _currentTrackPath;
             if (string.IsNullOrWhiteSpace(trackPath))
             {
@@ -319,28 +237,12 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
 
     private async Task DrawPlaceholderLineAsync(CancellationToken cancellationToken = default)
     {
-        await _waveformRenderLock.WaitAsync(cancellationToken);
-        try
-        {
-            WaveForm = await _waveFormDrawer.LineAsync();
-        }
-        finally
-        {
-            _waveformRenderLock.Release();
-        }
+        WaveForm = await _waveformRenderer.DrawPlaceholderAsync(cancellationToken);
     }
 
     private async Task DrawTrackWaveFormAsync(string trackPath, CancellationToken cancellationToken = default)
     {
-        await _waveformRenderLock.WaitAsync(cancellationToken);
-        try
-        {
-            WaveForm = await _waveFormDrawer.WaveFormAsync(trackPath);
-        }
-        finally
-        {
-            _waveformRenderLock.Release();
-        }
+        WaveForm = await _waveformRenderer.DrawTrackAsync(trackPath, cancellationToken);
     }
 
     private void SetMuted(bool isMuted)
@@ -356,19 +258,13 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
 
     private void ApplyStartupPlaybackDefaults()
     {
-        var (startupVolume, startsMuted) = _playbackDefaultsService.LoadStartupDefaults();
-        if (startupVolume > VolumeEpsilon)
-        {
-            _lastNonZeroVolume = startupVolume;
-        }
-
-        _musicPlayerController.Volume = startsMuted ? 0f : startupVolume;
-        SetMuted(startsMuted || startupVolume <= VolumeEpsilon);
+        var state = _playbackVolumeSetter.ApplyStartupDefaults();
+        SetMuted(state.IsMuted);
     }
     
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
-        Logger.Debug("[PlayerControlsViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
+        _logger.Debug("[PlayerControlsViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
         FontFamilyName = message.Value;
     }
 
@@ -400,7 +296,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
 
     private void OnAppThemeChangedMessage(AppThemeChangedMessage message)
     {
-        Logger.Debug("[PlayerControlsViewModel] Received AppThemeChangedMessage");
+        _logger.Debug("[PlayerControlsViewModel] Received AppThemeChangedMessage");
         ScheduleWaveformRedraw();
     }
 }
