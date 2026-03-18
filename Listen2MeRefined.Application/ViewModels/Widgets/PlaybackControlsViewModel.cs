@@ -166,45 +166,67 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     [RelayCommand]
     private async Task PlayPause()
     {
-        _logger.Debug("[PlayerControlsViewModel] Toggling play/pause");
-        await _musicPlayerController.PlayPauseAsync();
+        await ExecuteSafeAsync(async _ =>
+        {
+            _logger.Debug("[PlayerControlsViewModel] Toggling play/pause");
+            await _musicPlayerController.PlayPauseAsync();
+        });
     }
 
     [RelayCommand]
-    private void Stop()
+    private async Task Stop()
     {
-        _logger.Debug("[PlayerControlsViewModel] Stopping playback");
-        _musicPlayerController.Stop();
+        await ExecuteSafeAsync(_ =>
+        {
+            _logger.Debug("[PlayerControlsViewModel] Stopping playback");
+            _musicPlayerController.Stop();
+            
+            return Task.CompletedTask;
+        });
     }
 
     [RelayCommand]
     private async Task Next()
     {
-        _logger.Debug("[PlayerControlsViewModel] Skipping to next track");
-        await _musicPlayerController.NextAsync();
+        await ExecuteSafeAsync(async _ =>
+        {
+            _logger.Debug("[PlayerControlsViewModel] Skipping to next track");
+            await _musicPlayerController.NextAsync();
+        });
     }
 
     [RelayCommand]
     private async Task Previous()
     {
-        _logger.Debug("[PlayerControlsViewModel] Skipping to previous track");
-        await _musicPlayerController.PreviousAsync();
+        await ExecuteSafeAsync(async _ =>
+        {
+            _logger.Debug("[PlayerControlsViewModel] Skipping to previous track");
+            await _musicPlayerController.PreviousAsync();
+        });
     }
 
     [RelayCommand]
     private async Task Shuffle()
     {
-        _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
-        await _musicPlayerController.Shuffle();
+        await ExecuteSafeAsync(async _ =>
+        {
+            _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
+            await _musicPlayerController.Shuffle();
+        });
     }
 
     [RelayCommand]
-    private void ToggleMute()
+    private async Task ToggleMute()
     {
-        var change = _playbackVolumeSetter.ToggleMute();
-        SetMuted(change.IsMuted);
-        OnPropertyChanged(nameof(Volume));
-        OnPropertyChanged(nameof(VolumeIconKind));
+        await ExecuteSafeAsync(_ =>
+        {
+            var change = _playbackVolumeSetter.ToggleMute();
+            SetMuted(change.IsMuted);
+            OnPropertyChanged(nameof(Volume));
+            OnPropertyChanged(nameof(VolumeIconKind));
+            
+            return Task.CompletedTask;
+        });
     }
 
     private void ScheduleWaveformRedraw()
