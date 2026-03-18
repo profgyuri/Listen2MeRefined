@@ -15,6 +15,7 @@ public class SettingsModule : IModule
     
     public void RegisterServices(IServiceCollection services)
     {
+        services.AddSingleton<ISettingsShellNavigationProvider, SettingsShellNavigationProvider>();
         services.AddSingleton<SettingsShellViewModel>();
         services.AddSingleton<SettingsShell>();
 

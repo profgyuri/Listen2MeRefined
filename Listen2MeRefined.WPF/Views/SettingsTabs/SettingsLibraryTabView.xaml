@@ -3,13 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.SettingsTabs"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance settingsTabs:SettingsLibraryTabViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        
+    <Grid Margin="12,0,0,0">
+        <Border Style="{DynamicResource DarkBorderContainer}">
+            <StackPanel>
+                <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Library" />
+                <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
+                           Text="Library settings content will be migrated in stage 4." />
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

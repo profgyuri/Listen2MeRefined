@@ -31,6 +31,21 @@
             <DataTemplate DataType="{x:Type settingsTabs:SettingsGeneralTabViewModel}">
                 <settingsTabs1:SettingsGeneralTabView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsPlaybackTabViewModel}">
+                <settingsTabs1:SettingsPlaybackTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsLibraryTabViewModel}">
+                <settingsTabs1:SettingsLibraryTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsPlaylistsTabViewModel}">
+                <settingsTabs1:SettingsPlaylistsTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsHooksAndAlertsTabViewModel}">
+                <settingsTabs1:SettingsHooksAndAlertsTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsAdvancedTabViewModel}">
+                <settingsTabs1:SettingsAdvancedTabView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type defaultHomeViewModels:AdvancedSearchShellDefaultHomeViewModel}">
                 <defaultHomeViews:AdvancedSearchShellDefaultHomeView/>
             </DataTemplate>

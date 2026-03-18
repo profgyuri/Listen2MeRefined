@@ -32,6 +32,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Listen2MeRefined.Infrastructure\Listen2MeRefined.Infrastructure.csproj" />
+      <ProjectReference Include="..\Listen2MeRefined.WPF\Listen2MeRefined.WPF.csproj" />
     </ItemGroup>
 
 </Project>

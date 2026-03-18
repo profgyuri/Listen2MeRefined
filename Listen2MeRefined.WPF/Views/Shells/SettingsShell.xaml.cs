@@ -15,4 +15,9 @@ public partial class SettingsShell : Window
         InitializeComponent();
         DataContext = viewModel;
     }
+
+    private void CloseWindow(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }
