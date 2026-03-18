@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
@@ -12,11 +13,7 @@ using SkiaSharp;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class PlaybackControlsViewModel :
-    ViewModelBase,
-    INotificationHandler<CurrentSongNotification>,
-    INotificationHandler<AppThemeChangedNotification>,
-    IWaveformViewportAware
+public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewportAware
 {
     private const float VolumeEpsilon = 0.0001f;
     private const int DefaultWaveFormWidth = 480;
@@ -40,6 +37,7 @@ public partial class PlaybackControlsViewModel :
     private CancellationTokenSource? _waveformResizeCts;
     private Task _pendingWaveformRedrawTask = Task.CompletedTask;
 
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
     [ObservableProperty] private int _waveFormWidth;
     [ObservableProperty] private int _waveFormHeight;
@@ -127,6 +125,10 @@ public partial class PlaybackControlsViewModel :
 
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
+        RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
+        RegisterMessage<AppThemeChangedMessage>(OnAppThemeChangedMessage);
+        
         ApplyStartupPlaybackDefaults();
 
         _timedTask.Start(
@@ -341,40 +343,6 @@ public partial class PlaybackControlsViewModel :
         }
     }
 
-    public async Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
-    {
-        _logger.Information("[PlayerControlsViewModel] Received CurrentSongNotification: {@Audio}", notification.Audio);
-
-        try
-        {
-            ArePlaybackButtonsEnabled = false;
-            _currentTrackPath = notification.Audio.Path;
-            await DrawPlaceholderLineAsync(cancellationToken);
-
-            if (!string.IsNullOrWhiteSpace(_currentTrackPath))
-            {
-                await DrawTrackWaveFormAsync(_currentTrackPath, cancellationToken);
-            }
-
-            TotalTime = notification.Audio.Length.TotalMilliseconds;
-            OnPropertyChanged(nameof(TotalTimeDisplay));
-        }
-        catch (Exception e)
-        {
-            _logger.Error(e, "[PlayerControlsViewModel] Failed to draw waveform.");
-        }
-        finally
-        {
-            ArePlaybackButtonsEnabled = true;
-        }
-    }
-
-    public Task Handle(AppThemeChangedNotification notification, CancellationToken cancellationToken)
-    {
-        ScheduleWaveformRedraw();
-        return Task.CompletedTask;
-    }
-
     private void SetMuted(bool isMuted)
     {
         if (IsMuted == isMuted)
@@ -396,5 +364,43 @@ public partial class PlaybackControlsViewModel :
 
         _musicPlayerController.Volume = startsMuted ? 0f : startupVolume;
         SetMuted(startsMuted || startupVolume <= VolumeEpsilon);
+    }
+    
+    private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
+    {
+        Logger.Debug("[PlayerControlsViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
+        FontFamilyName = message.Value;
+    }
+
+    private async void OnCurrentSongChangedMessage(CurrentSongChangedMessage message)
+    {
+        try
+        {
+            ArePlaybackButtonsEnabled = false;
+            _currentTrackPath = message.Value.Path;
+            await DrawPlaceholderLineAsync();
+
+            if (!string.IsNullOrWhiteSpace(_currentTrackPath))
+            {
+                await DrawTrackWaveFormAsync(_currentTrackPath);
+            }
+
+            TotalTime = message.Value.Length.TotalMilliseconds;
+            OnPropertyChanged(nameof(TotalTimeDisplay));
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "[PlayerControlsViewModel] Failed to draw waveform.");
+        }
+        finally
+        {
+            ArePlaybackButtonsEnabled = true;
+        }
+    }
+
+    private void OnAppThemeChangedMessage(AppThemeChangedMessage message)
+    {
+        Logger.Debug("[PlayerControlsViewModel] Received AppThemeChangedMessage");
+        ScheduleWaveformRedraw();
     }
 }

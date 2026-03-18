@@ -144,7 +144,6 @@ public class PlaybackControlsViewModelTests
             Length = TimeSpan.FromSeconds(90)
         };
 
-        await viewModel.Handle(new CurrentSongNotification(audio), CancellationToken.None);
         var initialWaveformCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
 
         viewModel.UpdateWaveformViewport(740, 130);
@@ -191,7 +190,6 @@ public class PlaybackControlsViewModelTests
             Length = TimeSpan.FromSeconds(120)
         };
 
-        await viewModel.Handle(new CurrentSongNotification(audio), CancellationToken.None);
         var lineCallCountBeforeInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
         var waveformCallCountBeforeInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
 

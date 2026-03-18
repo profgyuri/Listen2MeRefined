@@ -4,14 +4,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance windows:MainWindowViewModel}"
+             d:DataContext="{d:DesignInstance widgets:PlaybackControlsViewModel}"
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
-             xmlns:windows="clr-namespace:Listen2MeRefined.Application.ViewModels.Windows;assembly=Listen2MeRefined.Application">
-    <Border DataContext="{Binding PlaybackControlsViewModel}"
-            Style="{DynamicResource BorderContainer}">
+             xmlns:widgets="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
+    <Border Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
