@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Navigation;
@@ -8,7 +9,7 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Shells;
 
-public sealed class MainShellViewModel : ShellViewModelBase
+public sealed partial class MainShellViewModel : ShellViewModelBase
 {
     private readonly NavigationOptions _navigationOptions;
     private readonly IWindowManager _windowManager;
@@ -37,5 +38,16 @@ public sealed class MainShellViewModel : ShellViewModelBase
             .ConfigureAwait(true);
         
         await base.InitializeAsync(cancellationToken);
+        
+        Logger.Debug("[MainShellViewModel] Finished InitializeAsync");
+    }
+
+    [RelayCommand]
+    private async Task OpenSettingsWindow()
+    {
+        await ExecuteSafeAsync(async ct =>
+        {
+            await _windowManager.ShowWindowAsync<SettingsShellViewModel>(WindowShowOptions.CenteredOnMainWindow(), ct);
+        });
     }
 }
