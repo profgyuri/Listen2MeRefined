@@ -1,5 +1,6 @@
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Settings;
 using Moq;
 

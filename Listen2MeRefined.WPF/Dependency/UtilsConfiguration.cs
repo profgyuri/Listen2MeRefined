@@ -11,6 +11,7 @@ using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
 using Listen2MeRefined.Infrastructure.FolderBrowser;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Playlist;
 using Listen2MeRefined.Infrastructure.Searching;

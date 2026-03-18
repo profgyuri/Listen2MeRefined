@@ -7,6 +7,7 @@ using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Widgets;
 using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
 using Listen2MeRefined.Infrastructure.Settings;
 using Moq;

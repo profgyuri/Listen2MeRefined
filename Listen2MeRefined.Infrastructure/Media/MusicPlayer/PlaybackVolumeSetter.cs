@@ -1,7 +1,7 @@
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
 
-namespace Listen2MeRefined.Infrastructure.Settings;
+namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 /// <summary>
 /// Applies playback volume and mute transitions and persists startup defaults.
