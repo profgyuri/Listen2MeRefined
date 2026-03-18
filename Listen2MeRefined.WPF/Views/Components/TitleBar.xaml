@@ -64,7 +64,7 @@
                              HorizontalAlignment="Right"
                              VerticalAlignment="Top"
                              Margin="0,6,6,0"
-                             Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                             Visibility="{Binding IsUpdateAvailableFeedbackVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </Grid>
 
                 <Button Command="{Binding EffectiveMinimizeCommand, ElementName=Root}"
