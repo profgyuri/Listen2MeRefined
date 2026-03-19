@@ -98,6 +98,8 @@ public partial class PlaylistPaneViewModel :
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<PlaylistViewModeChangedMessage>(OnPlaylistViewModeChangedMessage);
         RegisterMessage<PlaylistCreatedMessage>(OnPlaylistCreatedMessage);
+        RegisterMessage<PlaylistRenamedMessage>(OnPlaylistRenamedMessage);
+        RegisterMessage<PlaylistDeletedMessage>(OnPlaylistDeletedMessage);
         RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
         RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
@@ -454,6 +456,19 @@ public partial class PlaylistPaneViewModel :
         var payload = message.Value;
         _ = ExecuteSafeAsync(ct =>
             Handle(new PlaylistCreatedNotification(payload.PlaylistId, payload.Name), ct));
+    }
+
+    private void OnPlaylistRenamedMessage(PlaylistRenamedMessage message)
+    {
+        var payload = message.Value;
+        _ = ExecuteSafeAsync(ct =>
+            Handle(new PlaylistRenamedNotification(payload.PlaylistId, payload.Name), ct));
+    }
+
+    private void OnPlaylistDeletedMessage(PlaylistDeletedMessage message)
+    {
+        _ = ExecuteSafeAsync(ct =>
+            Handle(new PlaylistDeletedNotification(message.Value.PlaylistId), ct));
     }
 
     private void OnPlaylistMembershipChangedMessage(PlaylistMembershipChangedMessage message)

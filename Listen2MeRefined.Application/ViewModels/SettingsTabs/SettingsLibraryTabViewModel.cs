@@ -412,5 +412,6 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         FontFamilyName = message.Value;
+        Logger.Debug("[SettingsLibraryTabViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
     }
 }
