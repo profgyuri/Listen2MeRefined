@@ -95,6 +95,8 @@ public partial class PlaylistPaneViewModel :
 
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
+        RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        RegisterMessage<PlaylistViewModeChangedMessage>(OnPlaylistViewModeChangedMessage);
         RegisterMessage<PlaylistCreatedMessage>(OnPlaylistCreatedMessage);
         RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
         RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
@@ -105,6 +107,7 @@ public partial class PlaylistPaneViewModel :
         Tabs = [defaultTab];
         SelectedTab = defaultTab;
         await RefreshAvailablePlaylistsAsync(ct);
+        FontFamilyName = _settingsReader.GetFontFamily();
         IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(ct);
@@ -457,6 +460,16 @@ public partial class PlaylistPaneViewModel :
     {
         _ = ExecuteSafeAsync(ct =>
             Handle(new PlaylistMembershipChangedNotification(message.Value.PlaylistId), ct));
+    }
+
+    private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
+    {
+        FontFamilyName = message.Value;
+    }
+
+    private void OnPlaylistViewModeChangedMessage(PlaylistViewModeChangedMessage message)
+    {
+        IsCompactPlaylistView = message.Value;
     }
 
     private void OnSearchResultsToPlaylistRequestedMessage(SearchResultsToPlaylistRequestedMessage message)

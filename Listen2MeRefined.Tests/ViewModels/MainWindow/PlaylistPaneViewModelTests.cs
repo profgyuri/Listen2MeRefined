@@ -163,6 +163,22 @@ public class PlaylistPaneViewModelTests
     }
 
     [Fact]
+    public async Task PlaylistViewModeChangedMessage_UpdatesCompactViewMode()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+        await pane.InitializeAsync();
+
+        Assert.False(pane.IsCompactPlaylistView);
+
+        messenger.Send(new PlaylistViewModeChangedMessage(true));
+
+        Assert.True(pane.IsCompactPlaylistView);
+    }
+
+    [Fact]
     public async Task ExternalAudioFilesOpenedMessage_ForwardsPathsToExternalAudioOpenService()
     {
         var logger = CreateLogger();
