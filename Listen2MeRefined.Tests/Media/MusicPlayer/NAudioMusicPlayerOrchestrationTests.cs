@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
@@ -16,6 +17,58 @@ namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
 public class NAudioMusicPlayerOrchestrationTests
 {
+    [Fact]
+    public async Task AudioOutputDeviceChangedMessage_WhilePlaying_ReconfiguresAndResumesWithTimestamp()
+    {
+        var track = new AudioModel { Path = "message-device-track.mp3" };
+        using var stream = CreateWaveStream();
+
+        var queue = new Mock<IPlaybackQueueService>();
+        queue.Setup(x => x.GetCurrentTrack()).Returns(track);
+
+        var loader = new Mock<ITrackLoader>();
+        loader.Setup(x => x.Load(track)).Returns(TrackLoadResult.Success(stream));
+
+        var output = new Mock<IPlaybackOutput>();
+        output.SetupProperty(x => x.Volume, 1f);
+        output
+            .Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
+            .Returns(new PlaybackOutputReconfigureResult(true, false));
+
+        var timedTask = new TimedTask();
+        var messenger = new WeakReferenceMessenger();
+
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            Mock.Of<IMediator>(),
+            timedTask,
+            queue.Object,
+            loader.Object,
+            output.Object,
+            new PlaybackProgressMonitor(),
+            messenger);
+
+        await player.PlayPauseAsync();
+        player.CurrentTime = 1200;
+
+        messenger.Send(new AudioOutputDeviceChangedMessage(new AudioOutputDevice(7, "USB DAC")));
+
+        for (var i = 0; i < 20; i++)
+        {
+            if (output.Invocations.Any(x => x.Method.Name == nameof(IPlaybackOutput.Reinitialize) && (int)x.Arguments[1] == 7))
+            {
+                break;
+            }
+
+            await Task.Delay(25);
+        }
+
+        Assert.InRange(player.CurrentTime, 1199, 1201);
+        output.Verify(x => x.Reinitialize(It.IsAny<WaveStream>(), 7), Times.AtLeastOnce);
+        output.Verify(x => x.Play(), Times.Exactly(2));
+        await timedTask.StopAsync();
+    }
+
     [Fact]
     public async Task DeviceChangeWhilePlaying_ReconfiguresAndResumesWithTimestamp()
     {

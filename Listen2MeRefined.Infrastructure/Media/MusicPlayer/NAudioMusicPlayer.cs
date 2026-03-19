@@ -3,6 +3,7 @@ using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 
@@ -75,6 +76,9 @@ public sealed partial class NAudioMusicPlayer :
         _playbackOutput = playbackOutput;
         _playbackProgressMonitor = playbackProgressMonitor;
         _messenger = messenger;
+        _messenger.Register<NAudioMusicPlayer, AudioOutputDeviceChangedMessage>(
+            this,
+            static (recipient, message) => recipient.OnAudioOutputDeviceChangedMessage(message));
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), () => CheckPlaybackProgressAsync().GetAwaiter().GetResult());
         _logger.Debug("[NAudioMMusicPlayer] initialized");
@@ -213,13 +217,7 @@ public sealed partial class NAudioMusicPlayer :
     /// <param name="cancellationToken">Token that can cancel notification processing.</param>
     public async Task Handle(AudioOutputDeviceChangedNotification notification, CancellationToken cancellationToken)
     {
-        if (notification.Device.Index == _outputDeviceIndex)
-        {
-            return;
-        }
-
-        _outputDeviceIndex = notification.Device.Index;
-        await ReconfigureOutputAsync(_state == PlayerState.Playing, preservePosition: true);
+        await ApplyAudioOutputDeviceAsync(notification.Device);
     }
 
     private async Task StartPlaybackAsync()
@@ -350,5 +348,21 @@ public sealed partial class NAudioMusicPlayer :
     {
         _messenger.Send(new PlayerStateChangedMessage(newState));
         _state = newState;
+    }
+
+    private void OnAudioOutputDeviceChangedMessage(AudioOutputDeviceChangedMessage message)
+    {
+        _ = ApplyAudioOutputDeviceAsync(message.Value);
+    }
+
+    private async Task ApplyAudioOutputDeviceAsync(AudioOutputDevice device)
+    {
+        if (device.Index == _outputDeviceIndex)
+        {
+            return;
+        }
+
+        _outputDeviceIndex = device.Index;
+        await ReconfigureOutputAsync(_state == PlayerState.Playing, preservePosition: true);
     }
 }
