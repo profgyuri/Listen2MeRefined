@@ -3,17 +3,225 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
              mc:Ignorable="d"
+             FontFamily="{Binding FontFamilyName}"
              d:DataContext="{d:DesignInstance settingsTabs:SettingsLibraryTabViewModel}"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Margin="12,0,0,0">
-        <Border Style="{DynamicResource DarkBorderContainer}">
-            <StackPanel>
-                <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Library" />
-                <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
-                           Text="Library settings content will be migrated in stage 4." />
-            </StackPanel>
-        </Border>
-    </Grid>
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="12,0,0,0">
+            <Border Style="{DynamicResource DarkBorderContainer}">
+                <StackPanel>
+                    <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Library" />
+                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Folders and scan behavior for your local library." />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{DynamicResource DarkBorderContainer}" Margin="0,10,0,0">
+                <StackPanel>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ListView Grid.RowSpan="2"
+                                  Height="180"
+                                  Margin="0,0,10,0"
+                                  Style="{DynamicResource VirtualizedListView}"
+                                  ItemsSource="{Binding Folders}"
+                                  SelectedItem="{Binding SelectedFolder}"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               Foreground="{DynamicResource SecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis">
+                                        <TextBlock.ToolTip>
+                                            <ToolTip Visibility="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTextBlockVisibilityConverter}}"
+                                                     Content="{Binding}" />
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <Button Grid.Column="1"
+                                Style="{DynamicResource SettingsIconActionButton}"
+                                Command="{Binding OpenFolderBrowserCommand}"
+                                Content="{materialDesign:PackIcon Kind=FolderAddOutline, Size=18}"
+                                ToolTip="Browse and add folder"
+                                Margin="0,0,0,10" />
+                        <Button Grid.Row="1"
+                                Grid.Column="1"
+                                Style="{DynamicResource SettingsIconActionButton}"
+                                Command="{Binding RemoveFolderCommand}"
+                                IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
+                                Content="{materialDesign:PackIcon Kind=FolderRemoveOutline, Size=18}"
+                                ToolTip="Remove selected folder" />
+                    </Grid>
+
+                    <CheckBox IsChecked="{Binding SelectedFolderIncludeSubdirectories}"
+                              IsEnabled="{Binding SelectedFolder, Converter={StaticResource IsFolderSelectedConverter}}"
+                              Content="Scan selected folder recursively"
+                              Margin="0,0,0,6" />
+                    <CheckBox IsChecked="{Binding ScanOnStartup}" Content="Scan folders on startup" Margin="0,0,0,6" />
+                    <CheckBox IsChecked="{Binding AutoScanOnFolderAdd}" Content="Scan newly added folders immediately" Margin="0,0,0,10" />
+
+                    <Border Style="{DynamicResource BorderContainer}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
+                                       Text="Muted dropped-folder prompts (folder-specific)" />
+                            <ListView Height="100"
+                                      Margin="0,8,0,8"
+                                      Style="{DynamicResource VirtualizedListView}"
+                                      ItemsSource="{Binding MutedDroppedSongFolders}"
+                                      SelectedItem="{Binding SelectedMutedDroppedSongFolder}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}"
+                                                   Foreground="{StaticResource SecondaryBrush}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{DynamicResource SettingsActionButton}"
+                                        MinWidth="120"
+                                        Content="Remove Selected"
+                                        Command="{Binding RemoveMutedDroppedSongFolderCommand}" />
+                                <Button Style="{DynamicResource SettingsActionButton}"
+                                        MinWidth="120"
+                                        Margin="8,0,0,0"
+                                        Content="Reset All"
+                                        Command="{Binding ResetDroppedFolderPromptsCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Style="{DynamicResource SettingsActionButton}"
+                            HorizontalAlignment="Left"
+                            MinWidth="130"
+                            Content="Rescan Now"
+                            Command="{Binding ForceScanCommand}"
+                            ToolTip="Scan all configured folders now" />
+
+                    <Border Style="{DynamicResource DarkBorderContainer}"
+                            Margin="0,12,0,0">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
+                                       Text="Background task status in title bar" />
+                            <CheckBox Margin="0,8,0,0"
+                                      IsChecked="{Binding ShowTaskPercentage}"
+                                      Content="Show progress percentage" />
+                            <components:LabeledSliderRow Margin="0,8,0,0"
+                                                         Label="Percent step:"
+                                                         LabelWidth="170"
+                                                         SliderWidth="180"
+                                                         Minimum="1"
+                                                         Maximum="25"
+                                                         TickFrequency="1"
+                                                         IsSnapToTickEnabled="True"
+                                                         Value="{Binding TaskPercentageReportInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         ValueSuffix=" %" />
+
+                            <CheckBox Margin="0,10,0,0"
+                                      IsChecked="{Binding ShowScanMilestoneCount}"
+                                      Content="Show file-count milestones" />
+                            <components:FormFieldRow Margin="0,8,0,0"
+                                                     Label="Count basis:"
+                                                     LabelWidth="170">
+                                <components:FormFieldRow.FieldContent>
+                                    <ComboBox Style="{DynamicResource CustomComboBox}"
+                                              SelectedItem="{Binding SelectedScanMilestoneBasis}"
+                                              ItemsSource="{Binding ScanMilestoneBases}" />
+                                </components:FormFieldRow.FieldContent>
+                            </components:FormFieldRow>
+                            <components:LabeledSliderRow Margin="0,8,0,0"
+                                                         Label="Milestone every:"
+                                                         LabelWidth="170"
+                                                         SliderWidth="180"
+                                                         Minimum="5"
+                                                         Maximum="500"
+                                                         TickFrequency="5"
+                                                         IsSnapToTickEnabled="True"
+                                                         Value="{Binding ScanMilestoneInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                         ValueSuffix=" files"
+                                                         IsEnabled="{Binding ShowScanMilestoneCount}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{DynamicResource DarkBorderContainer}">
+                <StackPanel>
+                    <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Folder Browser Speed" />
+                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
+                               Margin="0,0,0,10"
+                               Text="Tune how quickly the folder browser returns to common locations." />
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Style="{DynamicResource SettingsFieldLabelText}" Text="Start location:" />
+                        <CheckBox Grid.Column="1"
+                                  IsChecked="{Binding FolderBrowserStartAtLastLocation}"
+                                  Content="Open browser at the last browsed folder when possible" />
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="120" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Style="{DynamicResource SettingsFieldLabelText}" Text="Pinned folders" />
+                        <ListView Grid.Row="1"
+                                  Height="120"
+                                  Margin="0,6,0,8"
+                                  Style="{DynamicResource VirtualizedListView}"
+                                  ItemsSource="{Binding PinnedFolders}"
+                                  SelectedItem="{Binding SelectedPinnedFolder}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               Foreground="{DynamicResource SecondaryBrush}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <Button Style="{DynamicResource SettingsActionButton}"
+                                    MinWidth="110"
+                                    Content="Remove Pin"
+                                    Command="{Binding RemovePinnedFolderCommand}" />
+                            <Button Style="{DynamicResource SettingsActionButton}"
+                                    MinWidth="130"
+                                    Margin="8,0,0,0"
+                                    Content="Clear Invalid Pins"
+                                    Command="{Binding ClearInvalidPinsCommand}" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>
