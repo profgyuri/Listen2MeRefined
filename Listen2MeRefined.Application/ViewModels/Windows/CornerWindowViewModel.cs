@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Models;
@@ -11,7 +12,6 @@ namespace Listen2MeRefined.Application.ViewModels.Windows;
 
 public sealed partial class CornerWindowViewModel :
     ViewModelBase,
-    INotificationHandler<NewSongWindowPositionChangedNotification>,
     INotificationHandler<CurrentSongNotification>,
     INotificationHandler<FontFamilyChangedNotification>
 {
@@ -44,6 +44,7 @@ public sealed partial class CornerWindowViewModel :
 
     public override Task InitializeAsync(CancellationToken ct = default)
     {
+        RegisterMessage<CornerWindowPositionChangedMessage>(OnCornerWindowPositionChangedMessage);
         IsTopmost = _windowPositionPolicyService.IsTopmost(_settingsReader.GetNewSongWindowPosition());
 
         Logger.Debug("[NewSongWindowViewModel] Finished InitializeCoreAsync");
@@ -51,12 +52,13 @@ public sealed partial class CornerWindowViewModel :
         return Task.CompletedTask;
     }
 
-    public Task Handle(NewSongWindowPositionChangedNotification notification, CancellationToken cancellationToken)
+    private void OnCornerWindowPositionChangedMessage(CornerWindowPositionChangedMessage message)
     {
-        Logger.Information("[NewSongWindowViewModel] Received NewSongWindowPositionChangedNotification: {Position}", notification.Position);
-        IsTopmost = _windowPositionPolicyService.IsTopmost(notification.Position);
+        Logger.Information(
+            "[CornerWindowViewModel] Received CornerWindowPositionChangedMessage: {Position}",
+            message.Value);
+        IsTopmost = _windowPositionPolicyService.IsTopmost(message.Value);
         OnPropertyChanged(nameof(IsTopmost));
-        return Task.CompletedTask;
     }
 
     public Task Handle(CurrentSongNotification notification, CancellationToken cancellationToken)
