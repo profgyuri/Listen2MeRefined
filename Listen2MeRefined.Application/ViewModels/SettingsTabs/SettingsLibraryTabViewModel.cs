@@ -5,8 +5,10 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Threading;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Repositories;
 using Serilog;
@@ -26,6 +28,7 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
     private readonly IFolderScanner _folderScanner;
     private readonly IPinnedFoldersService _pinnedFoldersService;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
+    private readonly IWindowManager _windowManager;
     private bool _isLoadingSettings;
     private bool _isUpdatingFolderSelection;
     private readonly Dictionary<string, bool> _folderRecursionByPath = new(StringComparer.OrdinalIgnoreCase);
@@ -71,7 +74,8 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
         IFromFolderRemover fromFolderRemover,
         IFolderScanner folderScanner,
         IPinnedFoldersService pinnedFoldersService,
-        IBackgroundTaskStatusService backgroundTaskStatusService) : base(errorHandler, logger, messenger)
+        IBackgroundTaskStatusService backgroundTaskStatusService,
+        IWindowManager windowManager) : base(errorHandler, logger, messenger)
     {
         _settingsReader = settingsReader;
         _settingsWriter = settingsWriter;
@@ -79,11 +83,14 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
         _folderScanner = folderScanner;
         _pinnedFoldersService = pinnedFoldersService;
         _backgroundTaskStatusService = backgroundTaskStatusService;
+        _windowManager = windowManager;
     }
 
     public override Task InitializeAsync(CancellationToken ct = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        RegisterMessage<FolderBrowserPathSelectedMessage>(OnFolderBrowserPathSelectedMessage);
+        RegisterMessage<PinnedFoldersChangedMessage>(OnPinnedFoldersChangedMessage);
         
         _isLoadingSettings = true;
         try
@@ -245,10 +252,12 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
 
     [RelayCommand]
     private Task OpenFolderBrowser() =>
-        ExecuteSafeAsync(_ =>
+        ExecuteSafeAsync(async ct =>
         {
-            Logger.Information("[SettingsLibraryTabViewModel] Open folder browser is not wired in shell stage yet.");
-            return Task.CompletedTask;
+            Logger.Information("[SettingsLibraryTabViewModel] Opening folder browser shell...");
+            await _windowManager.ShowWindowAsync<FolderBrowserShellViewModel>(
+                WindowShowOptions.CenteredOnMainWindow(),
+                ct);
         });
 
     [RelayCommand]
@@ -413,5 +422,40 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
     {
         FontFamilyName = message.Value;
         Logger.Debug("[SettingsLibraryTabViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
+    }
+
+    private void OnFolderBrowserPathSelectedMessage(FolderBrowserPathSelectedMessage message)
+    {
+        _ = ExecuteSafeAsync(
+            ct => HandleFolderBrowserPathSelectedAsync(message.Value, ct),
+            nameof(OnFolderBrowserPathSelectedMessage));
+    }
+
+    private void OnPinnedFoldersChangedMessage(PinnedFoldersChangedMessage message)
+    {
+        var normalizedPins = _pinnedFoldersService.Normalize(message.Value);
+        PinnedFolders = new ObservableCollection<string>(normalizedPins);
+    }
+
+    private async Task HandleFolderBrowserPathSelectedAsync(string path, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(path) || Folders.Contains(path))
+        {
+            return;
+        }
+
+        Logger.Information("[SettingsLibraryTabViewModel] Adding path to music folders: {Path}", path);
+        Folders.Add(path);
+        _folderRecursionByPath[path] = false;
+        PersistMusicFolders();
+
+        if (!AutoScanOnFolderAdd)
+        {
+            Logger.Information("[SettingsLibraryTabViewModel] Auto-scan on folder add is disabled.");
+            return;
+        }
+
+        Logger.Information("[SettingsLibraryTabViewModel] Scanning newly added folder: {Path}", path);
+        await _folderScanner.ScanAsync(path, ScanMode.Incremental, ct);
     }
 }

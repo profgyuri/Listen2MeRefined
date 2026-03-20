@@ -1,8 +1,11 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Folders;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Threading;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Application.ViewModels.SettingsTabs;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
@@ -33,7 +36,7 @@ public sealed class SettingsLibraryTabViewModelTests
             MutedDroppedSongFolders = [@"C:\Muted"]
         };
 
-        var (viewModel, _, _, _, _) = CreateViewModel(settings);
+        var (viewModel, _, _, _, _, _, _) = CreateViewModel(settings);
         await viewModel.InitializeAsync();
 
         Assert.Single(viewModel.Folders);
@@ -58,7 +61,7 @@ public sealed class SettingsLibraryTabViewModelTests
         {
             MusicFolders = [new MusicFolderModel(@"C:\Music", false)]
         };
-        var (viewModel, _, fromFolderRemover, _, _) = CreateViewModel(settings);
+        var (viewModel, _, fromFolderRemover, _, _, _, _) = CreateViewModel(settings);
         await viewModel.InitializeAsync();
 
         viewModel.SelectedFolder = @"C:\Music";
@@ -81,7 +84,7 @@ public sealed class SettingsLibraryTabViewModelTests
                 PinnedFolders = [validPath, @"Z:\Invalid\Missing"]
             };
 
-            var (viewModel, _, _, _, _) = CreateViewModel(settings);
+            var (viewModel, _, _, _, _, _, _) = CreateViewModel(settings);
             await viewModel.InitializeAsync();
             await viewModel.ClearInvalidPinsCommand.ExecuteAsync(null);
 
@@ -107,7 +110,7 @@ public sealed class SettingsLibraryTabViewModelTests
             ShowTaskPercentage = true
         };
 
-        var (viewModel, _, _, _, taskStatusService) = CreateViewModel(settings);
+        var (viewModel, _, _, _, taskStatusService, _, _) = CreateViewModel(settings);
         await viewModel.InitializeAsync();
 
         viewModel.ShowTaskPercentage = false;
@@ -120,7 +123,7 @@ public sealed class SettingsLibraryTabViewModelTests
     public async Task ForceScanCommand_WhenScannerThrows_UsesErrorHandler()
     {
         var settings = new AppSettings();
-        var (viewModel, errorHandler, _, folderScanner, _) = CreateViewModel(settings, throwOnScanAll: true);
+        var (viewModel, errorHandler, _, folderScanner, _, _, _) = CreateViewModel(settings, throwOnScanAll: true);
         await viewModel.InitializeAsync();
 
         await viewModel.ForceScanCommand.ExecuteAsync(null);
@@ -131,12 +134,68 @@ public sealed class SettingsLibraryTabViewModelTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task OpenFolderBrowserCommand_State_OpensFolderBrowserShellModal()
+    {
+        var settings = new AppSettings();
+        var (viewModel, _, _, _, _, windowManager, _) = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        await viewModel.OpenFolderBrowserCommand.ExecuteAsync(null);
+
+        windowManager.Verify(
+            x => x.ShowWindowAsync<FolderBrowserShellViewModel>(
+                It.IsAny<WindowShowOptions>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task FolderBrowserPathSelectedMessage_State_AddsFolderPersistsAndScans()
+    {
+        var settings = new AppSettings
+        {
+            AutoScanOnFolderAdd = true
+        };
+
+        var (viewModel, _, _, folderScanner, _, _, messenger) = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        messenger.Send(new FolderBrowserPathSelectedMessage(@"D:\FreshMusic"));
+        await Task.Delay(50);
+
+        Assert.Contains(@"D:\FreshMusic", viewModel.Folders);
+        Assert.Contains(settings.MusicFolders, x => x.FullPath == @"D:\FreshMusic");
+        folderScanner.Verify(
+            x => x.ScanAsync(@"D:\FreshMusic", ScanMode.Incremental, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task PinnedFoldersChangedMessage_State_UpdatesPinnedFolders()
+    {
+        var settings = new AppSettings
+        {
+            PinnedFolders = [@"C:\Before"]
+        };
+
+        var (viewModel, _, _, _, _, _, messenger) = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        messenger.Send(new PinnedFoldersChangedMessage([@"D:\After"]));
+
+        Assert.Single(viewModel.PinnedFolders);
+        Assert.Equal(@"D:\After", viewModel.PinnedFolders[0]);
+    }
+
     private static (
         SettingsLibraryTabViewModel ViewModel,
         Mock<IErrorHandler> ErrorHandler,
         Mock<IFromFolderRemover> FromFolderRemover,
         Mock<IFolderScanner> FolderScanner,
-        Mock<IBackgroundTaskStatusService> TaskStatusService) CreateViewModel(
+        Mock<IBackgroundTaskStatusService> TaskStatusService,
+        Mock<IWindowManager> WindowManager,
+        WeakReferenceMessenger Messenger) CreateViewModel(
             AppSettings settings,
             bool throwOnScanAll = false)
     {
@@ -158,6 +217,9 @@ public sealed class SettingsLibraryTabViewModelTests
             .Returns(Task.CompletedTask);
 
         var folderScanner = new Mock<IFolderScanner>();
+        folderScanner
+            .Setup(x => x.ScanAsync(It.IsAny<string>(), It.IsAny<ScanMode>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
         if (throwOnScanAll)
         {
             folderScanner
@@ -185,18 +247,26 @@ public sealed class SettingsLibraryTabViewModelTests
         logger
             .Setup(x => x.ForContext(It.IsAny<Type>()))
             .Returns(logger.Object);
+        var windowManager = new Mock<IWindowManager>();
+        windowManager
+            .Setup(x => x.ShowWindowAsync<FolderBrowserShellViewModel>(
+                It.IsAny<WindowShowOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((bool?)false);
+        var messenger = new WeakReferenceMessenger();
 
         var viewModel = new SettingsLibraryTabViewModel(
             errorHandler.Object,
             logger.Object,
-            new WeakReferenceMessenger(),
+            messenger,
             new AppSettingsReader(settingsManager.Object),
             new AppSettingsWriter(settingsManager.Object),
             fromFolderRemover.Object,
             folderScanner.Object,
             pinnedFoldersService,
-            taskStatusService.Object);
+            taskStatusService.Object,
+            windowManager.Object);
 
-        return (viewModel, errorHandler, fromFolderRemover, folderScanner, taskStatusService);
+        return (viewModel, errorHandler, fromFolderRemover, folderScanner, taskStatusService, windowManager, messenger);
     }
 }

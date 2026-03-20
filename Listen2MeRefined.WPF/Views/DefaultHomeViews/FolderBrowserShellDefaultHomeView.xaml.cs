@@ -7,5 +7,6 @@ public partial class FolderBrowserShellDefaultHomeView : UserControl
     public FolderBrowserShellDefaultHomeView()
     {
         InitializeComponent();
+        Loaded += (_, _) => FilterTextBox.Focus();
     }
 }

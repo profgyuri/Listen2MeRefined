@@ -17,7 +17,7 @@ public class FolderBrowserShellViewModel : ShellViewModelBase
     
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        await NavigationService.NavigateAsync("home", cancellationToken: cancellationToken).ConfigureAwait(true);
+        await NavigationService.NavigateAsync("folderBrowser/home", cancellationToken: cancellationToken).ConfigureAwait(true);
         
         await base.InitializeAsync(cancellationToken);
     }
