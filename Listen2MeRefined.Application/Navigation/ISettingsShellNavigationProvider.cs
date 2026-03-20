@@ -1,4 +1,6 @@
-namespace Listen2MeRefined.Application.ViewModels.Shells;
+using Listen2MeRefined.Application.ViewModels.Shells;
+
+namespace Listen2MeRefined.Application.Navigation;
 
 public interface ISettingsShellNavigationProvider
 {
