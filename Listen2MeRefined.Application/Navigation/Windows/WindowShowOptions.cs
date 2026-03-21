@@ -1,5 +1,14 @@
 namespace Listen2MeRefined.Application.Navigation.Windows;
 
+public enum WindowPositionAnchor
+{
+    Center,
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight
+}
+
 /// <summary>
 /// Carries the display configuration for a secondary window.
 /// </summary>
@@ -27,10 +36,14 @@ public sealed record WindowShowOptions(
         => new WindowShowOptions(Left: null, Top: null, IsModal: isModal) with { CentreOnMainWindow = true };
  
     /// <summary>
-    /// Positions the window centred on the given screen point.
+    /// Positions the window using the given anchor at the given screen point.
     /// </summary>
-    public static WindowShowOptions At(double left, double top, bool isModal = true)
-        => new(Left: left, Top: top, IsModal: isModal);
+    public static WindowShowOptions At(
+        double left,
+        double top,
+        bool isModal = true,
+        WindowPositionAnchor anchor = WindowPositionAnchor.Center)
+        => new WindowShowOptions(Left: left, Top: top, IsModal: isModal) with { Anchor = anchor };
  
     /// <summary>
     /// Shows a modeless window at the platform-default position.
@@ -41,4 +54,8 @@ public sealed record WindowShowOptions(
     // Internal flag used by the WPF implementation — callers use the factory
     // methods above rather than setting this directly.
     public bool CentreOnMainWindow { get; private init; }
+
+    // Internal flag used by the WPF implementation — callers use the factory
+    // methods above rather than setting this directly.
+    public WindowPositionAnchor Anchor { get; private init; } = WindowPositionAnchor.Center;
 }

@@ -3,7 +3,6 @@ using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
-using Listen2MeRefined.WPF.Views.DefaultHomeViews;
 using Listen2MeRefined.WPF.Views.Shells;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,11 +14,10 @@ public class CornerWindowModule : IModule
     
     public void RegisterServices(IServiceCollection services)
     {
-        services.AddSingleton<CornerWindowShellViewModel>();
-        services.AddSingleton<CornerWindowShell>();
+        services.AddTransient<CornerWindowShellViewModel>();
+        services.AddTransient<CornerWindowShell>();
 
         services.AddTransient<CornerShellDefaultHomeViewModel>();
-        services.AddTransient<CornerShellDefaultHomeView>();
     }
 
     public void RegisterNavigation(INavigationRegistry registry)

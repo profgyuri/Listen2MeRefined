@@ -3,12 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.Shells"
         xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance shells:CornerWindowShellViewModel}"
-        Title="CornerWindowShellView" Height="450" Width="800">
-    <Grid>
-        <ContentControl Content="{Binding CurrentViewModel}" />
-    </Grid>
+        Style="{DynamicResource BasicWindow}"
+        FontFamily="{Binding CurrentViewModel.FontFamilyName, Converter={StaticResource StringToFontFamily}}"
+        Topmost="{Binding CurrentViewModel.IsTopmost}"
+        ResizeMode="NoResize"
+        FontSize="15"
+        Title="Now Playing"
+        Height="260"
+        Width="560">
+    <ContentControl Content="{Binding CurrentViewModel}" />
 </Window>

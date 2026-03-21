@@ -23,7 +23,7 @@
                 <defaultHomeViews:MainShellDefaultHomeView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type defaultHomeViewModels:CornerShellDefaultHomeViewModel}">
-                <defaultHomeViews:CornerShellDefaultHomeView/>
+                <widgets:TrackInfoView DataContext="{Binding TrackInfoViewModel}" />
             </DataTemplate>
             <DataTemplate DataType="{x:Type defaultHomeViewModels:FolderBrowserShellDefaultHomeViewModel}">
                 <defaultHomeViews:FolderBrowserShellDefaultHomeView/>

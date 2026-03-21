@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Utils;
@@ -206,10 +207,45 @@ public sealed class WindowManager : IWindowManager
         {
             window.SourceInitialized += (_, _) =>
             {
-                window.Left = options.Left.Value - window.ActualWidth  / 2;
-                window.Top  = options.Top.Value  - window.ActualHeight / 2;
+                var anchorX = options.Left.Value;
+                var anchorY = options.Top.Value;
+                var anchorPoint = ConvertFromDevicePixels(window, anchorX, anchorY);
+                anchorX = anchorPoint.X;
+                anchorY = anchorPoint.Y;
+
+                switch (options.Anchor)
+                {
+                    case WindowPositionAnchor.TopLeft:
+                        window.Left = anchorX;
+                        window.Top = anchorY;
+                        break;
+                    case WindowPositionAnchor.TopRight:
+                        window.Left = anchorX - window.ActualWidth;
+                        window.Top = anchorY;
+                        break;
+                    case WindowPositionAnchor.BottomLeft:
+                        window.Left = anchorX;
+                        window.Top = anchorY - window.ActualHeight;
+                        break;
+                    case WindowPositionAnchor.BottomRight:
+                        window.Left = anchorX - window.ActualWidth;
+                        window.Top = anchorY - window.ActualHeight;
+                        break;
+                    case WindowPositionAnchor.Center:
+                    default:
+                        window.Left = anchorX - window.ActualWidth / 2;
+                        window.Top = anchorY - window.ActualHeight / 2;
+                        break;
+                }
             };
         }
+    }
+
+    private static System.Windows.Point ConvertFromDevicePixels(Window window, double deviceX, double deviceY)
+    {
+        var source = PresentationSource.FromVisual(window);
+        var transform = source?.CompositionTarget?.TransformFromDevice ?? Matrix.Identity;
+        return transform.Transform(new System.Windows.Point(deviceX, deviceY));
     }
 }
  

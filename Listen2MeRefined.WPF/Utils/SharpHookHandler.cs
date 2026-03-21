@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Listen2MeRefined.WPF.Views;
 using SharpHook;
 using SharpHook.Data;
 using System.Windows.Forms;
@@ -12,6 +11,8 @@ using Listen2MeRefined.Infrastructure.Settings;
 using Serilog;
 using IGlobalHook = Listen2MeRefined.Application.Utils.IGlobalHook;
 using Timer = System.Threading.Timer;
+using DrawingPoint = System.Drawing.Point;
+using DrawingRectangle = System.Drawing.Rectangle;
 
 namespace Listen2MeRefined.WPF.Utils;
 
@@ -39,14 +40,11 @@ internal sealed class SharpHookHandler : IGlobalHook
     private readonly IUiDispatcher _ui;
     private readonly Timer _mouseDebounceTimer;
     private readonly object _registrationGate = new();
-    private readonly int _width = Screen.PrimaryScreen!.Bounds.Width;
-    private readonly int _height = Screen.PrimaryScreen.Bounds.Height;
 
     private readonly SharpHook.IGlobalHook _hook;
     private bool _handlersAttached;
     private bool _runLoopStarted;
-    private Point _lastMousePosition;
-    private CornerWindow? _window;
+    private DrawingPoint _lastMousePosition;
 
     public SharpHookHandler(
         ILogger logger,
@@ -124,7 +122,7 @@ internal sealed class SharpHookHandler : IGlobalHook
         }
 
         var mouse = e.RawEvent.Mouse;
-        _lastMousePosition = new Point(mouse.X, mouse.Y);
+        _lastMousePosition = new DrawingPoint(mouse.X, mouse.Y);
         _mouseDebounceTimer.Change(GetDebounceIntervalMs(), Timeout.Infinite);
     }
 
@@ -137,19 +135,35 @@ internal sealed class SharpHookHandler : IGlobalHook
         }
 
         var pos = _lastMousePosition;
+        var screenBounds = Screen.FromPoint(pos).Bounds;
         var triggerSize = GetTriggerAreaSizePx();
-        if (IsMouseInCorner(pos.X, pos.Y, triggerSize))
+        if (IsMouseInCorner(pos.X, pos.Y, triggerSize, screenBounds))
         {
             _ui.InvokeAsync(() =>
             {
                 try
                 {
-                    var options = WindowShowOptions.At(pos.X, pos.Y);
-                    _windowManager.ShowWindowAsync<CornerWindowShellViewModel>(options);
+                    if (_windowManager.IsOpen<CornerWindowShellViewModel>())
+                    {
+                        return;
+                    }
+
+                    var anchor = ResolveCornerAnchor(pos.X, pos.Y, triggerSize, screenBounds);
+                    var (anchorX, anchorY) = ResolveCornerPoint(anchor, screenBounds);
+                    var options = WindowShowOptions.At(
+                        anchorX,
+                        anchorY,
+                        isModal: false,
+                        anchor: anchor);
+                    _ = _windowManager
+                        .ShowWindowAsync<CornerWindowShellViewModel>(options)
+                        .ContinueWith(
+                            task => _logger.Error(task.Exception, "Failed to show corner window"),
+                            TaskContinuationOptions.OnlyOnFaulted);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Failed to show new song window");
+                    _logger.Error(ex, "Failed to show corner window");
                 }
             });
             return;
@@ -183,9 +197,50 @@ internal sealed class SharpHookHandler : IGlobalHook
         }
     }
 
-    private bool IsMouseInCorner(int x, int y, int triggerAreaSize) =>
-        (x <= triggerAreaSize || x >= _width - triggerAreaSize) &&
-        (y <= triggerAreaSize || y >= _height - triggerAreaSize);
+    private static bool IsMouseInCorner(int x, int y, int triggerAreaSize, DrawingRectangle screenBounds)
+    {
+        var onLeftEdge = x <= screenBounds.Left + triggerAreaSize;
+        var onRightEdge = x >= screenBounds.Right - triggerAreaSize;
+        var onTopEdge = y <= screenBounds.Top + triggerAreaSize;
+        var onBottomEdge = y >= screenBounds.Bottom - triggerAreaSize;
+
+        return (onLeftEdge || onRightEdge) && (onTopEdge || onBottomEdge);
+    }
+
+    private static WindowPositionAnchor ResolveCornerAnchor(int x, int y, int triggerAreaSize, DrawingRectangle screenBounds)
+    {
+        var onLeftEdge = x <= screenBounds.Left + triggerAreaSize;
+        var onTopEdge = y <= screenBounds.Top + triggerAreaSize;
+
+        if (onLeftEdge && onTopEdge)
+        {
+            return WindowPositionAnchor.TopLeft;
+        }
+
+        if (!onLeftEdge && onTopEdge)
+        {
+            return WindowPositionAnchor.TopRight;
+        }
+
+        if (onLeftEdge)
+        {
+            return WindowPositionAnchor.BottomLeft;
+        }
+
+        return WindowPositionAnchor.BottomRight;
+    }
+
+    private static (double X, double Y) ResolveCornerPoint(WindowPositionAnchor anchor, DrawingRectangle screenBounds)
+    {
+        return anchor switch
+        {
+            WindowPositionAnchor.TopLeft => (screenBounds.Left, screenBounds.Top),
+            WindowPositionAnchor.TopRight => (screenBounds.Right, screenBounds.Top),
+            WindowPositionAnchor.BottomLeft => (screenBounds.Left, screenBounds.Bottom),
+            WindowPositionAnchor.BottomRight => (screenBounds.Right, screenBounds.Bottom),
+            _ => (screenBounds.Left, screenBounds.Top)
+        };
+    }
 
     private bool IsGlobalMediaKeysEnabled()
     {
@@ -211,7 +266,7 @@ internal sealed class SharpHookHandler : IGlobalHook
 
     private void HideNowPlayingWindow()
     {
-        System.Windows.Application.Current?.Dispatcher.BeginInvoke(() =>
+        _ui.InvokeAsync(() =>
         {
             try
             {
