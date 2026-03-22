@@ -8,7 +8,9 @@
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              xmlns:defaultHomeViews="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
              xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
-             xmlns:settingsTabs1="clr-namespace:Listen2MeRefined.WPF.Views.SettingsTabs">
+             xmlns:settingsTabs1="clr-namespace:Listen2MeRefined.WPF.Views.SettingsTabs"
+             xmlns:popupViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Popups;assembly=Listen2MeRefined.Application"
+             xmlns:popupViews="clr-namespace:Listen2MeRefined.WPF.Views.Popups">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -28,6 +30,8 @@
             <DataTemplate DataType="{x:Type defaultHomeViewModels:FolderBrowserShellDefaultHomeViewModel}">
                 <defaultHomeViews:FolderBrowserShellDefaultHomeView/>
             </DataTemplate>
+            
+            <!-- Settings -->
             <DataTemplate DataType="{x:Type settingsTabs:SettingsGeneralTabViewModel}">
                 <settingsTabs1:SettingsGeneralTabView/>
             </DataTemplate>
@@ -50,8 +54,12 @@
                 <defaultHomeViews:AdvancedSearchShellDefaultHomeView/>
             </DataTemplate>
             
+            <!-- Popups -->
+            <DataTemplate DataType="{x:Type popupViewModels:SongDroppedPopupViewModel}">
+                <popupViews:SongDroppedPopup/>
+            </DataTemplate>
+            
             <!-- Widgets -->
-
             <DataTemplate DataType="{x:Type widgetViewModels:PlaybackControlsViewModel}">
                 <widgets:PlaybackControlsView/>
             </DataTemplate>
