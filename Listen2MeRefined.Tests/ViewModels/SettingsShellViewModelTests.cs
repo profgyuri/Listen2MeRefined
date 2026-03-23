@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
+using Listen2MeRefined.Application.ViewModels.SettingsTabs;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Moq;
 using Serilog;
@@ -18,7 +19,7 @@ public sealed class SettingsShellViewModelTests
         await viewModel.InitializeAsync();
 
         navigationService.Verify(
-            x => x.NavigateAsync("settings/general", null, It.IsAny<CancellationToken>()),
+            x => x.NavigateAsync<SettingsGeneralTabViewModel>(It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -89,8 +90,7 @@ public sealed class SettingsShellViewModelTests
             logger.Object,
             Mock.Of<IMessenger>(),
             shellContextFactory.Object,
-            provider.Object,
-            Mock.Of<IWindowManager>());
+            provider.Object);
 
         return (viewModel, navigationService, navigationState, provider);
     }

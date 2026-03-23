@@ -21,6 +21,14 @@ public interface INavigationRegistry
     bool TryResolve(string route, out NavigationTarget? target);
 
     /// <summary>
+    /// Tries to resolve the route registered for a view model type.
+    /// </summary>
+    /// <typeparam name="TViewModel">The target view model type.</typeparam>
+    /// <param name="target">When this method returns, contains the navigation target when found.</param>
+    /// <returns><see langword="true"/> if a route mapping exists; otherwise, <see langword="false"/>.</returns>
+    bool TryResolve<TViewModel>(out NavigationTarget? target) where TViewModel : class;
+
+    /// <summary>
     /// Gets the currently registered route keys.
     /// </summary>
     IReadOnlyCollection<string> Routes { get; }

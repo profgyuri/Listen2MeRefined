@@ -5,13 +5,13 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Shells;
 
-public abstract class PopupShellViewModel : ShellViewModelBase
+public class PopupShellViewModel : ShellViewModelBase
 {
-    protected PopupShellViewModel(
+    public PopupShellViewModel(
         IErrorHandler errorHandler, 
         ILogger logger, 
         IMessenger messenger, 
-        ShellContext shellContext) : base(errorHandler, logger, messenger, shellContext)
+        IShellContextFactory context) : base(errorHandler, logger, messenger, context.Create())
     {
     }
 }

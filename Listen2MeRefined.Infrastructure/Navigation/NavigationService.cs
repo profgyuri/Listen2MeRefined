@@ -40,6 +40,18 @@ public sealed class NavigationService : INavigationService
     public bool CanNavigate(string route) => _registry.TryResolve(route, out _);
 
     /// <inheritdoc />
+    public Task NavigateAsync<TViewModel>(CancellationToken cancellationToken = default)
+        where TViewModel : class
+    {
+        if (!_registry.TryResolve<TViewModel>(out var target) || target is null)
+        {
+            throw new InvalidOperationException($"View model '{typeof(TViewModel).FullName}' is not registered.");
+        }
+
+        return NavigateCoreAsync(target, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task NavigateAsync(string route, object? parameter = null, CancellationToken cancellationToken = default)
     {
         if (!_registry.TryResolve(route, out var target) || target is null)
@@ -47,6 +59,11 @@ public sealed class NavigationService : INavigationService
             throw new InvalidOperationException($"Route '{route}' is not registered.");
         }
 
+        await NavigateCoreAsync(target, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task NavigateCoreAsync(NavigationTarget target, CancellationToken cancellationToken)
+    {
         try
         {
             var viewModel = _serviceProvider.GetRequiredService(target.ViewModelType);
@@ -60,8 +77,8 @@ public sealed class NavigationService : INavigationService
         }
         catch (Exception exception)
         {
-            var context = $"Navigation to route '{route}'";
-            _logger.Error(exception, "Navigation failed for route {Route}.", route);
+            var context = $"Navigation to route '{target.Route}'";
+            _logger.Error(exception, "Navigation failed for route {Route}.", target.Route);
             await _errorHandler.HandleAsync(exception, context, cancellationToken).ConfigureAwait(false);
             throw;
         }

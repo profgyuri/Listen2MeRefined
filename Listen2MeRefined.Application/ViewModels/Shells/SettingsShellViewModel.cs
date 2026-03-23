@@ -1,17 +1,15 @@
 using System.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
+using Listen2MeRefined.Application.ViewModels.SettingsTabs;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Shells;
 
 public class SettingsShellViewModel : ShellViewModelBase
 {
-    private readonly IWindowManager _windowManager;
-    
     public IReadOnlyList<SettingsShellNavigationItem> NavigationItems { get; }
 
     public SettingsShellViewModel(
@@ -19,10 +17,8 @@ public class SettingsShellViewModel : ShellViewModelBase
         ILogger logger, 
         IMessenger messenger, 
         IShellContextFactory context,
-        ISettingsShellNavigationProvider navigationProvider, 
-        IWindowManager windowManager) : base(errorHandler, logger, messenger, context.Create())
+        ISettingsShellNavigationProvider navigationProvider) : base(errorHandler, logger, messenger, context.Create())
     {
-        _windowManager = windowManager;
         NavigationItems = navigationProvider.CreateNavigationItems();
 
         PropertyChanged += OnPropertyChanged;
@@ -31,7 +27,7 @@ public class SettingsShellViewModel : ShellViewModelBase
     
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        await NavigationService.NavigateAsync("settings/general", cancellationToken: cancellationToken).ConfigureAwait(true);
+        await NavigationService.NavigateAsync<SettingsGeneralTabViewModel>(cancellationToken).ConfigureAwait(true);
         
         await base.InitializeAsync(cancellationToken);
     }

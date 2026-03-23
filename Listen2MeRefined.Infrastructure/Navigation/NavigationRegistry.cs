@@ -10,6 +10,7 @@ public sealed class NavigationRegistry : INavigationRegistry
 {
     private readonly ConcurrentDictionary<string, NavigationTarget> _routes =
         new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<Type, NavigationTarget> _routesByViewModel = new();
 
     /// <inheritdoc />
     public IReadOnlyCollection<string> Routes => _routes.Keys.ToArray();
@@ -28,6 +29,20 @@ public sealed class NavigationRegistry : INavigationRegistry
         {
             throw new InvalidOperationException($"Route '{normalizedRoute}' is already registered.");
         }
+
+        if (!_routesByViewModel.TryAdd(typeof(TViewModel), target))
+        {
+            _routes.TryRemove(normalizedRoute, out _);
+
+            if (_routesByViewModel.TryGetValue(typeof(TViewModel), out var existingTarget))
+            {
+                throw new InvalidOperationException(
+                    $"View model '{typeof(TViewModel).FullName}' is already registered to route '{existingTarget.Route}'.");
+            }
+
+            throw new InvalidOperationException(
+                $"View model '{typeof(TViewModel).FullName}' is already registered to a route.");
+        }
     }
 
     /// <inheritdoc />
@@ -41,4 +56,8 @@ public sealed class NavigationRegistry : INavigationRegistry
 
         return _routes.TryGetValue(route.Trim(), out target);
     }
+
+    /// <inheritdoc />
+    public bool TryResolve<TViewModel>(out NavigationTarget? target) where TViewModel : class =>
+        _routesByViewModel.TryGetValue(typeof(TViewModel), out target);
 }

@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Moq;
 using Serilog;
@@ -17,7 +18,7 @@ public sealed class CornerWindowShellViewModelTests
         await viewModel.InitializeAsync();
 
         navigationService.Verify(
-            x => x.NavigateAsync("corner/home", null, It.IsAny<CancellationToken>()),
+            x => x.NavigateAsync<CornerShellDefaultHomeViewModel>(It.IsAny<CancellationToken>()),
             Times.Once);
     }
 

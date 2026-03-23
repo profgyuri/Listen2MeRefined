@@ -6,6 +6,15 @@ namespace Listen2MeRefined.Application.Navigation;
 public interface INavigationService
 {
     /// <summary>
+    /// Navigates to the route registered for a view model type.
+    /// </summary>
+    /// <typeparam name="TViewModel">The target view model type.</typeparam>
+    /// <param name="cancellationToken">A token that can cancel navigation.</param>
+    /// <returns>A task representing the asynchronous navigation operation.</returns>
+    Task NavigateAsync<TViewModel>(CancellationToken cancellationToken = default)
+        where TViewModel : class;
+
+    /// <summary>
     /// Navigates to a route.
     /// </summary>
     /// <param name="route">The route key.</param>
