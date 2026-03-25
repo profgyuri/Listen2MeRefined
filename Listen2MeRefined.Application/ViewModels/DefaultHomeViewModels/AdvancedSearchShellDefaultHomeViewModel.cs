@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.ErrorHandling;
-using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
@@ -92,6 +91,9 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
     
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
+        RegisterMessage<AdvancedSearchCompletedMessage>(OnAdvancedSearchCompletedMessage);
+        RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        
         await _ui.InvokeAsync(() =>
         {
             Criterias.Clear();
@@ -104,11 +106,10 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             LastSearchResultCount = 0;
             HasSearchResults = false;
         }, ct);
-        RegisterMessage<AdvancedSearchCompletedMessage>(OnAdvancedSearchCompletedMessage);
 
         Logger.Debug("[AdvancedSearchViewModel] Finished InitializeCoreAsync");
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanAddCriteria))]
     private async Task AddCriteria()
     {
@@ -322,13 +323,6 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
         });
     }
 
-    public Task Handle(FontFamilyChangedNotification notification, CancellationToken cancellationToken)
-    {
-        Logger.Information("[AdvancedSearchViewModel] Received FontFamilyChangedNotification: {FontFamily}", notification.FontFamily);
-        FontFamilyName = notification.FontFamily;
-        return Task.CompletedTask;
-    }
-
     private void OnAdvancedSearchCompletedMessage(AdvancedSearchCompletedMessage message)
     {
         LastSearchResultCount = message.Value;
@@ -336,5 +330,11 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
         SearchStatusMessage = message.Value > 0
             ? $"Found {message.Value} result(s)."
             : "No matches found. Adjust filters and try again.";
+    }
+    
+    private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
+    {
+        Logger.Debug("[AdvancedSearchViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
+        FontFamilyName = message.Value;
     }
 }

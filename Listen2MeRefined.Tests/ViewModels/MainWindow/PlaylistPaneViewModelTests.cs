@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
@@ -13,7 +12,6 @@ using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Playlist;
-using MediatR;
 using Moq;
 using Serilog;
 
@@ -69,7 +67,7 @@ public class PlaylistPaneViewModelTests
     }
 
     [Fact]
-    public async Task HandlePlaylistCreatedNotification_AddsAndSelectsNewTab()
+    public async Task PlaylistCreatedMessage_AddsAndSelectsNewTab()
     {
         var logger = CreateLogger();
         var messenger = new WeakReferenceMessenger();
@@ -97,12 +95,16 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object,
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
-            Mock.Of<IMediator>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger.Object, messenger));
 
         await pane.InitializeAsync();
-        await pane.Handle(new PlaylistCreatedNotification(42, "Road Trip"), CancellationToken.None);
+        messenger.Send(new PlaylistCreatedMessage(new PlaylistCreatedMessageData(42, "Road Trip")));
+
+        for (var i = 0; i < 20 && pane.SelectedTab?.PlaylistId != 42; i++)
+        {
+            await Task.Delay(25);
+        }
 
         Assert.Equal(2, pane.Tabs.Count);
         Assert.Equal(42, pane.SelectedTab?.PlaylistId);
@@ -135,7 +137,6 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object,
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
-            Mock.Of<IMediator>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger.Object, messenger));
 
@@ -257,7 +258,6 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object,
             queueServices.PlaybackContextSyncService,
             externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
-            Mock.Of<IMediator>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger, messenger));
     }

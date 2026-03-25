@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation;
-using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.DomainObjects;
@@ -206,16 +205,6 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         }
     }
 
-    /// <summary>
-    /// Reconfigures audio output when the selected audio device changes.
-    /// </summary>
-    /// <param name="notification">The device change notification.</param>
-    /// <param name="cancellationToken">Token that can cancel notification processing.</param>
-    public async Task Handle(AudioOutputDeviceChangedNotification notification, CancellationToken cancellationToken)
-    {
-        await ApplyAudioOutputDeviceAsync(notification.Device);
-    }
-
     private async Task StartPlaybackAsync()
     {
         var currentTrack = _playbackQueueService.GetCurrentTrack();
@@ -285,51 +274,60 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 
         _playbackProgressMonitor.Reset();
 
-        var reconfigured = await ReconfigureOutputAsync(shouldResumeAfterLoad, preservePosition: false);
+        var reconfigured = ReconfigureOutput(shouldResumeAfterLoad, preservePosition: false);
         if (reconfigured && shouldResumeAfterLoad)
         {
             SetState(PlayerState.Playing);
         }
     }
 
-    private async Task<bool> ReconfigureOutputAsync(bool resumePlayback, bool preservePosition)
+    private bool ReconfigureOutput(bool resumePlayback, bool preservePosition)
     {
-        if (_fileReader is null)
+        try
         {
-            return false;
-        }
-
-        var timeStamp = _fileReader.CurrentTime;
-        var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
-        if (!result.IsSuccess)
-        {
-            _logger.Warning(result.Exception, "[NAudioMMusicPlayer] Failed to reconfigure audio output: {Context}", result.Context);
-            if (!result.PreservedPreviousOutput)
+            if (_fileReader is null)
             {
-                _startSongAutomatically = false;
-                SetState(PlayerState.Stopped);
+                return false;
             }
 
+            var timeStamp = _fileReader.CurrentTime;
+            var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
+            if (!result.IsSuccess)
+            {
+                _logger.Warning(result.Exception, "[NAudioMMusicPlayer] Failed to reconfigure audio output: {Context}",
+                    result.Context);
+                if (!result.PreservedPreviousOutput)
+                {
+                    _startSongAutomatically = false;
+                    SetState(PlayerState.Stopped);
+                }
+
+                return false;
+            }
+
+            if (preservePosition)
+            {
+                _fileReader.CurrentTime = timeStamp;
+            }
+
+            if (resumePlayback)
+            {
+                _playbackOutput.Play();
+                SetState(PlayerState.Playing);
+                _startSongAutomatically = true;
+            }
+            else if (_state == PlayerState.Paused)
+            {
+                _playbackOutput.Pause();
+            }
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "[NAudioMMusicPlayer] Failed to reconfigure audio output");
             return false;
         }
-
-        if (preservePosition)
-        {
-            _fileReader.CurrentTime = timeStamp;
-        }
-
-        if (resumePlayback)
-        {
-            _playbackOutput.Play();
-            SetState(PlayerState.Playing);
-            _startSongAutomatically = true;
-        }
-        else if (_state == PlayerState.Paused)
-        {
-            _playbackOutput.Pause();
-        }
-
-        return true;
     }
 
     private async Task HandleUnplayableTrackAsync(AudioModel track, TrackLoadResult result)
@@ -347,10 +345,17 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 
     private void OnAudioOutputDeviceChangedMessage(AudioOutputDeviceChangedMessage message)
     {
-        _ = ApplyAudioOutputDeviceAsync(message.Value);
+        try
+        {
+            ApplyAudioOutputDeviceAsync(message.Value);
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "[NAudioMMusicPlayer] Failed to apply audio output device change");
+        }
     }
 
-    private async Task ApplyAudioOutputDeviceAsync(AudioOutputDevice device)
+    private void ApplyAudioOutputDeviceAsync(AudioOutputDevice device)
     {
         if (device.Index == _outputDeviceIndex)
         {
@@ -358,6 +363,6 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         }
 
         _outputDeviceIndex = device.Index;
-        await ReconfigureOutputAsync(_state == PlayerState.Playing, preservePosition: true);
+        ReconfigureOutput(_state == PlayerState.Playing, preservePosition: true);
     }
 }

@@ -1,8 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
-using Listen2MeRefined.Application.Notifications;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Infrastructure.Playlist;
-using MediatR;
 using Moq;
 
 namespace Listen2MeRefined.Tests.PlaylistServices;
@@ -19,7 +18,6 @@ public class PlaylistMembershipTests
 
         var sut = new PlaylistMembership(
             playlistLibrary.Object,
-            Mock.Of<IMediator>(),
             new WeakReferenceMessenger());
 
         var result = await sut.GetPlaylistMembershipInfoAsync(["song-a.mp3"], activePlaylistId: null);
@@ -42,7 +40,6 @@ public class PlaylistMembershipTests
 
         var sut = new PlaylistMembership(
             playlistLibrary.Object,
-            Mock.Of<IMediator>(),
             new WeakReferenceMessenger());
 
         var result = await sut.GetPlaylistMembershipInfoAsync(["song-a.mp3", "song-b.mp3"], activePlaylistId: 2);
@@ -56,11 +53,15 @@ public class PlaylistMembershipTests
     public async Task TogglePlaylistMembershipAsync_RemoveNotAllowed_DoesNothing()
     {
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
-        var mediator = new Mock<IMediator>();
+        var messenger = new WeakReferenceMessenger();
+        var probe = new MessageProbe();
+        messenger.Register<MessageProbe, PlaylistMembershipChangedMessage>(
+            probe,
+            static (recipient, message) => recipient.MembershipChangedPlaylistIds.Add(message.Value));
+
         var sut = new PlaylistMembership(
             playlistLibrary.Object,
-            mediator.Object,
-            new WeakReferenceMessenger());
+            messenger);
 
         await sut.TogglePlaylistMembershipAsync(
             playlistId: 12,
@@ -71,24 +72,29 @@ public class PlaylistMembershipTests
         playlistLibrary.Verify(
             x => x.RemoveSongsByPathAsync(It.IsAny<int>(), It.IsAny<IEnumerable<string?>>(), It.IsAny<CancellationToken>()),
             Times.Never);
-        mediator.Verify(
-            x => x.Publish(It.IsAny<PlaylistMembershipChangedNotification>(), It.IsAny<CancellationToken>()),
-            Times.Never);
+        Assert.Empty(probe.MembershipChangedPlaylistIds);
     }
 
     [Fact]
     public async Task AddToNewPlaylistAsync_ValidInput_CreatesPlaylistAddsSongsAndPublishesNotifications()
     {
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
-        var mediator = new Mock<IMediator>();
+        var messenger = new WeakReferenceMessenger();
+        var probe = new MessageProbe();
+        messenger.Register<MessageProbe, PlaylistCreatedMessage>(
+            probe,
+            static (recipient, message) => recipient.Created = message.Value);
+        messenger.Register<MessageProbe, PlaylistMembershipChangedMessage>(
+            probe,
+            static (recipient, message) => recipient.MembershipChangedPlaylistIds.Add(message.Value));
+
         playlistLibrary
             .Setup(x => x.CreatePlaylistAsync("Fresh", It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PlaylistSummary(55, "Fresh"));
 
         var sut = new PlaylistMembership(
             playlistLibrary.Object,
-            mediator.Object,
-            new WeakReferenceMessenger());
+            messenger);
 
         await sut.AddToNewPlaylistAsync("Fresh", ["a.mp3", "b.mp3"]);
 
@@ -98,11 +104,16 @@ public class PlaylistMembershipTests
                 It.Is<IEnumerable<string?>>(paths => paths.Contains("a.mp3") && paths.Contains("b.mp3")),
                 It.IsAny<CancellationToken>()),
             Times.Once);
-        mediator.Verify(
-            x => x.Publish(It.Is<PlaylistCreatedNotification>(n => n.PlaylistId == 55 && n.Name == "Fresh"), It.IsAny<CancellationToken>()),
-            Times.Once);
-        mediator.Verify(
-            x => x.Publish(It.Is<PlaylistMembershipChangedNotification>(n => n.PlaylistId == 55), It.IsAny<CancellationToken>()),
-            Times.Once);
+        Assert.NotNull(probe.Created);
+        Assert.Equal(55, probe.Created!.PlaylistId);
+        Assert.Equal("Fresh", probe.Created!.Name);
+        Assert.Equal([55], probe.MembershipChangedPlaylistIds);
+    }
+
+    private sealed class MessageProbe
+    {
+        public PlaylistCreatedMessageData? Created { get; set; }
+
+        public List<int> MembershipChangedPlaylistIds { get; } = [];
     }
 }

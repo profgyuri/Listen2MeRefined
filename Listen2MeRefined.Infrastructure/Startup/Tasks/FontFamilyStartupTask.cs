@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Startup;
 

@@ -1,14 +1,11 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Utils;
-using MediatR;
 using Moq;
 using NAudio.Wave;
 using Serilog;
@@ -40,7 +37,6 @@ public class NAudioMusicPlayerOrchestrationTests
 
         var player = new NAudioMusicPlayer(
             Mock.Of<ILogger>(),
-            Mock.Of<IMediator>(),
             timedTask,
             queue.Object,
             loader.Object,
@@ -76,10 +72,7 @@ public class NAudioMusicPlayerOrchestrationTests
         using var stream = CreateWaveStream();
 
         var logger = Mock.Of<ILogger>();
-        var mediator = new Mock<IMediator>();
-        mediator
-            .Setup(x => x.Publish(It.IsAny<CurrentSongNotification>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        var messenger = new WeakReferenceMessenger();
 
         var queue = new Mock<IPlaybackQueueService>();
         queue.Setup(x => x.GetCurrentTrack()).Returns(track);
@@ -97,18 +90,17 @@ public class NAudioMusicPlayerOrchestrationTests
 
         var player = new NAudioMusicPlayer(
             logger,
-            mediator.Object,
             timedTask,
             queue.Object,
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
-            Mock.Of<IMessenger>());
+            messenger);
 
         await player.PlayPauseAsync();
         player.CurrentTime = 1200;
 
-        await player.Handle(new AudioOutputDeviceChangedNotification(new AudioOutputDevice(2, "Headphones")), CancellationToken.None);
+        messenger.Send(new AudioOutputDeviceChangedMessage(new AudioOutputDevice(2, "Headphones")));
 
         Assert.InRange(player.CurrentTime, 1199, 1201);
         output.Verify(x => x.Play(), Times.Exactly(2));
@@ -134,22 +126,22 @@ public class NAudioMusicPlayerOrchestrationTests
             .Returns(new PlaybackOutputReconfigureResult(true, false));
 
         var timedTask = new TimedTask();
+        var messenger = new WeakReferenceMessenger();
 
         var player = new NAudioMusicPlayer(
             Mock.Of<ILogger>(),
-            Mock.Of<IMediator>(),
             timedTask,
             queue.Object,
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
-            Mock.Of<IMessenger>());
+            messenger);
 
         await player.PlayPauseAsync();
         await player.PlayPauseAsync();
         player.CurrentTime = 900;
 
-        await player.Handle(new AudioOutputDeviceChangedNotification(new AudioOutputDevice(3, "Speakers")), CancellationToken.None);
+        messenger.Send(new AudioOutputDeviceChangedMessage(new AudioOutputDevice(3, "Speakers")));
 
         Assert.InRange(player.CurrentTime, 899, 901);
         output.Verify(x => x.Play(), Times.Once);
@@ -173,9 +165,11 @@ public class NAudioMusicPlayerOrchestrationTests
         loader.Setup(x => x.Load(unsupported)).Returns(new TrackLoadResult(TrackLoadStatus.UnsupportedFormat, Reason: "Extensible"));
         loader.Setup(x => x.Load(fallback)).Returns(TrackLoadResult.Success(fallbackStream));
 
-        var mediator = new Mock<IMediator>();
-        mediator.Setup(x => x.Publish(It.IsAny<CurrentSongNotification>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        var messenger = new WeakReferenceMessenger();
+        var probe = new CurrentSongProbe();
+        messenger.Register<CurrentSongProbe, CurrentSongChangedMessage>(
+            probe,
+            static (recipient, message) => recipient.Song = message.Value);
 
         var output = new Mock<IPlaybackOutput>();
         output.Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
@@ -185,18 +179,17 @@ public class NAudioMusicPlayerOrchestrationTests
 
         var player = new NAudioMusicPlayer(
             Mock.Of<ILogger>(),
-            mediator.Object,
             timedTask,
             queue.Object,
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
-            Mock.Of<IMessenger>());
+            messenger);
 
         await player.PlayPauseAsync();
 
         queue.Verify(x => x.RemoveTrack(unsupported), Times.Once);
-        mediator.Verify(x => x.Publish(It.Is<CurrentSongNotification>(n => n.Audio == fallback), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.Same(fallback, probe.Song);
         await timedTask.StopAsync();
     }
 
@@ -224,13 +217,12 @@ public class NAudioMusicPlayerOrchestrationTests
 
         var player = new NAudioMusicPlayer(
             Mock.Of<ILogger>(),
-            Mock.Of<IMediator>(),
             timedTask,
             queue.Object,
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
-            Mock.Of<IMessenger>());
+            new WeakReferenceMessenger());
 
         await player.PlayPauseAsync();
 
@@ -259,13 +251,12 @@ public class NAudioMusicPlayerOrchestrationTests
 
         var player = new NAudioMusicPlayer(
             Mock.Of<ILogger>(),
-            Mock.Of<IMediator>(),
             timedTask,
             queue.Object,
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
-            Mock.Of<IMessenger>());
+            new WeakReferenceMessenger());
 
         await player.PlayPauseAsync();
         player.CurrentTime = 1234;
@@ -283,6 +274,11 @@ public class NAudioMusicPlayerOrchestrationTests
         var bytesPerMillisecond = format.AverageBytesPerSecond / 1000;
         var buffer = new byte[Math.Max(bytesPerMillisecond * durationMs, format.BlockAlign)];
         return new RawSourceWaveStream(new MemoryStream(buffer), format);
+    }
+
+    private sealed class CurrentSongProbe
+    {
+        public AudioModel? Song { get; set; }
     }
 }
 
