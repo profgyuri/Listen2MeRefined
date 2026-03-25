@@ -1,25 +1,25 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
-using Listen2MeRefined.Application.Notifications;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
-using MediatR;
 using SkiaSharp;
 
 namespace Listen2MeRefined.WPF.Utils.Theming;
 
 public sealed class AppThemeService : IAppThemeService
 {
-    private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
     private readonly IEnumerable<IWaveformPaletteAware> _waveformPaletteAwareTargets;
 
     public AppThemeService(
-        IMediator mediator,
-        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets)
+        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets, 
+        IMessenger messenger)
     {
-        _mediator = mediator;
         _waveformPaletteAwareTargets = waveformPaletteAwareTargets;
+        _messenger = messenger;
     }
 
     private static readonly IReadOnlyList<string> SupportedThemeModes = ["Dark", "Light"];
@@ -125,7 +125,7 @@ public sealed class AppThemeService : IAppThemeService
             paletteAwareTarget.UpdatePalette(waveformLineColor, waveformBackgroundColor);
         }
 
-        _ = _mediator.Publish(new AppThemeChangedNotification());
+        _messenger.Send(new AppThemeChangedMessage());
     }
 
     private static void ApplyPalette(ResourceDictionary palette, IEnumerable<string> colorKeys)

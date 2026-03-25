@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Startup;
@@ -6,18 +8,18 @@ namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 
 public sealed class FontFamilyStartupTask : IStartupTask
 {
-    private readonly IMediator _mediator;
     private readonly ISettingsManager<AppSettings> _settingsManager;
     private readonly ILogger _logger;
+    private readonly IMessenger _messenger;
 
     public FontFamilyStartupTask(
-        IMediator mediator,
         ISettingsManager<AppSettings> settingsManager,
-        ILogger logger)
+        ILogger logger, 
+        IMessenger messenger)
     {
-        _mediator = mediator;
         _settingsManager = settingsManager;
         _logger = logger;
+        _messenger = messenger;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -29,8 +31,7 @@ public sealed class FontFamilyStartupTask : IStartupTask
             return;
         }
         
-        await _mediator.Publish(new FontFamilyChangedNotification(fontFamily), ct)
-            .ConfigureAwait(false);
+        _messenger.Send(new FontFamilyChangedMessage(fontFamily));
 
         _logger.Debug("[FontFamilyStartupTask] Font family notification published with value {FontFamily}.",
             fontFamily);

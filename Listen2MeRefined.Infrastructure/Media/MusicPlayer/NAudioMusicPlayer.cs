@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Notifications;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Utils;
@@ -12,9 +13,7 @@ namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 /// <summary>
 /// Wrapper class for NAudio.
 /// </summary>
-public sealed partial class NAudioMusicPlayer :
-    IMusicPlayerController,
-    INotificationHandler<AudioOutputDeviceChangedNotification>
+public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 {
     private bool _startSongAutomatically;
     private int _outputDeviceIndex = -1;
@@ -23,7 +22,6 @@ public sealed partial class NAudioMusicPlayer :
     private PlayerState _state = PlayerState.Stopped;
 
     private readonly ILogger _logger;
-    private readonly IMediator _mediator;
     private readonly IPlaybackQueueService _playbackQueueService;
     private readonly ITrackLoader _trackLoader;
     private readonly IPlaybackOutput _playbackOutput;
@@ -61,7 +59,6 @@ public sealed partial class NAudioMusicPlayer :
     /// </summary>
     public NAudioMusicPlayer(
         ILogger logger,
-        IMediator mediator,
         TimedTask timedTask,
         IPlaybackQueueService playbackQueueService,
         ITrackLoader trackLoader,
@@ -70,7 +67,6 @@ public sealed partial class NAudioMusicPlayer :
         IMessenger messenger)
     {
         _logger = logger;
-        _mediator = mediator;
         _playbackQueueService = playbackQueueService;
         _trackLoader = trackLoader;
         _playbackOutput = playbackOutput;
@@ -188,7 +184,7 @@ public sealed partial class NAudioMusicPlayer :
             return;
         }
 
-        await _mediator.Publish(new PlaylistShuffledNotification());
+        _messenger.Send(new PlaylistShuffledMessage());
 
         if (_currentSong is null)
         {
@@ -285,7 +281,6 @@ public sealed partial class NAudioMusicPlayer :
         _fileReader?.Dispose();
         _fileReader = loadResult.Reader;
 
-        await _mediator.Publish(new CurrentSongNotification(_currentSong));
         _messenger.Send(new CurrentSongChangedMessage(_currentSong));
 
         _playbackProgressMonitor.Reset();

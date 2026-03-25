@@ -1,7 +1,7 @@
-using Listen2MeRefined.Application.Notifications;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Startup;
-using Listen2MeRefined.Infrastructure.Media;
 
 namespace Listen2MeRefined.Infrastructure.Startup.Tasks;
 
@@ -9,19 +9,19 @@ public sealed class AudioOutputStartupTask : IStartupTask
 {
     private readonly IOutputDevice _outputDevice;
     private readonly ISettingsManager<AppSettings> _settingsManager;
-    private readonly IMediator _mediator;
     private readonly ILogger _logger;
+    private readonly IMessenger _messenger;
 
     public AudioOutputStartupTask(
         IOutputDevice outputDevice,
         ISettingsManager<AppSettings> settingsManager,
-        IMediator mediator,
-        ILogger logger)
+        ILogger logger, 
+        IMessenger messenger)
     {
         _outputDevice = outputDevice;
         _settingsManager = settingsManager;
-        _mediator = mediator;
         _logger = logger;
+        _messenger = messenger;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -41,8 +41,7 @@ public sealed class AudioOutputStartupTask : IStartupTask
             return;
         }
 
-        await _mediator.Publish(new AudioOutputDeviceChangedNotification(selectedOutputDevice), ct)
-            .ConfigureAwait(false);
+        _messenger.Send(new AudioOutputDeviceChangedMessage(selectedOutputDevice));
 
         _logger.Debug("[AudioOutputStartupTask] Audio output device notification published.");
     }

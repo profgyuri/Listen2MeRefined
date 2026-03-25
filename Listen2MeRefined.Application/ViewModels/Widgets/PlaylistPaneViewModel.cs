@@ -12,20 +12,11 @@ using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Core.Models;
-using MediatR;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class PlaylistPaneViewModel :
-    ViewModelBase,
-    INotificationHandler<PlaylistViewModeChangedNotification>,
-    INotificationHandler<PlaylistCreatedNotification>,
-    INotificationHandler<PlaylistRenamedNotification>,
-    INotificationHandler<PlaylistDeletedNotification>,
-    INotificationHandler<PlaylistMembershipChangedNotification>,
-    INotificationHandler<PlaylistShuffledNotification>,
-    INotificationHandler<FontFamilyChangedNotification>
+public partial class PlaylistPaneViewModel : ViewModelBase
 {
     private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IPlaylistQueueRoutingService _playlistQueueRoutingService;
@@ -37,7 +28,6 @@ public partial class PlaylistPaneViewModel :
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IPlaybackContextSyncService _playbackContextSyncService;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
-    private readonly IMediator _mediator;
     private readonly HashSet<AudioModel> _selectedTabSongs = [];
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
@@ -74,7 +64,6 @@ public partial class PlaylistPaneViewModel :
         IPlaylistLibraryService playlistLibraryService,
         IPlaybackContextSyncService playbackContextSyncService,
         IExternalAudioOpenService externalAudioOpenService,
-        IMediator mediator,
         IAppSettingsReader settingsReader,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
@@ -88,7 +77,6 @@ public partial class PlaylistPaneViewModel :
         _playlistLibraryService = playlistLibraryService;
         _playbackContextSyncService = playbackContextSyncService;
         _externalAudioOpenService = externalAudioOpenService;
-        _mediator = mediator;
         SongContextMenuViewModel = songContextMenuViewModel;
         _playlistQueueState.PropertyChanged += PlaylistQueueStateOnPropertyChanged;
     }
@@ -208,7 +196,8 @@ public partial class PlaylistPaneViewModel :
                     .ToArray();
                 tab.Songs.Clear();
                 await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, existingPaths);
-                await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
+                Messenger.Send(new PlaylistMembershipChangedMessage(tab.PlaylistId.Value));
+                
                 return;
             }
 
@@ -236,7 +225,7 @@ public partial class PlaylistPaneViewModel :
             }
 
             _selectedTabSongs.Clear();
-            await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
+            Messenger.Send(new PlaylistMembershipChangedMessage(tab.PlaylistId.Value));
         });
 
     [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
@@ -482,7 +471,7 @@ public partial class PlaylistPaneViewModel :
     private void OnPlaylistMembershipChangedMessage(PlaylistMembershipChangedMessage message)
     {
         _ = ExecuteSafeAsync(ct =>
-            Handle(new PlaylistMembershipChangedNotification(message.Value.PlaylistId), ct));
+            Handle(new PlaylistMembershipChangedNotification(message.Value), ct));
     }
 
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)

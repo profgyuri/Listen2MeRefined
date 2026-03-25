@@ -17,7 +17,6 @@
     <ItemGroup>
         <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
         <PackageReference Include="MaterialDesignThemes" Version="5.3.0" />
-        <PackageReference Include="MediatR.Extensions.Autofac.DependencyInjection" Version="11.3.0" />
         <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
             <PrivateAssets>all</PrivateAssets>

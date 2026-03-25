@@ -14,12 +14,6 @@ public static class WrappersConfiguration
         {
             services.AddSingleton<IGlobalHook, SharpHookHandler>();
             services.AddTransient<TimedTask>();
-            services.AddMediatR(cfg => 
-                cfg.RegisterServicesFromAssemblies([
-                    typeof(App).Assembly,
-                    typeof(StartupManager).Assembly,
-                    typeof(SettingsShellViewModel).Assembly
-                ]));
         });
         
         return builder;

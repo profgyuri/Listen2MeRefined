@@ -9,14 +9,11 @@ using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
-using MediatR;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 
-public partial class AdvancedSearchShellDefaultHomeViewModel : 
-    ViewModelBase,
-    INotificationHandler<FontFamilyChangedNotification>
+public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
 {
     private readonly IUiDispatcher _ui;
     private readonly IAppSettingsReader _settingsReader;
