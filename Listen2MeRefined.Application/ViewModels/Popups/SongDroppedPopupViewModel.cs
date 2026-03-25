@@ -1,10 +1,11 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Popups;
 
-public class SongDroppedPopupViewModel : PopupViewModelBase
+public partial class SongDroppedPopupViewModel : PopupViewModelBase
 {
     public SongDroppedPopupViewModel(
         IErrorHandler errorHandler, 
@@ -12,10 +13,13 @@ public class SongDroppedPopupViewModel : PopupViewModelBase
         IMessenger messenger) : base(errorHandler, logger, messenger)
     { }
 
-    public override string DisplayTitle => "Song dropped";
-    
-    public override void SendAcceptedMessage()
+    public override string DisplayTitle => "Handle new folder";
+
+    [ObservableProperty] private string _folderPath = string.Empty;
+    [ObservableProperty] private bool _dontAskAgain;
+
+    public void SetFolderPath(string folderPath)
     {
-        //Messenger.Send()
+        FolderPath = folderPath;
     }
 }

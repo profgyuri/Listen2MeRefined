@@ -1,4 +1,5 @@
 using Listen2MeRefined.Application.ViewModels.Shells;
+using Listen2MeRefined.Application.ViewModels;
 
 namespace Listen2MeRefined.Application.Navigation.Windows;
 
@@ -38,6 +39,26 @@ public interface IWindowManager
         WindowShowOptions options,
         CancellationToken cancellationToken = default)
         where TShellViewModel : ShellViewModelBase;
+
+    /// <summary>
+    /// Opens the popup shell and displays the popup content view model selected by
+    /// <typeparamref name="TPopupViewModel"/>.
+    /// </summary>
+    /// <typeparam name="TPopupViewModel">The popup content view model type.</typeparam>
+    /// <param name="options">Positioning and modality settings.</param>
+    /// <param name="configureViewModel">
+    /// Optional callback invoked after navigation succeeds and before the popup is shown.
+    /// </param>
+    /// <param name="cancellationToken">A token that can cancel the operation.</param>
+    /// <returns>
+    /// The dialog result when <paramref name="options"/> requests a modal
+    /// popup; <see langword="null"/> for modeless popups.
+    /// </returns>
+    Task<bool?> ShowPopupAsync<TPopupViewModel>(
+        WindowShowOptions options,
+        Action<TPopupViewModel>? configureViewModel = null,
+        CancellationToken cancellationToken = default)
+        where TPopupViewModel : PopupViewModelBase;
  
     /// <summary>
     /// Closes and disposes a previously opened window identified by its

@@ -53,6 +53,25 @@ public sealed class SettingsModuleTests
         Assert.Equal(typeof(SettingsShellNavigationProvider), descriptor.ImplementationType);
     }
 
+    [Fact]
+    public void RegisterServices_State_RegistersSettingsShellAsTransient()
+    {
+        var module = new SettingsModule();
+        var services = new ServiceCollection();
+
+        module.RegisterServices(services);
+
+        var shellVmDescriptor = Assert.Single(
+            services,
+            x => x.ServiceType == typeof(SettingsShellViewModel));
+        Assert.Equal(ServiceLifetime.Transient, shellVmDescriptor.Lifetime);
+
+        var shellDescriptor = Assert.Single(
+            services,
+            x => x.ServiceType == typeof(SettingsShell));
+        Assert.Equal(ServiceLifetime.Transient, shellDescriptor.Lifetime);
+    }
+
     private static void AssertRoute<TViewModel>(NavigationRegistry registry, string route)
         where TViewModel : class
     {

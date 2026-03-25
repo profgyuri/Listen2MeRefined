@@ -30,6 +30,26 @@ public sealed class WpfUiDispatcher : IUiDispatcher
         return _dispatcher.InvokeAsync(action, DispatcherPriority.DataBind, ct).Task;
     }
 
+    public Task InvokeAsync(Func<Task> func, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(func);
+
+        if (ct.IsCancellationRequested)
+        {
+            return Task.FromCanceled(ct);
+        }
+
+        if (_dispatcher.CheckAccess())
+        {
+            return func();
+        }
+
+        return _dispatcher
+            .InvokeAsync(func, DispatcherPriority.DataBind, ct)
+            .Task
+            .Unwrap();
+    }
+
     public Task<T> InvokeAsync<T>(Func<T> func, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(func);

@@ -43,19 +43,20 @@ public sealed class WindowManager : IWindowManager
     {
         _logger.Information(
             "Showing main window for ShellVM={ShellVMType}", typeof(TShellViewModel).Name);
- 
-        await _ui.InvokeAsync(async () =>
+
+        async Task ShowMainWindowCoreAsync()
         {
             var (window, shellVm, context) = BuildWindow<TShellViewModel>();
- 
+
             System.Windows.Application.Current.MainWindow = (Window)window;
- 
+
             Register(window, shellVm, context);
             ((Window)window).Show();
- 
-            await RunInitializationAsync(shellVm, context, (Window)window, cancellationToken)
-                .ConfigureAwait(false);
-        }, cancellationToken);
+
+            await RunInitializationAsync(shellVm, context, (Window)window, cancellationToken);
+        }
+
+        await _ui.InvokeAsync(ShowMainWindowCoreAsync, cancellationToken);
     }
  
     public async Task<bool?> ShowWindowAsync<TShellViewModel>(
@@ -68,25 +69,73 @@ public sealed class WindowManager : IWindowManager
             typeof(TShellViewModel).Name, options.IsModal);
  
         bool? dialogResult = null;
- 
-        var (window, shellVm, context) = BuildWindow<TShellViewModel>();
-        var wpfWindow = (Window)window;
- 
-        ApplyPosition(wpfWindow, options);
-        Register(window, shellVm, context);
- 
-        await RunInitializationAsync(shellVm, context, wpfWindow, cancellationToken)
-            .ConfigureAwait(false);
- 
-        if (options.IsModal)
+
+        async Task ShowWindowCoreAsync()
         {
-            dialogResult = wpfWindow.ShowDialog();
+            var (window, shellVm, context) = BuildWindow<TShellViewModel>();
+            var wpfWindow = (Window)window;
+
+            ApplyPosition(wpfWindow, options);
+            Register(window, shellVm, context);
+
+            await RunInitializationAsync(shellVm, context, wpfWindow, cancellationToken);
+
+            if (options.IsModal)
+            {
+                dialogResult = wpfWindow.ShowDialog();
+            }
+            else
+            {
+                wpfWindow.Show();
+            }
         }
-        else
+
+        await _ui.InvokeAsync(ShowWindowCoreAsync, cancellationToken);
+        return dialogResult;
+    }
+
+    public async Task<bool?> ShowPopupAsync<TPopupViewModel>(
+        WindowShowOptions options,
+        Action<TPopupViewModel>? configureViewModel = null,
+        CancellationToken cancellationToken = default)
+        where TPopupViewModel : PopupViewModelBase
+    {
+        _logger.Information(
+            "Showing popup for PopupVM={PopupVMType} Modal={IsModal}",
+            typeof(TPopupViewModel).Name, options.IsModal);
+
+        bool? dialogResult = null;
+
+        async Task ShowPopupCoreAsync()
         {
-            wpfWindow.Show();
+            var (window, shellVm, context) = BuildWindow<PopupShellViewModel>();
+            var wpfWindow = (Window)window;
+
+            ApplyPosition(wpfWindow, options);
+            Register(window, shellVm, context);
+
+            await RunInitializationAsync(shellVm, context, wpfWindow, cancellationToken);
+            await shellVm.NavigateToAsync<TPopupViewModel>(cancellationToken);
+
+            if (shellVm.CurrentViewModel is not TPopupViewModel popupViewModel)
+            {
+                throw new InvalidOperationException(
+                    $"Popup shell failed to navigate to {typeof(TPopupViewModel).Name}.");
+            }
+
+            configureViewModel?.Invoke(popupViewModel);
+
+            if (options.IsModal)
+            {
+                dialogResult = wpfWindow.ShowDialog();
+            }
+            else
+            {
+                wpfWindow.Show();
+            }
         }
- 
+
+        await _ui.InvokeAsync(ShowPopupCoreAsync, cancellationToken);
         return dialogResult;
     }
  

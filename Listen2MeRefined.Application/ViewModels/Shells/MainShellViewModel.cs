@@ -60,7 +60,14 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
     {
         await ExecuteSafeAsync(async ct =>
         {
-            await _ui.InvokeAsync(async () => await _windowManager.ShowWindowAsync<SettingsShellViewModel>(WindowShowOptions.CenteredOnMainWindow(), ct), ct);
+            async Task OpenSettingsOnUiAsync()
+            {
+                await _windowManager.ShowWindowAsync<SettingsShellViewModel>(
+                    WindowShowOptions.CenteredOnMainWindow(),
+                    ct);
+            }
+
+            await _ui.InvokeAsync(OpenSettingsOnUiAsync, ct);
         });
     }
 }

@@ -339,45 +339,6 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
             return _folderScanner.ScanAllAsync(ScanMode.FullRefresh);
         });
 
-    public void RefreshLibraryTabData()
-    {
-        var wasLoading = _isLoadingSettings;
-        _isLoadingSettings = true;
-        try
-        {
-            var previousSelection = SelectedFolder;
-            var musicFolderRequests = _settingsReader.GetMusicFolderRequests();
-
-            _folderRecursionByPath.Clear();
-            foreach (var folderRequest in musicFolderRequests)
-            {
-                _folderRecursionByPath[folderRequest.Path] = folderRequest.IncludeSubdirectories;
-            }
-
-            Folders.Clear();
-            foreach (var folderRequest in musicFolderRequests)
-            {
-                Folders.Add(folderRequest.Path);
-            }
-
-            if (!string.IsNullOrWhiteSpace(previousSelection) && Folders.Contains(previousSelection))
-            {
-                SelectedFolder = previousSelection;
-            }
-            else
-            {
-                SelectedFolder = Folders.FirstOrDefault();
-            }
-
-            ReloadPinnedFolders();
-            ReloadMutedDroppedSongFolders();
-        }
-        finally
-        {
-            _isLoadingSettings = wasLoading;
-        }
-    }
-
     private void PersistMusicFolders()
     {
         var folders = Folders.Select(path => new FolderScanRequest(
@@ -424,38 +385,40 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
         Logger.Debug("[SettingsLibraryTabViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
     }
 
-    private void OnFolderBrowserPathSelectedMessage(FolderBrowserPathSelectedMessage message)
+    private async void OnFolderBrowserPathSelectedMessage(FolderBrowserPathSelectedMessage message)
     {
-        _ = ExecuteSafeAsync(
-            ct => HandleFolderBrowserPathSelectedAsync(message.Value, ct),
-            nameof(OnFolderBrowserPathSelectedMessage));
+        try
+        {
+            var path = message.Value;
+            if (string.IsNullOrWhiteSpace(path) || Folders.Contains(path))
+            {
+                return;
+            }
+
+            Logger.Information("[SettingsLibraryTabViewModel] Adding path to music folders: {Path}", path);
+            Folders.Add(path);
+            _folderRecursionByPath[path] = false;
+            PersistMusicFolders();
+
+            if (!AutoScanOnFolderAdd)
+            {
+                Logger.Information("[SettingsLibraryTabViewModel] Auto-scan on folder add is disabled.");
+                return;
+            }
+
+            Logger.Information("[SettingsLibraryTabViewModel] Scanning newly added folder: {Path}", path);
+            await _folderScanner.ScanAsync(path, ScanMode.Incremental);
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e, "[SettingsLibraryTabViewModel] An error occurred while adding a folder:" +
+                            "{Path}", message.Value);
+        }
     }
 
     private void OnPinnedFoldersChangedMessage(PinnedFoldersChangedMessage message)
     {
         var normalizedPins = _pinnedFoldersService.Normalize(message.Value);
         PinnedFolders = new ObservableCollection<string>(normalizedPins);
-    }
-
-    private async Task HandleFolderBrowserPathSelectedAsync(string path, CancellationToken ct = default)
-    {
-        if (string.IsNullOrWhiteSpace(path) || Folders.Contains(path))
-        {
-            return;
-        }
-
-        Logger.Information("[SettingsLibraryTabViewModel] Adding path to music folders: {Path}", path);
-        Folders.Add(path);
-        _folderRecursionByPath[path] = false;
-        PersistMusicFolders();
-
-        if (!AutoScanOnFolderAdd)
-        {
-            Logger.Information("[SettingsLibraryTabViewModel] Auto-scan on folder add is disabled.");
-            return;
-        }
-
-        Logger.Information("[SettingsLibraryTabViewModel] Scanning newly added folder: {Path}", path);
-        await _folderScanner.ScanAsync(path, ScanMode.Incremental, ct);
     }
 }

@@ -14,4 +14,10 @@ public class PopupShellViewModel : ShellViewModelBase
         IShellContextFactory context) : base(errorHandler, logger, messenger, context.Create())
     {
     }
+
+    public Task NavigateToAsync<TPopupViewModel>(CancellationToken cancellationToken = default)
+        where TPopupViewModel : PopupViewModelBase
+    {
+        return NavigationService.NavigateAsync<TPopupViewModel>(cancellationToken);
+    }
 }
