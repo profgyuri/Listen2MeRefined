@@ -1,5 +1,5 @@
 using Listen2MeRefined.Application.Utils;
-using Listen2MeRefined.Application.ViewModels.Windows;
+using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.Infrastructure.Startup;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +18,7 @@ public static class WrappersConfiguration
                 cfg.RegisterServicesFromAssemblies([
                     typeof(App).Assembly,
                     typeof(StartupManager).Assembly,
-                    typeof(SettingsWindowViewModel).Assembly
+                    typeof(SettingsShellViewModel).Assembly
                 ]));
         });
         
