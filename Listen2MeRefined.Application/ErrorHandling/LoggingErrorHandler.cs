@@ -24,4 +24,21 @@ public sealed class LoggingErrorHandler : IErrorHandler
         _logger.Error(exception, "Unhandled exception in {Context}.", context);
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc />
+    public Task HandleUnhandledAsync(
+        Exception exception,
+        UnhandledErrorContext context,
+        CancellationToken cancellationToken = default)
+    {
+        _logger.Fatal(
+            exception,
+            "Unhandled fatal exception. Source={Source} IsTerminating={IsTerminating} OccurredAtUtc={OccurredAtUtc} Context={Context}",
+            context.Source,
+            context.IsTerminating,
+            context.OccurredAtUtc,
+            context.Context);
+
+        return Task.CompletedTask;
+    }
 }

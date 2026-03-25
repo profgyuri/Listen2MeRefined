@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Listen2MeRefined.WPF.ErrorHandling;
 using Serilog;
 using Serilog.Core;
 
@@ -11,13 +12,20 @@ public static class LoggerConfiguration
     {
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<ILogger>(_ => CreateLogger());
+            var logLocationService = new LocalAppDataLogLocationService();
+            logLocationService.EnsureLogDirectoryExists();
+
+            var logger = Log.Logger as Logger ?? CreateLogger(logLocationService);
+            Log.Logger = logger;
+
+            services.AddSingleton<ILogLocationService>(logLocationService);
+            services.AddSingleton<ILogger>(logger);
         });
 
         return builder;
     }
     
-    private static Logger CreateLogger()
+    public static Logger CreateLogger(ILogLocationService logLocationService)
     {
         var config = new Serilog.LoggerConfiguration();
         const string seqConnection = "http://192.168.0.22:5341";
@@ -26,10 +34,11 @@ public static class LoggerConfiguration
             .WriteTo.Async(conf => conf.Seq(seqConnection));
         config
             .WriteTo.Async(conf => conf.File(
-                "log.txt", 
+                logLocationService.LogFilePath,
                 retainedFileCountLimit: 3,
                 rollingInterval: RollingInterval.Day,
-                fileSizeLimitBytes: 1024 * 1024 * 10));
+                fileSizeLimitBytes: 1024 * 1024 * 10,
+                shared: true));
         config
             .MinimumLevel.Verbose();
 

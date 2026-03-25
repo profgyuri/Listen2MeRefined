@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Listen2MeRefined.Application.ErrorHandling;
 using System.Windows.Media;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
@@ -15,6 +16,7 @@ namespace Listen2MeRefined.WPF.Utils.Navigation;
 
 public sealed class WindowManager : IWindowManager
 {
+    private readonly IErrorHandler _errorHandler;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
@@ -26,11 +28,13 @@ public sealed class WindowManager : IWindowManager
     private readonly ConcurrentDictionary<object, WindowDescriptor> _openWindows = new(ReferenceEqualityComparer.Instance);
  
     public WindowManager(
+        IErrorHandler errorHandler,
         IServiceProvider serviceProvider,
         ILogger logger, 
         IUiDispatcher ui, 
         IWindowRegistry windowRegistry)
     {
+        _errorHandler = errorHandler;
         _serviceProvider = serviceProvider;
         _logger = logger;
         _ui = ui;
@@ -222,17 +226,30 @@ public sealed class WindowManager : IWindowManager
                 ex,
                 "Initialization failed for {ShellVM}. The window will be closed.",
                 shellVm.GetType().Name);
- 
-            await _ui.InvokeAsync(() =>
+
+            var errorContext = new UnhandledErrorContext(
+                UnhandledErrorSource.WindowInitialization,
+                IsTerminating: false,
+                OccurredAtUtc: DateTimeOffset.UtcNow,
+                Context: shellVm.GetType().Name);
+
+            try
             {
-                MessageBox.Show(
-                    ex.Message,
-                    $"Initialization failed — {shellVm.GetType().Name}",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
- 
-                window.Close();
-            }, cancellationToken);
+                await _errorHandler
+                    .HandleUnhandledAsync(ex, errorContext, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception errorHandlerException)
+            {
+                _logger.Error(
+                    errorHandlerException,
+                    "Error handler failed while processing window initialization failure for {ShellVM}.",
+                    shellVm.GetType().Name);
+            }
+            finally
+            {
+                await _ui.InvokeAsync(window.Close, CancellationToken.None);
+            }
         }
     }
  

@@ -18,6 +18,7 @@ using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
 using Listen2MeRefined.Infrastructure.Startup;
 using Listen2MeRefined.Infrastructure.Versioning;
+using Listen2MeRefined.WPF.ErrorHandling;
 using Listen2MeRefined.WPF.Utils.Navigation;
 using Listen2MeRefined.WPF.Utils.Theming;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,7 +63,8 @@ public static class UtilsConfiguration
             services.AddTransient<IPlaybackVolumeSetter, PlaybackVolumeSetter>();
             services.AddSingleton<IAppThemeService, AppThemeService>();
             services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();
-            services.AddSingleton<IErrorHandler, LoggingErrorHandler>();
+            services.AddSingleton<ICrashDialogService, CrashDialogService>();
+            services.AddSingleton<IErrorHandler, CrashAwareErrorHandler>();
             services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
             services.AddSingleton<IWindowManager, WindowManager>();
             services.AddSingleton<IWindowRegistry, WindowRegistry>();

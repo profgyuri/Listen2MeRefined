@@ -20,6 +20,9 @@ public class PopupModule : IModule
 
         services.AddTransient<SongDroppedPopup>();
         services.AddTransient<SongDroppedPopupViewModel>();
+        
+        services.AddTransient<CrashReportPopup>();
+        services.AddTransient<CrashReportWindow>();
     }
 
     public void RegisterNavigation(INavigationRegistry registry)

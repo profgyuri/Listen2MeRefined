@@ -1,16 +1,20 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
+using Dapper;
+using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Navigation.Windows;
+using Listen2MeRefined.Application.ViewModels.Shells;
+using Listen2MeRefined.WPF.Dependency;
+using Listen2MeRefined.WPF.ErrorHandling;
+using Listen2MeRefined.WPF.Utils.Navigation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Dapper;
-using Listen2MeRefined.Application.Navigation.Windows;
-using Listen2MeRefined.Application.ViewModels.Shells;
-using Listen2MeRefined.WPF.Dependency;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Serilog;
+using AppLoggerConfiguration = Listen2MeRefined.WPF.Dependency.LoggerConfiguration;
 
 namespace Listen2MeRefined.WPF;
 
@@ -19,11 +23,14 @@ namespace Listen2MeRefined.WPF;
 /// </summary>
 public sealed partial class App : System.Windows.Application
 {
+    private IErrorHandler _errorHandler;
     private IHost? _host;
     private SingleInstanceFileOpenBridge? _singleInstanceFileOpenBridge;
 
     public App()
     {
+        _errorHandler = CreateFallbackErrorHandler();
+
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -32,7 +39,7 @@ public sealed partial class App : System.Windows.Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        
+
         SqlMapper.AddTypeHandler(new TimeSpanTypeHandler());
         RenderOptions.ProcessRenderMode = RenderMode.Default;
 
@@ -48,6 +55,9 @@ public sealed partial class App : System.Windows.Application
 
             _host = CreateHostBuilder().Build();
             _host.ConfigureModuleNavigation();
+
+            _errorHandler = _host.Services.GetRequiredService<IErrorHandler>();
+
             var messenger = _host.Services.GetRequiredService<IMessenger>();
             _singleInstanceFileOpenBridge.AttachMessenger(messenger);
             await _host.StartAsync().ConfigureAwait(true);
@@ -62,8 +72,12 @@ public sealed partial class App : System.Windows.Application
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Application startup failed.");
-            Shutdown(-1);
+            ReportUnhandled(
+                ex,
+                UnhandledErrorSource.Startup,
+                isTerminating: true,
+                context: nameof(OnStartup));
+            ShutdownWithCode(-1);
         }
     }
 
@@ -100,7 +114,7 @@ public sealed partial class App : System.Windows.Application
     private static IHostBuilder CreateHostBuilder()
     {
         var builder = Host.CreateDefaultBuilder();
-        
+
         builder
             .ConfigureDataAccess()
             .ConfigureLogger()
@@ -112,14 +126,14 @@ public sealed partial class App : System.Windows.Application
             .ConfigureWaveForm()
             .ConfigureWrappers()
             .ConfigureModuleServices();
-        
+
         return builder;
     }
 
     protected override async void OnExit(ExitEventArgs e)
     {
         _singleInstanceFileOpenBridge?.Dispose();
-        
+
         if (_host is not null)
         {
             try
@@ -131,29 +145,117 @@ public sealed partial class App : System.Windows.Application
                 _host.Dispose();
             }
         }
-        
+
         await Log.CloseAndFlushAsync();
-        
+
         base.OnExit(e);
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        Log.Error(e.Exception, "Unhandled dispatcher exception.");
+        ReportUnhandled(
+            e.Exception,
+            UnhandledErrorSource.Dispatcher,
+            isTerminating: true,
+            context: nameof(OnDispatcherUnhandledException));
+
         e.Handled = true;
+        ShutdownWithCode(-1);
     }
-    
+
     private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         if (e.ExceptionObject is Exception exception)
         {
-            Log.Fatal(exception, "Unhandled AppDomain exception.");
+            ReportUnhandled(
+                exception,
+                UnhandledErrorSource.AppDomain,
+                isTerminating: e.IsTerminating,
+                context: nameof(OnUnhandledException));
         }
+        else
+        {
+            var fallback = new InvalidOperationException(
+                $"AppDomain unhandled exception object was not an Exception: {e.ExceptionObject}");
+            ReportUnhandled(
+                fallback,
+                UnhandledErrorSource.AppDomain,
+                isTerminating: e.IsTerminating,
+                context: nameof(OnUnhandledException));
+        }
+
+        ShutdownWithCode(-1);
     }
-    
+
     private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        Log.Error(e.Exception, "Unobserved task exception.");
+        ReportUnhandled(
+            e.Exception,
+            UnhandledErrorSource.TaskScheduler,
+            isTerminating: true,
+            context: nameof(OnUnobservedTaskException));
+
         e.SetObserved();
+        ShutdownWithCode(-1);
+    }
+
+    private void ReportUnhandled(
+        Exception exception,
+        UnhandledErrorSource source,
+        bool isTerminating,
+        string context)
+    {
+        var errorContext = new UnhandledErrorContext(
+            source,
+            isTerminating,
+            DateTimeOffset.UtcNow,
+            context);
+
+        try
+        {
+            _errorHandler
+                .HandleUnhandledAsync(exception, errorContext)
+                .GetAwaiter()
+                .GetResult();
+        }
+        catch (Exception reportException)
+        {
+            Log.Logger.Fatal(
+                reportException,
+                "Failed while reporting unhandled exception. Source={Source} Context={Context}",
+                source,
+                context);
+        }
+    }
+
+    private void ShutdownWithCode(int exitCode)
+    {
+        try
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                Shutdown(exitCode);
+                return;
+            }
+
+            Dispatcher.Invoke(() => Shutdown(exitCode));
+        }
+        catch
+        {
+            Environment.Exit(exitCode);
+        }
+    }
+
+    private IErrorHandler CreateFallbackErrorHandler()
+    {
+        var logLocationService = new LocalAppDataLogLocationService();
+        logLocationService.EnsureLogDirectoryExists();
+
+        var logger = AppLoggerConfiguration.CreateLogger(logLocationService);
+        Log.Logger = logger;
+
+        var uiDispatcher = new WpfUiDispatcher(Dispatcher);
+        var crashDialogService = new CrashDialogService(uiDispatcher, logLocationService, logger);
+        return new CrashAwareErrorHandler(logger, crashDialogService, logLocationService);
     }
 }
