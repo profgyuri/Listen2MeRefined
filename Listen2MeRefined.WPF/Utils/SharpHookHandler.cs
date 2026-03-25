@@ -62,8 +62,10 @@ internal sealed class SharpHookHandler : IGlobalHook
         _mouseDebounceTimer = new Timer(CheckMousePosition, null, Timeout.Infinite, Timeout.Infinite);
     }
 
-    public Task RegisterAsync()
+    public Task RegisterAsync(CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+
         var shouldStartRunLoop = false;
         lock (_registrationGate)
         {
@@ -84,7 +86,7 @@ internal sealed class SharpHookHandler : IGlobalHook
             return Task.CompletedTask;
         }
 
-        _ = Task.Run(() => _hook.Run()).ContinueWith(task =>
+        _ = Task.Run(() => _hook.Run(), ct).ContinueWith(task =>
         {
             _logger.Error(task.Exception, "Failed to initialize global hooks");
             lock (_registrationGate)

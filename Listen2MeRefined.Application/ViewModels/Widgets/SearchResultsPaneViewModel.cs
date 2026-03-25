@@ -52,6 +52,8 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         RegisterMessage<SearchResultsUpdatedMessage>(OnSearchResultsUpdatedMessage);
         RegisterMessage<AdvancedSearchRequestedMessage>(OnAdvancedSearchRequestedMessage);
         
+        FontFamilyName = _settingsReader.GetFontFamily();
+        
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
         

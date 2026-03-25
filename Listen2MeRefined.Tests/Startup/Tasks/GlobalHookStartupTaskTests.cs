@@ -28,14 +28,14 @@ public class GlobalHookStartupTaskTests
 
         await startupTask.RunAsync(CancellationToken.None);
 
-        globalHook.Verify(x => x.RegisterAsync(), Times.Never);
+        globalHook.Verify(x => x.RegisterAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
     public async Task RunAsync_RegistersHooks_WhenAtLeastOneFeatureIsEnabled()
     {
         var globalHook = new Mock<IGlobalHook>();
-        globalHook.Setup(x => x.RegisterAsync()).Returns(Task.CompletedTask);
+        globalHook.Setup(x => x.RegisterAsync(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var settings = new Mock<ISettingsManager<AppSettings>>();
         settings.SetupGet(x => x.Settings).Returns(new AppSettings
@@ -51,7 +51,7 @@ public class GlobalHookStartupTaskTests
 
         await startupTask.RunAsync(CancellationToken.None);
 
-        globalHook.Verify(x => x.RegisterAsync(), Times.Once);
+        globalHook.Verify(x => x.RegisterAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
 

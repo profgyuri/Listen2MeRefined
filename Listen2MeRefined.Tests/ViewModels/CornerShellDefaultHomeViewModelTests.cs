@@ -93,7 +93,8 @@ public sealed class CornerShellDefaultHomeViewModelTests
         var trackInfoViewModel = new TrackInfoViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
-            messenger);
+            messenger,
+            settingsReader.Object);
 
         var viewModel = new CornerShellDefaultHomeViewModel(
             Mock.Of<IErrorHandler>(),

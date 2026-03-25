@@ -30,7 +30,7 @@ public sealed class GlobalHookStartupTask : IStartupTask
         }
 
         _logger.Information("[GlobalHookStartupTask] Registering global hooks...");
-        await _globalHook.RegisterAsync().ConfigureAwait(false);
+        await _globalHook.RegisterAsync(ct).ConfigureAwait(false);
         _logger.Information("[GlobalHookStartupTask] Global hooks registered.");
     }
 }

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Serilog;
 using SkiaSharp;
@@ -23,6 +24,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     private readonly IPlaybackVolumeSetter _playbackVolumeSetter;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly TimedTask _timedTask;
+    private readonly IAppSettingsReader _settingsReader;
     private string? _currentTrackPath;
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
@@ -80,6 +82,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         IWaveformResizeScheduler waveformResizeScheduler,
         IPlaybackVolumeSetter playbackVolumeSetter,
         IMusicPlayerController musicPlayerController,
+        IAppSettingsReader settingsReader,
         TimedTask timedTask) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
@@ -88,6 +91,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         _waveformResizeScheduler = waveformResizeScheduler;
         _playbackVolumeSetter = playbackVolumeSetter;
         _musicPlayerController = musicPlayerController;
+        _settingsReader = settingsReader;
         _timedTask = timedTask;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
@@ -98,6 +102,8 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
         RegisterMessage<AppThemeChangedMessage>(OnAppThemeChangedMessage);
+        
+        FontFamilyName = _settingsReader.GetFontFamily();
         
         ApplyStartupPlaybackDefaults();
 

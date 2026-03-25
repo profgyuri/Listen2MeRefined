@@ -130,6 +130,7 @@ public class SongContextMenuViewModelTests
     private static IAppSettingsReader CreateSettingsReader()
     {
         var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetFontFamily()).Returns("Segoe UI");
         settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
         settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         settingsReader

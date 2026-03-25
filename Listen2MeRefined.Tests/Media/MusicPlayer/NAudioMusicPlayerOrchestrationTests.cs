@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
@@ -14,6 +15,50 @@ namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
 public class NAudioMusicPlayerOrchestrationTests
 {
+    [Fact]
+    public async Task StartupOutputDeviceConfiguration_State_UsesPersistedDeviceOnFirstPlayback()
+    {
+        var track = new AudioModel { Path = "startup-device-track.mp3" };
+        using var stream = CreateWaveStream();
+
+        var queue = new Mock<IPlaybackQueueService>();
+        queue.Setup(x => x.GetCurrentTrack()).Returns(track);
+
+        var loader = new Mock<ITrackLoader>();
+        loader.Setup(x => x.Load(track)).Returns(TrackLoadResult.Success(stream));
+
+        var output = new Mock<IPlaybackOutput>();
+        output.SetupProperty(x => x.Volume, 1f);
+        output
+            .Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
+            .Returns(new PlaybackOutputReconfigureResult(true, false));
+
+        var timedTask = new TimedTask();
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetAudioOutputDeviceName()).Returns("Speakers");
+
+        var outputDevice = new Mock<IOutputDevice>();
+        outputDevice
+            .Setup(x => x.EnumerateOutputDevices())
+            .Returns([new AudioOutputDevice(-1, "Windows Default"), new AudioOutputDevice(1, "Speakers")]);
+
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            timedTask,
+            queue.Object,
+            loader.Object,
+            output.Object,
+            new PlaybackProgressMonitor(),
+            settingsReader.Object,
+            outputDevice.Object,
+            new WeakReferenceMessenger());
+
+        await player.PlayPauseAsync();
+
+        output.Verify(x => x.Reinitialize(It.IsAny<WaveStream>(), 1), Times.Once);
+        await timedTask.StopAsync();
+    }
+
     [Fact]
     public async Task AudioOutputDeviceChangedMessage_WhilePlaying_ReconfiguresAndResumesWithTimestamp()
     {
@@ -42,6 +87,8 @@ public class NAudioMusicPlayerOrchestrationTests
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
             messenger);
 
         await player.PlayPauseAsync();
@@ -95,6 +142,8 @@ public class NAudioMusicPlayerOrchestrationTests
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
             messenger);
 
         await player.PlayPauseAsync();
@@ -135,6 +184,8 @@ public class NAudioMusicPlayerOrchestrationTests
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
             messenger);
 
         await player.PlayPauseAsync();
@@ -184,6 +235,8 @@ public class NAudioMusicPlayerOrchestrationTests
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
             messenger);
 
         await player.PlayPauseAsync();
@@ -222,6 +275,8 @@ public class NAudioMusicPlayerOrchestrationTests
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
             new WeakReferenceMessenger());
 
         await player.PlayPauseAsync();
@@ -256,6 +311,8 @@ public class NAudioMusicPlayerOrchestrationTests
             loader.Object,
             output.Object,
             new PlaybackProgressMonitor(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
             new WeakReferenceMessenger());
 
         await player.PlayPauseAsync();
@@ -276,9 +333,24 @@ public class NAudioMusicPlayerOrchestrationTests
         return new RawSourceWaveStream(new MemoryStream(buffer), format);
     }
 
+    private static IAppSettingsReader CreateSettingsReader()
+    {
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetAudioOutputDeviceName()).Returns("Windows Default");
+        return settingsReader.Object;
+    }
+
+    private static IOutputDevice CreateOutputDevice()
+    {
+        var outputDevice = new Mock<IOutputDevice>();
+        outputDevice
+            .Setup(x => x.EnumerateOutputDevices())
+            .Returns([new AudioOutputDevice(-1, "Windows Default"), new AudioOutputDevice(1, "Speakers")]);
+        return outputDevice.Object;
+    }
+
     private sealed class CurrentSongProbe
     {
         public AudioModel? Song { get; set; }
     }
 }
-

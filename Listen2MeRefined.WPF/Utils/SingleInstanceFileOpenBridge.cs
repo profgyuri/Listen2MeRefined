@@ -1,12 +1,12 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
+using Serilog;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Serilog;
 
 namespace Listen2MeRefined.WPF.Utils;
 
@@ -19,32 +19,54 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
     private const int RetryDelayMs = 200;
 
     private readonly ILogger _logger;
-    private readonly IMessenger _messenger;
     private readonly Mutex _mutex;
     private readonly bool _isPrimaryInstance;
     private readonly CancellationTokenSource _shutdown = new();
+    private readonly Lock _listenerGate = new();
+
+    private IMessenger? _messenger;
+    private bool _listenerStarted;
 
     /// <summary>
-    /// Initializes single-instance coordination and starts pipe listening in the primary instance.
+    /// Initializes single-instance coordination.
     /// </summary>
     /// <param name="logger">Logger used for bridge diagnostics.</param>
-    public SingleInstanceFileOpenBridge(ILogger logger, IMessenger messenger)
+    public SingleInstanceFileOpenBridge(ILogger logger)
     {
         _logger = logger;
-        _messenger = messenger;
         _mutex = new Mutex(true, MutexName, out var createdNew);
         _isPrimaryInstance = createdNew;
-
-        if (_isPrimaryInstance)
-        {
-            _ = Task.Run(() => ListenAsync(_shutdown.Token));
-        }
     }
 
     /// <summary>
     /// Gets whether this process is the primary instance responsible for handling forwarded open requests.
     /// </summary>
     public bool IsPrimaryInstance => _isPrimaryInstance;
+
+    /// <summary>
+    /// Starts pipe listening in the primary instance using the provided messenger.
+    /// </summary>
+    public void AttachMessenger(IMessenger messenger)
+    {
+        ArgumentNullException.ThrowIfNull(messenger);
+
+        if (!_isPrimaryInstance)
+        {
+            return;
+        }
+
+        lock (_listenerGate)
+        {
+            _messenger = messenger;
+            if (_listenerStarted || _shutdown.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _listenerStarted = true;
+            _ = Task.Run(() => ListenAsync(_shutdown.Token));
+        }
+    }
 
     /// <summary>
     /// Forwards shell-open file paths to the primary process through the named pipe.
@@ -120,7 +142,7 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
         {
             try
             {
-                using var server = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                await using var server = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
                 await server.WaitForConnectionAsync(ct).ConfigureAwait(false);
 
                 using var reader = new StreamReader(server, Encoding.UTF8, leaveOpen: true);
@@ -136,6 +158,12 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
                 _logger.Information(
                     "[SingleInstanceFileOpenBridge] Received {Count} forwarded path(s) from secondary instance",
                     paths.Length);
+
+                if (_messenger is null)
+                {
+                    _logger.Warning("[SingleInstanceFileOpenBridge] Messenger is not attached yet; dropping forwarded paths.");
+                    continue;
+                }
 
                 _messenger.Send(new ExternalAudioFilesOpenedMessage(paths));
             }

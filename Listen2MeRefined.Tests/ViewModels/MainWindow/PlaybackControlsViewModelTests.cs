@@ -184,6 +184,8 @@ public class PlaybackControlsViewModelTests
         var waveformViewportPolicy = new WaveformViewportPolicy();
         var waveformResizeScheduler = new WaveformResizeScheduler(TimeSpan.Zero);
         var playbackVolumeSetter = new PlaybackVolumeSetter(musicPlayer.Object, playbackDefaultsService);
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetFontFamily()).Returns("Segoe UI");
         var viewModel = new PlaybackControlsViewModel(
             Mock.Of<IErrorHandler>(),
             logger,
@@ -193,6 +195,7 @@ public class PlaybackControlsViewModelTests
             waveformResizeScheduler,
             playbackVolumeSetter,
             musicPlayer.Object,
+            settingsReader.Object,
             timedTask);
 
         var audio = new AudioModel
@@ -259,6 +262,8 @@ public class PlaybackControlsViewModelTests
         var waveformViewportPolicy = new WaveformViewportPolicy();
         var waveformResizeScheduler = new WaveformResizeScheduler(waveformResizeDebounce);
         var playbackVolumeSetter = new PlaybackVolumeSetter(musicPlayer.Object, playbackDefaultsService);
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetFontFamily()).Returns("Segoe UI");
         var viewModel = new PlaybackControlsViewModel(
             Mock.Of<IErrorHandler>(),
             logger,
@@ -268,6 +273,7 @@ public class PlaybackControlsViewModelTests
             waveformResizeScheduler,
             playbackVolumeSetter,
             musicPlayer.Object,
+            settingsReader.Object,
             timedTask);
 
         await viewModel.InitializeAsync();
@@ -291,4 +297,3 @@ public class PlaybackControlsViewModelTests
         }
     }
 }
-

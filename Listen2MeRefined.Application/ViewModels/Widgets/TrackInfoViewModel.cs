@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Serilog;
@@ -10,6 +11,8 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class TrackInfoViewModel : ViewModelBase
 {
+    private readonly IAppSettingsReader _settingsReader;
+
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private PlayerState _playerState = PlayerState.Stopped;
     [ObservableProperty] private AudioModel _song = new()
@@ -23,8 +26,10 @@ public partial class TrackInfoViewModel : ViewModelBase
     public TrackInfoViewModel(
         IErrorHandler errorHandler, 
         ILogger logger, 
-        IMessenger messenger) : base(errorHandler, logger, messenger)
+        IMessenger messenger,
+        IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
     {
+        _settingsReader = settingsReader;
     }
 
     public override Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -32,6 +37,8 @@ public partial class TrackInfoViewModel : ViewModelBase
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<PlayerStateChangedMessage>(OnPlayerStateChangedMessage);
+        
+        FontFamilyName = _settingsReader.GetFontFamily();
         
         return base.InitializeAsync(cancellationToken);
     }

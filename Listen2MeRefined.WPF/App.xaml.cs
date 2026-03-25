@@ -40,18 +40,23 @@ public sealed partial class App : System.Windows.Application
 
         try
         {
+            _singleInstanceFileOpenBridge = new SingleInstanceFileOpenBridge(Log.Logger);
+            if (ProcessFileOpenForwarding(e))
+            {
+                return;
+            }
+
             _host = CreateHostBuilder().Build();
             _host.ConfigureModuleNavigation();
+            var messenger = _host.Services.GetRequiredService<IMessenger>();
+            _singleInstanceFileOpenBridge.AttachMessenger(messenger);
             await _host.StartAsync().ConfigureAwait(true);
-            
-            if (ProcessFileOpenForwarding(e)) return;
-            
+
             var windowManager = _host.Services.GetRequiredService<IWindowManager>();
             await windowManager.ShowMainWindowAsync<MainShellViewModel>();
 
             if (e.Args.Length > 0)
             {
-                var messenger = _host.Services.GetRequiredService<IMessenger>();
                 messenger.Send(new ExternalAudioFilesOpenedMessage(e.Args));
             }
         }
@@ -67,13 +72,16 @@ public sealed partial class App : System.Windows.Application
     /// </summary>
     /// <param name="e">Startup event arguments.</param>
     /// <returns><see langword="False"/> if the current instance is the primary;
-    /// otherwise <see langword="True"/>, if the args were forwarded.</returns>"/>
+    /// otherwise <see langword="True"/>, if the args were forwarded.</returns>
     private bool ProcessFileOpenForwarding(StartupEventArgs e)
     {
-        _singleInstanceFileOpenBridge = 
-            new SingleInstanceFileOpenBridge(Log.Logger, _host!.Services.GetRequiredService<IMessenger>());
+        if (_singleInstanceFileOpenBridge is null)
+        {
+            throw new InvalidOperationException("Single-instance bridge has not been initialized.");
+        }
+
         if (_singleInstanceFileOpenBridge.IsPrimaryInstance) return false;
-        
+
         using var forwardTimeout = new CancellationTokenSource(TimeSpan.FromSeconds(12));
         var forwarded = _singleInstanceFileOpenBridge
             .ForwardToPrimaryAsync(e.Args, forwardTimeout.Token)
@@ -87,7 +95,6 @@ public sealed partial class App : System.Windows.Application
 
         Shutdown(0);
         return true;
-
     }
 
     private static IHostBuilder CreateHostBuilder()

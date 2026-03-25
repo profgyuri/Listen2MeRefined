@@ -2,6 +2,7 @@
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.DomainObjects;
 using Listen2MeRefined.Core.Enums;
@@ -62,7 +63,9 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         IPlaybackQueueService playbackQueueService,
         ITrackLoader trackLoader,
         IPlaybackOutput playbackOutput,
-        IPlaybackProgressMonitor playbackProgressMonitor, 
+        IPlaybackProgressMonitor playbackProgressMonitor,
+        IAppSettingsReader settingsReader,
+        IOutputDevice outputDevice,
         IMessenger messenger)
     {
         _logger = logger;
@@ -71,6 +74,8 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         _playbackOutput = playbackOutput;
         _playbackProgressMonitor = playbackProgressMonitor;
         _messenger = messenger;
+        
+        InitializeStartupOutputDevice(settingsReader, outputDevice);
         _messenger.Register<NAudioMusicPlayer, AudioOutputDeviceChangedMessage>(
             this,
             static (recipient, message) => recipient.OnAudioOutputDeviceChangedMessage(message));
@@ -364,5 +369,31 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 
         _outputDeviceIndex = device.Index;
         ReconfigureOutput(_state == PlayerState.Playing, preservePosition: true);
+    }
+
+    private void InitializeStartupOutputDevice(IAppSettingsReader settingsReader, IOutputDevice outputDevice)
+    {
+        try
+        {
+            var allDevices = outputDevice.EnumerateOutputDevices().ToArray();
+            var selectedOutputDevice = allDevices
+                .FirstOrDefault(x => x.Name == settingsReader.GetAudioOutputDeviceName())
+                ?? allDevices.FirstOrDefault();
+
+            if (selectedOutputDevice is null)
+            {
+                _logger.Warning("[NAudioMMusicPlayer] No audio output devices were detected on startup.");
+                return;
+            }
+
+            _outputDeviceIndex = selectedOutputDevice.Index;
+            _logger.Information(
+                "[NAudioMMusicPlayer] Selected startup audio output device: {DeviceName}.",
+                selectedOutputDevice.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[NAudioMMusicPlayer] Failed to resolve startup audio output device.");
+        }
     }
 }
