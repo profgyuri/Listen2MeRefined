@@ -116,78 +116,105 @@ public partial class PlaylistPaneViewModel :
     }
 
     [RelayCommand]
-    private async Task OpenPlaylistTab(PlaylistSummary? playlist)
-    {
-        if (playlist is null)
+    private Task OpenPlaylistTab(PlaylistSummary? playlist) =>
+        ExecuteSafeAsync(async _ =>
         {
-            return;
-        }
+            if (playlist is null)
+            {
+                return;
+            }
 
-        var existing = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == playlist.Id);
-        if (existing is not null)
-        {
-            SelectedTab = existing;
-            return;
-        }
+            var existing = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.PlaylistId == playlist.Id);
+            if (existing is not null)
+            {
+                SelectedTab = existing;
+                return;
+            }
 
-        var songs = await _playlistLibraryService.GetPlaylistSongsAsync(playlist.Id);
-        var tab = new PlaylistTabItem(playlist.Name, playlist.Id, new ObservableCollection<AudioModel>(songs));
-        Tabs.Add(tab);
-        SelectedTab = tab;
-    }
+            var songs = await _playlistLibraryService.GetPlaylistSongsAsync(playlist.Id);
+            var tab = new PlaylistTabItem(playlist.Name, playlist.Id, new ObservableCollection<AudioModel>(songs));
+            Tabs.Add(tab);
+            SelectedTab = tab;
+        });
 
     [RelayCommand]
-    private void CloseTab(PlaylistTabItem? tab)
-    {
-        if (tab is null || tab.IsDefaultTab)
+    private Task CloseTab(PlaylistTabItem? tab) =>
+        ExecuteSafeAsync(_ =>
         {
-            return;
-        }
+            if (tab is null || tab.IsDefaultTab)
+            {
+                return Task.CompletedTask;
+            }
 
-        var wasSelected = ReferenceEquals(SelectedTab, tab);
-        var wasActiveSource = _playlistQueueState.ActiveNamedPlaylistId == tab.PlaylistId;
-        Tabs.Remove(tab);
+            var wasSelected = ReferenceEquals(SelectedTab, tab);
+            var wasActiveSource = _playlistQueueState.ActiveNamedPlaylistId == tab.PlaylistId;
+            Tabs.Remove(tab);
 
-        if (wasSelected)
-        {
-            SelectedTab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ??
-                          Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
-        }
+            if (wasSelected)
+            {
+                SelectedTab = Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs, x => x.IsDefaultTab) ??
+                              Enumerable.FirstOrDefault<PlaylistTabItem>(Tabs);
+            }
 
-        if (!wasActiveSource)
-        {
-            return;
-        }
+            if (!wasActiveSource)
+            {
+                return Task.CompletedTask;
+            }
 
-        var canContinue = _playlistQueueRoutingService.SwitchActiveQueueToDefaultPreservingCurrentSong();
-        if (!canContinue)
-        {
-            _playlistQueueRoutingService.SwitchActiveQueueToDefaultAndStop();
-        }
-    }
+            var canContinue = _playlistQueueRoutingService.SwitchActiveQueueToDefaultPreservingCurrentSong();
+            if (!canContinue)
+            {
+                _playlistQueueRoutingService.SwitchActiveQueueToDefaultAndStop();
+            }
+
+            return Task.CompletedTask;
+        });
 
     /// <summary>
     /// Removes selected songs from the active tab, or clears the tab when there is no explicit selection.
     /// </summary>
     [RelayCommand]
-    private async Task RemoveSelectedFromActiveTab()
-    {
-        var tab = SelectedTab;
-        if (tab is null)
+    private Task RemoveSelectedFromActiveTab() =>
+        ExecuteSafeAsync(async _ =>
         {
-            return;
-        }
+            var tab = SelectedTab;
+            if (tab is null)
+            {
+                return;
+            }
 
-        var selectedSongs = _playlistSelectionService.ResolveSelectedSongs(
-            _selectedTabSongs,
-            tab.Songs,
-            SelectedSong);
+            var selectedSongs = _playlistSelectionService.ResolveSelectedSongs(
+                _selectedTabSongs,
+                tab.Songs,
+                SelectedSong);
 
-        if (selectedSongs.Length == 0)
-        {
+            if (selectedSongs.Length == 0)
+            {
+                if (tab.IsDefaultTab)
+                {
+                    _defaultPlaylistService.RemoveFromDefaultPlaylist(_playlistQueueState.DefaultPlaylist.ToArray());
+                    _selectedTabSongs.Clear();
+                    return;
+                }
+
+                if (tab.PlaylistId is null)
+                {
+                    return;
+                }
+
+                var existingPaths = tab.Songs
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Path))
+                    .Select(x => x.Path!)
+                    .ToArray();
+                tab.Songs.Clear();
+                await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, existingPaths);
+                await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
+                return;
+            }
+
             if (tab.IsDefaultTab)
             {
-                _defaultPlaylistService.RemoveFromDefaultPlaylist(_playlistQueueState.DefaultPlaylist.ToArray());
+                _defaultPlaylistService.RemoveFromDefaultPlaylist(selectedSongs);
                 _selectedTabSongs.Clear();
                 return;
             }
@@ -197,116 +224,97 @@ public partial class PlaylistPaneViewModel :
                 return;
             }
 
-            var existingPaths = tab.Songs
-                .Where(x => !string.IsNullOrWhiteSpace(x.Path))
-                .Select(x => x.Path!)
-                .ToArray();
-            tab.Songs.Clear();
-            await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, existingPaths);
-            await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
-            return;
-        }
+            await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, selectedSongs.Select(x => x.Path));
+            foreach (var song in selectedSongs)
+            {
+                tab.Songs.Remove(song);
+            }
 
-        if (tab.IsDefaultTab)
-        {
-            _defaultPlaylistService.RemoveFromDefaultPlaylist(selectedSongs);
+            if (_playlistQueueState.ActiveNamedPlaylistId == tab.PlaylistId)
+            {
+                _playlistQueueRoutingService.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
+            }
+
             _selectedTabSongs.Clear();
-            return;
-        }
-
-        if (tab.PlaylistId is null)
-        {
-            return;
-        }
-
-        await _playlistLibraryService.RemoveSongsByPathAsync(tab.PlaylistId.Value, selectedSongs.Select(x => x.Path));
-        foreach (var song in selectedSongs)
-        {
-            tab.Songs.Remove(song);
-        }
-
-        if (_playlistQueueState.ActiveNamedPlaylistId == tab.PlaylistId)
-        {
-            _playlistQueueRoutingService.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
-        }
-
-        _selectedTabSongs.Clear();
-        await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
-    }
+            await _mediator.Publish(new PlaylistMembershipChangedNotification(tab.PlaylistId.Value));
+        });
 
     [RelayCommand(CanExecute = nameof(CanJumpToSelectedSong))]
-    private Task JumpToSelectedSong()
-    {
-        return _playbackQueueActionsService.JumpToSelectedSongAsync();
-    }
+    private Task JumpToSelectedSong() =>
+        ExecuteSafeAsync(_ => _playbackQueueActionsService.JumpToSelectedSongAsync());
 
     [RelayCommand]
-    private void SetSelectedSongAsNext()
-    {
-        _playbackQueueActionsService.SetSelectedSongAsNext();
-    }
+    private Task SetSelectedSongAsNext() =>
+        ExecuteSafeAsync(_ =>
+        {
+            _playbackQueueActionsService.SetSelectedSongAsNext();
+            return Task.CompletedTask;
+        });
 
     [RelayCommand]
-    private Task ScanSelectedSong()
-    {
-        return _playbackQueueActionsService.ScanSelectedSongAsync();
-    }
+    private Task ScanSelectedSong() =>
+        ExecuteSafeAsync(_ => _playbackQueueActionsService.ScanSelectedSongAsync());
 
     /// <summary>
     /// Activates the selected tab as playback source and jumps to the currently selected song.
     /// </summary>
     [RelayCommand]
-    private async Task PlaySelectedFromActiveTab()
-    {
-        var tab = SelectedTab;
-        if (tab is null || SelectedSong is null)
+    private Task PlaySelectedFromActiveTab() =>
+        ExecuteSafeAsync(async _ =>
         {
-            return;
-        }
+            var tab = SelectedTab;
+            if (tab is null || SelectedSong is null)
+            {
+                return;
+            }
 
-        if (tab.IsDefaultTab)
-        {
-            _playlistQueueRoutingService.ActivateDefaultPlaylistQueue();
-        }
-        else if (tab.PlaylistId is not null)
-        {
-            _playlistQueueRoutingService.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
-        }
+            if (tab.IsDefaultTab)
+            {
+                _playlistQueueRoutingService.ActivateDefaultPlaylistQueue();
+            }
+            else if (tab.PlaylistId is not null)
+            {
+                _playlistQueueRoutingService.ActivateNamedPlaylistQueue(tab.PlaylistId.Value, tab.Songs);
+            }
 
-        var jumpIndex = IndexOfSongByPath(_playlistQueueState.PlayList, SelectedSong.Path);
-        if (jumpIndex < 0)
-        {
-            return;
-        }
+            var jumpIndex = IndexOfSongByPath(_playlistQueueState.PlayList, SelectedSong.Path);
+            if (jumpIndex < 0)
+            {
+                return;
+            }
 
-        _playlistQueueState.SelectedIndex = jumpIndex;
-        _playlistQueueState.SelectedSong = _playlistQueueState.PlayList[jumpIndex];
-        await _playbackQueueActionsService.JumpToSelectedSongAsync();
-    }
+            _playlistQueueState.SelectedIndex = jumpIndex;
+            _playlistQueueState.SelectedSong = _playlistQueueState.PlayList[jumpIndex];
+            await _playbackQueueActionsService.JumpToSelectedSongAsync();
+        });
 
     [RelayCommand]
-    private void PlaylistSelectionAdded(IList items)
-    {
-        var songs = items.Cast<AudioModel>().ToArray();
-        foreach (var song in songs)
+    private Task PlaylistSelectionAdded(IList items) =>
+        ExecuteSafeAsync(_ =>
         {
-            _selectedTabSongs.Add(song);
-        }
+            var songs = items.Cast<AudioModel>().ToArray();
+            foreach (var song in songs)
+            {
+                _selectedTabSongs.Add(song);
+            }
 
-        PublishSongContextSelectionChanged();
-    }
+            PublishSongContextSelectionChanged();
+            return Task.CompletedTask;
+        });
 
     [RelayCommand]
-    private void PlaylistSelectionRemoved(IList items)
-    {
-        var songs = items.Cast<AudioModel>().ToArray();
-        foreach (var song in songs)
+    private Task PlaylistSelectionRemoved(IList items) =>
+        ExecuteSafeAsync(_ =>
         {
-            _selectedTabSongs.Remove(song);
-        }
+            var songs = items.Cast<AudioModel>().ToArray();
+            foreach (var song in songs)
+            {
+                _selectedTabSongs.Remove(song);
+            }
 
-        PublishSongContextSelectionChanged();
-    }
+            PublishSongContextSelectionChanged();
+            return Task.CompletedTask;
+        });
 
     public async Task Handle(PlaylistCreatedNotification notification, CancellationToken cancellationToken)
     {
