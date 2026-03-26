@@ -28,8 +28,6 @@ public sealed class InfrastructureModule : IModule
 
     public void RegisterServices(IServiceCollection services)
     {
-        services.AddOptions<NavigationOptions>().BindConfiguration("Navigation");
-
         var logLocationService = new LocalAppDataLogLocationService();
         logLocationService.EnsureLogDirectoryExists();
 

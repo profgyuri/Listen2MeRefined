@@ -6,6 +6,7 @@ using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Updating;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -13,7 +14,6 @@ namespace Listen2MeRefined.Application.ViewModels.Shells;
 
 public sealed partial class MainShellViewModel : ShellViewModelBase
 {
-    private readonly NavigationOptions _navigationOptions;
     private readonly IWindowManager _windowManager;
     private readonly IAppUpdateChecker _appUpdateChecker;
     private readonly IUiDispatcher _ui;
@@ -25,7 +25,6 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
         ILogger logger, 
         IMessenger messenger, 
         IShellContextFactory context, 
-        IOptions<NavigationOptions> navigationOptions, 
         IWindowManager windowManager, 
         IAppUpdateChecker appUpdateChecker, 
         IUiDispatcher ui) : base(errorHandler, logger, messenger, context.Create())
@@ -33,7 +32,6 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
         _windowManager = windowManager;
         _appUpdateChecker = appUpdateChecker;
         _ui = ui;
-        _navigationOptions = navigationOptions.Value;
     }
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -41,7 +39,7 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
         IsUpdateAvailable = (await _appUpdateChecker.CheckForUpdatesAsync()).IsUpdateAvailable;
         
         await NavigationService
-            .NavigateAsync(_navigationOptions.DefaultRoute, cancellationToken: cancellationToken)
+            .NavigateAsync<MainShellDefaultHomeViewModel>(cancellationToken: cancellationToken)
             .ConfigureAwait(true);
         
         await base.InitializeAsync(cancellationToken);
