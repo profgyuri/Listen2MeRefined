@@ -113,21 +113,8 @@ public sealed partial class App : System.Windows.Application
 
     private static IHostBuilder CreateHostBuilder()
     {
-        var builder = Host.CreateDefaultBuilder();
-
-        builder
-            .ConfigureDataAccess()
-            .ConfigureLogger()
-            .ConfigureNavigation()
-            .ConfigureMusicPlayer()
-            .ConfigureStartup()
-            .ConfigureSystem()
-            .ConfigureUtils()
-            .ConfigureWaveForm()
-            .ConfigureWrappers()
+        return Host.CreateDefaultBuilder()
             .ConfigureModuleServices();
-
-        return builder;
     }
 
     protected override async void OnExit(ExitEventArgs e)
