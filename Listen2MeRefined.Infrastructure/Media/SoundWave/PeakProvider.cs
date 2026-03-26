@@ -27,6 +27,11 @@ public sealed class PeakProvider
             var total = 0.0;
             for (var y = 0; y < BlockSize && i + y < samplesRead; y++)
             {
+                if (_buffer is null)
+                {
+                    break;
+                }
+                
                 total += _buffer[i + y] * _buffer[i + y];
             }
 

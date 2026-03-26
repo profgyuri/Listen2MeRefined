@@ -71,10 +71,10 @@ public class VersionChecker : IVersionChecker
 /// </summary>
 class Release
 {
-    public string Tag_Name { get; set; }
-    public string Name { get; set; }
-    public string Body { get; set; }
-    public Asset[] Assets { get; set; }
+    public string Tag_Name { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+    public Asset[] Assets { get; set; } = [];
     public Version Version => Version.FromString(Tag_Name);
 }
 
