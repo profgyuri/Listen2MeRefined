@@ -12,8 +12,7 @@
              xmlns:contextMenus="clr-namespace:Listen2MeRefined.WPF.Views.ContextMenus"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
-    <Border Style="{DynamicResource BorderContainer}"
-            Margin="0,8,0,0" >
+    <Border Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

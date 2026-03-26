@@ -10,31 +10,29 @@
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <Grid Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" MinHeight="150" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" MinHeight="150" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+        </Grid.ColumnDefinitions>
 
-            <Grid Grid.ColumnSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <ContentControl Content="{Binding TrackInfoViewModel}" Grid.Column="0"/>
-                <ContentControl Content="{Binding PlaybackControlsViewModel}" Grid.Column="1"/>
-            </Grid>
+        <ContentControl Content="{Binding TrackInfoViewModel}" Grid.Row="1" Grid.Column="1"/>
+        <ContentControl Content="{Binding PlaybackControlsViewModel}" Grid.Row="1" Grid.Column="3"/>
             
-            <ContentControl Content="{Binding SearchResultsPaneViewModel}" Grid.Row="1" Grid.Column="0"/>
-            <ContentControl Content="{Binding PlaylistPaneViewModel}" Grid.Row="1" Grid.Column="1"/>
-            <ContentControl Content="{Binding SearchbarViewModel}" Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" />
+        <ContentControl Content="{Binding SearchResultsPaneViewModel}" Grid.Row="3" Grid.Column="1"/>
+        <ContentControl Content="{Binding PlaylistPaneViewModel}" Grid.Row="3" Grid.Column="3"/>
+        <ContentControl Content="{Binding SearchbarViewModel}" Grid.Row="5" Grid.ColumnSpan="3" Grid.Column="1" />
             
-        </Grid>
     </Grid>
 </UserControl>

@@ -7,8 +7,7 @@
              d:DataContext="{d:DesignInstance widgets:TrackInfoViewModel}"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:widgets="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
-    <Border Style="{DynamicResource BorderContainer}"
-            Margin="0,0,10,0">
+    <Border Style="{DynamicResource BorderContainer}">
         <Grid ClipToBounds="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

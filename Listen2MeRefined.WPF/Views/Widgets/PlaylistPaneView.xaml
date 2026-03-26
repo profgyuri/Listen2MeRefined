@@ -15,8 +15,7 @@
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
 
-    <Border Margin="0,16,0,12"
-            Style="{DynamicResource BorderContainer}">
+    <Border Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="44"/>

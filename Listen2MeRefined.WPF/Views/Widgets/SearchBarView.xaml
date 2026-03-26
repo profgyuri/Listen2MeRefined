@@ -8,8 +8,7 @@
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance widgetViewModels:SearchbarViewModel}">
-    <Border Style="{DynamicResource BorderContainer}"
-            Margin="0,12,0,0">
+    <Border Style="{DynamicResource BorderContainer}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
