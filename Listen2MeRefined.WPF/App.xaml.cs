@@ -123,14 +123,7 @@ public sealed partial class App : System.Windows.Application
 
         if (_host is not null)
         {
-            try
-            {
-                await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-            }
-            finally
-            {
-                _host.Dispose();
-            }
+            await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
         }
 
         await Log.CloseAndFlushAsync();
