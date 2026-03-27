@@ -11,6 +11,7 @@ using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
+using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Serilog;
 
@@ -93,6 +94,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
         RegisterMessage<ExternalAudioFilesOpenedMessage>(OnExternalAudioFilesOpenedMessage);
         RegisterMessage<PlaylistShuffledMessage>(OnPlaylistShuffledMessage);
+        RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
 
         var defaultTab = new PlaylistTabItem("Default", null, _playlistQueueState.DefaultPlaylist);
         Tabs = [defaultTab];
@@ -238,12 +240,45 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         ExecuteSafeAsync(_ =>
         {
             _playbackQueueActionsService.SetSelectedSongAsNext();
+            SyncVisiblePlaylistOrderWithActiveQueue();
             return Task.CompletedTask;
         });
 
     [RelayCommand]
     private Task ScanSelectedSong() =>
         ExecuteSafeAsync(_ => _playbackQueueActionsService.ScanSelectedSongAsync());
+
+    /// <summary>
+    /// Removes only the current selection from the default playlist.
+    /// </summary>
+    public Task RemoveSelectedFromDefaultPlaylistSelectionAsync() =>
+        ExecuteSafeAsync(_ =>
+        {
+            var tab = SelectedTab;
+            if (tab is null || !tab.IsDefaultTab)
+            {
+                return Task.CompletedTask;
+            }
+
+            var selectedSongs = _playlistSelectionService.ResolveSelectedSongs(
+                _selectedTabSongs,
+                tab.Songs,
+                SelectedSong);
+
+            if (selectedSongs.Length == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            _defaultPlaylistService.RemoveFromDefaultPlaylist(selectedSongs);
+            foreach (var song in selectedSongs)
+            {
+                _selectedTabSongs.Remove(song);
+            }
+
+            PublishSongContextSelectionChanged();
+            return Task.CompletedTask;
+        });
 
     /// <summary>
     /// Activates the selected tab as playback source and jumps to the currently selected song.
@@ -481,32 +516,54 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     {
         try
         {
-            _playlistQueueRoutingService.SyncDefaultPlaylistOrder();
-
-            var tab = SelectedTab;
-            if (tab is null ||
-                _playlistQueueState.ActiveNamedPlaylistId != tab.PlaylistId ||
-                tab.IsDefaultTab)
-            {
-                return;
-            }
-
-            var target = _playlistQueueState.PlayList;
-            var songs = tab.Songs;
-
-            for (int i = 0; i < target.Count; i++)
-            {
-                var currentPos = songs.IndexOf(target[i]);
-                if (currentPos >= 0 && currentPos != i)
-                {
-                    songs.Move(currentPos, i);
-                }
-            }
+            SyncVisiblePlaylistOrderWithActiveQueue();
         }
         catch (Exception e)
         {
             Logger.Error(e, "Failed to shuffle playlist");
         }
+    }
+
+    private void SyncVisiblePlaylistOrderWithActiveQueue()
+    {
+        _playlistQueueRoutingService.SyncDefaultPlaylistOrder();
+
+        var tab = SelectedTab;
+        if (tab is null ||
+            tab.IsDefaultTab ||
+            _playlistQueueState.ActiveNamedPlaylistId != tab.PlaylistId)
+        {
+            return;
+        }
+
+        var target = _playlistQueueState.PlayList;
+        var songs = tab.Songs;
+        for (var index = 0; index < target.Count; index++)
+        {
+            var currentPos = songs.IndexOf(target[index]);
+            if (currentPos >= 0 && currentPos != index)
+            {
+                songs.Move(currentPos, index);
+            }
+        }
+    }
+
+    private void OnPlaylistContextMenuActionRequestedMessage(PlaylistContextMenuActionRequestedMessage message)
+    {
+        var request = message.Value;
+        if (!ReferenceEquals(request.SourceViewModel, this))
+        {
+            return;
+        }
+
+        _ = request.Action switch
+        {
+            PlaylistContextMenuAction.Rescan => ScanSelectedSong(),
+            PlaylistContextMenuAction.PlayNow => PlaySelectedFromActiveTab(),
+            PlaylistContextMenuAction.PlayAfterCurrent => SetSelectedSongAsNext(),
+            PlaylistContextMenuAction.RemoveFromPlaylist => RemoveSelectedFromDefaultPlaylistSelectionAsync(),
+            _ => Task.CompletedTask
+        };
     }
 
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)

@@ -5,6 +5,7 @@ using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.ViewModels.Widgets;
+using Listen2MeRefined.Core.Enums;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.ContextMenus;
@@ -17,6 +18,9 @@ public partial class SongContextMenuViewModel : ViewModelBase
     private bool _isMenuOpen;
 
     [ObservableProperty] private ObservableCollection<SongContextMenuItemViewModel> _playlists = [];
+
+    public bool ShowPlaylistActions { get; private set; }
+    public bool ShowRemoveFromPlaylistAction { get; private set; }
 
     public SongContextMenuViewModel(
         IErrorHandler errorHandler,
@@ -90,9 +94,34 @@ public partial class SongContextMenuViewModel : ViewModelBase
         await RefreshAsync(ct);
     }
 
+    public Task RescanAsync(CancellationToken ct = default)
+    {
+        return SendPlaylistActionRequest(PlaylistContextMenuAction.Rescan);
+    }
+
+    public Task PlayNowAsync(CancellationToken ct = default)
+    {
+        return SendPlaylistActionRequest(PlaylistContextMenuAction.PlayNow);
+    }
+
+    public Task PlayAfterCurrentAsync(CancellationToken ct = default)
+    {
+        return SendPlaylistActionRequest(PlaylistContextMenuAction.PlayAfterCurrent);
+    }
+
+    public Task RemoveFromPlaylistAsync(CancellationToken ct = default)
+    {
+        return SendPlaylistActionRequest(
+            PlaylistContextMenuAction.RemoveFromPlaylist,
+            requireDefaultPlaylistHost: true);
+    }
+
     private async Task RefreshAsync(CancellationToken ct = default)
     {
         var context = GetContext();
+        ShowPlaylistActions = context.IsPlaylistHost;
+        ShowRemoveFromPlaylistAction = context.IsDefaultPlaylistHost;
+
         if (context.SelectedSongPaths.Count == 0)
         {
             Playlists = [];
@@ -121,7 +150,9 @@ public partial class SongContextMenuViewModel : ViewModelBase
                 _songContextSelectionService.ResolveSearchSelectionPaths(
                     searchResultsPaneViewModel.GetDirectSongContextSelection(),
                     searchResultsPaneViewModel.GetFallbackSongContextSelection()),
-                searchResultsPaneViewModel.GetSongContextActivePlaylistId());
+                searchResultsPaneViewModel.GetSongContextActivePlaylistId(),
+                IsPlaylistHost: false,
+                IsDefaultPlaylistHost: false);
         }
 
         if (_hostViewModel is PlaylistPaneViewModel playlistPaneViewModel)
@@ -131,10 +162,12 @@ public partial class SongContextMenuViewModel : ViewModelBase
                     playlistPaneViewModel.GetSelectedTabSongContextSelection(),
                     playlistPaneViewModel.GetCurrentTabSongContextSelection(),
                     playlistPaneViewModel.SelectedSong),
-                playlistPaneViewModel.GetSongContextActivePlaylistId());
+                playlistPaneViewModel.GetSongContextActivePlaylistId(),
+                IsPlaylistHost: true,
+                IsDefaultPlaylistHost: playlistPaneViewModel.SelectedTab?.IsDefaultTab == true);
         }
 
-        return new SongContextSelectionContext([], null);
+        return new SongContextSelectionContext([], null, IsPlaylistHost: false, IsDefaultPlaylistHost: false);
     }
 
     private void OnSelectionChangedMessage(SongContextMenuSelectionChangedMessage message)
@@ -147,17 +180,29 @@ public partial class SongContextMenuViewModel : ViewModelBase
         _ = ExecuteSafeAsync(ct => RefreshAsync(ct));
     }
 
-    private sealed record SongContextSelectionContext(IReadOnlyList<string> SelectedSongPaths, int? ActivePlaylistId);
-}
+    private sealed record SongContextSelectionContext(
+        IReadOnlyList<string> SelectedSongPaths,
+        int? ActivePlaylistId,
+        bool IsPlaylistHost,
+        bool IsDefaultPlaylistHost);
 
-public sealed class SongContextMenuItemViewModel(
-    int playlistId,
-    string playlistName,
-    bool isChecked,
-    bool allowRemove)
-{
-    public int PlaylistId { get; } = playlistId;
-    public string PlaylistName { get; } = playlistName;
-    public bool IsChecked { get; set; } = isChecked;
-    public bool AllowRemove { get; } = allowRemove;
+    private Task SendPlaylistActionRequest(
+        PlaylistContextMenuAction action,
+        bool requireDefaultPlaylistHost = false)
+    {
+        if (_hostViewModel is not PlaylistPaneViewModel playlistHost)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (requireDefaultPlaylistHost && playlistHost.SelectedTab?.IsDefaultTab != true)
+        {
+            return Task.CompletedTask;
+        }
+
+        Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
+            new PlaylistContextMenuActionRequest(playlistHost, action)));
+
+        return Task.CompletedTask;
+    }
 }

@@ -193,7 +193,11 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         if (_currentSong is null)
         {
             await LoadSongAsync(shuffledCurrentTrack);
+            return;
         }
+
+        // Re-publish current track so shared queue state can refresh CurrentSongIndex after reordering.
+        _messenger.Send(new CurrentSongChangedMessage(_currentSong));
     }
 
     internal async Task CheckPlaybackProgressAsync()

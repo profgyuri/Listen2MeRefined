@@ -1,6 +1,7 @@
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Playlist;
 
@@ -59,14 +60,43 @@ public sealed class PlaybackQueueActionsService : IPlaybackQueueActionsService
             return;
         }
 
-        var selectedSongIndex = _queueState.PlayList.IndexOf(selectedSong);
-        var newIndex = _queueState.CurrentSongIndex + 1;
-        if (newIndex >= _queueState.PlayList.Count)
+        var currentSongIndex = _queueState.CurrentSongIndex;
+        if (currentSongIndex < 0 || currentSongIndex >= _queueState.PlayList.Count)
         {
-            newIndex = 0;
+            return;
         }
 
-        _queueState.PlayList.Move(selectedSongIndex, newIndex);
+        var selectedSongIndex = IndexOfSongByPath(_queueState.PlayList, selectedSong.Path);
+        if (selectedSongIndex < 0)
+        {
+            return;
+        }
+
+        selectedSong = _queueState.PlayList[selectedSongIndex];
+        var currentSong = _queueState.PlayList[currentSongIndex];
+        if (ReferenceEquals(selectedSong, currentSong))
+        {
+            return;
+        }
+
+        _queueState.PlayList.RemoveAt(selectedSongIndex);
+
+        var updatedCurrentSongIndex = _queueState.PlayList.IndexOf(currentSong);
+        if (updatedCurrentSongIndex < 0)
+        {
+            return;
+        }
+
+        var insertionIndex = updatedCurrentSongIndex + 1;
+        if (insertionIndex >= _queueState.PlayList.Count)
+        {
+            insertionIndex = 0;
+        }
+
+        _queueState.PlayList.Insert(insertionIndex, selectedSong);
+        _queueState.CurrentSongIndex = _queueState.PlayList.IndexOf(currentSong);
+        _queueState.SelectedIndex = _queueState.PlayList.IndexOf(selectedSong);
+        _queueState.SelectedSong = selectedSong;
     }
 
     /// <inheritdoc />
@@ -86,5 +116,25 @@ public sealed class PlaybackQueueActionsService : IPlaybackQueueActionsService
         }
 
         _queueState.SelectedSong = scanned;
+    }
+
+    private static int IndexOfSongByPath(IReadOnlyList<AudioModel> songs, string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return -1;
+        }
+
+        for (var index = 0; index < songs.Count; index++)
+        {
+            var songPath = songs[index].Path;
+            if (!string.IsNullOrWhiteSpace(songPath) &&
+                songPath.Equals(path, StringComparison.OrdinalIgnoreCase))
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 }

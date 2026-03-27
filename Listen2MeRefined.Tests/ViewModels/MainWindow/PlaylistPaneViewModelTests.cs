@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
@@ -64,6 +65,111 @@ public class PlaylistPaneViewModelTests
 
         Assert.Empty(queueServices.State.DefaultPlaylist);
         Assert.Empty(queueServices.State.PlayList);
+    }
+
+    [Fact]
+    public async Task RemoveSelectedFromDefaultPlaylistSelectionAsync_WithSelection_RemovesOnlySelectedSong()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var keepSong = new AudioModel { Title = "Keep", Path = "keep.mp3" };
+        var removeSong = new AudioModel { Title = "Remove", Path = "remove.mp3" };
+        queueServices.State.DefaultPlaylist.Add(keepSong);
+        queueServices.State.DefaultPlaylist.Add(removeSong);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = removeSong;
+
+        await pane.RemoveSelectedFromDefaultPlaylistSelectionAsync();
+
+        Assert.Single(queueServices.State.DefaultPlaylist);
+        Assert.Contains(keepSong, queueServices.State.DefaultPlaylist);
+        Assert.DoesNotContain(removeSong, queueServices.State.DefaultPlaylist);
+    }
+
+    [Fact]
+    public async Task RemoveSelectedFromDefaultPlaylistSelectionAsync_WithoutSelection_DoesNotClearDefaultQueue()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var first = new AudioModel { Title = "First", Path = "first.mp3" };
+        var second = new AudioModel { Title = "Second", Path = "second.mp3" };
+        queueServices.State.DefaultPlaylist.Add(first);
+        queueServices.State.DefaultPlaylist.Add(second);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = null;
+
+        await pane.RemoveSelectedFromDefaultPlaylistSelectionAsync();
+
+        Assert.Equal(2, queueServices.State.DefaultPlaylist.Count);
+        Assert.Contains(first, queueServices.State.DefaultPlaylist);
+        Assert.Contains(second, queueServices.State.DefaultPlaylist);
+    }
+
+    [Fact]
+    public async Task SetSelectedSongAsNextCommand_DefaultTab_RefreshesVisibleOrder()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var first = new AudioModel { Title = "A", Path = "a.mp3" };
+        var second = new AudioModel { Title = "B", Path = "b.mp3" };
+        var third = new AudioModel { Title = "C", Path = "c.mp3" };
+        var fourth = new AudioModel { Title = "D", Path = "d.mp3" };
+        queueServices.State.DefaultPlaylist.Add(first);
+        queueServices.State.DefaultPlaylist.Add(second);
+        queueServices.State.DefaultPlaylist.Add(third);
+        queueServices.State.DefaultPlaylist.Add(fourth);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+        queueServices.State.CurrentSongIndex = 2;
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = first;
+
+        await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
+
+        Assert.Equal(["B", "C", "A", "D"], pane.SelectedTab!.Songs.Select(x => x.Title ?? string.Empty).ToArray());
+    }
+
+    [Fact]
+    public async Task SetSelectedSongAsNextCommand_NamedTab_RefreshesVisibleOrder()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        await pane.InitializeAsync();
+
+        var first = new AudioModel { Title = "A", Path = "a.mp3" };
+        var second = new AudioModel { Title = "B", Path = "b.mp3" };
+        var third = new AudioModel { Title = "C", Path = "c.mp3" };
+        var fourth = new AudioModel { Title = "D", Path = "d.mp3" };
+        var namedTab = new PlaylistPaneViewModel.PlaylistTabItem(
+            "Named",
+            42,
+            new ObservableCollection<AudioModel>([first, second, third, fourth]));
+        pane.Tabs.Add(namedTab);
+        pane.SelectedTab = namedTab;
+
+        queueServices.RoutingService.ActivateNamedPlaylistQueue(42, namedTab.Songs);
+        queueServices.State.CurrentSongIndex = 2;
+        pane.SelectedSong = first;
+
+        await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
+
+        Assert.Equal(["B", "C", "A", "D"], namedTab.Songs.Select(x => x.Title ?? string.Empty).ToArray());
     }
 
     [Fact]

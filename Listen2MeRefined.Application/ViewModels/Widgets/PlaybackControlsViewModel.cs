@@ -300,6 +300,12 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     {
         try
         {
+            if (string.Equals(_currentTrackPath, message.Value.Path, StringComparison.OrdinalIgnoreCase))
+            {
+                // Same track notification (for example after queue-only operations) should not redraw waveform.
+                return;
+            }
+
             ArePlaybackButtonsEnabled = false;
             _currentTrackPath = message.Value.Path;
             await DrawPlaceholderLineAsync();

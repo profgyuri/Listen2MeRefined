@@ -237,6 +237,36 @@ public class PlaybackControlsViewModelTests
         await timedTask.StopAsync();
     }
 
+    [Fact]
+    public async Task CurrentSongChangedMessage_SameTrack_DoesNotRedrawWaveform()
+    {
+        var settings = new AppSettings();
+        var (viewModel, _, timedTask, waveFormDrawer, messenger) = await CreateViewModelAsync(settings, waveformResizeDebounce: TimeSpan.Zero);
+
+        var audio = new AudioModel
+        {
+            Path = "E:\\music\\same-track.mp3",
+            Length = TimeSpan.FromSeconds(120)
+        };
+
+        messenger.Send(new CurrentSongChangedMessage(audio));
+        await WaitForInvocationCountAsync(waveFormDrawer, nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync), minimumCount: 1);
+
+        var waveformCallsBefore = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+        var lineCallsBefore = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+
+        messenger.Send(new CurrentSongChangedMessage(audio));
+        await Task.Delay(100);
+
+        var waveformCallsAfter = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+        var lineCallsAfter = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+
+        Assert.Equal(waveformCallsBefore, waveformCallsAfter);
+        Assert.Equal(lineCallsBefore, lineCallsAfter);
+
+        await timedTask.StopAsync();
+    }
+
     private static async Task<(PlaybackControlsViewModel ViewModel, Mock<IMusicPlayerController> MusicPlayer, TimedTask TimedTask, Mock<IWaveFormDrawer<SKBitmap>> WaveFormDrawer, WeakReferenceMessenger Messenger)> CreateViewModelAsync(
         AppSettings settings,
         TimeSpan? waveformResizeDebounce = null)

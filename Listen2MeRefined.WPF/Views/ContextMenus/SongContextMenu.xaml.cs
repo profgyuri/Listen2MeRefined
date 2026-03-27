@@ -38,24 +38,40 @@ public partial class SongContextMenu : ContextMenu
     private void BuildMenu(SongContextMenuViewModel viewModel)
     {
         Items.Clear();
+        Items.Add(BuildPlaylistMenu(viewModel));
+
+        if (!viewModel.ShowPlaylistActions)
+        {
+            return;
+        }
+
+        Items.Add(new Separator());
+        Items.Add(CreateActionMenuItem("Rescan", () => viewModel.RescanAsync()));
+        Items.Add(CreateActionMenuItem("Play now", () => viewModel.PlayNowAsync()));
+        Items.Add(CreateActionMenuItem("Play after current", () => viewModel.PlayAfterCurrentAsync()));
+
+        if (viewModel.ShowRemoveFromPlaylistAction)
+        {
+            Items.Add(CreateActionMenuItem("Remove from playlist", () => viewModel.RemoveFromPlaylistAsync()));
+        }
+    }
+
+    private MenuItem BuildPlaylistMenu(SongContextMenuViewModel viewModel)
+    {
+        var playlistMenuItem = CreateStyledMenuItem("Playlist");
 
         foreach (var state in viewModel.Playlists)
         {
-            var menuItem = new MenuItem
-            {
-                Header = state.PlaylistName,
-                IsCheckable = true,
-                IsChecked = state.IsChecked,
-                Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
-            };
-
-            menuItem.Click += async (_, _) =>
+            var membershipMenuItem = CreateStyledMenuItem(state.PlaylistName);
+            membershipMenuItem.IsCheckable = true;
+            membershipMenuItem.IsChecked = state.IsChecked;
+            membershipMenuItem.Click += async (_, _) =>
             {
                 var previousChecked = state.IsChecked;
-                var shouldContain = menuItem.IsChecked;
+                var shouldContain = membershipMenuItem.IsChecked;
                 if (!state.AllowRemove && !shouldContain)
                 {
-                    menuItem.IsChecked = true;
+                    membershipMenuItem.IsChecked = true;
                     return;
                 }
 
@@ -66,34 +82,32 @@ public partial class SongContextMenu : ContextMenu
                 }
                 catch
                 {
-                    menuItem.IsChecked = previousChecked;
+                    membershipMenuItem.IsChecked = previousChecked;
                     state.IsChecked = previousChecked;
                 }
             };
 
-            Items.Add(menuItem);
+            playlistMenuItem.Items.Add(membershipMenuItem);
         }
 
-        if (viewModel.Playlists.Count > 0)
+        if (playlistMenuItem.Items.Count > 0)
         {
-            Items.Add(new Separator());
+            playlistMenuItem.Items.Add(new Separator());
         }
 
-        var addToNewPlaylistMenuItem = new MenuItem
-        {
-            Header = "Add To New Playlist",
-            StaysOpenOnClick = true,
-            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
-        };
+        var addToNewPlaylistMenuItem = CreateStyledMenuItem("Add To New Playlist");
+        addToNewPlaylistMenuItem.StaysOpenOnClick = true;
         addToNewPlaylistMenuItem.Click += (_, _) =>
-            AddInlineNewPlaylistDraft(viewModel, addToNewPlaylistMenuItem);
+            AddInlineNewPlaylistDraft(viewModel, addToNewPlaylistMenuItem, playlistMenuItem.Items);
+        playlistMenuItem.Items.Add(addToNewPlaylistMenuItem);
 
-        Items.Add(addToNewPlaylistMenuItem);
+        return playlistMenuItem;
     }
 
     private void AddInlineNewPlaylistDraft(
         SongContextMenuViewModel viewModel,
-        MenuItem addToNewPlaylistMenuItem)
+        MenuItem addToNewPlaylistMenuItem,
+        ItemCollection parentItems)
     {
         if (addToNewPlaylistMenuItem.Tag is MenuItem existingDraft &&
             existingDraft.Header is TextBox existingTextBox)
@@ -114,14 +128,14 @@ public partial class SongContextMenu : ContextMenu
         addToNewPlaylistMenuItem.Tag = draftMenuItem;
         addToNewPlaylistMenuItem.IsEnabled = false;
 
-        var insertIndex = Items.IndexOf(addToNewPlaylistMenuItem);
+        var insertIndex = parentItems.IndexOf(addToNewPlaylistMenuItem);
         if (insertIndex < 0)
         {
-            Items.Add(draftMenuItem);
+            parentItems.Add(draftMenuItem);
         }
         else
         {
-            Items.Insert(insertIndex, draftMenuItem);
+            parentItems.Insert(insertIndex, draftMenuItem);
         }
 
         textBox.Loaded += (_, _) =>
@@ -134,7 +148,7 @@ public partial class SongContextMenu : ContextMenu
         {
             if (args.Key == Key.Escape)
             {
-                Items.Remove(draftMenuItem);
+                parentItems.Remove(draftMenuItem);
                 addToNewPlaylistMenuItem.Tag = null;
                 addToNewPlaylistMenuItem.IsEnabled = true;
                 args.Handled = true;
@@ -167,6 +181,22 @@ public partial class SongContextMenu : ContextMenu
             }
 
             args.Handled = true;
+        };
+    }
+
+    private MenuItem CreateActionMenuItem(string header, Func<Task> action)
+    {
+        var menuItem = CreateStyledMenuItem(header);
+        menuItem.Click += async (_, _) => await action();
+        return menuItem;
+    }
+
+    private MenuItem CreateStyledMenuItem(string header)
+    {
+        return new MenuItem
+        {
+            Header = header,
+            Style = (Style?)FindResource("PlaylistContextMenuItemStyle")
         };
     }
 
