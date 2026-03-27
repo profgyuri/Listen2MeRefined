@@ -1,8 +1,7 @@
-using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using Listen2MeRefined.Application.ErrorHandling;
-using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation.Windows;
+using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Shells;
 using Listen2MeRefined.WPF.Dependency;
 using Listen2MeRefined.WPF.ErrorHandling;
@@ -58,8 +57,8 @@ public sealed partial class App : System.Windows.Application
 
             _errorHandler = _host.Services.GetRequiredService<IErrorHandler>();
 
-            var messenger = _host.Services.GetRequiredService<IMessenger>();
-            _singleInstanceFileOpenBridge.AttachMessenger(messenger);
+            var externalAudioOpenInbox = _host.Services.GetRequiredService<IExternalAudioOpenInbox>();
+            _singleInstanceFileOpenBridge.AttachInbox(externalAudioOpenInbox);
             await _host.StartAsync().ConfigureAwait(true);
 
             var windowManager = _host.Services.GetRequiredService<IWindowManager>();
@@ -67,7 +66,7 @@ public sealed partial class App : System.Windows.Application
 
             if (e.Args.Length > 0)
             {
-                messenger.Send(new ExternalAudioFilesOpenedMessage(e.Args));
+                externalAudioOpenInbox.Enqueue(e.Args);
             }
         }
         catch (Exception ex)

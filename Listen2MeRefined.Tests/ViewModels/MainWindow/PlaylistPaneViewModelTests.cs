@@ -13,6 +13,7 @@ using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Playlist;
+using Listen2MeRefined.Infrastructure.Startup;
 using Moq;
 using Serilog;
 
@@ -201,6 +202,7 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object,
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
+            Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger.Object, messenger));
 
@@ -243,6 +245,7 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object,
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
+            Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger.Object, messenger));
 
@@ -286,17 +289,60 @@ public class PlaylistPaneViewModelTests
     }
 
     [Fact]
-    public async Task ExternalAudioFilesOpenedMessage_ForwardsPathsToExternalAudioOpenService()
+    public async Task ExternalAudioOpenInbox_LivePaths_ForwardedToExternalAudioOpenService()
     {
         var logger = CreateLogger();
         var messenger = new WeakReferenceMessenger();
         var queueServices = CreateQueueServices(logger.Object);
         var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
-        var pane = CreatePane(logger.Object, messenger, queueServices, externalAudioOpenService.Object);
+        var externalAudioOpenInbox = new ExternalAudioOpenInbox(logger.Object);
+        var pane = CreatePane(
+            logger.Object,
+            messenger,
+            queueServices,
+            externalAudioOpenService.Object,
+            externalAudioOpenInbox);
         await pane.InitializeAsync();
 
         var paths = new[] { "a.mp3", "b.mp3" };
-        messenger.Send(new ExternalAudioFilesOpenedMessage(paths));
+        externalAudioOpenInbox.Enqueue(paths);
+
+        for (var i = 0; i < 20; i++)
+        {
+            if (externalAudioOpenService.Invocations.Count > 0)
+            {
+                break;
+            }
+
+            await Task.Delay(25);
+        }
+
+        externalAudioOpenService.Verify(
+            x => x.OpenAsync(
+                It.Is<IReadOnlyList<string>>(value => value.SequenceEqual(paths)),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ExternalAudioOpenInbox_PathsQueuedBeforeInitialization_AreReplayedToExternalAudioOpenService()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
+        var externalAudioOpenInbox = new ExternalAudioOpenInbox(logger.Object);
+        var pane = CreatePane(
+            logger.Object,
+            messenger,
+            queueServices,
+            externalAudioOpenService.Object,
+            externalAudioOpenInbox);
+
+        var paths = new[] { "pre-init-a.mp3", "pre-init-b.mp3" };
+        externalAudioOpenInbox.Enqueue(paths);
+
+        await pane.InitializeAsync();
 
         for (var i = 0; i < 20; i++)
         {
@@ -342,7 +388,8 @@ public class PlaylistPaneViewModelTests
         ILogger logger,
         IMessenger messenger,
         QueueServices queueServices,
-        IExternalAudioOpenService? externalAudioOpenService = null)
+        IExternalAudioOpenService? externalAudioOpenService = null,
+        IExternalAudioOpenInbox? externalAudioOpenInbox = null)
     {
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
@@ -364,6 +411,7 @@ public class PlaylistPaneViewModelTests
             playlistLibrary.Object,
             queueServices.PlaybackContextSyncService,
             externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
+            externalAudioOpenInbox ?? Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
             CreateSongContextMenuViewModel(logger, messenger));
     }

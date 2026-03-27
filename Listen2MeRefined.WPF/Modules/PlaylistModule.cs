@@ -33,6 +33,7 @@ public sealed class PlaylistModule : IModule
         services.AddTransient<IDroppedSongFolderPromptService, DroppedSongFolderPromptService>();
         services.AddSingleton<IExternalDropImportService, ExternalDropImportService>();
         services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();
+        services.AddSingleton<IExternalAudioOpenInbox, ExternalAudioOpenInbox>();
 
         services.AddTransient<PlaylistPaneViewModel>();
         services.AddTransient<PlaylistPaneView>();

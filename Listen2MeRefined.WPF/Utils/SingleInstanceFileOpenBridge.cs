@@ -1,5 +1,4 @@
-using CommunityToolkit.Mvvm.Messaging;
-using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Utils;
 using Serilog;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +23,7 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
     private readonly CancellationTokenSource _shutdown = new();
     private readonly Lock _listenerGate = new();
 
-    private IMessenger? _messenger;
+    private IExternalAudioOpenInbox? _externalAudioOpenInbox;
     private bool _listenerStarted;
 
     /// <summary>
@@ -44,11 +43,11 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
     public bool IsPrimaryInstance => _isPrimaryInstance;
 
     /// <summary>
-    /// Starts pipe listening in the primary instance using the provided messenger.
+    /// Starts pipe listening in the primary instance using the provided shell-open inbox.
     /// </summary>
-    public void AttachMessenger(IMessenger messenger)
+    public void AttachInbox(IExternalAudioOpenInbox externalAudioOpenInbox)
     {
-        ArgumentNullException.ThrowIfNull(messenger);
+        ArgumentNullException.ThrowIfNull(externalAudioOpenInbox);
 
         if (!_isPrimaryInstance)
         {
@@ -57,7 +56,7 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
 
         lock (_listenerGate)
         {
-            _messenger = messenger;
+            _externalAudioOpenInbox = externalAudioOpenInbox;
             if (_listenerStarted || _shutdown.IsCancellationRequested)
             {
                 return;
@@ -159,13 +158,13 @@ internal sealed class SingleInstanceFileOpenBridge : IDisposable
                     "[SingleInstanceFileOpenBridge] Received {Count} forwarded path(s) from secondary instance",
                     paths.Length);
 
-                if (_messenger is null)
+                if (_externalAudioOpenInbox is null)
                 {
-                    _logger.Warning("[SingleInstanceFileOpenBridge] Messenger is not attached yet; dropping forwarded paths.");
+                    _logger.Warning("[SingleInstanceFileOpenBridge] Inbox is not attached yet; dropping forwarded paths.");
                     continue;
                 }
 
-                _messenger.Send(new ExternalAudioFilesOpenedMessage(paths));
+                _externalAudioOpenInbox.Enqueue(paths);
             }
             catch (OperationCanceledException) when (ct.IsCancellationRequested)
             {

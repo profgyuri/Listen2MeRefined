@@ -29,6 +29,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IPlaybackContextSyncService _playbackContextSyncService;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
+    private readonly IExternalAudioOpenInbox _externalAudioOpenInbox;
     private readonly HashSet<AudioModel> _selectedTabSongs = [];
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
@@ -65,6 +66,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         IPlaylistLibraryService playlistLibraryService,
         IPlaybackContextSyncService playbackContextSyncService,
         IExternalAudioOpenService externalAudioOpenService,
+        IExternalAudioOpenInbox externalAudioOpenInbox,
         IAppSettingsReader settingsReader,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
@@ -78,6 +80,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         _playlistLibraryService = playlistLibraryService;
         _playbackContextSyncService = playbackContextSyncService;
         _externalAudioOpenService = externalAudioOpenService;
+        _externalAudioOpenInbox = externalAudioOpenInbox;
         SongContextMenuViewModel = songContextMenuViewModel;
         _playlistQueueState.PropertyChanged += PlaylistQueueStateOnPropertyChanged;
     }
@@ -92,7 +95,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
         RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
-        RegisterMessage<ExternalAudioFilesOpenedMessage>(OnExternalAudioFilesOpenedMessage);
         RegisterMessage<PlaylistShuffledMessage>(OnPlaylistShuffledMessage);
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
 
@@ -104,6 +106,8 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         IsCompactPlaylistView = _settingsReader.GetUseCompactPlaylistView();
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(ct);
+
+        _externalAudioOpenInbox.RegisterConsumer(OnExternalAudioPathsOpened, replayPending: true);
     }
 
     [RelayCommand]
@@ -588,12 +592,12 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         _playbackContextSyncService.SetCurrentSong(message.Value);
     }
 
-    private void OnExternalAudioFilesOpenedMessage(ExternalAudioFilesOpenedMessage message)
+    private void OnExternalAudioPathsOpened(IReadOnlyList<string> paths)
     {
         Logger.Information(
             "[PlaylistPaneViewModel] Handling {Count} shell-opened audio file(s)",
-            message.Value.Count);
-        _ = ExecuteSafeAsync(ct => _externalAudioOpenService.OpenAsync(message.Value, ct));
+            paths.Count);
+        _ = ExecuteSafeAsync(ct => _externalAudioOpenService.OpenAsync(paths, ct));
     }
     
     public sealed class PlaylistTabItem : ObservableObject

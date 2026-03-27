@@ -292,6 +292,7 @@ public class SongContextMenuViewModelTests
             playlistLibraryService.Object,
             new PlaybackContextSyncService(queueState),
             Mock.Of<IExternalAudioOpenService>(),
+            Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
             songContextMenuViewModel);
     }
