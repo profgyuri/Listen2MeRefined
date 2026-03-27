@@ -28,7 +28,10 @@ public class SettingsModule : IModule
         services.AddTransient<IPlaybackDefaultsService, PlaybackDefaultsService>();
         services.AddTransient<IWindowPositionPolicyService, WindowPositionPolicyService>();
         services.AddSingleton<IAppThemeService, AppThemeService>();
-        services.AddSingleton(_ => new FontFamilies(Fonts.SystemFontFamilies.Select(f => f.Source)));
+        services.AddSingleton(_ => 
+            new FontFamilies(Fonts.SystemFontFamilies
+                .Select(f => f.Source)
+                .OrderBy(f => f)));
 
         services.AddSingleton<ISettingsShellNavigationProvider, SettingsShellNavigationProvider>();
         services.AddTransient<SettingsShellViewModel>();

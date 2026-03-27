@@ -25,6 +25,7 @@
             </Grid.RowDefinitions>
 
             <components:TitleBar Grid.Row="0"
+                                 FontFamily="{Binding FontFamilyName}"
                                  CenterText="Advanced Search"
                                  ShowSettingsButton="False"
                                  ShowMinimizeButton="False"

@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Threading;
@@ -24,6 +25,7 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
     [ObservableProperty] private bool _isTaskStatusVisible;
     [ObservableProperty] private string _taskStatusText = string.Empty;
     [ObservableProperty] private string _taskStatusTooltip = string.Empty;
+    [ObservableProperty] private string _fontFamilyName = string.Empty;
     
     public MainShellViewModel(
         IErrorHandler errorHandler, 
@@ -46,6 +48,8 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
+        
         IsUpdateAvailable = (await _appUpdateChecker.CheckForUpdatesAsync()).IsUpdateAvailable;
         
         await NavigationService
@@ -126,5 +130,11 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
                     ct);
             }
         });
+    }
+    
+    private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
+    {
+        Logger.Debug("[MainShellViewModel] Received FontFamily changed message: {message}", message.Value);
+        FontFamilyName = message.Value;
     }
 }

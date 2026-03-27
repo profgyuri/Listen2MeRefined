@@ -39,11 +39,13 @@
                              Fill="{DynamicResource TertiaryBrush}"
                              Margin="0,0,6,0" />
                     <TextBlock Text="{Binding CenterText, ElementName=Root}"
+                               FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontFamily}"
                                Style="{DynamicResource ComponentTitleBarCenterText}" />
                     <Border Style="{DynamicResource ComponentTitleBarStatusBadgeBorder}"
                             ToolTip="{Binding TaskStatusTooltip, ElementName=Root}"
                             Visibility="{Binding ShowTaskStatus, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
                         <TextBlock Text="{Binding TaskStatusText, ElementName=Root}"
+                                   FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontFamily}"
                                    Style="{DynamicResource ComponentTitleBarStatusBadgeText}" />
                     </Border>
                 </StackPanel>

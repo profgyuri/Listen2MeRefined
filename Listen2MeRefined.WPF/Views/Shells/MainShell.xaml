@@ -23,7 +23,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <components:TitleBar CenterText="Desktop Player"
+            <components:TitleBar FontFamily="{Binding FontFamilyName}" 
+                                 CenterText="Desktop Player"
                                  ShowSettingsButton="True"
                                  ShowMinimizeButton="True"
                                  ShowMaximizeButton="True"
