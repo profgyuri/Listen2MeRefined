@@ -1,5 +1,6 @@
+using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Infrastructure.Startup;
-using Listen2MeRefined.Infrastructure.Startup.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace Listen2MeRefined.Tests.Startup;
@@ -33,7 +34,7 @@ public class StartupManagerTests
 
         var startupManager = new StartupManager(
             migrationTask,
-            independentTasks,
+            BuildServiceProvider(independentTasks),
             TestLogger);
 
         var startupRun = startupManager.StartAsync();
@@ -62,7 +63,7 @@ public class StartupManagerTests
 
         var startupManager = new StartupManager(
             migrationTask,
-            [migrationTask, failingTask, successfulTask],
+            BuildServiceProvider([migrationTask, failingTask, successfulTask]),
             TestLogger);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => startupManager.StartAsync());
@@ -82,14 +83,14 @@ public class StartupManagerTests
 
         var startupManager = new StartupManager(
             migrationTask,
-            [
+            BuildServiceProvider([
                 migrationTask,
                 new FakeStartupTask(_ =>
                 {
                     independentTaskExecuted = true;
                     return Task.CompletedTask;
                 })
-            ],
+            ]),
             TestLogger);
 
         using var cts = new CancellationTokenSource();
@@ -106,4 +107,15 @@ public class StartupManagerTests
 
     private sealed class FakeDatabaseMigrationStartupTask(Func<CancellationToken, Task> runAsync)
         : FakeStartupTask(runAsync), IDatabaseMigrationStartupTask;
+
+    private static ServiceProvider BuildServiceProvider(IEnumerable<IStartupTask> startupTasks)
+    {
+        var serviceCollection = new ServiceCollection();
+        foreach (var startupTask in startupTasks)
+        {
+            serviceCollection.AddSingleton(typeof(IStartupTask), startupTask);
+        }
+
+        return serviceCollection.BuildServiceProvider();
+    }
 }

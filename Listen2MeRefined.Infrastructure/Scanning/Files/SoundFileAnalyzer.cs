@@ -1,4 +1,6 @@
 using Ardalis.GuardClauses;
+using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Core.Models;
 using File = TagLib.File;
 
 namespace Listen2MeRefined.Infrastructure.Scanning.Files;
@@ -27,7 +29,7 @@ public sealed class SoundFileAnalyzer : IFileAnalyzer<AudioModel>
             Title = file.Tag.Title,
             Artist = string.Join("; ", file.Tag.Performers!),
             Genre = string.Join("; ", file.Tag.Genres!),
-            BPM = (short)file.Tag.BeatsPerMinute,
+            BPM = file.Tag.BeatsPerMinute,
             Bitrate = (short)file.Properties.AudioBitrate,
             Length = file.Properties.Duration,
             LastWriteUtc = info.LastWriteTimeUtc,

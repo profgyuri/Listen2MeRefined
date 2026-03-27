@@ -1,0 +1,49 @@
+<Window x:Class="Listen2MeRefined.WPF.Views.Shells.CrashReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:popups="clr-namespace:Listen2MeRefined.WPF.Views.Popups"
+        mc:Ignorable="d"
+        d:DesignHeight="500"
+        d:DesignWidth="680"
+        Style="{DynamicResource BasicWindow}"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        Width="680"
+        Height="500"
+        MinWidth="680"
+        MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Title="Unexpected Error">
+    <Border BorderThickness="2"
+            BorderBrush="{DynamicResource TertiaryBrush}"
+            Background="{DynamicResource PrimaryBrush}"
+            CornerRadius="0,0,8,8">
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <popups:CrashReportPopup x:Name="CrashReportContent" />
+
+            <StackPanel Grid.Row="1"
+                        Margin="12,6,12,12"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button x:Name="PrimaryActionButton"
+                        MinWidth="170"
+                        Margin="0,0,10,0"
+                        Style="{DynamicResource WindowFooterActionButton}"
+                        Click="PrimaryActionButton_OnClick" />
+                <Button x:Name="SecondaryActionButton"
+                        MinWidth="120"
+                        Style="{DynamicResource WindowFooterActionButton}"
+                        Click="SecondaryActionButton_OnClick" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

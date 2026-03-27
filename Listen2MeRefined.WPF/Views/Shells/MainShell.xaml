@@ -1,0 +1,44 @@
+﻿<Window x:Class="Listen2MeRefined.WPF.Views.Shells.MainShell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
+        xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance shells:MainShellViewModel}"
+        Style="{DynamicResource BasicWindow}"
+        WindowStartupLocation="Manual"
+        MinHeight="502" MinWidth="1030"
+        Height="752" Width="1030">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
+    </WindowChrome.WindowChrome>
+
+    <Border BorderThickness="2" BorderBrush="{DynamicResource TertiaryBrush}" Background="{DynamicResource PrimaryBrush}" CornerRadius="0, 0, 8, 8">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding ElementName=WindowChrome, Path=CaptionHeight, FallbackValue=40}" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <components:TitleBar FontFamily="{Binding FontFamilyName}" 
+                                 CenterText="Desktop Player"
+                                 ShowSettingsButton="True"
+                                 ShowMinimizeButton="True"
+                                 ShowMaximizeButton="True"
+                                 ShowCloseButton="True"
+                                 ShowTaskStatus="{Binding IsTaskStatusVisible}"
+                                 TaskStatusText="{Binding TaskStatusText}"
+                                 TaskStatusTooltip="{Binding TaskStatusTooltip}"
+                                 SettingsCommand="{Binding OpenSettingsWindowCommand}"
+                                 MinimizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MinimizeWindowCommand}"
+                                 ToggleMaximizeCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ToggleWindowStateCommand}"
+                                 CloseCommand="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CloseWindowCommand}"
+                                 IsUpdateAvailableFeedbackVisible="False"/>
+
+            <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}"/>
+        </Grid>
+    </Border>
+</Window>

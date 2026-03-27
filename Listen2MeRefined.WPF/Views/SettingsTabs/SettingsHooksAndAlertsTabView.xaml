@@ -1,0 +1,84 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.SettingsTabs.SettingsHooksAndAlertsTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
+             xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
+             mc:Ignorable="d"
+             FontFamily="{Binding FontFamilyName}"
+             d:DataContext="{d:DesignInstance settingsTabs:SettingsHooksAndAlertsTabViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="12,0,0,0">
+            <Border Style="{DynamicResource DarkBorderContainer}">
+                <StackPanel>
+                    <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Notifications and Hooks" />
+                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Global key hooks and corner popup behavior." />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{DynamicResource DarkBorderContainer}"
+                    Margin="0,10,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Style="{DynamicResource SettingsFieldLabelText}" Text="Global media keys:" />
+                    <CheckBox Grid.Column="1"
+                              IsChecked="{Binding EnableGlobalMediaKeys}"
+                              Content="Enable global media key shortcuts" />
+                    <CheckBox Grid.Row="1"
+                              Grid.Column="1"
+                              IsChecked="{Binding EnableCornerNowPlayingPopup}"
+                              Content="Enable corner now-playing popup"
+                              Margin="0,8,0,8" />
+
+                    <TextBlock Grid.Row="1" Style="{DynamicResource SettingsFieldLabelText}" Text="Corner popup:" />
+                    <StackPanel Grid.Row="2" Grid.Column="1">
+                        <components:LabeledSliderRow Margin="0,0,0,8"
+                                                     Label="Trigger area:"
+                                                     LabelWidth="170"
+                                                     SliderWidth="140"
+                                                     Minimum="4"
+                                                     Maximum="64"
+                                                     TickFrequency="1"
+                                                     IsSnapToTickEnabled="True"
+                                                     Value="{Binding CornerTriggerSizePx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     ValueSuffix="px" />
+                        <components:LabeledSliderRow Label="Debounce:"
+                                                     LabelWidth="170"
+                                                     SliderWidth="140"
+                                                     Minimum="5"
+                                                     Maximum="200"
+                                                     TickFrequency="5"
+                                                     IsSnapToTickEnabled="True"
+                                                     Value="{Binding CornerTriggerDebounceMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     ValueSuffix=" ms" />
+                    </StackPanel>
+
+                    <components:FormFieldRow Grid.Row="3"
+                                             Grid.ColumnSpan="2"
+                                             Margin="0,10,0,0"
+                                             Label="Notification window:"
+                                             LabelWidth="210">
+                        <components:FormFieldRow.FieldContent>
+                            <ComboBox Style="{DynamicResource CustomComboBox}"
+                                      SelectedItem="{Binding SelectedNewSongWindowPosition}"
+                                      ItemsSource="{Binding NewSongWindowPositions}" />
+                        </components:FormFieldRow.FieldContent>
+                    </components:FormFieldRow>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

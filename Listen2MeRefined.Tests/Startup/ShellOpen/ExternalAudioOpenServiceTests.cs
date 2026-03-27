@@ -1,9 +1,13 @@
-using Listen2MeRefined.Infrastructure.BackgroundTaskStatusReport;
-using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Threading;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Scanning.Files;
-using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
-using Listen2MeRefined.Infrastructure.ViewModels;
+using Listen2MeRefined.Infrastructure.Playlist;
+using Listen2MeRefined.Infrastructure.Startup;
 using Moq;
 using Serilog;
 
@@ -14,7 +18,7 @@ public sealed class ExternalAudioOpenServiceTests
     [Fact]
     public async Task OpenAsync_UnsupportedExtension_ShowsQuickStatusAndSkips()
     {
-        var sut = CreateSut(out var analyzer, out _, out var status, out _, out _);
+        var sut = CreateSut(out var analyzer, out _, out var status, out _, out _, out _);
         var path = Path.Combine(Path.GetTempPath(), $"unsupported-{Guid.NewGuid()}.txt");
         await File.WriteAllTextAsync(path, "x");
 
@@ -34,7 +38,7 @@ public sealed class ExternalAudioOpenServiceTests
     [Fact]
     public async Task OpenAsync_ExistingPathInPlaylist_JumpsToExistingIndex()
     {
-        var sut = CreateSut(out var analyzer, out var player, out _, out var playlist, out _);
+        var sut = CreateSut(out var analyzer, out var player, out _, out var playlist, out _, out _);
         var path = Path.Combine(Path.GetTempPath(), $"existing-{Guid.NewGuid()}.mp3");
         await File.WriteAllTextAsync(path, "x");
 
@@ -58,11 +62,13 @@ public sealed class ExternalAudioOpenServiceTests
     [Fact]
     public async Task OpenAsync_CurrentSongSet_InsertsAfterCurrentAndJumpsToFirstInserted()
     {
-        var sut = CreateSut(out var analyzer, out var player, out _, out var playlist, out _);
+        var sut = CreateSut(out var analyzer, out var player, out _, out var playlist, out var queueState, out _);
         var first = new AudioModel { Path = "C:/music/first.mp3", Title = "First" };
         var second = new AudioModel { Path = "C:/music/second.mp3", Title = "Second" };
         playlist.Items.Add(first);
         playlist.Items.Add(second);
+        queueState.DefaultPlaylist.Add(first);
+        queueState.DefaultPlaylist.Add(second);
         sut.SetCurrentSong(first);
 
         var newFileA = Path.Combine(Path.GetTempPath(), $"open-a-{Guid.NewGuid()}.mp3");
@@ -84,6 +90,9 @@ public sealed class ExternalAudioOpenServiceTests
             Assert.Equal(4, playlist.Count);
             Assert.Equal(newFileA, playlist[1].Path);
             Assert.Equal(newFileB, playlist[2].Path);
+            Assert.Equal(4, queueState.DefaultPlaylist.Count);
+            Assert.Equal(newFileA, queueState.DefaultPlaylist[1].Path);
+            Assert.Equal(newFileB, queueState.DefaultPlaylist[2].Path);
             player.Verify(x => x.JumpToIndexAsync(1), Times.Once);
         }
         finally
@@ -97,13 +106,15 @@ public sealed class ExternalAudioOpenServiceTests
         out Mock<IFileAnalyzer<AudioModel>> analyzer,
         out Mock<IMusicPlayerController> player,
         out Mock<IBackgroundTaskStatusService> status,
-        out Playlist playlist,
+        out PlaylistQueue playlistQueue,
+        out PlaylistQueueState queueState,
         out Mock<IUiDispatcher> ui)
     {
         analyzer = new Mock<IFileAnalyzer<AudioModel>>();
         player = new Mock<IMusicPlayerController>();
         status = new Mock<IBackgroundTaskStatusService>();
-        playlist = new Playlist();
+        playlistQueue = new PlaylistQueue();
+        queueState = new PlaylistQueueState(playlistQueue);
         ui = new Mock<IUiDispatcher>();
 
         ui.Setup(x => x.InvokeAsync(It.IsAny<Action>(), It.IsAny<CancellationToken>()))
@@ -116,7 +127,8 @@ public sealed class ExternalAudioOpenServiceTests
         return new ExternalAudioOpenService(
             Mock.Of<ILogger>(),
             analyzer.Object,
-            playlist,
+            playlistQueue,
+            queueState,
             player.Object,
             status.Object,
             ui.Object);

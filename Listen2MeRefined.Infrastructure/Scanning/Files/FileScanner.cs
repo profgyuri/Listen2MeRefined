@@ -1,3 +1,7 @@
+using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Core.Repositories;
+
 namespace Listen2MeRefined.Infrastructure.Scanning.Files;
 
 public sealed class FileScanner : IFileScanner

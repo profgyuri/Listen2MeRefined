@@ -1,3 +1,6 @@
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
+
 namespace Listen2MeRefined.Infrastructure.Settings;
 
 public sealed class GlobalHookSettingsSyncService : IGlobalHookSettingsSyncService

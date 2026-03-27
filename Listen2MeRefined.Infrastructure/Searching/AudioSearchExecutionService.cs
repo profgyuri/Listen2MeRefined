@@ -1,3 +1,9 @@
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Core.Repositories;
+
 namespace Listen2MeRefined.Infrastructure.Searching;
 
 public sealed class AudioSearchExecutionService : IAudioSearchExecutionService

@@ -1,35 +1,36 @@
-using System.Collections;
-using Listen2MeRefined.Infrastructure.Data.Models;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Files;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.ContextMenus;
+using Listen2MeRefined.Application.ViewModels.Widgets;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
-using Listen2MeRefined.Infrastructure.Notifications;
 using Listen2MeRefined.Infrastructure.Playlist;
-using Listen2MeRefined.Infrastructure.Scanning.Files;
-using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.Settings;
-using Listen2MeRefined.Infrastructure.Startup.ShellOpen;
-using Listen2MeRefined.Infrastructure.ViewModels;
-using MediatR;
+using Listen2MeRefined.Infrastructure.Startup;
 using Moq;
 using Serilog;
-using ListsViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.ListsViewModel;
-using PlaylistPaneViewModel = Listen2MeRefined.Infrastructure.ViewModels.MainWindow.PlaylistPaneViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
 public class PlaylistPaneViewModelTests
 {
     [Fact]
-    public async Task CurrentSongNotification_PropagatesSelectedSongChangeToPlaylistPane()
+    public async Task CurrentSongChangedMessage_PropagatesSelectedSongChangeToPlaylistPane()
     {
-        var lists = CreateListsViewModel();
-        var playlistLibrary = new Mock<IPlaylistLibraryService>();
-        playlistLibrary
-            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<PlaylistSummary>());
-        var settingsReader = new Mock<IAppSettingsReader>();
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
         var song = new AudioModel { Title = "Current", Path = "song.mp3" };
-        lists.PlayList.Add(song);
+        queueServices.State.PlayList.Add(song);
+        await pane.InitializeAsync();
 
         var changed = false;
         pane.PropertyChanged += (_, e) =>
@@ -40,7 +41,7 @@ public class PlaylistPaneViewModelTests
             }
         };
 
-        await lists.Handle(new CurrentSongNotification(song), CancellationToken.None);
+        messenger.Send(new CurrentSongChangedMessage(song));
 
         Assert.True(changed);
         Assert.Same(song, pane.SelectedSong);
@@ -49,31 +50,135 @@ public class PlaylistPaneViewModelTests
     [Fact]
     public async Task RemoveSelectedFromActiveTab_OnDefaultTabWithoutSelection_ClearsDefaultQueue()
     {
-        var lists = CreateListsViewModel();
-        var playlistLibrary = new Mock<IPlaylistLibraryService>();
-        playlistLibrary
-            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<PlaylistSummary>());
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
 
         var songOne = new AudioModel { Title = "One", Path = "one.mp3" };
         var songTwo = new AudioModel { Title = "Two", Path = "two.mp3" };
-        lists.SearchResults.Add(songOne);
-        lists.SearchResults.Add(songTwo);
-        lists.SendSelectedToPlaylistCommand.Execute(null);
+        queueServices.State.DefaultPlaylist.Add(songOne);
+        queueServices.State.DefaultPlaylist.Add(songTwo);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
 
-        var settingsReader = new Mock<IAppSettingsReader>();
-        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
+        await pane.InitializeAsync();
         await pane.RemoveSelectedFromActiveTabCommand.ExecuteAsync(null);
 
-        Assert.Empty(lists.DefaultPlaylist);
-        Assert.Empty(lists.PlayList);
+        Assert.Empty(queueServices.State.DefaultPlaylist);
+        Assert.Empty(queueServices.State.PlayList);
     }
 
     [Fact]
-    public async Task HandlePlaylistCreatedNotification_AddsAndSelectsNewTab()
+    public async Task RemoveSelectedFromDefaultPlaylistSelectionAsync_WithSelection_RemovesOnlySelectedSong()
     {
-        var lists = CreateListsViewModel();
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var keepSong = new AudioModel { Title = "Keep", Path = "keep.mp3" };
+        var removeSong = new AudioModel { Title = "Remove", Path = "remove.mp3" };
+        queueServices.State.DefaultPlaylist.Add(keepSong);
+        queueServices.State.DefaultPlaylist.Add(removeSong);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = removeSong;
+
+        await pane.RemoveSelectedFromDefaultPlaylistSelectionAsync();
+
+        Assert.Single(queueServices.State.DefaultPlaylist);
+        Assert.Contains(keepSong, queueServices.State.DefaultPlaylist);
+        Assert.DoesNotContain(removeSong, queueServices.State.DefaultPlaylist);
+    }
+
+    [Fact]
+    public async Task RemoveSelectedFromDefaultPlaylistSelectionAsync_WithoutSelection_DoesNotClearDefaultQueue()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var first = new AudioModel { Title = "First", Path = "first.mp3" };
+        var second = new AudioModel { Title = "Second", Path = "second.mp3" };
+        queueServices.State.DefaultPlaylist.Add(first);
+        queueServices.State.DefaultPlaylist.Add(second);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = null;
+
+        await pane.RemoveSelectedFromDefaultPlaylistSelectionAsync();
+
+        Assert.Equal(2, queueServices.State.DefaultPlaylist.Count);
+        Assert.Contains(first, queueServices.State.DefaultPlaylist);
+        Assert.Contains(second, queueServices.State.DefaultPlaylist);
+    }
+
+    [Fact]
+    public async Task SetSelectedSongAsNextCommand_DefaultTab_RefreshesVisibleOrder()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var first = new AudioModel { Title = "A", Path = "a.mp3" };
+        var second = new AudioModel { Title = "B", Path = "b.mp3" };
+        var third = new AudioModel { Title = "C", Path = "c.mp3" };
+        var fourth = new AudioModel { Title = "D", Path = "d.mp3" };
+        queueServices.State.DefaultPlaylist.Add(first);
+        queueServices.State.DefaultPlaylist.Add(second);
+        queueServices.State.DefaultPlaylist.Add(third);
+        queueServices.State.DefaultPlaylist.Add(fourth);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+        queueServices.State.CurrentSongIndex = 2;
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = first;
+
+        await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
+
+        Assert.Equal(["B", "C", "A", "D"], pane.SelectedTab!.Songs.Select(x => x.Title ?? string.Empty).ToArray());
+    }
+
+    [Fact]
+    public async Task SetSelectedSongAsNextCommand_NamedTab_RefreshesVisibleOrder()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        await pane.InitializeAsync();
+
+        var first = new AudioModel { Title = "A", Path = "a.mp3" };
+        var second = new AudioModel { Title = "B", Path = "b.mp3" };
+        var third = new AudioModel { Title = "C", Path = "c.mp3" };
+        var fourth = new AudioModel { Title = "D", Path = "d.mp3" };
+        var namedTab = new PlaylistPaneViewModel.PlaylistTabItem(
+            "Named",
+            42,
+            new ObservableCollection<AudioModel>([first, second, third, fourth]));
+        pane.Tabs.Add(namedTab);
+        pane.SelectedTab = namedTab;
+
+        queueServices.RoutingService.ActivateNamedPlaylistQueue(42, namedTab.Songs);
+        queueServices.State.CurrentSongIndex = 2;
+        pane.SelectedSong = first;
+
+        await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
+
+        Assert.Equal(["B", "C", "A", "D"], namedTab.Songs.Select(x => x.Title ?? string.Empty).ToArray());
+    }
+
+    [Fact]
+    public async Task PlaylistCreatedMessage_AddsAndSelectsNewTab()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
@@ -84,8 +189,30 @@ public class PlaylistPaneViewModelTests
 
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
-        await pane.Handle(new PlaylistCreatedNotification(42, "Road Trip"), CancellationToken.None);
+        var pane = new PlaylistPaneViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            messenger,
+            queueServices.State,
+            queueServices.RoutingService,
+            queueServices.DefaultPlaylistService,
+            queueServices.PlaybackActionsService,
+            queueServices.DropImportService,
+            new PlaylistSelectionService(),
+            playlistLibrary.Object,
+            queueServices.PlaybackContextSyncService,
+            Mock.Of<IExternalAudioOpenService>(),
+            Mock.Of<IExternalAudioOpenInbox>(),
+            settingsReader.Object,
+            CreateSongContextMenuViewModel(logger.Object, messenger));
+
+        await pane.InitializeAsync();
+        messenger.Send(new PlaylistCreatedMessage(new PlaylistCreatedMessageData(42, "Road Trip")));
+
+        for (var i = 0; i < 20 && pane.SelectedTab?.PlaylistId != 42; i++)
+        {
+            await Task.Delay(25);
+        }
 
         Assert.Equal(2, pane.Tabs.Count);
         Assert.Equal(42, pane.SelectedTab?.PlaylistId);
@@ -93,55 +220,34 @@ public class PlaylistPaneViewModelTests
     }
 
     [Fact]
-    public async Task AddToNewPlaylistFromContextAsync_UsesEverySelectedSongPath()
-    {
-        var lists = CreateListsViewModel();
-        var mediator = new Mock<IMediator>();
-        var playlistLibrary = new Mock<IPlaylistLibraryService>();
-        playlistLibrary
-            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<PlaylistSummary>());
-        playlistLibrary
-            .Setup(x => x.CreatePlaylistAsync("Fresh", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PlaylistSummary(15, "Fresh"));
-
-        var settingsReader = new Mock<IAppSettingsReader>();
-        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, mediator.Object, settingsReader.Object);
-        var first = new AudioModel { Title = "First", Path = "a.mp3" };
-        var second = new AudioModel { Title = "Second", Path = "b.mp3" };
-        lists.DefaultPlaylist.Add(first);
-        lists.DefaultPlaylist.Add(second);
-        lists.ActivateDefaultPlaylistQueue();
-
-        pane.PlaylistSelectionAddedCommand.Execute(new ArrayList { first, second });
-        await pane.AddToNewPlaylistFromContextAsync("Fresh");
-
-        playlistLibrary.Verify(
-            x => x.AddSongsByPathAsync(
-                15,
-                It.Is<IEnumerable<string?>>(paths => paths.Contains("a.mp3") && paths.Contains("b.mp3")),
-                It.IsAny<CancellationToken>()),
-            Times.Once);
-        mediator.Verify(
-            x => x.Publish(It.IsAny<PlaylistCreatedNotification>(), It.IsAny<CancellationToken>()),
-            Times.Once);
-        mediator.Verify(
-            x => x.Publish(It.IsAny<PlaylistMembershipChangedNotification>(), It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
-
-    [Fact]
     public async Task InitializeAsync_LoadsCompactViewModeFromSettings()
     {
-        var lists = CreateListsViewModel();
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(true);
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<PlaylistSummary>());
-        var pane = new PlaylistPaneViewModel(lists, playlistLibrary.Object, Mock.Of<IMediator>(), settingsReader.Object);
+
+        var pane = new PlaylistPaneViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            messenger,
+            queueServices.State,
+            queueServices.RoutingService,
+            queueServices.DefaultPlaylistService,
+            queueServices.PlaybackActionsService,
+            queueServices.DropImportService,
+            new PlaylistSelectionService(),
+            playlistLibrary.Object,
+            queueServices.PlaybackContextSyncService,
+            Mock.Of<IExternalAudioOpenService>(),
+            Mock.Of<IExternalAudioOpenInbox>(),
+            settingsReader.Object,
+            CreateSongContextMenuViewModel(logger.Object, messenger));
 
         await pane.InitializeAsync();
 
@@ -149,39 +255,232 @@ public class PlaylistPaneViewModelTests
         settingsReader.Verify(x => x.GetUseCompactPlaylistView(), Times.AtLeastOnce);
     }
 
-    private static ListsViewModel CreateListsViewModel()
+    [Fact]
+    public async Task SearchResultsToPlaylistRequestedMessage_AddsSongsToDefaultPlaylist()
     {
-        var logger = new Mock<ILogger>();
-        var mediator = new Mock<IMediator>();
-        var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
-        var scanner = new Mock<IFileScanner>();
-        var settingsReader = new Mock<IAppSettingsReader>();
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+        await pane.InitializeAsync();
+
+        var first = new AudioModel { Path = "a.mp3", Title = "A" };
+        var second = new AudioModel { Path = "b.mp3", Title = "B" };
+        messenger.Send(new SearchResultsToPlaylistRequestedMessage([first, second]));
+
+        Assert.Equal(2, queueServices.State.DefaultPlaylist.Count);
+        Assert.Equal(2, queueServices.State.PlayList.Count);
+    }
+
+    [Fact]
+    public async Task PlaylistViewModeChangedMessage_UpdatesCompactViewMode()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+        await pane.InitializeAsync();
+
+        Assert.False(pane.IsCompactPlaylistView);
+
+        messenger.Send(new PlaylistViewModeChangedMessage(true));
+
+        Assert.True(pane.IsCompactPlaylistView);
+    }
+
+    [Fact]
+    public async Task ExternalAudioOpenInbox_LivePaths_ForwardedToExternalAudioOpenService()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
+        var externalAudioOpenInbox = new ExternalAudioOpenInbox(logger.Object);
+        var pane = CreatePane(
+            logger.Object,
+            messenger,
+            queueServices,
+            externalAudioOpenService.Object,
+            externalAudioOpenInbox);
+        await pane.InitializeAsync();
+
+        var paths = new[] { "a.mp3", "b.mp3" };
+        externalAudioOpenInbox.Enqueue(paths);
+
+        for (var i = 0; i < 20; i++)
+        {
+            if (externalAudioOpenService.Invocations.Count > 0)
+            {
+                break;
+            }
+
+            await Task.Delay(25);
+        }
+
+        externalAudioOpenService.Verify(
+            x => x.OpenAsync(
+                It.Is<IReadOnlyList<string>>(value => value.SequenceEqual(paths)),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ExternalAudioOpenInbox_PathsQueuedBeforeInitialization_AreReplayedToExternalAudioOpenService()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
+        var externalAudioOpenInbox = new ExternalAudioOpenInbox(logger.Object);
+        var pane = CreatePane(
+            logger.Object,
+            messenger,
+            queueServices,
+            externalAudioOpenService.Object,
+            externalAudioOpenInbox);
+
+        var paths = new[] { "pre-init-a.mp3", "pre-init-b.mp3" };
+        externalAudioOpenInbox.Enqueue(paths);
+
+        await pane.InitializeAsync();
+
+        for (var i = 0; i < 20; i++)
+        {
+            if (externalAudioOpenService.Invocations.Count > 0)
+            {
+                break;
+            }
+
+            await Task.Delay(25);
+        }
+
+        externalAudioOpenService.Verify(
+            x => x.OpenAsync(
+                It.Is<IReadOnlyList<string>>(value => value.SequenceEqual(paths)),
+                It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task JumpToSelectedSongCommand_UsesCoordinatorSelectionAndJumps()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
         var playerController = new Mock<IMusicPlayerController>();
-        var playlist = new Playlist();
-        settingsReader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
-        settingsReader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
-        var settingsWriter = new Mock<IAppSettingsWriter>();
-        var prompt = new Mock<IDroppedSongFolderPromptService>();
+        var queueServices = CreateQueueServices(logger.Object, playerController: playerController);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+        var first = new AudioModel { Title = "First", Path = "first.mp3" };
+        var second = new AudioModel { Title = "Second", Path = "second.mp3" };
+        queueServices.State.PlayList.Add(first);
+        queueServices.State.PlayList.Add(second);
+
+        Assert.False(pane.JumpToSelectedSongCommand.CanExecute(null));
+
+        pane.SelectedSong = second;
+        pane.SelectedIndex = 1;
+
+        Assert.True(pane.JumpToSelectedSongCommand.CanExecute(null));
+        await pane.JumpToSelectedSongCommand.ExecuteAsync(null);
+        playerController.Verify(x => x.JumpToIndexAsync(1), Times.Once);
+    }
+
+    private static PlaylistPaneViewModel CreatePane(
+        ILogger logger,
+        IMessenger messenger,
+        QueueServices queueServices,
+        IExternalAudioOpenService? externalAudioOpenService = null,
+        IExternalAudioOpenInbox? externalAudioOpenInbox = null)
+    {
+        var playlistLibrary = new Mock<IPlaylistLibraryService>();
+        playlistLibrary
+            .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Array.Empty<PlaylistSummary>());
+        var settingsReader = new Mock<IAppSettingsReader>();
+        settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
+
+        return new PlaylistPaneViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger,
+            messenger,
+            queueServices.State,
+            queueServices.RoutingService,
+            queueServices.DefaultPlaylistService,
+            queueServices.PlaybackActionsService,
+            queueServices.DropImportService,
+            new PlaylistSelectionService(),
+            playlistLibrary.Object,
+            queueServices.PlaybackContextSyncService,
+            externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
+            externalAudioOpenInbox ?? Mock.Of<IExternalAudioOpenInbox>(),
+            settingsReader.Object,
+            CreateSongContextMenuViewModel(logger, messenger));
+    }
+
+    private static QueueServices CreateQueueServices(
+        ILogger logger,
+        Mock<IMusicPlayerController>? playerController = null,
+        Mock<IFileScanner>? fileScanner = null,
+        Mock<IAppSettingsReader>? settingsReader = null,
+        Mock<IAppSettingsWriter>? settingsWriter = null,
+        Mock<IDroppedSongFolderPromptService>? promptService = null)
+    {
+        var playlistQueue = new PlaylistQueue();
+        var queueState = new PlaylistQueueState(playlistQueue);
+        var musicPlayerController = playerController ?? new Mock<IMusicPlayerController>();
+        var scanner = fileScanner ?? new Mock<IFileScanner>();
+        var reader = settingsReader ?? new Mock<IAppSettingsReader>();
+        var writer = settingsWriter ?? new Mock<IAppSettingsWriter>();
+        var prompt = promptService ?? new Mock<IDroppedSongFolderPromptService>();
+
+        reader.Setup(x => x.GetMusicFolders()).Returns(Array.Empty<string>());
+        reader.Setup(x => x.GetMutedDroppedSongFolders()).Returns(Array.Empty<string>());
         prompt.Setup(x => x.PromptAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(AddDroppedSongFolderDecision.Skip);
-        var externalAudioOpenService = new Mock<IExternalAudioOpenService>();
-        settingsReader
-            .Setup(x => x.GetSearchResultsTransferMode())
-            .Returns(SearchResultsTransferMode.Move);
-        var ui = new Mock<IUiDispatcher>();
 
-        return new ListsViewModel(
-            logger.Object,
-            mediator.Object,
-            audioSearchExecutionService.Object,
-            scanner.Object,
-            settingsReader.Object,
-            playerController.Object,
-            playlist,
-            settingsWriter.Object,
-            prompt.Object,
-            externalAudioOpenService.Object,
-            ui.Object);
+        var playbackContextSync = new PlaybackContextSyncService(queueState);
+        return new QueueServices(
+            queueState,
+            new DefaultPlaylistService(queueState),
+            new PlaylistQueueRoutingService(queueState, playlistQueue, musicPlayerController.Object),
+            playbackContextSync,
+            new PlaybackQueueActionsService(
+                queueState,
+                playbackContextSync,
+                scanner.Object,
+                musicPlayerController.Object,
+                logger),
+            new ExternalDropImportService(
+                queueState,
+                scanner.Object,
+                reader.Object,
+                writer.Object,
+                prompt.Object));
     }
-}
 
+    private static SongContextMenuViewModel CreateSongContextMenuViewModel(ILogger logger, IMessenger messenger)
+    {
+        return new SongContextMenuViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger,
+            messenger,
+            Mock.Of<IPlaylistMembership>(),
+            Mock.Of<ISongContextSelectionService>());
+    }
+
+    private static Mock<ILogger> CreateLogger()
+    {
+        var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
+        return logger;
+    }
+
+    private sealed record QueueServices(
+        PlaylistQueueState State,
+        IDefaultPlaylistService DefaultPlaylistService,
+        IPlaylistQueueRoutingService RoutingService,
+        IPlaybackContextSyncService PlaybackContextSyncService,
+        IPlaybackQueueActionsService PlaybackActionsService,
+        IExternalDropImportService DropImportService);
+}

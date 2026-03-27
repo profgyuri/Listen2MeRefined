@@ -1,4 +1,4 @@
-using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 namespace Listen2MeRefined.Tests.Media.MusicPlayer;
@@ -76,9 +76,9 @@ public class PlaybackQueueServiceTests
         DeleteTracks([validTrack]);
     }
 
-    private static Playlist CreatePlaylist(IReadOnlyList<AudioModel> tracks)
+    private static PlaylistQueue CreatePlaylist(IReadOnlyList<AudioModel> tracks)
     {
-        var playlist = new Playlist();
+        var playlist = new PlaylistQueue();
         foreach (var track in tracks)
         {
             playlist.Items.Add(track);

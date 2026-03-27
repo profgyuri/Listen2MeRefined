@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Listen2MeRefined.WPF;
 using System.Windows;
 using SkiaSharp;
@@ -35,9 +37,15 @@ internal static class SkiaElementHelper
     {
         var element = (SKElement)sender;
         var bitmap = (SKBitmap)element.GetValue(BitmapProperty);
-        if (bitmap is not null)
+        if (bitmap is null) return;
+        
+        try
         {
             e.Surface.Canvas.DrawBitmap(bitmap, 0, 0);
+        }
+        catch
+        {
+            Debug.WriteLine("Failed to draw bitmap.");
         }
     }
 }

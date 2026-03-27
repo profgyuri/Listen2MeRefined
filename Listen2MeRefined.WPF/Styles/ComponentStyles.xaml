@@ -254,6 +254,49 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
+    <Style x:Key="SettingsShellNavButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource SettingsActionButton}">
+        <Setter Property="Width" Value="188" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="Height" Value="48" />
+        <Setter Property="Padding" Value="14 0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
+        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="BtnBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
+                <Setter Property="Background" Value="{DynamicResource BorderBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 
     <Style x:Key="SettingsIconActionButton" TargetType="Button" BasedOn="{StaticResource SettingsActionButton}">
         <Setter Property="Width" Value="38" />

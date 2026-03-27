@@ -1,0 +1,47 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.SettingsTabs.SettingsAdvancedTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
+             mc:Ignorable="d"
+             FontFamily="{Binding FontFamilyName}"
+             d:DataContext="{d:DesignInstance settingsTabs:SettingsAdvancedTabViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="12,0,0,0">
+            <Border Style="{DynamicResource DarkBorderContainer}">
+                <StackPanel>
+                    <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Advanced" />
+                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Danger zone. Clearing metadata removes songs, playlists, and folder registrations from the local database." />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{DynamicResource DarkBorderContainer}"
+                    BorderBrush="{DynamicResource ValidationErrorBrush}"
+                    Background="{DynamicResource DefaultBorderBackgroundBrush}"
+                    Margin="0,10,0,0">
+                <StackPanel>
+                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}"
+                               Foreground="{DynamicResource ValidationErrorBrush}"
+                               Text="This action cannot be undone. Use it only when you want a full local reset."
+                               Margin="0,0,0,10" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Style="{DynamicResource SettingsActionButton}"
+                                MinWidth="150"
+                                Content="Clear Metadata"
+                                Command="{Binding ClearMetadataCommand}"
+                                Visibility="{Binding IsClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                        <Button Style="{DynamicResource SettingsActionButton}"
+                                MinWidth="150"
+                                Margin="10,0,0,0"
+                                Content="{Binding CancelClearMetadataButtonContent}"
+                                Visibility="{Binding IsCancelClearMetadataButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Command="{Binding CancelClearMetadataCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

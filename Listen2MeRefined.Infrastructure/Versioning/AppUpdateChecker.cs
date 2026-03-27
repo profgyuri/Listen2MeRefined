@@ -1,3 +1,5 @@
+using Listen2MeRefined.Application.Updating;
+
 namespace Listen2MeRefined.Infrastructure.Versioning;
 
 public sealed class AppUpdateChecker : IAppUpdateChecker

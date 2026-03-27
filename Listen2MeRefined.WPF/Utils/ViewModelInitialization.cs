@@ -1,4 +1,4 @@
-﻿using Listen2MeRefined.Infrastructure.ViewModels;
+﻿using Listen2MeRefined.Application.ViewModels;
 
 namespace Listen2MeRefined.WPF.Utils;
 
@@ -56,7 +56,7 @@ public static class ViewModelInitialization
         if (!fe.IsLoaded)
             return;
 
-        if (fe.DataContext is not IAsyncInitializable init)
+        if (fe.DataContext is not IInitializeAsync init)
             return;
 
         try

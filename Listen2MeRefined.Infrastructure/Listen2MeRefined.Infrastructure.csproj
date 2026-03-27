@@ -9,34 +9,39 @@
 
     <ItemGroup>
         <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
-        <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.0" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-        <PackageReference Include="Dapper" Version="2.1.66" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+        <PackageReference Include="Dapper" Version="2.1.72" />
         <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-        <PackageReference Include="MediatR" Version="12.5.0" />
-        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.5" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="MouseKeyHook" Version="5.7.1" />
-        <PackageReference Include="NAudio" Version="2.2.1" />
-        <PackageReference Include="NAudio.WinForms" Version="2.2.1" />
+        <PackageReference Include="NAudio" Version="2.3.0" />
+        <PackageReference Include="NAudio.WinForms" Version="2.3.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="Serilog" Version="4.3.0" />
-        <PackageReference Include="SkiaSharp" Version="3.119.1" />
-        <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="3.119.1" />
-        <PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.1" />
+        <PackageReference Include="Serilog" Version="4.3.2-dev-02419" />
+        <PackageReference Include="SkiaSharp" Version="3.119.2" />
+        <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="3.119.2" />
+        <PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.2" />
         <PackageReference Include="TagLibSharp" Version="2.3.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <Reference Include="Microsoft.Data.SqlClient">
+          <HintPath>..\Listen2MeRefined.WPF\bin\Debug\net10.0-windows7.0\Microsoft.Data.SqlClient.dll</HintPath>
+        </Reference>
         <Reference Include="PresentationCore">
             <HintPath>C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\6.0.8\PresentationCore.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Listen2MeRefined.Application\Listen2MeRefined.Application.csproj" />
+      <ProjectReference Include="..\Listen2MeRefined.Core\Listen2MeRefined.Core.csproj" />
     </ItemGroup>
 
 </Project>

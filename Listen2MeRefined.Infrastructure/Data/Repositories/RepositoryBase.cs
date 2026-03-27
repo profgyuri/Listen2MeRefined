@@ -1,12 +1,14 @@
 using Dapper;
 using Dapper.Contrib.Extensions;
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Core.Repositories;
 using Listen2MeRefined.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public abstract class RepositoryBase<T> : IRepository<T>
-    where T: Model
+    where T: ModelBase
 {
     protected readonly ILogger _logger;
     protected readonly IDbContextFactory<DataContext> _dataContextFactory;

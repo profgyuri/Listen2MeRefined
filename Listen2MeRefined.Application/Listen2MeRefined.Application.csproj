@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Listen2MeRefined.Core\Listen2MeRefined.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.5" />
+      <PackageReference Include="Serilog" Version="4.3.2-dev-02419" />
+      <PackageReference Include="SkiaSharp" Version="3.119.2" />
+    </ItemGroup>
+
+</Project>

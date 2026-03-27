@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Listen2MeRefined.Core.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Listen2MeRefined.Infrastructure.Data.EntityFramework;
 

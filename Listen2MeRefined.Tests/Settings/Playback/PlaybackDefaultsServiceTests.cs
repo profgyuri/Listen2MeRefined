@@ -1,6 +1,5 @@
-using Listen2MeRefined.Infrastructure.Data;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.Settings;
-using Listen2MeRefined.Infrastructure.Settings.Playback;
 using Moq;
 
 namespace Listen2MeRefined.Tests.Settings.Playback;

@@ -1,25 +1,25 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
-using Listen2MeRefined.Infrastructure.Notifications;
-using Listen2MeRefined.Infrastructure.Settings;
-using MediatR;
 using SkiaSharp;
 
 namespace Listen2MeRefined.WPF.Utils.Theming;
 
 public sealed class AppThemeService : IAppThemeService
 {
-    private readonly IMediator _mediator;
+    private readonly IMessenger _messenger;
     private readonly IEnumerable<IWaveformPaletteAware> _waveformPaletteAwareTargets;
 
     public AppThemeService(
-        IMediator mediator,
-        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets)
+        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets, 
+        IMessenger messenger)
     {
-        _mediator = mediator;
         _waveformPaletteAwareTargets = waveformPaletteAwareTargets;
+        _messenger = messenger;
     }
 
     private static readonly IReadOnlyList<string> SupportedThemeModes = ["Dark", "Light"];
@@ -95,28 +95,28 @@ public sealed class AppThemeService : IAppThemeService
         ApplyPalette(basePalette, BaseColorKeys);
         ApplyPalette(accentPalette, AccentColorKeys);
 
-        if (Application.Current.Resources["HoloBackground"] is SolidColorBrush holoBackground
-            && Application.Current.Resources["PrimaryColor"] is Color primaryColor)
+        if (System.Windows.Application.Current.Resources["HoloBackground"] is SolidColorBrush holoBackground
+            && System.Windows.Application.Current.Resources["PrimaryColor"] is Color primaryColor)
         {
             holoBackground.Color = primaryColor;
         }
 
-        if (Application.Current.Resources["MaterialDesignPaper"] is SolidColorBrush paperBrush
-            && Application.Current.Resources["PrimaryColor"] is Color materialPaperColor)
+        if (System.Windows.Application.Current.Resources["MaterialDesignPaper"] is SolidColorBrush paperBrush
+            && System.Windows.Application.Current.Resources["PrimaryColor"] is Color materialPaperColor)
         {
             paperBrush.Color = materialPaperColor;
         }
 
-        if (Application.Current.Resources["ContainerGradientBackgroundBrush"] is SolidColorBrush containerBrush
-            && Application.Current.Resources["PrimaryLightColor"] is Color primaryLightColor)
+        if (System.Windows.Application.Current.Resources["ContainerGradientBackgroundBrush"] is SolidColorBrush containerBrush
+            && System.Windows.Application.Current.Resources["PrimaryLightColor"] is Color primaryLightColor)
         {
             containerBrush.Color = primaryLightColor;
         }
 
-        var waveformLineColor = Application.Current.Resources["TertiaryColor"] is Color accent
+        var waveformLineColor = System.Windows.Application.Current.Resources["TertiaryColor"] is Color accent
             ? ToSkColor(accent)
             : new SKColor(255, 138, 61);
-        var waveformBackgroundColor = Application.Current.Resources["DarkBorderBackgroundColor"] is Color background
+        var waveformBackgroundColor = System.Windows.Application.Current.Resources["DarkBorderBackgroundColor"] is Color background
             ? ToSkColor(background)
             : new SKColor(35, 35, 35);
 
@@ -125,7 +125,7 @@ public sealed class AppThemeService : IAppThemeService
             paletteAwareTarget.UpdatePalette(waveformLineColor, waveformBackgroundColor);
         }
 
-        _ = _mediator.Publish(new AppThemeChangedNotification());
+        _messenger.Send(new AppThemeChangedMessage());
     }
 
     private static void ApplyPalette(ResourceDictionary palette, IEnumerable<string> colorKeys)
@@ -137,12 +137,12 @@ public sealed class AppThemeService : IAppThemeService
                 continue;
             }
 
-            Application.Current.Resources[colorKey] = color;
+            System.Windows.Application.Current.Resources[colorKey] = color;
 
             if (ColorToBrushMap.TryGetValue(colorKey, out var brushKey)
-                && Application.Current.Resources[brushKey] is SolidColorBrush)
+                && System.Windows.Application.Current.Resources[brushKey] is SolidColorBrush)
             {
-                Application.Current.Resources[brushKey] = new SolidColorBrush(color);
+                System.Windows.Application.Current.Resources[brushKey] = new SolidColorBrush(color);
             }
         }
     }

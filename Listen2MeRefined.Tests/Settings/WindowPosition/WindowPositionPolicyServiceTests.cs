@@ -1,4 +1,4 @@
-using Listen2MeRefined.Infrastructure.Settings.WindowPosition;
+using Listen2MeRefined.Infrastructure.Settings;
 
 namespace Listen2MeRefined.Tests.Settings.WindowPosition;
 

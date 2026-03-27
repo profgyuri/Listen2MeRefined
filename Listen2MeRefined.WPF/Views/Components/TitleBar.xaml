@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:mainWindow="clr-namespace:Listen2MeRefined.Infrastructure.ViewModels.MainWindow;assembly=Listen2MeRefined.Infrastructure"
+             xmlns:shells="clr-namespace:Listen2MeRefined.Application.ViewModels.Shells;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance mainWindow:MainWindowViewModel}"
+             d:DataContext="{d:DesignInstance shells:MainShellViewModel}"
              d:DesignWidth="400">
     <Border Style="{DynamicResource ComponentTitleBarContainerBorder}">
         <Grid VerticalAlignment="Center">
@@ -39,11 +39,13 @@
                              Fill="{DynamicResource TertiaryBrush}"
                              Margin="0,0,6,0" />
                     <TextBlock Text="{Binding CenterText, ElementName=Root}"
+                               FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontFamily}"
                                Style="{DynamicResource ComponentTitleBarCenterText}" />
                     <Border Style="{DynamicResource ComponentTitleBarStatusBadgeBorder}"
                             ToolTip="{Binding TaskStatusTooltip, ElementName=Root}"
                             Visibility="{Binding ShowTaskStatus, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}">
                         <TextBlock Text="{Binding TaskStatusText, ElementName=Root}"
+                                   FontFamily="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontFamily}"
                                    Style="{DynamicResource ComponentTitleBarStatusBadgeText}" />
                     </Border>
                 </StackPanel>
@@ -64,7 +66,7 @@
                              HorizontalAlignment="Right"
                              VerticalAlignment="Top"
                              Margin="0,6,6,0"
-                             Visibility="{Binding IsUpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                             Visibility="{Binding IsUpdateAvailableFeedbackVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </Grid>
 
                 <Button Command="{Binding EffectiveMinimizeCommand, ElementName=Root}"

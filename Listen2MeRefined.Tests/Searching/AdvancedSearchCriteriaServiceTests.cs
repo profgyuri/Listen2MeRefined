@@ -1,7 +1,7 @@
-using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Data.Models;
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Searching;
-using Listen2MeRefined.Infrastructure.ViewModels;
 
 namespace Listen2MeRefined.Tests.Searching;
 
@@ -22,6 +22,16 @@ public sealed class AdvancedSearchCriteriaServiceTests
     public void BuildCriterion_InvalidNumericInput_FailsWithMessage()
     {
         var result = _sut.BuildCriterion(nameof(AudioModel.BPM), "Bigger than", "abc");
+
+        Assert.False(result.Success);
+        Assert.Null(result.Criterion);
+        Assert.Contains("whole number", result.ErrorMessage);
+    }
+
+    [Fact]
+    public void BuildCriterion_NegativeBpmInput_FailsWithMessage()
+    {
+        var result = _sut.BuildCriterion(nameof(AudioModel.BPM), "Is", "-1");
 
         Assert.False(result.Success);
         Assert.Null(result.Criterion);

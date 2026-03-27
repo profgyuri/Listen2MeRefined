@@ -1,9 +1,16 @@
-﻿<Application x:Class="Listen2MeRefined.WPF.App"
-             x:Name="App"
+<Application x:Class="Listen2MeRefined.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF">
+             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
+             xmlns:widgets="clr-namespace:Listen2MeRefined.WPF.Views.Widgets"
+             xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application"
+             xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
+             xmlns:defaultHomeViews="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
+             xmlns:settingsTabs="clr-namespace:Listen2MeRefined.Application.ViewModels.SettingsTabs;assembly=Listen2MeRefined.Application"
+             xmlns:settingsTabs1="clr-namespace:Listen2MeRefined.WPF.Views.SettingsTabs"
+             xmlns:popupViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Popups;assembly=Listen2MeRefined.Application"
+             xmlns:popupViews="clr-namespace:Listen2MeRefined.WPF.Views.Popups">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -12,9 +19,67 @@
                 <ResourceDictionary Source="Styles/ControlStyles.xaml" />
                 <ResourceDictionary Source="Styles/ComponentStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Default Home Views -->
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:MainShellDefaultHomeViewModel}">
+                <defaultHomeViews:MainShellDefaultHomeView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:CornerShellDefaultHomeViewModel}">
+                <widgets:TrackInfoView DataContext="{Binding TrackInfoViewModel}" />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:FolderBrowserShellDefaultHomeViewModel}">
+                <defaultHomeViews:FolderBrowserShellDefaultHomeView/>
+            </DataTemplate>
+            
+            <!-- Settings -->
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsGeneralTabViewModel}">
+                <settingsTabs1:SettingsGeneralTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsPlaybackTabViewModel}">
+                <settingsTabs1:SettingsPlaybackTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsLibraryTabViewModel}">
+                <settingsTabs1:SettingsLibraryTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsPlaylistsTabViewModel}">
+                <settingsTabs1:SettingsPlaylistsTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsHooksAndAlertsTabViewModel}">
+                <settingsTabs1:SettingsHooksAndAlertsTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type settingsTabs:SettingsAdvancedTabViewModel}">
+                <settingsTabs1:SettingsAdvancedTabView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type defaultHomeViewModels:AdvancedSearchShellDefaultHomeViewModel}">
+                <defaultHomeViews:AdvancedSearchShellDefaultHomeView/>
+            </DataTemplate>
+            
+            <!-- Popups -->
+            <DataTemplate DataType="{x:Type popupViewModels:SongDroppedPopupViewModel}">
+                <popupViews:SongDroppedPopup/>
+            </DataTemplate>
+            
+            <!-- Widgets -->
+            <DataTemplate DataType="{x:Type widgetViewModels:PlaybackControlsViewModel}">
+                <widgets:PlaybackControlsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:PlaylistPaneViewModel}">
+                <widgets:PlaylistPaneView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:SearchbarViewModel}">
+                <widgets:SearchBarView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:SearchResultsPaneViewModel}">
+                <widgets:SearchResultsPaneView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:TrackInfoViewModel}">
+                <widgets:TrackInfoView/>
+            </DataTemplate>
+            
             <wpf:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <wpf:IsFolderSelectedConverter x:Key="IsFolderSelectedConverter" />
             <wpf:TrimmedTextBlockVisibilityConverter x:Key="TrimmedTextBlockVisibilityConverter" />
+            <wpf:StringToFontFamilyConverter x:Key="StringToFontFamily" />
             <Style TargetType="{x:Type FrameworkElement}">
                 <Setter Property="ToolTipService.InitialShowDelay" Value="350" />
                 <Setter Property="ToolTipService.BetweenShowDelay" Value="150" />

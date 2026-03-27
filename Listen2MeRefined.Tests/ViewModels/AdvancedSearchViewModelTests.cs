@@ -1,13 +1,15 @@
-using Listen2MeRefined.Infrastructure.Data;
-using Listen2MeRefined.Infrastructure.Data.Models;
-using Listen2MeRefined.Infrastructure.Notifications;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Searching;
 using Listen2MeRefined.Infrastructure.Settings;
-using Listen2MeRefined.Infrastructure.ViewModels;
-using MediatR;
 using Moq;
 using Serilog;
-using AdvancedSearchViewModel = Listen2MeRefined.Infrastructure.ViewModels.AdvancedSearchViewModel;
 
 namespace Listen2MeRefined.Tests.ViewModels;
 
@@ -40,12 +42,13 @@ public class AdvancedSearchViewModelTests
         var criterion = Assert.Single(vm.Criterias);
         Assert.Equal("00:03:05", criterion.NormalizedValue);
         Assert.Equal("03:05", criterion.RawValue);
+        Assert.Equal(string.Empty, vm.InputText);
     }
 
     [Fact]
     public async Task SearchCommand_UsesMatchAnyAndDoesNotClearCriteria()
     {
-        var (vm, mediator) = await CreateViewModelAsync();
+        var (vm, messenger) = await CreateViewModelAsync();
 
         vm.SelectedColumnName = nameof(AudioModel.Title);
         vm.SelectedRelation = "Contains";
@@ -55,54 +58,64 @@ public class AdvancedSearchViewModelTests
         Assert.True(vm.SearchCommand.CanExecute(null));
         vm.IsMatchAny = true;
 
-        AdvancedSearchNotification? captured = null;
-        mediator
-            .Setup(m => m.Publish(It.IsAny<AdvancedSearchNotification>(), It.IsAny<CancellationToken>()))
-            .Callback<AdvancedSearchNotification, CancellationToken>((notification, _) => captured = notification)
-            .Returns(Task.CompletedTask);
+        AdvancedSearchRequestedMessage? captured = null;
+        var recipient = new object();
+        messenger.Register<object, AdvancedSearchRequestedMessage>(recipient, (_, message) => captured = message);
 
         await vm.SearchCommand.ExecuteAsync(null);
 
         Assert.NotNull(captured);
-        Assert.Equal(SearchMatchMode.Any, captured!.MatchMode);
+        Assert.Equal(SearchMatchMode.Any, captured!.Value.MatchMode);
         Assert.Single(vm.Criterias);
         Assert.NotEqual("Searching...", vm.SearchStatusMessage);
     }
 
     [Fact]
-    public async Task Handle_SearchCompletedNotification_UpdatesResultStatus()
+    public async Task SearchCompletedMessage_UpdatesResultStatus()
     {
-        var (vm, _) = await CreateViewModelAsync();
+        var (vm, messenger) = await CreateViewModelAsync();
 
-        await vm.Handle(new AdvancedSearchCompletedNotification(0), CancellationToken.None);
+        messenger.Send(new AdvancedSearchCompletedMessage(0));
 
         Assert.False(vm.HasSearchResults);
         Assert.Contains("No matches found", vm.SearchStatusMessage);
 
-        await vm.Handle(new AdvancedSearchCompletedNotification(4), CancellationToken.None);
+        messenger.Send(new AdvancedSearchCompletedMessage(4));
 
         Assert.True(vm.HasSearchResults);
         Assert.Equal(4, vm.LastSearchResultCount);
         Assert.Contains("Found 4 result(s).", vm.SearchStatusMessage);
     }
 
-    private static async Task<(AdvancedSearchViewModel ViewModel, Mock<IMediator> Mediator)> CreateViewModelAsync()
+    private static async Task<(AdvancedSearchShellDefaultHomeViewModel ViewModel, IMessenger Messenger)> CreateViewModelAsync()
     {
-        var mediator = new Mock<IMediator>();
         var logger = new Mock<ILogger>();
+        logger
+            .Setup(x => x.ForContext(It.IsAny<Type>()))
+            .Returns(logger.Object);
         var settings = new Mock<ISettingsManager<AppSettings>>();
         var ui = new Mock<IUiDispatcher>();
+        var messenger = new WeakReferenceMessenger();
         settings.SetupGet(s => s.Settings).Returns(new AppSettings { FontFamily = "Segoe UI" });
+        ui.Setup(x => x.InvokeAsync(It.IsAny<Action>(), It.IsAny<CancellationToken>()))
+            .Returns<Action, CancellationToken>((action, _) =>
+            {
+                action();
+                return Task.CompletedTask;
+            });
+        ui.Setup(x => x.InvokeAsync(It.IsAny<Func<bool>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<bool>, CancellationToken>((func, _) => Task.FromResult(func()));
         var settingsReadService = new AppSettingsReader(settings.Object);
         var criteriaService = new AdvancedSearchCriteriaService();
 
-        var vm = new AdvancedSearchViewModel(
-            mediator.Object,
+        var vm = new AdvancedSearchShellDefaultHomeViewModel(
+            Mock.Of<IErrorHandler>(),
             logger.Object,
+            messenger,
             ui.Object,
-            settingsReadService,
-            criteriaService);
+            criteriaService,
+            settingsReadService);
         await vm.InitializeAsync();
-        return (vm, mediator);
+        return (vm, messenger);
     }
 }

@@ -1,3 +1,6 @@
+using Listen2MeRefined.Application;
+using Listen2MeRefined.Application.Folders;
+
 namespace Listen2MeRefined.Infrastructure.FolderBrowser;
 
 public sealed class FolderNavigationService : IFolderNavigationService

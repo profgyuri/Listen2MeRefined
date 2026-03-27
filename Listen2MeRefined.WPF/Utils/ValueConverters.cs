@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.WPF;
+﻿using System.Windows.Media;
+
+namespace Listen2MeRefined.WPF;
 using System;
 using System.Globalization;
 using System.Windows;
@@ -82,4 +84,17 @@ internal sealed class TrimmedTextBlockVisibilityConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+}
+
+public sealed class StringToFontFamilyConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value is string name && !string.IsNullOrWhiteSpace(name)
+            ? new FontFamily(name)
+            : new FontFamily("Segoe UI");
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => value is FontFamily ff ? ff.Source : "Segoe UI";
 }

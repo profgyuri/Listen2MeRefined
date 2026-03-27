@@ -1,3 +1,5 @@
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Core.DomainObjects;
 using NAudio.CoreAudioApi;
 
 namespace Listen2MeRefined.Infrastructure.Media;

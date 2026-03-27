@@ -1,5 +1,8 @@
 using System.Globalization;
-using Listen2MeRefined.Infrastructure.ViewModels;
+using Listen2MeRefined.Application.Searching;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Searching;
 
@@ -108,7 +111,21 @@ public sealed class AdvancedSearchCriteriaService : IAdvancedSearchCriteriaServi
             return false;
         }
 
-        if (selectedColumnName is nameof(AudioModel.BPM) or nameof(AudioModel.Bitrate))
+        if (selectedColumnName == nameof(AudioModel.BPM))
+        {
+            if (!uint.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
+            {
+                normalized = string.Empty;
+                error = $"{selectedColumnName} must be a whole number.";
+                return false;
+            }
+
+            normalized = number.ToString(CultureInfo.InvariantCulture);
+            error = string.Empty;
+            return true;
+        }
+
+        if (selectedColumnName == nameof(AudioModel.Bitrate))
         {
             if (!short.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
             {

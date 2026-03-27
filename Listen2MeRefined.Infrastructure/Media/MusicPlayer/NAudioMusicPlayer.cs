@@ -1,13 +1,19 @@
-﻿using Listen2MeRefined.Infrastructure.Notifications;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Settings;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Core.DomainObjects;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 /// <summary>
 /// Wrapper class for NAudio.
 /// </summary>
-public sealed partial class NAudioMusicPlayer :
-    IMusicPlayerController,
-    INotificationHandler<AudioOutputDeviceChangedNotification>
+public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 {
     private bool _startSongAutomatically;
     private int _outputDeviceIndex = -1;
@@ -16,11 +22,11 @@ public sealed partial class NAudioMusicPlayer :
     private PlayerState _state = PlayerState.Stopped;
 
     private readonly ILogger _logger;
-    private readonly IMediator _mediator;
     private readonly IPlaybackQueueService _playbackQueueService;
     private readonly ITrackLoader _trackLoader;
     private readonly IPlaybackOutput _playbackOutput;
     private readonly IPlaybackProgressMonitor _playbackProgressMonitor;
+    private readonly IMessenger _messenger;
 
     private const int TimeCheckInterval = 500;
 
@@ -53,19 +59,26 @@ public sealed partial class NAudioMusicPlayer :
     /// </summary>
     public NAudioMusicPlayer(
         ILogger logger,
-        IMediator mediator,
         TimedTask timedTask,
         IPlaybackQueueService playbackQueueService,
         ITrackLoader trackLoader,
         IPlaybackOutput playbackOutput,
-        IPlaybackProgressMonitor playbackProgressMonitor)
+        IPlaybackProgressMonitor playbackProgressMonitor,
+        IAppSettingsReader settingsReader,
+        IOutputDevice outputDevice,
+        IMessenger messenger)
     {
         _logger = logger;
-        _mediator = mediator;
         _playbackQueueService = playbackQueueService;
         _trackLoader = trackLoader;
         _playbackOutput = playbackOutput;
         _playbackProgressMonitor = playbackProgressMonitor;
+        _messenger = messenger;
+        
+        InitializeStartupOutputDevice(settingsReader, outputDevice);
+        _messenger.Register<NAudioMusicPlayer, AudioOutputDeviceChangedMessage>(
+            this,
+            static (recipient, message) => recipient.OnAudioOutputDeviceChangedMessage(message));
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), () => CheckPlaybackProgressAsync().GetAwaiter().GetResult());
         _logger.Debug("[NAudioMMusicPlayer] initialized");
@@ -175,12 +188,16 @@ public sealed partial class NAudioMusicPlayer :
             return;
         }
 
-        await _mediator.Publish(new PlaylistShuffledNotification());
+        _messenger.Send(new PlaylistShuffledMessage());
 
         if (_currentSong is null)
         {
             await LoadSongAsync(shuffledCurrentTrack);
+            return;
         }
+
+        // Re-publish current track so shared queue state can refresh CurrentSongIndex after reordering.
+        _messenger.Send(new CurrentSongChangedMessage(_currentSong));
     }
 
     internal async Task CheckPlaybackProgressAsync()
@@ -195,22 +212,6 @@ public sealed partial class NAudioMusicPlayer :
             _logger.Debug("[NAudioMMusicPlayer] Current song reached its end, skipping to the next song...");
             await NextAsync();
         }
-    }
-
-    /// <summary>
-    /// Reconfigures audio output when the selected audio device changes.
-    /// </summary>
-    /// <param name="notification">The device change notification.</param>
-    /// <param name="cancellationToken">Token that can cancel notification processing.</param>
-    public async Task Handle(AudioOutputDeviceChangedNotification notification, CancellationToken cancellationToken)
-    {
-        if (notification.Device.Index == _outputDeviceIndex)
-        {
-            return;
-        }
-
-        _outputDeviceIndex = notification.Device.Index;
-        await ReconfigureOutputAsync(_state == PlayerState.Playing, preservePosition: true);
     }
 
     private async Task StartPlaybackAsync()
@@ -278,55 +279,64 @@ public sealed partial class NAudioMusicPlayer :
         _fileReader?.Dispose();
         _fileReader = loadResult.Reader;
 
-        await _mediator.Publish(new CurrentSongNotification(_currentSong));
+        _messenger.Send(new CurrentSongChangedMessage(_currentSong));
 
         _playbackProgressMonitor.Reset();
 
-        var reconfigured = await ReconfigureOutputAsync(shouldResumeAfterLoad, preservePosition: false);
+        var reconfigured = ReconfigureOutput(shouldResumeAfterLoad, preservePosition: false);
         if (reconfigured && shouldResumeAfterLoad)
         {
             SetState(PlayerState.Playing);
         }
     }
 
-    private async Task<bool> ReconfigureOutputAsync(bool resumePlayback, bool preservePosition)
+    private bool ReconfigureOutput(bool resumePlayback, bool preservePosition)
     {
-        if (_fileReader is null)
+        try
         {
-            return false;
-        }
-
-        var timeStamp = _fileReader.CurrentTime;
-        var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
-        if (!result.IsSuccess)
-        {
-            _logger.Warning(result.Exception, "[NAudioMMusicPlayer] Failed to reconfigure audio output: {Context}", result.Context);
-            if (!result.PreservedPreviousOutput)
+            if (_fileReader is null)
             {
-                _startSongAutomatically = false;
-                SetState(PlayerState.Stopped);
+                return false;
             }
 
+            var timeStamp = _fileReader.CurrentTime;
+            var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
+            if (!result.IsSuccess)
+            {
+                _logger.Warning(result.Exception, "[NAudioMMusicPlayer] Failed to reconfigure audio output: {Context}",
+                    result.Context);
+                if (!result.PreservedPreviousOutput)
+                {
+                    _startSongAutomatically = false;
+                    SetState(PlayerState.Stopped);
+                }
+
+                return false;
+            }
+
+            if (preservePosition)
+            {
+                _fileReader.CurrentTime = timeStamp;
+            }
+
+            if (resumePlayback)
+            {
+                _playbackOutput.Play();
+                SetState(PlayerState.Playing);
+                _startSongAutomatically = true;
+            }
+            else if (_state == PlayerState.Paused)
+            {
+                _playbackOutput.Pause();
+            }
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "[NAudioMMusicPlayer] Failed to reconfigure audio output");
             return false;
         }
-
-        if (preservePosition)
-        {
-            _fileReader.CurrentTime = timeStamp;
-        }
-
-        if (resumePlayback)
-        {
-            _playbackOutput.Play();
-            SetState(PlayerState.Playing);
-            _startSongAutomatically = true;
-        }
-        else if (_state == PlayerState.Paused)
-        {
-            _playbackOutput.Pause();
-        }
-
-        return true;
     }
 
     private async Task HandleUnplayableTrackAsync(AudioModel track, TrackLoadResult result)
@@ -338,7 +348,56 @@ public sealed partial class NAudioMusicPlayer :
 
     private void SetState(PlayerState newState)
     {
-        _mediator.Publish(new PlayerStateChangedNotification(newState));
+        _messenger.Send(new PlayerStateChangedMessage(newState));
         _state = newState;
+    }
+
+    private void OnAudioOutputDeviceChangedMessage(AudioOutputDeviceChangedMessage message)
+    {
+        try
+        {
+            ApplyAudioOutputDeviceAsync(message.Value);
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "[NAudioMMusicPlayer] Failed to apply audio output device change");
+        }
+    }
+
+    private void ApplyAudioOutputDeviceAsync(AudioOutputDevice device)
+    {
+        if (device.Index == _outputDeviceIndex)
+        {
+            return;
+        }
+
+        _outputDeviceIndex = device.Index;
+        ReconfigureOutput(_state == PlayerState.Playing, preservePosition: true);
+    }
+
+    private void InitializeStartupOutputDevice(IAppSettingsReader settingsReader, IOutputDevice outputDevice)
+    {
+        try
+        {
+            var allDevices = outputDevice.EnumerateOutputDevices().ToArray();
+            var selectedOutputDevice = allDevices
+                .FirstOrDefault(x => x.Name == settingsReader.GetAudioOutputDeviceName())
+                ?? allDevices.FirstOrDefault();
+
+            if (selectedOutputDevice is null)
+            {
+                _logger.Warning("[NAudioMMusicPlayer] No audio output devices were detected on startup.");
+                return;
+            }
+
+            _outputDeviceIndex = selectedOutputDevice.Index;
+            _logger.Information(
+                "[NAudioMMusicPlayer] Selected startup audio output device: {DeviceName}.",
+                selectedOutputDevice.Name);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[NAudioMMusicPlayer] Failed to resolve startup audio output device.");
+        }
     }
 }

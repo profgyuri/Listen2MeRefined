@@ -1,24 +1,27 @@
+using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Core.Models;
+
 namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 
 public sealed class PlaybackQueueService : IPlaybackQueueService
 {
-    private readonly IPlaylist _playlist;
+    private readonly IPlaylistQueue _playlistQueue;
 
-    public PlaybackQueueService(IPlaylist playlist)
+    public PlaybackQueueService(IPlaylistQueue playlistQueue)
     {
-        _playlist = playlist;
+        _playlistQueue = playlistQueue;
     }
     
     public AudioModel? GetCurrentTrack()
     {
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
             return null;
         }
 
         NormalizeCurrentIndex();
         
-        var track = _playlist[_playlist.CurrentIndex];
+        var track = _playlistQueue[_playlistQueue.CurrentIndex];
         
         if (RemoveIfInvalid(track))
         {
@@ -30,13 +33,13 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
     public AudioModel? GetNextTrack()
     {
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
             return null;
         }
 
-        _playlist.CurrentIndex = (_playlist.CurrentIndex + 1) % _playlist.Count;
-        var track = _playlist[_playlist.CurrentIndex];
+        _playlistQueue.CurrentIndex = (_playlistQueue.CurrentIndex + 1) % _playlistQueue.Count;
+        var track = _playlistQueue[_playlistQueue.CurrentIndex];
         
         if (RemoveIfInvalid(track))
         {
@@ -48,13 +51,13 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
     public AudioModel? GetPreviousTrack()
     {
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
             return null;
         }
 
-        _playlist.CurrentIndex = (_playlist.CurrentIndex - 1 + _playlist.Count) % _playlist.Count;
-        var track = _playlist[_playlist.CurrentIndex];
+        _playlistQueue.CurrentIndex = (_playlistQueue.CurrentIndex - 1 + _playlistQueue.Count) % _playlistQueue.Count;
+        var track = _playlistQueue[_playlistQueue.CurrentIndex];
 
         if (RemoveIfInvalid(track))
         {
@@ -66,19 +69,19 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
     public AudioModel? GetTrackAtIndex(int index)
     {
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
             return null;
         }
 
-        var normalizedIndex = index % _playlist.Count;
+        var normalizedIndex = index % _playlistQueue.Count;
         if (normalizedIndex < 0)
         {
-            normalizedIndex += _playlist.Count;
+            normalizedIndex += _playlistQueue.Count;
         }
 
-        _playlist.CurrentIndex = normalizedIndex;
-        var track = _playlist[_playlist.CurrentIndex];
+        _playlistQueue.CurrentIndex = normalizedIndex;
+        var track = _playlistQueue[_playlistQueue.CurrentIndex];
 
         if (RemoveIfInvalid(track))
         {
@@ -90,50 +93,50 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
     public AudioModel? Shuffle(AudioModel? currentTrack)
     {
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
             return null;
         }
 
-        _playlist.Shuffle();
+        _playlistQueue.Shuffle();
 
-        var currentIndex = _playlist.IndexOf(currentTrack);
+        var currentIndex = _playlistQueue.IndexOf(currentTrack);
         if (currentIndex > 0)
         {
-            _playlist.Move(currentIndex, 0);
+            _playlistQueue.Move(currentIndex, 0);
         }
 
-        _playlist.CurrentIndex = 0;
-        return _playlist[0];
+        _playlistQueue.CurrentIndex = 0;
+        return _playlistQueue[0];
     }
 
     public bool RemoveTrack(AudioModel track)
     {
-        var removeIndex = _playlist.IndexOf(track);
+        var removeIndex = _playlistQueue.IndexOf(track);
         if (removeIndex < 0)
         {
             return false;
         }
 
-        var removed = _playlist.Remove(track);
+        var removed = _playlistQueue.Remove(track);
         if (!removed)
         {
             return false;
         }
 
-        if (_playlist.Count == 0)
+        if (_playlistQueue.Count == 0)
         {
-            _playlist.CurrentIndex = 0;
+            _playlistQueue.CurrentIndex = 0;
             return true;
         }
 
-        if (removeIndex < _playlist.CurrentIndex)
+        if (removeIndex < _playlistQueue.CurrentIndex)
         {
-            _playlist.CurrentIndex--;
+            _playlistQueue.CurrentIndex--;
         }
-        else if (_playlist.CurrentIndex >= _playlist.Count)
+        else if (_playlistQueue.CurrentIndex >= _playlistQueue.Count)
         {
-            _playlist.CurrentIndex = 0;
+            _playlistQueue.CurrentIndex = 0;
         }
 
         return true;
@@ -146,9 +149,9 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
     /// <returns>True if the track was removed, false otherwise.</returns>
     private bool RemoveIfInvalid(AudioModel audio)
     {
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
-            _playlist.CurrentIndex = 0;
+            _playlistQueue.CurrentIndex = 0;
             return false;
         }
 
@@ -157,16 +160,16 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
             return false;
         }
 
-        var index = _playlist.IndexOf(audio);
-        _playlist.Remove(audio);
-        if (index < _playlist.CurrentIndex)
+        var index = _playlistQueue.IndexOf(audio);
+        _playlistQueue.Remove(audio);
+        if (index < _playlistQueue.CurrentIndex)
         {
-            _playlist.CurrentIndex--;
+            _playlistQueue.CurrentIndex--;
         }
 
-        if (!_playlist.Any())
+        if (!_playlistQueue.Any())
         {
-            _playlist.CurrentIndex = 0;
+            _playlistQueue.CurrentIndex = 0;
             return false;
         }
 
@@ -176,15 +179,15 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
     private void NormalizeCurrentIndex()
     {
-        if (_playlist.Count == 0 || _playlist.CurrentIndex < 0)
+        if (_playlistQueue.Count == 0 || _playlistQueue.CurrentIndex < 0)
         {
-            _playlist.CurrentIndex = 0;
+            _playlistQueue.CurrentIndex = 0;
             return;
         }
 
-        if (_playlist.CurrentIndex >= _playlist.Count)
+        if (_playlistQueue.CurrentIndex >= _playlistQueue.Count)
         {
-            _playlist.CurrentIndex = _playlist.Count - 1;
+            _playlistQueue.CurrentIndex = _playlistQueue.Count - 1;
         }
     }
 }

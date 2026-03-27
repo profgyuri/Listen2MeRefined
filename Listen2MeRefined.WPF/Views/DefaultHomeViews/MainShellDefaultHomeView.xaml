@@ -1,0 +1,38 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.DefaultHomeViews.MainShellDefaultHomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" MinHeight="150" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+        </Grid.ColumnDefinitions>
+
+        <ContentControl Content="{Binding TrackInfoViewModel}" Grid.Row="1" Grid.Column="1"/>
+        <ContentControl Content="{Binding PlaybackControlsViewModel}" Grid.Row="1" Grid.Column="3"/>
+            
+        <ContentControl Content="{Binding SearchResultsPaneViewModel}" Grid.Row="3" Grid.Column="1"/>
+        <ContentControl Content="{Binding PlaylistPaneViewModel}" Grid.Row="3" Grid.Column="3"/>
+        <ContentControl Content="{Binding SearchbarViewModel}" Grid.Row="5" Grid.ColumnSpan="3" Grid.Column="1" />
+            
+    </Grid>
+</UserControl>
