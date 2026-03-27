@@ -119,7 +119,7 @@ public sealed partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _singleInstanceFileOpenBridge?.Dispose();
-        _host?.StopAsync(TimeSpan.FromSeconds(5));
+        _host?.StopAsync(TimeSpan.FromSeconds(5)).Wait();
         Log.CloseAndFlush();
 
         base.OnExit(e);
