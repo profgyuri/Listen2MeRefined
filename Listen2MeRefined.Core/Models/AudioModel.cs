@@ -14,7 +14,7 @@ public sealed class AudioModel : ModelBase
 
     public string? Genre { get; set; }
 
-    public short BPM { get; set; }
+    public uint BPM { get; set; }
 
     public short Bitrate { get; set; }
 

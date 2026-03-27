@@ -29,6 +29,16 @@ public sealed class AdvancedSearchCriteriaServiceTests
     }
 
     [Fact]
+    public void BuildCriterion_NegativeBpmInput_FailsWithMessage()
+    {
+        var result = _sut.BuildCriterion(nameof(AudioModel.BPM), "Is", "-1");
+
+        Assert.False(result.Success);
+        Assert.Null(result.Criterion);
+        Assert.Contains("whole number", result.ErrorMessage);
+    }
+
+    [Fact]
     public void BuildCriterion_LengthInput_NormalizesToConstantTimeFormat()
     {
         var result = _sut.BuildCriterion(nameof(AudioModel.Length), "Is", "03:05");
