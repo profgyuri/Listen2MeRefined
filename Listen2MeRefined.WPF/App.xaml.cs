@@ -117,16 +117,11 @@ public sealed partial class App : System.Windows.Application
             .ConfigureModuleServices();
     }
 
-    protected override async void OnExit(ExitEventArgs e)
+    protected override void OnExit(ExitEventArgs e)
     {
         _singleInstanceFileOpenBridge?.Dispose();
-
-        if (_host is not null)
-        {
-            await _host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-        }
-
-        await Log.CloseAndFlushAsync();
+        _host?.StopAsync(TimeSpan.FromSeconds(5));
+        Log.CloseAndFlush();
 
         base.OnExit(e);
     }
