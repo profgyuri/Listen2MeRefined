@@ -1,4 +1,5 @@
 using Listen2MeRefined.Application.Startup;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
 namespace Listen2MeRefined.Infrastructure.Startup;
@@ -6,18 +7,16 @@ namespace Listen2MeRefined.Infrastructure.Startup;
 public class StartupManager : IStartupManager
 {
     private readonly IDatabaseMigrationStartupTask _databaseMigrationStartupTask;
-    private readonly IReadOnlyCollection<IStartupTask> _independentStartupTasks;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
 
     public StartupManager(
         IDatabaseMigrationStartupTask databaseMigrationStartupTask,
-        IEnumerable<IStartupTask> startupTasks,
+        IServiceProvider serviceProvider,
         ILogger logger)
     {
         _databaseMigrationStartupTask = databaseMigrationStartupTask;
-        _independentStartupTasks = startupTasks
-            .Where(task => task is not IDatabaseMigrationStartupTask)
-            .ToArray();
+        _serviceProvider = serviceProvider;
         _logger = logger;
 
         _logger.Debug("[StartupManager] Class initialized");
@@ -29,8 +28,13 @@ public class StartupManager : IStartupManager
 
         await RunStartupTaskWithLoggingAsync(_databaseMigrationStartupTask, ct).ConfigureAwait(false);
 
+        var independentStartupTasks = _serviceProvider
+            .GetServices<IStartupTask>()
+            .Where(task => task is not IDatabaseMigrationStartupTask)
+            .ToArray();
+
         await Task.WhenAll(
-                _independentStartupTasks.Select(task => RunStartupTaskWithLoggingAsync(task, ct)))
+                independentStartupTasks.Select(task => RunStartupTaskWithLoggingAsync(task, ct)))
             .ConfigureAwait(false);
 
         _logger.Information("[StartupManager] Startup pipeline completed.");

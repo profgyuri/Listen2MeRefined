@@ -38,8 +38,7 @@ public abstract partial class ShellViewModelBase : ViewModelBase
     [RelayCommand]
     private Task NavigateAsync(string route) =>
         ExecuteSafeAsync(
-            ct => NavigationService.NavigateAsync(route, cancellationToken: ct),
-            $"Navigate({route})");
+            ct => NavigationService.NavigateAsync(route, cancellationToken: ct));
 
     private void OnNavigationStateChanged(object? sender, PropertyChangedEventArgs e)
     {

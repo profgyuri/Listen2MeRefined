@@ -138,8 +138,8 @@ public abstract class ViewModelBase : ObservableObject, IInitializeAsync, IDispo
     /// <returns>A task representing the asynchronous operation.</returns>
     protected async Task ExecuteSafeAsync(
         Func<CancellationToken, Task> action,
-        [CallerMemberName] string context = "",
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        [CallerMemberName] string context = "")
     {
         try
         {
