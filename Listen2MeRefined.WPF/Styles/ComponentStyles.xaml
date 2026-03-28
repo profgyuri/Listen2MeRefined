@@ -712,6 +712,80 @@
         </Setter>
     </Style>
 
+    <Style x:Key="PopupFooterStripBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+        <Setter Property="CornerRadius" Value="0,0,8,8" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+
+    <Style x:Key="PopupFooterPrimaryActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TertiaryLightBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="BtnBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="10"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource TertiaryMidBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PopupFooterActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Padding" Value="14,0" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="BtnBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="10"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CrashReportFooterStripBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+        <Setter Property="CornerRadius" Value="0,0,8,8" />
+        <Setter Property="Padding" Value="14,10" />
+    </Style>
+
+    <Style x:Key="CrashReportFooterPrimaryActionButton" TargetType="Button" BasedOn="{StaticResource PopupFooterPrimaryActionButton}" />
+
+    <Style x:Key="CrashReportFooterActionButton" TargetType="Button" BasedOn="{StaticResource PopupFooterActionButton}" />
+
     <Style x:Key="FolderBrowserActionButton" TargetType="Button" BasedOn="{StaticResource InteractionButton}">
         <Setter Property="Height" Value="38" />
         <Setter Property="Width" Value="Auto" />

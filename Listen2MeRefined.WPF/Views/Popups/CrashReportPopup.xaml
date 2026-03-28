@@ -6,7 +6,7 @@
              mc:Ignorable="d"
              d:DesignHeight="360"
              d:DesignWidth="620">
-    <Grid Margin="12">
+    <Grid Margin="14,12,14,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -29,8 +29,8 @@
         <Border Grid.Row="2"
                 Margin="0,14,0,0"
                 Padding="10"
-                BorderThickness="1"
-                BorderBrush="{DynamicResource TertiaryBrush}">
+                Background="{DynamicResource SurfaceBrush}"
+                CornerRadius="8">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -89,10 +89,10 @@
                    Text="Exception" />
 
         <TextBox Grid.Row="4"
-                 BorderThickness="1"
-                 BorderBrush="{DynamicResource TertiaryBrush}"
-                 Background="{DynamicResource PrimaryBrush}"
+                 Background="{DynamicResource SurfaceBrush}"
                  Foreground="{DynamicResource SecondaryDarkBrush}"
+                 BorderThickness="0"
+                 Padding="10"
                  FontFamily="Consolas"
                  IsReadOnly="True"
                  TextWrapping="Wrap"
