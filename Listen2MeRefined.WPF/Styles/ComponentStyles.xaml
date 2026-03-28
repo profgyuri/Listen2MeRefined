@@ -934,64 +934,75 @@
         <Setter Property="CornerRadius" Value="8"/>
     </Style>
 
+    <Style x:Key="PlaylistContextMenuSeparator" TargetType="Separator">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Border Height="1"
+                            Margin="0,4"
+                            Background="{DynamicResource BorderBrush}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="PlaylistContextMenuStyle" TargetType="ContextMenu">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="HasDropShadow" Value="False" />
-        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="0,4" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ContextMenu">
                     <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="8"
                             Padding="{TemplateBinding Padding}"
-                            SnapsToDevicePixels="True">
+                            SnapsToDevicePixels="True"
+                            Effect="{TemplateBinding Effect}">
                         <StackPanel IsItemsHost="True"
                                     KeyboardNavigation.DirectionalNavigation="Cycle" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.35" Color="Black" />
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="PlaylistContextMenuItemStyle" TargetType="MenuItem">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
-        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10,6" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
                     <Border x:Name="ItemBorder"
                             Background="{TemplateBinding Background}"
-                            BorderBrush="Transparent"
-                            BorderThickness="1"
-                            CornerRadius="6"
                             SnapsToDevicePixels="True">
-                        <Grid MinWidth="140">
+                        <Grid MinWidth="160">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="26" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="18" />
                             </Grid.ColumnDefinitions>
 
                             <Border x:Name="CheckHost"
                                     Grid.Column="0"
-                                    Width="14"
-                                    Height="14"
+                                    Width="16"
+                                    Height="16"
                                     Margin="6,0,4,0"
                                     VerticalAlignment="Center"
-                                    CornerRadius="3"
-                                    BorderThickness="1"
-                                    BorderBrush="{DynamicResource BorderBrush}"
-                                    Background="{DynamicResource DefaultBorderBackgroundBrush}"
+                                    CornerRadius="4"
+                                    BorderThickness="0"
+                                    Background="{DynamicResource SurfaceBrush}"
                                     Visibility="Collapsed" />
 
                             <Path x:Name="CheckGlyph"
@@ -1001,7 +1012,7 @@
                                   VerticalAlignment="Center"
                                   HorizontalAlignment="Center"
                                   Data="M 0 3 L 2.5 5.5 L 8 0"
-                                  Stroke="{DynamicResource SecondaryBrush}"
+                                  Stroke="{DynamicResource TertiaryLightBrush}"
                                   StrokeThickness="1.6"
                                   StrokeEndLineCap="Round"
                                   StrokeStartLineCap="Round"
@@ -1017,12 +1028,12 @@
 
                             <Path x:Name="SubmenuArrow"
                                   Grid.Column="2"
-                                  Width="6"
-                                  Height="10"
+                                  Width="5"
+                                  Height="8"
                                   Margin="0,0,8,0"
                                   HorizontalAlignment="Right"
                                   VerticalAlignment="Center"
-                                  Data="M 0 0 L 6 5 L 0 10"
+                                  Data="M 0 0 L 5 4 L 0 8"
                                   Stroke="{DynamicResource SecondaryDarkBrush}"
                                   StrokeThickness="1.4"
                                   StrokeEndLineCap="Round"
@@ -1032,17 +1043,18 @@
 
                             <Popup x:Name="SubMenuPopup"
                                    Placement="Right"
-                                   HorizontalOffset="-4"
-                                   VerticalOffset="-6"
+                                   HorizontalOffset="0"
+                                   VerticalOffset="-4"
                                    IsOpen="{TemplateBinding IsSubmenuOpen}"
                                    AllowsTransparency="True"
                                    Focusable="False"
                                    PopupAnimation="Fade">
-                                <Border Background="{DynamicResource DefaultBorderBackgroundBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="8"
-                                        Padding="4">
+                                <Border Background="{DynamicResource SurfaceElevatedBrush}"
+                                        Padding="0,4"
+                                        SnapsToDevicePixels="True">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.35" Color="Black" />
+                                    </Border.Effect>
                                     <StackPanel IsItemsHost="True"
                                                 KeyboardNavigation.DirectionalNavigation="Cycle" />
                                 </Border>
@@ -1055,25 +1067,22 @@
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="CheckHost" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
-                            <Setter TargetName="CheckHost" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
                             <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="HasItems" Value="True">
                             <Setter TargetName="SubmenuArrow" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
                         </Trigger>
                         <Trigger Property="IsSubmenuOpen" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
-                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
-                            <Setter TargetName="CheckHost" Property="Opacity" Value="0.6" />
-                            <Setter TargetName="CheckGlyph" Property="Opacity" Value="0.6" />
-                            <Setter TargetName="SubmenuArrow" Property="Opacity" Value="0.6" />
+                            <Setter TargetName="CheckHost" Property="Opacity" Value="0.4" />
+                            <Setter TargetName="CheckGlyph" Property="Opacity" Value="0.4" />
+                            <Setter TargetName="SubmenuArrow" Property="Opacity" Value="0.4" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
