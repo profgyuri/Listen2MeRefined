@@ -17,18 +17,18 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0"
-                    Style="{DynamicResource BorderContainer}" Padding="10 0">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Image Source="pack://application:,,,/Resources/Listen2Me.ico"
-                           Width="16"
-                           Height="16"
-                           SnapsToDevicePixels="True"
-                           Margin="0,0,7,0" />
-                    <TextBlock Text="Listen2Me Refined"
-                               Style="{DynamicResource ComponentTitleBarBrandText}" />
-                </StackPanel>
-            </Border>
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0">
+                <Image Source="pack://application:,,,/Resources/Listen2Me.ico"
+                       Width="16"
+                       Height="16"
+                       SnapsToDevicePixels="True"
+                       Margin="0,0,7,0" />
+                <TextBlock Text="Listen2Me Refined"
+                           Style="{DynamicResource ComponentTitleBarBrandText}" />
+            </StackPanel>
 
             <Border Grid.Column="0"
                     Grid.ColumnSpan="3"

@@ -53,7 +53,7 @@
         <Setter Property="Padding" Value="10,4" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
-        <Setter Property="Background" Value="{DynamicResource DarkBorderBackgroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
     </Style>
 
     <Style x:Key="ComponentTitleBarBrandText" TargetType="TextBlock">
@@ -70,9 +70,8 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="Padding" Value="10,4" />
         <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-        <Setter Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 
     <Style x:Key="ComponentTitleBarCenterText" TargetType="TextBlock">
@@ -105,27 +104,24 @@
         <Setter Property="Width" Value="36" />
         <Setter Property="Height" Value="30" />
         <Setter Property="Margin" Value="0" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="ButtonBorder"
                             Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="8">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -137,11 +133,9 @@
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="#970000" />
-                <Setter Property="BorderBrush" Value="#970000" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Background" Value="#6F0000" />
-                <Setter Property="BorderBrush" Value="#6F0000" />
             </Trigger>
         </Style.Triggers>
     </Style>
