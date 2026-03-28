@@ -7,4 +7,8 @@
     <Color x:Key="BorderColor">#3A3A3A</Color>
     <Color x:Key="DefaultBorderBackgroundColor">#282828</Color>
     <Color x:Key="DarkBorderBackgroundColor">#232323</Color>
+    <Color x:Key="SurfaceColor">#1A1A1A</Color>
+    <Color x:Key="SurfaceElevatedColor">#242424</Color>
+    <Color x:Key="SurfaceRaisedColor">#2E2E2E</Color>
+    <Color x:Key="SeparatorColor">#2A2A2A</Color>
 </ResourceDictionary>

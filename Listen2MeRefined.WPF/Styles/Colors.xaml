@@ -14,6 +14,10 @@
     <Color x:Key="TertiaryMidColor">#33FF8A3D</Color>
     <Color x:Key="TertiaryDarkColor">#1FFF8A3D</Color>
     <Color x:Key="ValidationErrorColor">#E26A6A</Color>
+    <Color x:Key="SurfaceColor">#1A1A1A</Color>
+    <Color x:Key="SurfaceElevatedColor">#242424</Color>
+    <Color x:Key="SurfaceRaisedColor">#2E2E2E</Color>
+    <Color x:Key="SeparatorColor">#2A2A2A</Color>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}" />
     <SolidColorBrush x:Key="PrimaryLightBrush" Color="{DynamicResource PrimaryLightColor}" />
     <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource BorderColor}" />
@@ -30,4 +34,8 @@
     <SolidColorBrush x:Key="MaterialDesignPaper" Color="{DynamicResource PrimaryColor}"/>
     <SolidColorBrush x:Key="ContainerGradientBackgroundBrush" Color="{DynamicResource PrimaryLightColor}" />
     <SolidColorBrush x:Key="ValidationErrorBrush" Color="{DynamicResource ValidationErrorColor}" />
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{DynamicResource SurfaceColor}" />
+    <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="{DynamicResource SurfaceElevatedColor}" />
+    <SolidColorBrush x:Key="SurfaceRaisedBrush" Color="{DynamicResource SurfaceRaisedColor}" />
+    <SolidColorBrush x:Key="SeparatorBrush" Color="{DynamicResource SeparatorColor}" />
 </ResourceDictionary>

@@ -47,7 +47,11 @@ public sealed class AppThemeService : IAppThemeService
         "SecondaryDarkColor",
         "BorderColor",
         "DefaultBorderBackgroundColor",
-        "DarkBorderBackgroundColor"
+        "DarkBorderBackgroundColor",
+        "SurfaceColor",
+        "SurfaceElevatedColor",
+        "SurfaceRaisedColor",
+        "SeparatorColor"
     ];
 
     private static readonly string[] AccentColorKeys = [
@@ -67,6 +71,10 @@ public sealed class AppThemeService : IAppThemeService
         ["BorderColor"] = "BorderBrush",
         ["DefaultBorderBackgroundColor"] = "DefaultBorderBackgroundBrush",
         ["DarkBorderBackgroundColor"] = "DarkBorderBackgroundBrush",
+        ["SurfaceColor"] = "SurfaceBrush",
+        ["SurfaceElevatedColor"] = "SurfaceElevatedBrush",
+        ["SurfaceRaisedColor"] = "SurfaceRaisedBrush",
+        ["SeparatorColor"] = "SeparatorBrush",
         ["TertiaryColor"] = "TertiaryBrush",
         ["TertiaryLightColor"] = "TertiaryLightBrush",
         ["TertiaryLightMidColor"] = "TertiaryLightMidBrush",

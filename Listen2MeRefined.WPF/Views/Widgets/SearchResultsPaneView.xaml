@@ -12,121 +12,121 @@
              xmlns:contextMenus="clr-namespace:Listen2MeRefined.WPF.Views.ContextMenus"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
-    <Border Style="{DynamicResource BorderContainer}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition x:Name="ListRow" Height="*" />
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition x:Name="ListRow" Height="*" />
+        </Grid.RowDefinitions>
 
-            <components:SectionHeader Grid.Row="0"
-                                      Title="Search Results"
-                                      IconKind="MusicNote"
-                                      ShowActionButton="True"
-                                      ActionToolTip="Add Selected / All to Playlist"
-                                      ActionIconKind="ArrowRightCircleOutline"
-                                      ActionCommand="{Binding SendSelectedToPlaylistCommand}" />
+        <components:SectionHeader Grid.Row="0"
+                                  Title="Search Results"
+                                  IconKind="MusicNote"
+                                  ShowActionButton="True"
+                                  ActionToolTip="Add Selected / All to Playlist"
+                                  ActionIconKind="ArrowRightCircleOutline"
+                                  ActionCommand="{Binding SendSelectedToPlaylistCommand}" />
 
-                <ListView Grid.Row="2"
-                      Height="{Binding ElementName=ListRow, Path=Height}"
-                      Foreground="{DynamicResource SecondaryBrush}"
-                      dd:DragDrop.IsDragSource="True"
-                      dd:DragDrop.IsDropTarget="True"
-                      PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
-                      ItemsSource="{Binding SearchResults}"
-                      SelectionMode="Extended"
-                      ItemContainerStyle="{DynamicResource SearchResultsListItemStyle}"
-                      Style="{DynamicResource SearchResultsListViewStyle}"
-                      utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}"
-                      utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}">
-                <ListView.InputBindings>
-                    <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
-                </ListView.InputBindings>
-                <ListView.ContextMenu>
-                    <contextMenus:SongContextMenu DataContext="{Binding PlacementTarget.DataContext.SongContextMenuViewModel, RelativeSource={RelativeSource Self}}" />
-                </ListView.ContextMenu>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
+            <ListView Grid.Row="2"
+                  Height="{Binding ElementName=ListRow, Path=Height}"
+                  Foreground="{DynamicResource SecondaryBrush}"
+                  dd:DragDrop.IsDragSource="True"
+                  dd:DragDrop.IsDropTarget="True"
+                  PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
+                  ItemsSource="{Binding SearchResults}"
+                  SelectionMode="Extended"
+                  ItemContainerStyle="{DynamicResource ContentListItemStyle}"
+                  Style="{DynamicResource ContentListViewStyle}"
+                  utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding SearchResultsSelectionAddedCommand}"
+                  utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding SearchResultsSelectionRemovedCommand}">
+            <ListView.InputBindings>
+                <KeyBinding Modifiers="Ctrl" Key="Right" Command="{Binding SendSelectedToPlaylistCommand}"/>
+            </ListView.InputBindings>
+            <ListView.ContextMenu>
+                <contextMenus:SongContextMenu DataContext="{Binding PlacementTarget.DataContext.SongContextMenuViewModel, RelativeSource={RelativeSource Self}}" />
+            </ListView.ContextMenu>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+                            <ToggleButton x:Name="RowExpandToggle"
+                                          Style="{DynamicResource SearchResultsRowExpandToggleButtonStyle}"
+                                          ToolTip="Show details">
+                                <Grid>
+                                    <materialDesign:PackIcon x:Name="RowExpandIconDown"
+                                                             Kind="ChevronDown"
+                                                             Width="16"
+                                                             Height="16"
+                                                             Foreground="{DynamicResource SecondaryBrush}" />
+                                    <materialDesign:PackIcon x:Name="RowExpandIconUp"
+                                                             Kind="ChevronUp"
+                                                             Width="16"
+                                                             Height="16"
+                                                             Foreground="{DynamicResource SecondaryBrush}"
+                                                             Visibility="Collapsed" />
+                                </Grid>
+                            </ToggleButton>
 
-                                <ToggleButton x:Name="RowExpandToggle"
-                                              Style="{DynamicResource SearchResultsRowExpandToggleButtonStyle}"
-                                              ToolTip="Show details">
-                                    <Grid>
-                                        <materialDesign:PackIcon x:Name="RowExpandIconDown"
-                                                                 Kind="ChevronDown"
-                                                                 Width="16"
-                                                                 Height="16"
-                                                                 Foreground="{DynamicResource SecondaryBrush}" />
-                                        <materialDesign:PackIcon x:Name="RowExpandIconUp"
-                                                                 Kind="ChevronUp"
-                                                                 Width="16"
-                                                                 Height="16"
-                                                                 Foreground="{DynamicResource SecondaryBrush}"
-                                                                 Visibility="Collapsed" />
-                                    </Grid>
-                                </ToggleButton>
-
-                                <TextBlock Grid.Column="1"
-                                           Text="{Binding Display}"
-                                           FontSize="14"
-                                           Foreground="{DynamicResource SecondaryBrush}"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
-                            </Grid>
-
-                            <Border Grid.Row="1"
-                                    Style="{DynamicResource BorderContainer}"
-                                    Margin="32,8,0,2"
-                                    Visibility="{Binding IsChecked, ElementName=RowExpandToggle, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <UniformGrid Columns="3">
-                                    <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Artist" Style="{DynamicResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Artist}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                    <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Title" Style="{DynamicResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Title}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                    <StackPanel>
-                                        <TextBlock Text="Genre" Style="{DynamicResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Genre}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                    <StackPanel Margin="0,8,12,0">
-                                        <TextBlock Text="BPM" Style="{DynamicResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding BPM}" Style="{DynamicResource SearchResultsToolbarValueText}" />
-                                    </StackPanel>
-                                    <StackPanel Margin="0,8,12,0">
-                                        <TextBlock Text="Bitrate" Style="{DynamicResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{DynamicResource SearchResultsToolbarValueText}" />
-                                    </StackPanel>
-                                    <StackPanel Margin="0,8,0,0">
-                                        <TextBlock Text="Path" Style="{DynamicResource SearchResultsToolbarLabelText}" />
-                                        <TextBlock Text="{Binding Path}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                </UniformGrid>
-                            </Border>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Display}"
+                                       FontSize="14"
+                                       Foreground="{DynamicResource SecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
                         </Grid>
-                        <DataTemplate.Triggers>
-                            <Trigger SourceName="RowExpandToggle" Property="IsChecked" Value="True">
-                                <Setter TargetName="RowExpandIconDown" Property="Visibility" Value="Collapsed" />
-                                <Setter TargetName="RowExpandIconUp" Property="Visibility" Value="Visible" />
-                            </Trigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-    </Border>
+
+                        <Border Grid.Row="1"
+                                Background="{DynamicResource SurfaceRaisedBrush}"
+                                CornerRadius="6"
+                                Padding="10"
+                                Margin="32,8,0,2"
+                                Visibility="{Binding IsChecked, ElementName=RowExpandToggle, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <UniformGrid Columns="3">
+                                <StackPanel Margin="0,0,12,0">
+                                    <TextBlock Text="Artist" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                    <TextBlock Text="{Binding Artist}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel Margin="0,0,12,0">
+                                    <TextBlock Text="Title" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                    <TextBlock Text="{Binding Title}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock Text="Genre" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                    <TextBlock Text="{Binding Genre}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <StackPanel Margin="0,8,12,0">
+                                    <TextBlock Text="BPM" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                    <TextBlock Text="{Binding BPM}" Style="{DynamicResource SearchResultsToolbarValueText}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,8,12,0">
+                                    <TextBlock Text="Bitrate" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                    <TextBlock Text="{Binding Bitrate, StringFormat={}{0} kbps}" Style="{DynamicResource SearchResultsToolbarValueText}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,8,0,0">
+                                    <TextBlock Text="Path" Style="{DynamicResource SearchResultsToolbarLabelText}" />
+                                    <TextBlock Text="{Binding Path}" Style="{DynamicResource SearchResultsToolbarValueText}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </UniformGrid>
+                        </Border>
+                    </Grid>
+                    <DataTemplate.Triggers>
+                        <Trigger SourceName="RowExpandToggle" Property="IsChecked" Value="True">
+                            <Setter TargetName="RowExpandIconDown" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="RowExpandIconUp" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
 </UserControl>

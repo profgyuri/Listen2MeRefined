@@ -6,127 +6,76 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance widgets:TrackInfoViewModel}"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
+             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:widgets="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
-    <Border Style="{DynamicResource BorderContainer}">
-        <Grid ClipToBounds="True">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="8" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="8" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="6" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <Border Grid.Row="0"
-                    Style="{DynamicResource DarkBorderContainer}">
-                <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                        <materialDesign:PackIcon Kind="Equalizer"
-                                                 Width="14"
-                                                 Height="14"
-                                                 Margin="0,0,6,0"
-                                                 VerticalAlignment="Center"
-                                                 Foreground="{DynamicResource TertiaryBrush}" />
-                        <TextBlock Style="{DynamicResource TrackInfoInfoBadgeText}" FontFamily="{Binding FontFamilyName}" Text="NOW PLAYING" VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <Border DockPanel.Dock="Right"
-                            Style="{DynamicResource StatusBorderContainer}"
-                            HorizontalAlignment="Right"
-                            Padding="7,2,7,2">
-                        <TextBlock FontSize="10"
-                                   Foreground="{DynamicResource TertiaryLightBrush}"
-                                   FontFamily="{Binding FontFamilyName}"
-                                   Text="{Binding PlayerState}" />
-                    </Border>
-                </DockPanel>
+        <!-- Title + Player State -->
+        <DockPanel Grid.Row="0" ClipToBounds="True">
+            <Border DockPanel.Dock="Right"
+                    Style="{DynamicResource StatusBorderContainer}"
+                    Padding="7,2"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center">
+                <TextBlock FontSize="10"
+                           Foreground="{DynamicResource TertiaryLightBrush}"
+                           FontFamily="{Binding FontFamilyName}"
+                           Text="{Binding PlayerState}" />
             </Border>
+            <resources:StoryboardTextBlock
+                FontSize="20"
+                FontWeight="Bold"
+                Foreground="{DynamicResource SecondaryBrush}"
+                FontFamily="{Binding FontFamilyName}"
+                Text="{Binding Song.Title, FallbackValue=Title}"
+                TextTrimming="None"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                ClipToBounds="True"
+                utils:FlowingTextBehavior.IsEnabled="True" />
+        </DockPanel>
 
-            <Border Grid.Row="2"
-                    Style="{DynamicResource TrackInfoMetricCardBorder}"
-                    Margin="0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+        <!-- Artist -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" ClipToBounds="True">
+            <materialDesign:PackIcon Kind="AccountMusic"
+                                     VerticalAlignment="Center"
+                                     Width="14"
+                                     Height="14"
+                                     Margin="0,0,6,0"
+                                     Foreground="{DynamicResource SecondaryDarkBrush}" />
+            <resources:StoryboardTextBlock
+                FontSize="14"
+                Foreground="{DynamicResource SecondaryDarkBrush}"
+                FontFamily="{Binding FontFamilyName}"
+                Text="{Binding Song.Artist, FallbackValue=Artist}"
+                TextTrimming="None"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                ClipToBounds="True"
+                utils:FlowingTextBehavior.IsEnabled="True" />
+        </StackPanel>
 
-                    <TextBlock FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="{DynamicResource SecondaryBrush}"
-                               FontFamily="{Binding FontFamilyName}"
-                               Text="{Binding Song.Title, FallbackValue=Title}"
-                               TextTrimming="CharacterEllipsis" />
-
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
-                        <materialDesign:PackIcon Kind="AccountMusic"
-                                                 VerticalAlignment="Center"
-                                                 Width="15"
-                                                 Height="15"
-                                                 Margin="0,0,6,0"
-                                                 Foreground="{DynamicResource SecondaryDarkBrush}" />
-                        <TextBlock FontSize="17"
-                                   Foreground="{DynamicResource SecondaryDarkBrush}"
-                                   FontFamily="{Binding FontFamilyName}"
-                                   Text="{Binding Song.Artist, FallbackValue=Artist}"
-                                   TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </Grid>
-            </Border>
-
-            <UniformGrid Grid.Row="4" Columns="3">
-                <Border Style="{DynamicResource TrackInfoMetricCardBorder}">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Metronome"
-                                                     Width="14"
-                                                     Height="14"
-                                                     Margin="0,0,5,0"
-                                                     Foreground="{DynamicResource TertiaryBrush}" />
-                            <TextBlock Style="{DynamicResource TrackInfoMetricLabelText}" Text="TEMPO"  FontFamily="{Binding FontFamilyName}" />
-                        </StackPanel>
-                        <TextBlock Style="{DynamicResource TrackInfoMetricValueText}"
-                                   FontFamily="{Binding FontFamilyName}"
-                                   Margin="0,4,0,0"
-                                   Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{DynamicResource TrackInfoMetricCardBorder}">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="ShapeOutline"
-                                                     Width="14"
-                                                     Height="14"
-                                                     Margin="0,0,5,0"
-                                                     Foreground="{DynamicResource TertiaryBrush}" />
-                            <TextBlock Style="{DynamicResource TrackInfoMetricLabelText}" Text="GENRE"  FontFamily="{Binding FontFamilyName}" />
-                        </StackPanel>
-                        <TextBlock Style="{DynamicResource TrackInfoMetricValueText}"
-                                   FontFamily="{Binding FontFamilyName}"
-                                   Margin="0,4,0,0"
-                                   Text="{Binding Song.Genre, FallbackValue=Genre}" />
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{DynamicResource TrackInfoMetricCardBorder}" Margin="0">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="SignalCellular3"
-                                                     Width="14"
-                                                     Height="14"
-                                                     Margin="0,0,5,0"
-                                                     Foreground="{DynamicResource TertiaryBrush}" />
-                            <TextBlock Style="{DynamicResource TrackInfoMetricLabelText}" Text="BITRATE"  FontFamily="{Binding FontFamilyName}" />
-                        </StackPanel>
-                        <TextBlock Style="{DynamicResource TrackInfoMetricValueText}"
-                                   FontFamily="{Binding FontFamilyName}"
-                                   Margin="0,4,0,0"
-                                   Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=1411 Kbps}" />
-                    </StackPanel>
-                </Border>
-            </UniformGrid>
-        </Grid>
-    </Border>
+        <!-- Compact metadata line -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal">
+            <TextBlock Style="{DynamicResource TrackInfoCompactMetricText}"
+                       FontFamily="{Binding FontFamilyName}"
+                       Text="{Binding Song.BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
+            <TextBlock Style="{DynamicResource TrackInfoCompactSeparatorText}" Text="|" />
+            <TextBlock Style="{DynamicResource TrackInfoCompactMetricText}"
+                       FontFamily="{Binding FontFamilyName}"
+                       Text="{Binding Song.Genre, FallbackValue=Genre}" />
+            <TextBlock Style="{DynamicResource TrackInfoCompactSeparatorText}" Text="|" />
+            <TextBlock Style="{DynamicResource TrackInfoCompactMetricText}"
+                       FontFamily="{Binding FontFamilyName}"
+                       Text="{Binding Song.Bitrate, StringFormat={}{0} Kbps, FallbackValue=0 Kbps}" />
+        </StackPanel>
+    </Grid>
 </UserControl>
-
