@@ -13,82 +13,78 @@
              d:DesignWidth="300">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="12,0,0,0">
-            <Border Style="{DynamicResource DarkBorderContainer}">
-                <StackPanel>
-                    <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="General Preferences" />
-                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Basic app behavior and update policy." />
+            <components:SectionHeader IconKind="Tune"
+                                      Title="General Preferences"
+                                      ShowSubtitle="True"
+                                      Subtitle="Basic app behavior and update policy." />
+
+            <StackPanel Margin="0,16,0,0">
+                <components:FormFieldRow Margin="0,0,0,10"
+                                         Label="Font family:"
+                                         LabelWidth="170">
+                    <components:FormFieldRow.FieldContent>
+                        <ComboBox Style="{DynamicResource CustomComboBox}"
+                                  SelectedItem="{Binding SelectedFontFamily}"
+                                  ItemsSource="{Binding FontFamilies}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontFamily="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </components:FormFieldRow.FieldContent>
+                </components:FormFieldRow>
+
+                <components:FormFieldRow Margin="0,0,0,10"
+                                         Label="Playlist view:"
+                                         LabelWidth="170">
+                    <components:FormFieldRow.FieldContent>
+                        <ComboBox Style="{DynamicResource CustomComboBox}"
+                                  SelectedItem="{Binding SelectedPlaylistViewMode}"
+                                  ItemsSource="{Binding PlaylistViewModes}" />
+                    </components:FormFieldRow.FieldContent>
+                </components:FormFieldRow>
+
+                <components:FormFieldRow Margin="0,0,0,10"
+                                         Label="Theme:"
+                                         LabelWidth="170">
+                    <components:FormFieldRow.FieldContent>
+                        <ComboBox Style="{DynamicResource CustomComboBox}"
+                                  SelectedItem="{Binding SelectedThemeMode}"
+                                  ItemsSource="{Binding ThemeModes}" />
+                    </components:FormFieldRow.FieldContent>
+                </components:FormFieldRow>
+
+                <components:FormFieldRow Margin="0,0,0,10"
+                                         Label="Accent color:"
+                                         LabelWidth="170">
+                    <components:FormFieldRow.FieldContent>
+                        <ComboBox Style="{DynamicResource CustomComboBox}"
+                                  SelectedItem="{Binding SelectedAccentColor}"
+                                  ItemsSource="{Binding AccentColors}" />
+                    </components:FormFieldRow.FieldContent>
+                </components:FormFieldRow>
+
+                <CheckBox IsChecked="{Binding AutoCheckUpdatesOnStartup}"
+                          Content="Automatically check for updates on startup"
+                          Margin="0,0,0,10" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button Style="{DynamicResource SettingsSurfaceButton}"
+                            MinWidth="130"
+                            Content="Check Now"
+                            Command="{Binding CheckForUpdatesNowCommand}" />
+                    <Button Style="{DynamicResource SettingsSurfaceButton}"
+                            MinWidth="130"
+                            Margin="10,0,0,0"
+                            Content="{materialDesign:PackIcon Kind=Download, Size=16}"
+                            ToolTip="Download latest release"
+                            Command="{Binding OpenBrowserForUpdateCommand}"
+                            Visibility="{Binding IsUpdateButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                 </StackPanel>
-            </Border>
 
-            <Border Style="{DynamicResource DarkBorderContainer}" Margin="0,10,0,0">
-                <StackPanel>
-                    <components:FormFieldRow Margin="0,0,0,10"
-                                             Label="Font family:"
-                                             LabelWidth="170">
-                        <components:FormFieldRow.FieldContent>
-                            <ComboBox Style="{DynamicResource CustomComboBox}"
-                                      SelectedItem="{Binding SelectedFontFamily}"
-                                      ItemsSource="{Binding FontFamilies}">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}" FontFamily="{Binding}" />
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </components:FormFieldRow.FieldContent>
-                    </components:FormFieldRow>
-
-                    <components:FormFieldRow Margin="0,0,0,10"
-                                             Label="Playlist view:"
-                                             LabelWidth="170">
-                        <components:FormFieldRow.FieldContent>
-                            <ComboBox Style="{DynamicResource CustomComboBox}"
-                                      SelectedItem="{Binding SelectedPlaylistViewMode}"
-                                      ItemsSource="{Binding PlaylistViewModes}" />
-                        </components:FormFieldRow.FieldContent>
-                    </components:FormFieldRow>
-
-                    <components:FormFieldRow Margin="0,0,0,10"
-                                             Label="Theme:"
-                                             LabelWidth="170">
-                        <components:FormFieldRow.FieldContent>
-                            <ComboBox Style="{DynamicResource CustomComboBox}"
-                                      SelectedItem="{Binding SelectedThemeMode}"
-                                      ItemsSource="{Binding ThemeModes}" />
-                        </components:FormFieldRow.FieldContent>
-                    </components:FormFieldRow>
-
-                    <components:FormFieldRow Margin="0,0,0,10"
-                                             Label="Accent color:"
-                                             LabelWidth="170">
-                        <components:FormFieldRow.FieldContent>
-                            <ComboBox Style="{DynamicResource CustomComboBox}"
-                                      SelectedItem="{Binding SelectedAccentColor}"
-                                      ItemsSource="{Binding AccentColors}" />
-                        </components:FormFieldRow.FieldContent>
-                    </components:FormFieldRow>
-
-                    <CheckBox IsChecked="{Binding AutoCheckUpdatesOnStartup}"
-                              Content="Automatically check for updates on startup"
-                              Margin="0,0,0,10" />
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <Button Style="{DynamicResource SettingsActionButton}"
-                                MinWidth="130"
-                                Content="Check Now"
-                                Command="{Binding CheckForUpdatesNowCommand}" />
-                        <Button Style="{DynamicResource SettingsActionButton}"
-                                MinWidth="130"
-                                Margin="10,0,0,0"
-                                Content="{materialDesign:PackIcon Kind=Download, Size=16}"
-                                ToolTip="Download latest release"
-                                Command="{Binding OpenBrowserForUpdateCommand}"
-                                Visibility="{Binding IsUpdateButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
-                    </StackPanel>
-
-                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="{Binding UpdateAvailableText}" />
-                </StackPanel>
-            </Border>
+                <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="{Binding UpdateAvailableText}" />
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

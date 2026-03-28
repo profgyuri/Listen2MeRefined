@@ -37,7 +37,6 @@
                                  IsUpdateAvailableFeedbackVisible="False"/>
 
             <Border Grid.Row="1"
-                    Style="{DynamicResource BorderContainer}"
                     Margin="10,10,10,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -46,7 +45,10 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" Style="{DynamicResource DarkBorderContainer}">
+                    <Border Grid.Column="0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            CornerRadius="8"
+                            Padding="10">
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Disabled">
                             <ItemsControl Margin="0,0,0,2"
@@ -54,7 +56,7 @@
                                           ItemsSource="{Binding NavigationItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Button Style="{DynamicResource SettingsShellNavButtonStyle}"
+                                        <Button Style="{DynamicResource SettingsNavButtonSurfaceStyle}"
                                                 Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding Route}">
                                             <StackPanel Orientation="Horizontal">

@@ -22,6 +22,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Header: Tabs + Actions -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -72,9 +73,9 @@
                         Margin="0,0,10,0">
 
                 <Button ToolTip="Open named playlist"
-                        Style="{DynamicResource PlaylistPaneHeaderIconButton}"
+                        Style="{DynamicResource PlaylistPaneHeaderIconButtonFlat}"
                         Click="OpenPlaylistPickerButton_OnClick">
-                    <materialDesign:PackIcon Kind="Plus" Width="14" Height="14"/>
+                    <materialDesign:PackIcon Kind="PlaylistPlus" Width="16" Height="16"/>
                     <Button.ContextMenu>
                         <ContextMenu x:Name="PlaylistPickerContextMenu"
                                      Style="{DynamicResource PlaylistPaneContextMenuStyle}"
@@ -90,14 +91,15 @@
                     </Button.ContextMenu>
                 </Button>
 
-                <Button Content="CLEAR"
+                <Button Content="Clear"
                         ToolTip="Clear all songs from playlist"
-                        Style="{DynamicResource PlaylistPaneHeaderActionButton}"
+                        Style="{DynamicResource PlaylistPaneHeaderClearPill}"
                         Visibility="{Binding SelectedTab.IsDefaultTab, Converter={StaticResource BoolToVisibilityConverter}}"
                         Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
             </StackPanel>
         </Grid>
 
+        <!-- Accent gradient separator -->
         <Border Grid.Row="1">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -108,6 +110,7 @@
             </Border.Background>
         </Border>
 
+        <!-- Playlist ListView -->
         <ListView Grid.Row="2"
                   dd:DragDrop.IsDragSource="True"
                   dd:DragDrop.IsDropTarget="True"
@@ -145,10 +148,11 @@
                 <DataTemplate>
                     <Grid MinWidth="300" ClipToBounds="True">
 
+                        <!-- Detailed view -->
                         <Grid x:Name="DetailedViewRoot">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="5"/>
+                                <RowDefinition Height="3"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
@@ -162,38 +166,60 @@
                                 ClipToBounds="True"
                                 utils:FlowingTextBehavior.IsEnabled="True"/>
 
-                            <components:MetaBadgeRow
-                                Grid.Row="2"
-                                BpmText="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=BPM}"
-                                BitrateText="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=Bitrate}"
-                                LengthText="{Binding Length, StringFormat={}{0:hh\:mm\:ss\.f}, FallbackValue=Length}"
-                                GenreText="{Binding Genre, FallbackValue=Genre}"/>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                           Text="{Binding Length, StringFormat={}{0:mm\\:ss}, FallbackValue=0:00}" />
+                                <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
+                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                           Text="{Binding Genre, FallbackValue=Genre}" />
+                                <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
+                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                           Text="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
+                                <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
+                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                           Text="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=0 Kbps}" />
+                            </StackPanel>
                         </Grid>
 
-                        <resources:StoryboardTextBlock
-                            x:Name="CompactViewText"
-                            Text="{Binding Display, FallbackValue=Track Title}"
-                            Foreground="{DynamicResource SecondaryBrush}"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            TextTrimming="None"
-                            HorizontalAlignment="Left"
-                            ClipToBounds="True"
-                            Visibility="Collapsed"
-                            utils:FlowingTextBehavior.IsEnabled="True"/>
+                        <!-- Compact view -->
+                        <Grid x:Name="CompactViewRoot" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <resources:StoryboardTextBlock
+                                Text="{Binding Display, FallbackValue=Track Title}"
+                                Foreground="{DynamicResource SecondaryBrush}"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                TextTrimming="None"
+                                HorizontalAlignment="Left"
+                                ClipToBounds="True"
+                                utils:FlowingTextBehavior.IsEnabled="True"/>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Length, StringFormat={}{0:mm\\:ss}, FallbackValue=0:00}"
+                                       Foreground="{DynamicResource SecondaryDarkBrush}"
+                                       FontSize="11"
+                                       Opacity="0.7"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0" />
+                        </Grid>
                     </Grid>
 
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding DataContext.IsCompactPlaylistView, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                      Value="True">
                             <Setter TargetName="DetailedViewRoot" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="CompactViewText" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="CompactViewRoot" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
+        <!-- Empty state overlay -->
         <Grid Grid.Row="2"
               IsHitTestVisible="False">
             <Grid.Style>
@@ -210,9 +236,9 @@
                         HorizontalAlignment="Center"
                         Opacity="0.35">
                 <materialDesign:PackIcon Kind="MusicNote"
-                                        Width="40" Height="40"
-                                        Foreground="{DynamicResource TertiaryBrush}"
-                                        HorizontalAlignment="Center"/>
+                                         Width="40" Height="40"
+                                         Foreground="{DynamicResource TertiaryBrush}"
+                                         HorizontalAlignment="Center"/>
                 <TextBlock Text="Drop tracks here"
                            Foreground="{DynamicResource SecondaryDarkBrush}"
                            FontSize="13"
