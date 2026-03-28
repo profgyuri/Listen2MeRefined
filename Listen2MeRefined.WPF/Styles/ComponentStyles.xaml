@@ -509,8 +509,8 @@
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Padding" Value="14,0" />
         <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-        <Setter Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -523,11 +523,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="BtnBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightMidBrush}" />
-                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
+                            <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -535,11 +534,10 @@
         </Setter>
     </Style>
 
-    <Style x:Key="FolderBrowserSectionTitleText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Margin" Value="0,0,0,6" />
+    <Style x:Key="FolderBrowserFilterTextBoxBorder" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="10,0" />
     </Style>
 
     <Style x:Key="FolderBrowserListView" TargetType="ListView" BasedOn="{StaticResource VirtualizedListView}">
@@ -549,31 +547,25 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="ListViewItem">
-                    <Setter Property="Margin" Value="0" />
-                    <Setter Property="Padding" Value="0" />
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
-                    <Setter Property="BorderThickness" Value="0,0,0,1" />
+                    <Setter Property="Margin" Value="0,0,0,2" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListViewItem">
                                 <Border x:Name="ItemBorder"
                                         Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        Padding="8,5">
+                                        CornerRadius="6"
+                                        Padding="8,6">
                                     <ContentPresenter />
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource PrimaryLightBrush}" />
+                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}" />
-                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource BorderBrush}" />
-                                        <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1" />
-                                        <Setter Property="Margin" Value="0,1,0,1" />
+                                        <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>

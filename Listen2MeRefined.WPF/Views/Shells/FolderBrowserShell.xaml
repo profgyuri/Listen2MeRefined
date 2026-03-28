@@ -50,10 +50,13 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0"
-                            Style="{DynamicResource DarkBorderContainer}">
+                            Style="{DynamicResource DarkBorderContainer}"
+                            Padding="0,6">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Style="{DynamicResource FolderBrowserSectionTitleText}" Text="Pinned" />
+                                <components:SectionHeader Title="Pinned"
+                                                          IconKind="Pin"
+                                                          ShowActionButton="False" />
                                 <ListView Height="180"
                                           ItemsSource="{Binding CurrentViewModel.PinnedFolders}"
                                           SelectedItem="{Binding CurrentViewModel.SelectedPinnedFolder, Mode=TwoWay}"
@@ -72,7 +75,10 @@
                                     </i:Interaction.Triggers>
                                 </ListView>
 
-                                <TextBlock Style="{DynamicResource FolderBrowserSectionTitleText}" Margin="0,10,0,6" Text="Drives" />
+                                <components:SectionHeader Title="Drives"
+                                                          IconKind="Harddisk"
+                                                          ShowActionButton="False"
+                                                          Margin="0,4,0,0" />
                                 <ListView Height="130"
                                           ItemsSource="{Binding CurrentViewModel.Drives}"
                                           SelectedItem="{Binding CurrentViewModel.SelectedDrive, Mode=TwoWay}"
