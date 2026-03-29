@@ -16,242 +16,188 @@
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="44"/>
-            <RowDefinition Height="1"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="1"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <!-- Header: Tabs + Actions -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- Sidebar -->
+        <ContentControl Content="{Binding PlaylistSidebarViewModel}"/>
 
-            <TabControl Grid.Column="0"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="0"
-                        ItemContainerStyle="{DynamicResource PlaylistPaneTabItemStyle}"
-                        ItemsSource="{Binding Tabs}"
-                        SelectedItem="{Binding SelectedTab}">
-                <TabControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="TabHeaderText"
-                                       Grid.Column="0"
-                                       Text="{Binding Header}"
-                                       Style="{DynamicResource PlaylistPaneTabHeaderText}"/>
-                            <Button x:Name="CloseTabButton"
-                                    Grid.Column="1"
-                                    Style="{DynamicResource PlaylistPaneTabCloseButton}"
-                                    Visibility="{Binding IsCloseable, Converter={StaticResource BoolToVisibilityConverter}}"
-                                    Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}"
-                                    ToolTip="Close tab">
-                                <materialDesign:PackIcon Kind="Close" Width="11" Height="11"/>
-                            </Button>
-                        </Grid>
-                    </DataTemplate>
-                </TabControl.ItemTemplate>
+        <!-- Separator -->
+        <Border Grid.Column="1"
+                Background="{DynamicResource BorderBrush}"/>
 
-                <TabControl.ContentTemplate>
-                    <DataTemplate>
-                        <Grid/>
-                    </DataTemplate>
-                </TabControl.ContentTemplate>
-            </TabControl>
+        <!-- Song list area -->
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="1"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="0,0,10,0">
-
-                <Button ToolTip="Open named playlist"
-                        Style="{DynamicResource PlaylistPaneHeaderIconButtonFlat}"
-                        Click="OpenPlaylistPickerButton_OnClick">
-                    <materialDesign:PackIcon Kind="PlaylistPlus" Width="16" Height="16"/>
-                    <Button.ContextMenu>
-                        <ContextMenu x:Name="PlaylistPickerContextMenu"
-                                     Style="{DynamicResource PlaylistPaneContextMenuStyle}"
-                                     ItemsSource="{Binding PlacementTarget.DataContext.AvailablePlaylists, RelativeSource={RelativeSource Self}}">
-                            <ContextMenu.ItemContainerStyle>
-                                <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistPaneContextMenuItemStyle}">
-                                    <Setter Property="Header" Value="{Binding Name}"/>
-                                    <Setter Property="Command" Value="{Binding PlacementTarget.DataContext.OpenPlaylistTabCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                    <Setter Property="CommandParameter" Value="{Binding}"/>
-                                </Style>
-                            </ContextMenu.ItemContainerStyle>
-                        </ContextMenu>
-                    </Button.ContextMenu>
-                </Button>
+            <!-- Header: playlist name + Clear -->
+            <Grid Margin="12,8,12,8" MinHeight="28">
+                <TextBlock Text="{Binding ActivePlaylistName}"
+                           Foreground="{DynamicResource SecondaryBrush}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
 
                 <Button Content="Clear"
-                        ToolTip="Clear all songs from playlist"
+                        HorizontalAlignment="Right"
+                        ToolTip="Remove selected or clear playlist"
                         Style="{DynamicResource PlaylistPaneHeaderClearPill}"
-                        Visibility="{Binding SelectedTab.IsDefaultTab, Converter={StaticResource BoolToVisibilityConverter}}"
                         Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
-            </StackPanel>
-        </Grid>
+            </Grid>
 
-        <!-- Accent gradient separator -->
-        <Border Grid.Row="1">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Color="{DynamicResource TertiaryColor}" Offset="0"/>
-                    <GradientStop Color="{DynamicResource TertiaryMidColor}" Offset="0.6"/>
-                    <GradientStop Color="Transparent" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-        </Border>
+            <!-- Separator -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource BorderBrush}"/>
 
-        <!-- Playlist ListView -->
-        <ListView Grid.Row="2"
-                  dd:DragDrop.IsDragSource="True"
-                  dd:DragDrop.IsDropTarget="True"
-                  AllowDrop="True"
-                  PreviewDragOver="PlaylistListView_OnPreviewDragOver"
-                  PreviewDrop="PlaylistListView_OnPreviewDrop"
-                  ItemsSource="{Binding SelectedTab.Songs}"
-                  Style="{DynamicResource PlaylistListView}"
-                  PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
-                  SelectedItem="{Binding SelectedSong, Mode=TwoWay}"
-                  SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
-                  SelectionMode="Extended"
-                  utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding PlaylistSelectionAddedCommand}"
-                  utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding PlaylistSelectionRemovedCommand}"
-                  utils:SelectionChangedCommandBehavior.ScrollSelectedItemIntoView="True">
+            <!-- Playlist ListView -->
+            <ListView Grid.Row="2"
+                      dd:DragDrop.IsDragSource="True"
+                      dd:DragDrop.IsDropTarget="True"
+                      AllowDrop="True"
+                      PreviewDragOver="PlaylistListView_OnPreviewDragOver"
+                      PreviewDrop="PlaylistListView_OnPreviewDrop"
+                      ItemsSource="{Binding CurrentPlaylistSongs}"
+                      Style="{DynamicResource PlaylistListView}"
+                      PreviewMouseRightButtonDown="ListViewOnPreviewMouseRightButtonDown"
+                      SelectedItem="{Binding SelectedSong, Mode=TwoWay}"
+                      SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
+                      SelectionMode="Extended"
+                      utils:SelectionChangedCommandBehavior.AddedItemsCommand="{Binding PlaylistSelectionAddedCommand}"
+                      utils:SelectionChangedCommandBehavior.RemovedItemsCommand="{Binding PlaylistSelectionRemovedCommand}"
+                      utils:SelectionChangedCommandBehavior.ScrollSelectedItemIntoView="True">
 
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding PlaySelectedFromActiveTabCommand}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding PlaySelectedFromActiveTabCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
 
-            <ListView.InputBindings>
-                <KeyBinding Modifiers="Ctrl" Key="Delete"
-                            Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
-                <KeyBinding Modifiers="Ctrl+Shift" Key="Delete"
-                            Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
-            </ListView.InputBindings>
+                <ListView.InputBindings>
+                    <KeyBinding Modifiers="Ctrl" Key="Delete"
+                                Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
+                    <KeyBinding Modifiers="Ctrl+Shift" Key="Delete"
+                                Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
+                </ListView.InputBindings>
 
-            <ListView.ContextMenu>
-                <contextMenus:SongContextMenu DataContext="{Binding PlacementTarget.DataContext.SongContextMenuViewModel, RelativeSource={RelativeSource Self}}" />
-            </ListView.ContextMenu>
+                <ListView.ContextMenu>
+                    <contextMenus:SongContextMenu DataContext="{Binding PlacementTarget.DataContext.SongContextMenuViewModel, RelativeSource={RelativeSource Self}}" />
+                </ListView.ContextMenu>
 
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid MinWidth="300" ClipToBounds="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid MinWidth="300" ClipToBounds="True">
 
-                        <!-- Detailed view -->
-                        <Grid x:Name="DetailedViewRoot">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="3"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
+                            <!-- Detailed view -->
+                            <Grid x:Name="DetailedViewRoot">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="3"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
 
-                            <resources:StoryboardTextBlock
-                                Text="{Binding Display, FallbackValue=Track Title}"
-                                Foreground="{DynamicResource SecondaryBrush}"
-                                FontSize="14"
-                                FontWeight="SemiBold"
-                                TextTrimming="None"
-                                HorizontalAlignment="Left"
-                                ClipToBounds="True"
-                                utils:FlowingTextBehavior.IsEnabled="True"/>
+                                <resources:StoryboardTextBlock
+                                    Text="{Binding Display, FallbackValue=Track Title}"
+                                    Foreground="{DynamicResource SecondaryBrush}"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    TextTrimming="None"
+                                    HorizontalAlignment="Left"
+                                    ClipToBounds="True"
+                                    utils:FlowingTextBehavior.IsEnabled="True"/>
 
-                            <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
-                                           Text="{Binding Length, StringFormat={}{0:mm\\:ss}, FallbackValue=0:00}" />
-                                <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
-                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
-                                           Text="{Binding Genre, FallbackValue=Genre}" />
-                                <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
-                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
-                                           Text="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
-                                <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
-                                <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
-                                           Text="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=0 Kbps}" />
-                            </StackPanel>
+                                <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                               Text="{Binding Length, StringFormat={}{0:mm\\:ss}, FallbackValue=0:00}" />
+                                    <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
+                                    <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                               Text="{Binding Genre, FallbackValue=Genre}" />
+                                    <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
+                                    <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                               Text="{Binding BPM, StringFormat={}{0} BPM, FallbackValue=0 BPM}" />
+                                    <TextBlock Style="{DynamicResource PlaylistDetailSeparatorText}" Text="|" />
+                                    <TextBlock Style="{DynamicResource PlaylistDetailMetricText}"
+                                               Text="{Binding Bitrate, StringFormat={}{0} Kbps, FallbackValue=0 Kbps}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Compact view -->
+                            <Grid x:Name="CompactViewRoot" Visibility="Collapsed">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <resources:StoryboardTextBlock
+                                    Text="{Binding Display, FallbackValue=Track Title}"
+                                    Foreground="{DynamicResource SecondaryBrush}"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    TextTrimming="None"
+                                    HorizontalAlignment="Left"
+                                    ClipToBounds="True"
+                                    utils:FlowingTextBehavior.IsEnabled="True"/>
+
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Length, StringFormat={}{0:mm\\:ss}, FallbackValue=0:00}"
+                                           Foreground="{DynamicResource SecondaryDarkBrush}"
+                                           FontSize="11"
+                                           Opacity="0.7"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0" />
+                            </Grid>
                         </Grid>
 
-                        <!-- Compact view -->
-                        <Grid x:Name="CompactViewRoot" Visibility="Collapsed">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding DataContext.IsCompactPlaylistView, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         Value="True">
+                                <Setter TargetName="DetailedViewRoot" Property="Visibility" Value="Collapsed"/>
+                                <Setter TargetName="CompactViewRoot" Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
 
-                            <resources:StoryboardTextBlock
-                                Text="{Binding Display, FallbackValue=Track Title}"
-                                Foreground="{DynamicResource SecondaryBrush}"
-                                FontSize="14"
-                                FontWeight="SemiBold"
-                                TextTrimming="None"
-                                HorizontalAlignment="Left"
-                                ClipToBounds="True"
-                                utils:FlowingTextBehavior.IsEnabled="True"/>
-
-                            <TextBlock Grid.Column="1"
-                                       Text="{Binding Length, StringFormat={}{0:mm\\:ss}, FallbackValue=0:00}"
-                                       Foreground="{DynamicResource SecondaryDarkBrush}"
-                                       FontSize="11"
-                                       Opacity="0.7"
-                                       VerticalAlignment="Center"
-                                       Margin="10,0,0,0" />
-                        </Grid>
-                    </Grid>
-
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding DataContext.IsCompactPlaylistView, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                     Value="True">
-                            <Setter TargetName="DetailedViewRoot" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="CompactViewRoot" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-
-        <!-- Empty state overlay -->
-        <Grid Grid.Row="2"
-              IsHitTestVisible="False">
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedTab.Songs.Count}" Value="0">
-                            <Setter Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <StackPanel VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Opacity="0.35">
-                <materialDesign:PackIcon Kind="MusicNote"
-                                         Width="40" Height="40"
-                                         Foreground="{DynamicResource TertiaryBrush}"
-                                         HorizontalAlignment="Center"/>
-                <TextBlock Text="Drop tracks here"
-                           Foreground="{DynamicResource SecondaryDarkBrush}"
-                           FontSize="13"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
-                           Margin="0,10,0,4"/>
-                <TextBlock Text="or double-click from the library"
-                           Foreground="{DynamicResource SecondaryDarkBrush}"
-                           FontSize="11"
-                           HorizontalAlignment="Center"
-                           Opacity="0.7"/>
-            </StackPanel>
+            <!-- Empty state overlay -->
+            <Grid Grid.Row="2"
+                  IsHitTestVisible="False">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentPlaylistSongs.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Opacity="0.35">
+                    <materialDesign:PackIcon Kind="MusicNote"
+                                             Width="40" Height="40"
+                                             Foreground="{DynamicResource TertiaryBrush}"
+                                             HorizontalAlignment="Center"/>
+                    <TextBlock Text="Drop tracks here"
+                               Foreground="{DynamicResource SecondaryDarkBrush}"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               Margin="0,10,0,4"/>
+                    <TextBlock Text="or double-click from the library"
+                               Foreground="{DynamicResource SecondaryDarkBrush}"
+                               FontSize="11"
+                               HorizontalAlignment="Center"
+                               Opacity="0.7"/>
+                </StackPanel>
+            </Grid>
         </Grid>
-
     </Grid>
 </UserControl>

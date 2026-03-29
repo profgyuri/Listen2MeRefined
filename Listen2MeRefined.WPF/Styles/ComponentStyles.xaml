@@ -1635,85 +1635,100 @@
         <Setter Property="FontStyle" Value="Italic" />
     </Style>
     
-    <Style x:Key="PlaylistPaneTabItemStyle" TargetType="TabItem">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="14,8,10,8"/>
-            <Setter Property="Margin" Value="0,0,2,0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Border x:Name="TabBorder"
-                                Background="Transparent"
-                                BorderThickness="0,0,0,1"
-                                BorderBrush="Transparent"
-                                Padding="{TemplateBinding Padding}"
-                                SnapsToDevicePixels="True">
-                            <ContentPresenter ContentSource="Header"
-                                              VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource TertiaryMidBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+    <!--#region Playlist Sidebar -->
+        <Style x:Key="PlaylistSidebarGroupHeader" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="14,14,14,6"/>
+            <Setter Property="Opacity" Value="0.6"/>
         </Style>
 
-        <Style x:Key="PlaylistPaneTabHeaderText" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-            <Setter Property="MaxWidth" Value="110"/>
+        <Style x:Key="PlaylistSidebarItem" TargetType="Border">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Margin" Value="4,1"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
-                    <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+                </Trigger>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="PlaylistPaneTabCloseButton" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="3"/>
-            <Setter Property="Margin" Value="5,0,0,0"/>
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Cursor" Value="Hand"/>
+        <Style x:Key="PlaylistSidebarItemText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="PlaylistSidebarItemSubtitle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="Margin" Value="0,2,0,0"/>
+        </Style>
+
+        <Style x:Key="PlaylistSidebarPinIcon" TargetType="materialDesign:PackIcon">
+            <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Height" Value="10"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+
+        <Style x:Key="PlaylistSidebarRenameTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource TertiaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="2,1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="PlaylistSidebarNewButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="CloseBtnBorder"
+                        <Border x:Name="NewBtnBorder"
                                 Background="Transparent"
-                                CornerRadius="3"
-                                Width="20" Height="20">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="CloseBtnBorder" Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="CloseBtnBorder" Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                <Setter TargetName="NewBtnBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="PlaylistSidebarEmptyHint" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+            <Setter Property="Opacity" Value="0.4"/>
+            <Setter Property="Margin" Value="14,4,14,4"/>
+        </Style>
+        <!--#endregion-->
 
         <Style x:Key="PlaylistListView" TargetType="ListView">
             <Setter Property="Background" Value="Transparent"/>
@@ -1778,18 +1793,15 @@
         </Style>
 
         <Style x:Key="PlaylistPaneContextMenuStyle" TargetType="ContextMenu">
-            <Setter Property="Background" Value="{DynamicResource DefaultBorderBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="0,4"/>
             <Setter Property="HasDropShadow" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ContextMenu">
                         <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6"
+                                BorderThickness="0"
                                 Padding="{TemplateBinding Padding}"
                                 Effect="{DynamicResource MaterialDesignShadowDepth3}">
                             <StackPanel IsItemsHost="True"/>
@@ -1838,7 +1850,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="MenuItemBorder" Property="Background" Value="#18FF8A3D"/>
+                                <Setter TargetName="MenuItemBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible"/>

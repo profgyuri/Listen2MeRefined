@@ -25,8 +25,8 @@ public sealed class SettingsPlaylistsTabViewModelTests
 
         var seedPlaylists = new[]
         {
-            new PlaylistSummary(10, "Favorites"),
-            new PlaylistSummary(20, "Road Trip")
+            new PlaylistSummary(10, "Favorites", false, 0),
+            new PlaylistSummary(20, "Road Trip", false, 1)
         };
 
         var (viewModel, _, _, _) = CreateViewModel(settings, seedPlaylists);
@@ -61,7 +61,7 @@ public sealed class SettingsPlaylistsTabViewModelTests
         var settings = new AppSettings();
         var (viewModel, _, _, probe) = CreateViewModel(
             settings,
-            [new PlaylistSummary(1, "Existing")]);
+            [new PlaylistSummary(1, "Existing", false, 0)]);
         await viewModel.InitializeAsync();
 
         viewModel.PlaylistNameInput = "Fresh";
@@ -80,7 +80,7 @@ public sealed class SettingsPlaylistsTabViewModelTests
         var settings = new AppSettings();
         var (viewModel, _, _, probe) = CreateViewModel(
             settings,
-            [new PlaylistSummary(42, "Old Name")]);
+            [new PlaylistSummary(42, "Old Name", false, 0)]);
         await viewModel.InitializeAsync();
 
         viewModel.SelectedPlaylist = viewModel.Playlists[0];
@@ -100,8 +100,8 @@ public sealed class SettingsPlaylistsTabViewModelTests
         var (viewModel, _, _, probe) = CreateViewModel(
             settings,
             [
-                new PlaylistSummary(10, "A"),
-                new PlaylistSummary(20, "B")
+                new PlaylistSummary(10, "A", false, 0),
+                new PlaylistSummary(20, "B", false, 1)
             ]);
         await viewModel.InitializeAsync();
 
@@ -149,7 +149,7 @@ public sealed class SettingsPlaylistsTabViewModelTests
             .Callback<Action<AppSettings>>(apply => apply(settings));
 
         var playlists = seedPlaylists
-            .Select(x => new PlaylistSummary(x.Id, x.Name))
+            .Select(x => new PlaylistSummary(x.Id, x.Name, x.IsPinned, x.DisplayOrder))
             .ToList();
         var nextPlaylistId = playlists.Count == 0
             ? 1
@@ -158,7 +158,7 @@ public sealed class SettingsPlaylistsTabViewModelTests
         var playlistLibraryService = new Mock<IPlaylistLibraryService>();
         playlistLibraryService
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() => playlists.Select(x => new PlaylistSummary(x.Id, x.Name)).ToArray());
+            .ReturnsAsync(() => playlists.Select(x => new PlaylistSummary(x.Id, x.Name, x.IsPinned, x.DisplayOrder)).ToArray());
 
         if (throwOnCreate)
         {
@@ -172,7 +172,7 @@ public sealed class SettingsPlaylistsTabViewModelTests
                 .Setup(x => x.CreatePlaylistAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((string name, CancellationToken _) =>
                 {
-                    var created = new PlaylistSummary(nextPlaylistId++, name.Trim());
+                    var created = new PlaylistSummary(nextPlaylistId++, name.Trim(), false, 0);
                     playlists.Add(created);
                     return created;
                 });
@@ -185,7 +185,7 @@ public sealed class SettingsPlaylistsTabViewModelTests
                 var index = playlists.FindIndex(x => x.Id == playlistId);
                 if (index >= 0)
                 {
-                    playlists[index] = new PlaylistSummary(playlistId, newName.Trim());
+                    playlists[index] = new PlaylistSummary(playlistId, newName.Trim(), false, 0);
                 }
 
                 return Task.CompletedTask;

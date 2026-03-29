@@ -12,6 +12,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -30,20 +31,99 @@
             </Grid>
         </Border>
 
-        <!-- Content panels -->
-        <Grid Grid.Row="1" Margin="0,8,0,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <!-- Content view toggle -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="12,8,12,0">
+            <Button Command="{Binding ShowPlaylistViewCommand}"
+                    Cursor="Hand"
+                    Margin="0,0,4,0">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="ToggleBorder"
+                                            Background="{TemplateBinding Background}"
+                                            CornerRadius="6"
+                                            Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="PlaylistMusic" Width="14" Height="14"
+                                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock Text="Playlist" FontSize="12" FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPlaylistViewActive}" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Command="{Binding ShowSearchResultsViewCommand}"
+                    Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="ToggleBorder"
+                                            Background="{TemplateBinding Background}"
+                                            CornerRadius="6"
+                                            Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="Magnify" Width="14" Height="14"
+                                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock Text="Search Results" FontSize="12" FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPlaylistViewActive}" Value="False">
+                                <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
 
-            <ContentControl Content="{Binding SearchResultsPaneViewModel}" Margin="12,0,0,0" />
-            <Border Grid.Column="1" Style="{DynamicResource ContentPanelSeparator}" />
-            <ContentControl Grid.Column="2" Content="{Binding PlaylistPaneViewModel}" Margin="0,0,12,0" />
-        </Grid>
+        <!-- Content panel (switches between search results and playlist pane) -->
+        <ContentControl Grid.Row="2"
+                        Content="{Binding CurrentContentViewModel}"
+                        Margin="12,8,12,8"/>
 
         <!-- Search bar -->
-        <ContentControl Grid.Row="2" Content="{Binding SearchbarViewModel}" />
+        <ContentControl Grid.Row="3" Content="{Binding SearchbarViewModel}" />
     </Grid>
 </UserControl>

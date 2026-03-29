@@ -26,6 +26,14 @@ public sealed class DataContext : DbContext
             .IsUnique();
 
         modelBuilder.Entity<PlaylistModel>()
+            .Property(x => x.IsPinned)
+            .HasDefaultValue(false);
+
+        modelBuilder.Entity<PlaylistModel>()
+            .Property(x => x.DisplayOrder)
+            .HasDefaultValue(0);
+
+        modelBuilder.Entity<PlaylistModel>()
             .HasMany(x => x.Songs)
             .WithMany()
             .UsingEntity<Dictionary<string, object>>(

@@ -140,55 +140,39 @@ public class PlaylistPaneViewModelTests
 
         await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
 
-        Assert.Equal(["B", "C", "A", "D"], pane.SelectedTab!.Songs.Select(x => x.Title ?? string.Empty).ToArray());
+        Assert.Equal(["B", "C", "A", "D"], pane.CurrentPlaylistSongs.Select(x => x.Title ?? string.Empty).ToArray());
     }
 
     [Fact]
-    public async Task SetSelectedSongAsNextCommand_NamedTab_RefreshesVisibleOrder()
+    public async Task SetSelectedSongAsNextCommand_NamedPlaylist_RefreshesVisibleOrder()
     {
         var logger = CreateLogger();
         var messenger = new WeakReferenceMessenger();
         var queueServices = CreateQueueServices(logger.Object);
-        var pane = CreatePane(logger.Object, messenger, queueServices);
-
-        await pane.InitializeAsync();
 
         var first = new AudioModel { Title = "A", Path = "a.mp3" };
         var second = new AudioModel { Title = "B", Path = "b.mp3" };
         var third = new AudioModel { Title = "C", Path = "c.mp3" };
         var fourth = new AudioModel { Title = "D", Path = "d.mp3" };
-        var namedTab = new PlaylistPaneViewModel.PlaylistTabItem(
-            "Named",
-            42,
-            new ObservableCollection<AudioModel>([first, second, third, fourth]));
-        pane.Tabs.Add(namedTab);
-        pane.SelectedTab = namedTab;
 
-        queueServices.RoutingService.ActivateNamedPlaylistQueue(42, namedTab.Songs);
-        queueServices.State.CurrentSongIndex = 2;
-        pane.SelectedSong = first;
-
-        await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
-
-        Assert.Equal(["B", "C", "A", "D"], namedTab.Songs.Select(x => x.Title ?? string.Empty).ToArray());
-    }
-
-    [Fact]
-    public async Task PlaylistCreatedMessage_AddsAndSelectsNewTab()
-    {
-        var logger = CreateLogger();
-        var messenger = new WeakReferenceMessenger();
-        var queueServices = CreateQueueServices(logger.Object);
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new PlaylistSummary(42, "Road Trip")]);
+            .ReturnsAsync([new PlaylistSummary(42, "Named", false, 4)]);
         playlistLibrary
             .Setup(x => x.GetPlaylistSongsAsync(42, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new AudioModel { Title = "Song", Path = "song.mp3" }]);
+            .ReturnsAsync([first, second, third, fourth]);
 
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
+
+        var sidebarViewModel = new PlaylistSidebarViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            messenger,
+            playlistLibrary.Object,
+            queueServices.State);
+
         var pane = new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
@@ -204,19 +188,27 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
+            sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
 
         await pane.InitializeAsync();
-        messenger.Send(new PlaylistCreatedMessage(new PlaylistCreatedMessageData(42, "Road Trip")));
 
-        for (var i = 0; i < 20 && pane.SelectedTab?.PlaylistId != 42; i++)
+        // Select the named playlist via sidebar message
+        messenger.Send(new PlaylistSidebarSelectionChangedMessage(new PlaylistSidebarSelectionData(42)));
+
+        // Wait for async loading of playlist songs
+        for (var i = 0; i < 20 && pane.CurrentPlaylistSongs.Count == 0; i++)
         {
             await Task.Delay(25);
         }
 
-        Assert.Equal(2, pane.Tabs.Count);
-        Assert.Equal(42, pane.SelectedTab?.PlaylistId);
-        Assert.Equal("Road Trip", pane.SelectedTab?.Header);
+        queueServices.RoutingService.ActivateNamedPlaylistQueue(42, pane.CurrentPlaylistSongs);
+        queueServices.State.CurrentSongIndex = 2;
+        pane.SelectedSong = first;
+
+        await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
+
+        Assert.Equal(["B", "C", "A", "D"], pane.CurrentPlaylistSongs.Select(x => x.Title ?? string.Empty).ToArray());
     }
 
     [Fact]
@@ -232,6 +224,13 @@ public class PlaylistPaneViewModelTests
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<PlaylistSummary>());
 
+        var sidebarViewModel = new PlaylistSidebarViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            messenger,
+            playlistLibrary.Object,
+            queueServices.State);
+
         var pane = new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
@@ -247,6 +246,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
+            sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
 
         await pane.InitializeAsync();
@@ -398,6 +398,13 @@ public class PlaylistPaneViewModelTests
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetUseCompactPlaylistView()).Returns(false);
 
+        var sidebarViewModel = new PlaylistSidebarViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger,
+            messenger,
+            playlistLibrary.Object,
+            queueServices.State);
+
         return new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
             logger,
@@ -413,6 +420,7 @@ public class PlaylistPaneViewModelTests
             externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
             externalAudioOpenInbox ?? Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
+            sidebarViewModel,
             CreateSongContextMenuViewModel(logger, messenger));
     }
 

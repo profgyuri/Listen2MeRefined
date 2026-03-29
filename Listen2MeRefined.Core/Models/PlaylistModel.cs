@@ -9,5 +9,9 @@ public sealed class PlaylistModel : ModelBase
     [MaxLength(50)]
     public string? Name { get; set; }
 
+    public bool IsPinned { get; set; }
+
+    public int DisplayOrder { get; set; }
+
     public List<AudioModel> Songs { get; init; } = new();
 }
