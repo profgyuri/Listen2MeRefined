@@ -6,6 +6,7 @@ using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.Widgets;
+using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Media.SoundWave;
@@ -270,6 +271,33 @@ public class PlaybackControlsViewModelTests
         await timedTask.StopAsync();
     }
 
+    [Fact]
+    public async Task ToggleRepeatCommand_CyclesOffAllOne()
+    {
+        var settings = new AppSettings();
+        var (viewModel, musicPlayer, timedTask, _, _) = await CreateViewModelAsync(settings);
+
+        Assert.Equal(RepeatMode.Off, viewModel.RepeatMode);
+        Assert.False(viewModel.IsRepeatActive);
+
+        viewModel.ToggleRepeatCommand.Execute(null);
+        Assert.Equal(RepeatMode.All, viewModel.RepeatMode);
+        Assert.True(viewModel.IsRepeatActive);
+        Assert.Equal("Repeat", viewModel.RepeatIconKind);
+
+        viewModel.ToggleRepeatCommand.Execute(null);
+        Assert.Equal(RepeatMode.One, viewModel.RepeatMode);
+        Assert.True(viewModel.IsRepeatActive);
+        Assert.Equal("RepeatOnce", viewModel.RepeatIconKind);
+
+        viewModel.ToggleRepeatCommand.Execute(null);
+        Assert.Equal(RepeatMode.Off, viewModel.RepeatMode);
+        Assert.False(viewModel.IsRepeatActive);
+        Assert.Equal("Repeat", viewModel.RepeatIconKind);
+
+        await timedTask.StopAsync();
+    }
+
     private static async Task<(PlaybackControlsViewModel ViewModel, Mock<IMusicPlayerController> MusicPlayer, TimedTask TimedTask, Mock<IWaveFormDrawer<SKBitmap>> WaveFormDrawer, WeakReferenceMessenger Messenger)> CreateViewModelAsync(
         AppSettings settings,
         TimeSpan? waveformResizeDebounce = null)
@@ -281,6 +309,7 @@ public class PlaybackControlsViewModelTests
 
         var musicPlayer = new Mock<IMusicPlayerController>();
         musicPlayer.SetupProperty(x => x.Volume, 1f);
+        musicPlayer.SetupProperty(x => x.RepeatMode, RepeatMode.Off);
 
         var settingsManager = new Mock<ISettingsManager<AppSettings>>();
         settingsManager.SetupGet(x => x.Settings).Returns(settings);

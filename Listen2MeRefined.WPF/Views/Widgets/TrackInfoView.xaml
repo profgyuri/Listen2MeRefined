@@ -18,30 +18,20 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Title + Player State -->
-        <DockPanel Grid.Row="0" ClipToBounds="True">
-            <Border DockPanel.Dock="Right"
-                    Style="{DynamicResource StatusBorderContainer}"
-                    Padding="7,2"
-                    Margin="8,0,0,0"
-                    VerticalAlignment="Center">
-                <TextBlock FontSize="10"
-                           Foreground="{DynamicResource TertiaryLightBrush}"
-                           FontFamily="{Binding FontFamilyName}"
-                           Text="{Binding PlayerState}" />
-            </Border>
-            <resources:StoryboardTextBlock
-                FontSize="20"
-                FontWeight="Bold"
-                Foreground="{DynamicResource SecondaryBrush}"
-                FontFamily="{Binding FontFamilyName}"
-                Text="{Binding Song.Title, FallbackValue=Title}"
-                TextTrimming="None"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                ClipToBounds="True"
-                utils:FlowingTextBehavior.IsEnabled="True" />
-        </DockPanel>
+        <!-- Title -->
+        <resources:StoryboardTextBlock
+            Grid.Row="0"
+            FontSize="20"
+            FontWeight="Bold"
+            Foreground="{DynamicResource SecondaryBrush}"
+            FontFamily="{Binding FontFamilyName}"
+            Text="{Binding Song.Title, FallbackValue=Title}"
+            TextTrimming="None"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            ClipToBounds="True"
+            utils:FlowingTextBehavior.IsEnabled="True"
+            utils:FlowingTextBehavior.IsAutoFlow="{Binding AutoFlowTrackText}" />
 
         <!-- Artist -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" ClipToBounds="True">
@@ -60,7 +50,8 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 ClipToBounds="True"
-                utils:FlowingTextBehavior.IsEnabled="True" />
+                utils:FlowingTextBehavior.IsEnabled="True"
+                utils:FlowingTextBehavior.IsAutoFlow="{Binding AutoFlowTrackText}" />
         </StackPanel>
 
         <!-- Compact metadata line -->

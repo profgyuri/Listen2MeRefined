@@ -46,4 +46,5 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public IReadOnlyList<string> GetMutedDroppedSongFolders() => _settingsManager.Settings.MutedDroppedSongFolders.ToList();
     public string GetThemeMode() => _settingsManager.Settings.ThemeMode;
     public string GetAccentColor() => _settingsManager.Settings.AccentColor;
+    public bool GetAutoFlowTrackText() => _settingsManager.Settings.AutoFlowTrackText;
 }

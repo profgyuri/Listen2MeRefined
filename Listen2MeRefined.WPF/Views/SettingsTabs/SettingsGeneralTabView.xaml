@@ -65,6 +65,11 @@
                     </components:FormFieldRow.FieldContent>
                 </components:FormFieldRow>
 
+                <CheckBox IsChecked="{Binding AutoFlowTrackText}"
+                          Content="Auto-scroll track title and artist on song change"
+                          ToolTip="When enabled, title and artist scroll automatically when a new song starts instead of on hover."
+                          Margin="0,0,0,10" />
+
                 <CheckBox IsChecked="{Binding AutoCheckUpdatesOnStartup}"
                           Content="Automatically check for updates on startup"
                           Margin="0,0,0,10" />

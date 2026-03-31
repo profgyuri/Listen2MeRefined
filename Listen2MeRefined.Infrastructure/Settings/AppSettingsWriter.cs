@@ -175,6 +175,11 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.AccentColor = value);
     }
 
+    public void SetAutoFlowTrackText(bool value)
+    {
+        _settingsManager.SaveSettings(s => s.AutoFlowTrackText = value);
+    }
+
     private static List<string> Normalize(IEnumerable<string> folders)
     {
         return folders

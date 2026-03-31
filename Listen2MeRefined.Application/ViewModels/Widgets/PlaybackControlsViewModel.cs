@@ -6,6 +6,7 @@ using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Core.Enums;
 using Serilog;
 using SkiaSharp;
 
@@ -74,6 +75,14 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     }
 
     public string VolumeIconKind => _playbackVolumeSetter.GetVolumeIconKind();
+
+    public RepeatMode RepeatMode => _musicPlayerController.RepeatMode;
+
+    public string RepeatIconKind => _musicPlayerController.RepeatMode == RepeatMode.One
+        ? "RepeatOnce"
+        : "Repeat";
+
+    public bool IsRepeatActive => _musicPlayerController.RepeatMode != RepeatMode.Off;
 
     public PlaybackControlsViewModel(
         IErrorHandler errorHandler,
@@ -226,6 +235,22 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
             _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
             await _musicPlayerController.Shuffle();
         });
+    }
+
+    [RelayCommand]
+    private void ToggleRepeat()
+    {
+        _musicPlayerController.RepeatMode = _musicPlayerController.RepeatMode switch
+        {
+            RepeatMode.Off => RepeatMode.All,
+            RepeatMode.All => RepeatMode.One,
+            RepeatMode.One => RepeatMode.Off,
+            _ => RepeatMode.Off
+        };
+        OnPropertyChanged(nameof(RepeatMode));
+        OnPropertyChanged(nameof(RepeatIconKind));
+        OnPropertyChanged(nameof(IsRepeatActive));
+        _logger.Debug("[PlayerControlsViewModel] Repeat mode changed to: {Mode}", _musicPlayerController.RepeatMode);
     }
 
     [RelayCommand]

@@ -1,4 +1,6 @@
-﻿namespace Listen2MeRefined.Application.Playback;
+﻿using Listen2MeRefined.Core.Enums;
+
+namespace Listen2MeRefined.Application.Playback;
 
 /// <summary>
 ///     Contract for controlling any media element.
@@ -8,6 +10,8 @@ public interface IMusicPlayerController
     double CurrentTime { get; set; }
 
     float Volume { get; set; }
+
+    RepeatMode RepeatMode { get; set; }
 
     /// <summary>
     ///     Play or pause the playback.

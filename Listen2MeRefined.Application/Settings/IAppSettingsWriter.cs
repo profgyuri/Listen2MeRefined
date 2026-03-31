@@ -64,4 +64,6 @@ public interface IAppSettingsWriter
     void SetThemeMode(string value);
     /// <summary>Sets current accent color name.</summary>
     void SetAccentColor(string value);
+    /// <summary>Sets whether track title/artist auto-scrolls on song change instead of on hover.</summary>
+    void SetAutoFlowTrackText(bool value);
 }

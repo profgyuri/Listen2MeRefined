@@ -36,6 +36,7 @@ public sealed class AppSettings : Application.Settings.Settings
     public string MutedDroppedSongFoldersJson { get; set; } = "[]";
     public string ThemeMode { get; set; } = "Dark";
     public string AccentColor { get; set; } = "Orange";
+    public bool AutoFlowTrackText { get; set; }
 
     [NotMapped]
     public List<string> PinnedFolders

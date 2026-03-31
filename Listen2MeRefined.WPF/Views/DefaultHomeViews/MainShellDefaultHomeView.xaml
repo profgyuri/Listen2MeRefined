@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
+             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
@@ -20,14 +22,68 @@
         <!-- Now Playing strip -->
         <Border Style="{DynamicResource NowPlayingStripBorder}">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MaxWidth="280" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="6" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <ContentControl Content="{Binding TrackInfoViewModel}" VerticalAlignment="Center" />
-                <ContentControl Grid.Column="2" Content="{Binding PlaybackControlsViewModel}" />
+                <!-- Full-width waveform -->
+                <Border Grid.Row="0"
+                        Style="{DynamicResource NowPlayingWaveformBorder}"
+                        DataContext="{Binding PlaybackControlsViewModel}">
+                    <Grid>
+                        <wpf:WaveSlider Style="{DynamicResource NoHaloSlider}"
+                                        Foreground="{DynamicResource TertiaryBrush}"
+                                        utils:WaveformViewportSyncBehavior.IsEnabled="True"
+                                        WaveBitmap="{Binding WaveForm}"
+                                        Minimum="0"
+                                        Maximum="{Binding TotalTime}"
+                                        Value="{Binding CurrentTime}"
+                                        MinHeight="48"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Margin="6,0" />
+                    </Grid>
+                </Border>
+
+                <!-- Transport strip: TrackInfo | Buttons+Time | Volume -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" MaxWidth="300" />
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="2*" MaxWidth="300" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Track info -->
+                    <ContentControl Grid.Column="0"
+                                    Content="{Binding TrackInfoViewModel}"
+                                    VerticalAlignment="Center" />
+
+                    <!-- Center: Transport controls + time -->
+                    <ContentControl Grid.Column="1"
+                                    Content="{Binding PlaybackControlsViewModel}"
+                                    VerticalAlignment="Center" />
+
+                    <!-- Right: Volume -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right"
+                                DataContext="{Binding PlaybackControlsViewModel}">
+                        <Button Style="{DynamicResource NowPlayingVolumeButton}"
+                                Command="{Binding ToggleMuteCommand}"
+                                ToolTip="Mute / Unmute">
+                            <materialDesign:PackIcon Kind="{Binding VolumeIconKind}" Width="14" Height="14" />
+                        </Button>
+                        <Slider Width="84"
+                                Margin="8,0,0,0"
+                                Minimum="0"
+                                Maximum="1"
+                                Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Border>
 

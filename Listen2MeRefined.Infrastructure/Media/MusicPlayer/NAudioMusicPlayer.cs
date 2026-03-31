@@ -20,6 +20,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
     private AudioModel? _currentSong;
     private NAudio.Wave.WaveStream? _fileReader;
     private PlayerState _state = PlayerState.Stopped;
+    private RepeatMode _repeatMode = RepeatMode.Off;
 
     private readonly ILogger _logger;
     private readonly IPlaybackQueueService _playbackQueueService;
@@ -52,6 +53,15 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
     {
         get => _playbackOutput.Volume;
         set => _playbackOutput.Volume = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the repeat mode for auto-advancing at end of track or playlist.
+    /// </summary>
+    public RepeatMode RepeatMode
+    {
+        get => _repeatMode;
+        set => _repeatMode = value;
     }
 
     /// <summary>
@@ -207,11 +217,29 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
             return;
         }
 
-        if (_playbackProgressMonitor.ShouldAdvance(_fileReader.CurrentTime, _fileReader.TotalTime, _state == PlayerState.Playing))
+        if (!_playbackProgressMonitor.ShouldAdvance(_fileReader.CurrentTime, _fileReader.TotalTime, _state == PlayerState.Playing))
         {
-            _logger.Debug("[NAudioMMusicPlayer] Current song reached its end, skipping to the next song...");
-            await NextAsync();
+            return;
         }
+
+        _logger.Debug("[NAudioMMusicPlayer] Current song reached its end, repeat mode: {RepeatMode}", _repeatMode);
+
+        if (_repeatMode == RepeatMode.One)
+        {
+            _fileReader.CurrentTime = TimeSpan.Zero;
+            _playbackProgressMonitor.Reset();
+            _playbackOutput.Play();
+            return;
+        }
+
+        if (_repeatMode == RepeatMode.Off && _playbackQueueService.IsAtLastTrack())
+        {
+            _logger.Information("[NAudioMMusicPlayer] End of playlist reached with repeat off, stopping.");
+            Stop();
+            return;
+        }
+
+        await NextAsync();
     }
 
     private async Task StartPlaybackAsync()
