@@ -1,0 +1,24 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Widgets.NowPlayingWaveformView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
+             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
+             xmlns:widgets="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance widgets:NowPlayingWaveformViewModel}">
+    <Grid>
+        <wpf:WaveSlider Style="{DynamicResource NoHaloSlider}"
+                        Foreground="{DynamicResource TertiaryBrush}"
+                        utils:WaveformViewportSyncBehavior.IsEnabled="True"
+                        WaveBitmap="{Binding WaveForm}"
+                        Minimum="0"
+                        Maximum="{Binding TotalTime}"
+                        Value="{Binding CurrentTime}"
+                        MinHeight="48"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Margin="6,0" />
+    </Grid>
+</UserControl>

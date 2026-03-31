@@ -3,10 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
-             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
@@ -28,24 +25,8 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Full-width waveform -->
-                <Border Grid.Row="0"
-                        Style="{DynamicResource NowPlayingWaveformBorder}"
-                        DataContext="{Binding PlaybackControlsViewModel}">
-                    <Grid>
-                        <wpf:WaveSlider Style="{DynamicResource NoHaloSlider}"
-                                        Foreground="{DynamicResource TertiaryBrush}"
-                                        utils:WaveformViewportSyncBehavior.IsEnabled="True"
-                                        WaveBitmap="{Binding WaveForm}"
-                                        Minimum="0"
-                                        Maximum="{Binding TotalTime}"
-                                        Value="{Binding CurrentTime}"
-                                        MinHeight="48"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Stretch"
-                                        Margin="6,0" />
-                    </Grid>
-                </Border>
+                <ContentControl Grid.Row="0"
+                                Content="{Binding NowPlayingWaveformViewModel}" />
 
                 <!-- Transport strip: TrackInfo | Buttons+Time | Volume -->
                 <Grid Grid.Row="2">

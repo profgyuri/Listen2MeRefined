@@ -1,0 +1,295 @@
+using System.Reflection;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Application.ViewModels.Widgets;
+using Listen2MeRefined.Core.Enums;
+using Listen2MeRefined.Core.Models;
+using Listen2MeRefined.Infrastructure.Media.SoundWave;
+using Moq;
+using Serilog;
+using SkiaSharp;
+
+namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
+
+public class NowPlayingWaveformViewModelTests
+{
+    private static readonly IUiDispatcher UiDispatcher = new ImmediateUiDispatcher();
+
+    [Fact]
+    public async Task UpdateWaveformViewport_ValidSize_UpdatesDimensionsAndResizesDrawer()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, _) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+
+        viewModel.UpdateWaveformViewport(612.4, 132.8);
+        await viewModel.WaitForPendingWaveformRedrawAsync();
+
+        Assert.Equal(612, viewModel.WaveFormWidth);
+        Assert.Equal(133, viewModel.WaveFormHeight);
+        waveFormDrawer.Verify(x => x.SetSize(612, 133), Times.Once);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task UpdateWaveformViewport_WithZeroSize_DoesNotChangeDimensions()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, _) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+        var initialWidth = viewModel.WaveFormWidth;
+        var initialHeight = viewModel.WaveFormHeight;
+
+        viewModel.UpdateWaveformViewport(0, 0);
+
+        Assert.Equal(initialWidth, viewModel.WaveFormWidth);
+        Assert.Equal(initialHeight, viewModel.WaveFormHeight);
+        waveFormDrawer.Verify(x => x.SetSize(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task UpdateWaveformViewport_TinySize_ClampsToMinimumDimensions()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, _) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+
+        viewModel.UpdateWaveformViewport(1, 1);
+        await viewModel.WaitForPendingWaveformRedrawAsync();
+
+        Assert.Equal(64, viewModel.WaveFormWidth);
+        Assert.Equal(24, viewModel.WaveFormHeight);
+        waveFormDrawer.Verify(x => x.SetSize(64, 24), Times.Once);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task UpdateWaveformViewport_WithoutCurrentTrack_RedrawsPlaceholderLine()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, _) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+        var initialLineCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+
+        viewModel.UpdateWaveformViewport(520, 92);
+        await viewModel.WaitForPendingWaveformRedrawAsync();
+
+        var updatedLineCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+        Assert.True(updatedLineCallCount > initialLineCallCount);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task UpdateWaveformViewport_WithCurrentTrack_RedrawsTrackWaveform()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, messenger) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+
+        var audio = new AudioModel
+        {
+            Path = "E:\\music\\track.mp3",
+            Length = TimeSpan.FromSeconds(90)
+        };
+        messenger.Send(new CurrentSongChangedMessage(audio));
+        await WaitForInvocationCountAsync(waveFormDrawer, nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync), minimumCount: 1);
+
+        var initialWaveformCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+
+        viewModel.UpdateWaveformViewport(740, 130);
+        await viewModel.WaitForPendingWaveformRedrawAsync();
+
+        var updatedWaveformCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+        Assert.True(updatedWaveformCallCount > initialWaveformCallCount);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_CurrentSongAlreadySet_DoesNotRedrawPlaceholderAfterWaveform()
+    {
+        var logger = Mock.Of<ILogger>();
+        var waveFormDrawer = new Mock<IWaveFormDrawer<SKBitmap>>();
+        waveFormDrawer.Setup(x => x.LineAsync()).ReturnsAsync(new SKBitmap(1, 1));
+        waveFormDrawer.Setup(x => x.WaveFormAsync(It.IsAny<string>())).ReturnsAsync(new SKBitmap(1, 1));
+
+        var musicPlayer = new Mock<IMusicPlayerController>();
+        musicPlayer.SetupProperty(x => x.CurrentTime, 0d);
+        musicPlayer.SetupProperty(x => x.Volume, 1f);
+        musicPlayer.SetupProperty(x => x.RepeatMode, RepeatMode.Off);
+
+        var timedTask = new TimedTask();
+        var waveformRenderer = new WaveformRenderer(waveFormDrawer.Object);
+        var waveformViewportPolicy = new WaveformViewportPolicy();
+        var waveformResizeScheduler = new WaveformResizeScheduler(TimeSpan.Zero);
+        var viewModel = new NowPlayingWaveformViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger,
+            new WeakReferenceMessenger(),
+            waveformRenderer,
+            waveformViewportPolicy,
+            waveformResizeScheduler,
+            musicPlayer.Object,
+            UiDispatcher,
+            timedTask);
+
+        var audio = new AudioModel
+        {
+            Path = "E:\\music\\startup-track.mp3",
+            Length = TimeSpan.FromSeconds(120)
+        };
+        var currentTrackPathField = typeof(NowPlayingWaveformViewModel).GetField("_currentTrackPath", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(currentTrackPathField);
+        currentTrackPathField.SetValue(viewModel, audio.Path);
+
+        var lineCallCountBeforeInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+        var waveformCallCountBeforeInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+
+        await viewModel.InitializeAsync();
+
+        var lineCallCountAfterInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+        var waveformCallCountAfterInit = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+
+        Assert.Equal(lineCallCountBeforeInit, lineCallCountAfterInit);
+        Assert.True(waveformCallCountAfterInit > waveformCallCountBeforeInit);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task AppThemeChangedMessage_SchedulesWaveformRedraw()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, messenger) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+        var initialLineCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+
+        messenger.Send(new AppThemeChangedMessage("Dark"));
+        await viewModel.WaitForPendingWaveformRedrawAsync();
+
+        var updatedLineCallCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+        Assert.True(updatedLineCallCount > initialLineCallCount);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task CurrentSongChangedMessage_SameTrack_DoesNotRedrawWaveform()
+    {
+        var (viewModel, _, timedTask, waveFormDrawer, messenger) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+
+        var audio = new AudioModel
+        {
+            Path = "E:\\music\\same-track.mp3",
+            Length = TimeSpan.FromSeconds(120)
+        };
+
+        messenger.Send(new CurrentSongChangedMessage(audio));
+        await WaitForInvocationCountAsync(waveFormDrawer, nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync), minimumCount: 1);
+
+        var waveformCallsBefore = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+        var lineCallsBefore = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+
+        messenger.Send(new CurrentSongChangedMessage(audio));
+        await Task.Delay(100);
+
+        var waveformCallsAfter = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.WaveFormAsync));
+        var lineCallsAfter = waveFormDrawer.Invocations.Count(x => x.Method.Name == nameof(IWaveFormDrawer<SKBitmap>.LineAsync));
+
+        Assert.Equal(waveformCallsBefore, waveformCallsAfter);
+        Assert.Equal(lineCallsBefore, lineCallsAfter);
+
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task CurrentSongChangedMessage_UpdatesTotalTime()
+    {
+        var (viewModel, _, timedTask, _, messenger) = await CreateViewModelAsync(waveformResizeDebounce: TimeSpan.Zero);
+        var audio = new AudioModel
+        {
+            Path = "E:\\music\\total-time-track.mp3",
+            Length = TimeSpan.FromSeconds(42)
+        };
+
+        messenger.Send(new CurrentSongChangedMessage(audio));
+        await Task.Delay(100);
+
+        Assert.Equal(TimeSpan.FromSeconds(42).TotalMilliseconds, viewModel.TotalTime);
+
+        await timedTask.StopAsync();
+    }
+
+    private static async Task<(NowPlayingWaveformViewModel ViewModel, Mock<IMusicPlayerController> MusicPlayer, TimedTask TimedTask, Mock<IWaveFormDrawer<SKBitmap>> WaveFormDrawer, WeakReferenceMessenger Messenger)> CreateViewModelAsync(
+        TimeSpan? waveformResizeDebounce = null)
+    {
+        var logger = Mock.Of<ILogger>();
+        var waveFormDrawer = new Mock<IWaveFormDrawer<SKBitmap>>();
+        waveFormDrawer.Setup(x => x.LineAsync()).ReturnsAsync(new SKBitmap(1, 1));
+        waveFormDrawer.Setup(x => x.WaveFormAsync(It.IsAny<string>())).ReturnsAsync(new SKBitmap(1, 1));
+
+        var musicPlayer = new Mock<IMusicPlayerController>();
+        musicPlayer.SetupProperty(x => x.CurrentTime, 0d);
+        musicPlayer.SetupProperty(x => x.Volume, 1f);
+        musicPlayer.SetupProperty(x => x.RepeatMode, RepeatMode.Off);
+
+        var messenger = new WeakReferenceMessenger();
+        var timedTask = new TimedTask();
+        var waveformRenderer = new WaveformRenderer(waveFormDrawer.Object);
+        var waveformViewportPolicy = new WaveformViewportPolicy();
+        var waveformResizeScheduler = new WaveformResizeScheduler(waveformResizeDebounce);
+        var viewModel = new NowPlayingWaveformViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger,
+            messenger,
+            waveformRenderer,
+            waveformViewportPolicy,
+            waveformResizeScheduler,
+            musicPlayer.Object,
+            UiDispatcher,
+            timedTask);
+
+        await viewModel.InitializeAsync();
+        return (viewModel, musicPlayer, timedTask, waveFormDrawer, messenger);
+    }
+
+    private static async Task WaitForInvocationCountAsync(
+        Mock<IWaveFormDrawer<SKBitmap>> waveFormDrawer,
+        string methodName,
+        int minimumCount)
+    {
+        for (var i = 0; i < 20; i++)
+        {
+            var callCount = waveFormDrawer.Invocations.Count(x => x.Method.Name == methodName);
+            if (callCount >= minimumCount)
+            {
+                return;
+            }
+
+            await Task.Delay(25);
+        }
+    }
+
+    private sealed class ImmediateUiDispatcher : IUiDispatcher
+    {
+        public bool CheckAccess() => true;
+
+        public Task InvokeAsync(Action action, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(action);
+            ct.ThrowIfCancellationRequested();
+            action();
+            return Task.CompletedTask;
+        }
+
+        public Task InvokeAsync(Func<Task> func, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(func);
+            ct.ThrowIfCancellationRequested();
+            return func();
+        }
+
+        public Task<T> InvokeAsync<T>(Func<T> func, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(func);
+            ct.ThrowIfCancellationRequested();
+            return Task.FromResult(func());
+        }
+    }
+}

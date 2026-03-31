@@ -60,6 +60,9 @@
             </DataTemplate>
             
             <!-- Widgets -->
+            <DataTemplate DataType="{x:Type widgetViewModels:NowPlayingWaveformViewModel}">
+                <widgets:NowPlayingWaveformView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type widgetViewModels:PlaybackControlsViewModel}">
                 <widgets:PlaybackControlsView/>
             </DataTemplate>

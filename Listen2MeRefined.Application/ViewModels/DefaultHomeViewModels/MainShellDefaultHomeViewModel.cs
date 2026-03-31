@@ -12,6 +12,7 @@ namespace Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 public partial class MainShellDefaultHomeViewModel : ViewModelBase
 {
     public TrackInfoViewModel TrackInfoViewModel { get; }
+    public NowPlayingWaveformViewModel NowPlayingWaveformViewModel { get; }
     public PlaybackControlsViewModel PlaybackControlsViewModel { get; }
     public PlaylistPaneViewModel PlaylistPaneViewModel { get; }
     public SearchResultsPaneViewModel SearchResultsPaneViewModel { get; }
@@ -25,12 +26,14 @@ public partial class MainShellDefaultHomeViewModel : ViewModelBase
         ILogger logger,
         IMessenger messenger,
         TrackInfoViewModel trackInfoViewModel,
+        NowPlayingWaveformViewModel nowPlayingWaveformViewModel,
         PlaybackControlsViewModel playbackControlsViewModel,
         PlaylistPaneViewModel playlistPaneViewModel,
         SearchResultsPaneViewModel searchResultsPaneViewModel,
         SearchbarViewModel searchbarViewModel) : base(errorHandler, logger, messenger)
     {
         TrackInfoViewModel = trackInfoViewModel;
+        NowPlayingWaveformViewModel = nowPlayingWaveformViewModel;
         PlaybackControlsViewModel = playbackControlsViewModel;
         PlaylistPaneViewModel = playlistPaneViewModel;
         SearchResultsPaneViewModel = searchResultsPaneViewModel;
@@ -44,6 +47,7 @@ public partial class MainShellDefaultHomeViewModel : ViewModelBase
         RegisterMessage<PlaylistSidebarSelectionChangedMessage>(OnPlaylistSidebarSelectionChanged);
 
         await TrackInfoViewModel.EnsureInitializedAsync(cancellationToken);
+        await NowPlayingWaveformViewModel.EnsureInitializedAsync(cancellationToken);
         await PlaybackControlsViewModel.EnsureInitializedAsync(cancellationToken);
         await PlaylistPaneViewModel.EnsureInitializedAsync(cancellationToken);
         await SearchResultsPaneViewModel.EnsureInitializedAsync(cancellationToken);
