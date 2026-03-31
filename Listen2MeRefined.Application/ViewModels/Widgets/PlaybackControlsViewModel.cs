@@ -16,6 +16,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     private const float VolumeEpsilon = 0.0001f;
     private const int DefaultWaveFormWidth = 480;
     private const int DefaultWaveFormHeight = 70;
+    private static readonly TimeSpan BitmapDisposeDelay = TimeSpan.FromMilliseconds(250);
 
     private readonly ILogger _logger;
     private readonly IWaveformRenderer _waveformRenderer;
@@ -25,6 +26,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly TimedTask _timedTask;
     private readonly IAppSettingsReader _settingsReader;
+    private readonly IUiDispatcher _uiDispatcher;
     private string? _currentTrackPath;
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
@@ -83,6 +85,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         IPlaybackVolumeSetter playbackVolumeSetter,
         IMusicPlayerController musicPlayerController,
         IAppSettingsReader settingsReader,
+        IUiDispatcher uiDispatcher,
         TimedTask timedTask) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
@@ -92,6 +95,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         _playbackVolumeSetter = playbackVolumeSetter;
         _musicPlayerController = musicPlayerController;
         _settingsReader = settingsReader;
+        _uiDispatcher = uiDispatcher;
         _timedTask = timedTask;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
@@ -111,8 +115,11 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
             TimeSpan.FromMilliseconds(100),
             () =>
             {
-                OnPropertyChanged(nameof(CurrentTime));
-                OnPropertyChanged(nameof(CurrentTimeDisplay));
+                _ = _uiDispatcher.InvokeAsync(() =>
+                {
+                    OnPropertyChanged(nameof(CurrentTime));
+                    OnPropertyChanged(nameof(CurrentTimeDisplay));
+                }, ct);
             });
 
         OnPropertyChanged(nameof(Volume));
@@ -265,12 +272,14 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
 
     private async Task DrawPlaceholderLineAsync(CancellationToken cancellationToken = default)
     {
-        WaveForm = await _waveformRenderer.DrawPlaceholderAsync(cancellationToken);
+        var renderedBitmap = await _waveformRenderer.DrawPlaceholderAsync(cancellationToken);
+        await UpdateWaveFormAsync(renderedBitmap, cancellationToken);
     }
 
     private async Task DrawTrackWaveFormAsync(string trackPath, CancellationToken cancellationToken = default)
     {
-        WaveForm = await _waveformRenderer.DrawTrackAsync(trackPath, cancellationToken);
+        var renderedBitmap = await _waveformRenderer.DrawTrackAsync(trackPath, cancellationToken);
+        await UpdateWaveFormAsync(renderedBitmap, cancellationToken);
     }
 
     private void SetMuted(bool isMuted)
@@ -306,7 +315,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
                 return;
             }
 
-            ArePlaybackButtonsEnabled = false;
+            await _uiDispatcher.InvokeAsync(() => ArePlaybackButtonsEnabled = false);
             _currentTrackPath = message.Value.Path;
             await DrawPlaceholderLineAsync();
 
@@ -315,8 +324,11 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
                 await DrawTrackWaveFormAsync(_currentTrackPath);
             }
 
-            TotalTime = message.Value.Length.TotalMilliseconds;
-            OnPropertyChanged(nameof(TotalTimeDisplay));
+            await _uiDispatcher.InvokeAsync(() =>
+            {
+                TotalTime = message.Value.Length.TotalMilliseconds;
+                OnPropertyChanged(nameof(TotalTimeDisplay));
+            });
         }
         catch (Exception e)
         {
@@ -324,7 +336,14 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         }
         finally
         {
-            ArePlaybackButtonsEnabled = true;
+            try
+            {
+                await _uiDispatcher.InvokeAsync(() => ArePlaybackButtonsEnabled = true);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warning(ex, "[PlayerControlsViewModel] Failed to re-enable playback controls on UI thread.");
+            }
         }
     }
 
@@ -332,5 +351,41 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     {
         _logger.Debug("[PlayerControlsViewModel] Received AppThemeChangedMessage");
         ScheduleWaveformRedraw();
+    }
+
+    private async Task UpdateWaveFormAsync(SKBitmap renderedBitmap, CancellationToken cancellationToken)
+    {
+        SKBitmap? previousBitmap = null;
+        try
+        {
+            await _uiDispatcher.InvokeAsync(() =>
+            {
+                previousBitmap = WaveForm;
+                WaveForm = renderedBitmap;
+            }, cancellationToken);
+        }
+        catch
+        {
+            renderedBitmap.Dispose();
+            throw;
+        }
+
+        if (previousBitmap is not null && !ReferenceEquals(previousBitmap, renderedBitmap))
+        {
+            _ = DisposeBitmapAfterDelayAsync(previousBitmap);
+        }
+    }
+
+    private async Task DisposeBitmapAfterDelayAsync(SKBitmap bitmap)
+    {
+        try
+        {
+            await Task.Delay(BitmapDisposeDelay).ConfigureAwait(false);
+            bitmap.Dispose();
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "[PlayerControlsViewModel] Failed to dispose previous waveform bitmap.");
+        }
     }
 }

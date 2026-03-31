@@ -18,6 +18,8 @@ namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 
 public class PlaybackControlsViewModelTests
 {
+    private static readonly IUiDispatcher UiDispatcher = new ImmediateUiDispatcher();
+
     [Fact]
     public async Task InitializeAsync_AppliesConfiguredStartupVolume_WhenNotMuted()
     {
@@ -196,6 +198,7 @@ public class PlaybackControlsViewModelTests
             playbackVolumeSetter,
             musicPlayer.Object,
             settingsReader.Object,
+            UiDispatcher,
             timedTask);
 
         var audio = new AudioModel
@@ -304,6 +307,7 @@ public class PlaybackControlsViewModelTests
             playbackVolumeSetter,
             musicPlayer.Object,
             settingsReader.Object,
+            UiDispatcher,
             timedTask);
 
         await viewModel.InitializeAsync();
@@ -324,6 +328,33 @@ public class PlaybackControlsViewModelTests
             }
 
             await Task.Delay(25);
+        }
+    }
+
+    private sealed class ImmediateUiDispatcher : IUiDispatcher
+    {
+        public bool CheckAccess() => true;
+
+        public Task InvokeAsync(Action action, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(action);
+            ct.ThrowIfCancellationRequested();
+            action();
+            return Task.CompletedTask;
+        }
+
+        public Task InvokeAsync(Func<Task> func, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(func);
+            ct.ThrowIfCancellationRequested();
+            return func();
+        }
+
+        public Task<T> InvokeAsync<T>(Func<T> func, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(func);
+            ct.ThrowIfCancellationRequested();
+            return Task.FromResult(func());
         }
     }
 }

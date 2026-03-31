@@ -33,11 +33,15 @@ internal static class SkiaElementHelper
         element.InvalidateVisual();
     }
 
-    private static void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private static void OnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
-        var element = (SKElement)sender;
+        if (sender is not SKElement element)
+        {
+            return;
+        }
+
         var bitmap = (SKBitmap)element.GetValue(BitmapProperty);
-        if (bitmap is null) return;
+        if (bitmap is null || bitmap.Handle == IntPtr.Zero) return;
         
         try
         {

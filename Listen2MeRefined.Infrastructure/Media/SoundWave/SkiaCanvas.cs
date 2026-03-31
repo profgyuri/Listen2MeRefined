@@ -54,15 +54,14 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWavef
     public void Reset(int width, int height)
     {
         var oldCanvas = _canvas;
-        var oldBitmap = _bitmap;
     
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         _canvas.Clear(_backgroundColor);
 
-        // Dispose of old objects after new ones are created successfully
+        // The old bitmap may still be bound to SKElement and painted by WPF.
+        // Its owner (view model) disposes it after the UI swap is complete.
         oldCanvas?.Dispose();
-        oldBitmap?.Dispose();
     }
 
     public void Dispose()
