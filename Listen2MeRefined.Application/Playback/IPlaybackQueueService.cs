@@ -39,4 +39,9 @@ public interface IPlaybackQueueService
     /// <param name="track">The track to remove.</param>
     /// <returns>True if the track was removed, false otherwise.</returns>
     bool RemoveTrack(AudioModel track);
+
+    /// <summary>
+    ///     Returns whether the current track is the last in the queue.
+    /// </summary>
+    bool IsAtLastTrack();
 }

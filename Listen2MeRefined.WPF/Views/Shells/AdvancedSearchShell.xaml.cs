@@ -15,7 +15,7 @@ public partial class AdvancedSearchShell : Window
     private void AdvancedSearchShell_OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key != Key.Escape) return;
-        
+
         Close();
         e.Handled = true;
     }

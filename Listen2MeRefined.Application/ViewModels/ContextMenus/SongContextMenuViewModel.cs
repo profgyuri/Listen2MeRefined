@@ -164,7 +164,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
                     playlistPaneViewModel.SelectedSong),
                 playlistPaneViewModel.GetSongContextActivePlaylistId(),
                 IsPlaylistHost: true,
-                IsDefaultPlaylistHost: playlistPaneViewModel.SelectedTab?.IsDefaultTab == true);
+                IsDefaultPlaylistHost: playlistPaneViewModel.IsDefaultPlaylist);
         }
 
         return new SongContextSelectionContext([], null, IsPlaylistHost: false, IsDefaultPlaylistHost: false);
@@ -195,7 +195,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
             return Task.CompletedTask;
         }
 
-        if (requireDefaultPlaylistHost && playlistHost.SelectedTab?.IsDefaultTab != true)
+        if (requireDefaultPlaylistHost && !playlistHost.IsDefaultPlaylist)
         {
             return Task.CompletedTask;
         }

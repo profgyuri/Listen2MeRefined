@@ -8,7 +8,7 @@
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance widgetViewModels:SearchbarViewModel}">
-    <Border Style="{DynamicResource BorderContainer}">
+    <Border Style="{DynamicResource SearchBarStripBorder}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -16,8 +16,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Border Style="{DynamicResource DarkBorderContainer}"
-                    Padding="10,0">
+            <Border Style="{DynamicResource SearchBarStripTextBoxBorder}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -32,7 +31,7 @@
                                              Foreground="{DynamicResource SecondaryDarkBrush}" />
 
                     <TextBox Grid.Column="1"
-                             Height="36"
+                             Height="32"
                              BorderThickness="0"
                              Background="Transparent"
                              Foreground="{DynamicResource SecondaryBrush}"
@@ -50,15 +49,14 @@
 
             <Button Grid.Column="1"
                     Command="{Binding QuickSearchCommand}"
-                    Style="{DynamicResource SearchBarActionButton}"
+                    Style="{DynamicResource SearchBarStripActionButton}"
                     ToolTip="Quick Search"
                     Content="{materialDesign:PackIcon Kind=Search,Size=18}" />
             <Button Grid.Column="2"
                     Command="{Binding DataContext.OpenAdvancedSearchWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Style="{DynamicResource SearchBarActionButton}"
+                    Style="{DynamicResource SearchBarStripActionButton}"
                     ToolTip="Advanced Search"
                     Content="{materialDesign:PackIcon Kind=Tune,Size=18}" />
         </Grid>
     </Border>
 </UserControl>
-

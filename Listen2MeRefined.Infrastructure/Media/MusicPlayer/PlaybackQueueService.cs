@@ -110,6 +110,11 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
         return _playlistQueue[0];
     }
 
+    public bool IsAtLastTrack()
+    {
+        return _playlistQueue.Any() && _playlistQueue.CurrentIndex == _playlistQueue.Count - 1;
+    }
+
     public bool RemoveTrack(AudioModel track)
     {
         var removeIndex = _playlistQueue.IndexOf(track);

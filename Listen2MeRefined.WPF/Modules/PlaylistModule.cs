@@ -35,6 +35,7 @@ public sealed class PlaylistModule : IModule
         services.AddSingleton<IExternalAudioOpenService, ExternalAudioOpenService>();
         services.AddSingleton<IExternalAudioOpenInbox, ExternalAudioOpenInbox>();
 
+        services.AddTransient<PlaylistSidebarViewModel>();
         services.AddTransient<PlaylistPaneViewModel>();
         services.AddTransient<PlaylistPaneView>();
         services.AddTransient<SongContextMenuViewModel>();

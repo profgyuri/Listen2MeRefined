@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
@@ -152,12 +153,15 @@ public class SongContextMenuViewModelTests
 
         await pane.InitializeAsync();
         var song = new AudioModel { Path = "named.mp3", Title = "Named track" };
-        var namedTab = new PlaylistPaneViewModel.PlaylistTabItem(
-            "Named",
-            7,
-            new ObservableCollection<AudioModel>([song]));
-        pane.Tabs.Add(namedTab);
-        pane.SelectedTab = namedTab;
+
+        // Switch to a named playlist via sidebar selection
+        messenger.Send(new PlaylistSidebarSelectionChangedMessage(new PlaylistSidebarSelectionData(7)));
+        // Wait for async playlist load
+        for (var i = 0; i < 20 && pane.CurrentPlaylistSongs.Count == 0; i++)
+        {
+            await Task.Delay(25);
+        }
+
         pane.SelectedSong = song;
 
         await songContextMenuVm.HandleOpenedAsync();
@@ -269,6 +273,9 @@ public class SongContextMenuViewModelTests
         playlistLibraryService
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<PlaylistSummary>());
+        playlistLibraryService
+            .Setup(x => x.GetPlaylistSongsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new AudioModel { Path = "named.mp3", Title = "Named track" }]);
 
         var settingsReader = new Mock<IAppSettingsReader>();
         settingsReader.Setup(x => x.GetFontFamily()).Returns("Segoe UI");
@@ -278,6 +285,13 @@ public class SongContextMenuViewModelTests
             queueState,
             new PlaylistQueue(),
             Mock.Of<IMusicPlayerController>());
+
+        var sidebarViewModel = new PlaylistSidebarViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger,
+            messenger,
+            playlistLibraryService.Object,
+            queueState);
 
         return new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
@@ -294,6 +308,7 @@ public class SongContextMenuViewModelTests
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
             settingsReader.Object,
+            sidebarViewModel,
             songContextMenuViewModel);
     }
 

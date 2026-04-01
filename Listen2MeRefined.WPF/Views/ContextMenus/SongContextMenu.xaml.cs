@@ -45,7 +45,7 @@ public partial class SongContextMenu : ContextMenu
             return;
         }
 
-        Items.Add(new Separator());
+        Items.Add(CreateStyledSeparator());
         Items.Add(CreateActionMenuItem("Rescan", () => viewModel.RescanAsync()));
         Items.Add(CreateActionMenuItem("Play now", () => viewModel.PlayNowAsync()));
         Items.Add(CreateActionMenuItem("Play after current", () => viewModel.PlayAfterCurrentAsync()));
@@ -92,7 +92,7 @@ public partial class SongContextMenu : ContextMenu
 
         if (playlistMenuItem.Items.Count > 0)
         {
-            playlistMenuItem.Items.Add(new Separator());
+            playlistMenuItem.Items.Add(CreateStyledSeparator());
         }
 
         var addToNewPlaylistMenuItem = CreateStyledMenuItem("Add To New Playlist");
@@ -200,17 +200,25 @@ public partial class SongContextMenu : ContextMenu
         };
     }
 
+    private Separator CreateStyledSeparator()
+    {
+        return new Separator
+        {
+            Style = (Style?)FindResource("PlaylistContextMenuSeparator")
+        };
+    }
+
     private TextBox CreateInlinePlaylistNameEditor()
     {
         return new TextBox
         {
             MinWidth = 180,
             Margin = new Thickness(0),
-            Padding = new Thickness(4, 2, 4, 2),
-            Background = (Brush?)FindResource("PrimaryBrush"),
+            Padding = new Thickness(6, 4, 6, 4),
+            Background = (Brush?)FindResource("SurfaceBrush"),
             Foreground = (Brush?)FindResource("SecondaryBrush"),
-            BorderBrush = (Brush?)FindResource("TertiaryBrush"),
-            BorderThickness = new Thickness(1),
+            CaretBrush = (Brush?)FindResource("TertiaryBrush"),
+            BorderThickness = new Thickness(0),
             ToolTip = "Type a name, Enter to create, Esc to cancel"
         };
     }

@@ -12,4 +12,6 @@ public interface IPlaylistLibraryService
     Task AddSongsByPathAsync(int playlistId, IEnumerable<string?> songPaths, CancellationToken ct = default);
     Task RemoveSongsByPathAsync(int playlistId, IEnumerable<string?> songPaths, CancellationToken ct = default);
     Task<IReadOnlyList<PlaylistMembershipInfo>> GetMembershipBySongPathAsync(string songPath, CancellationToken ct = default);
+    Task SetPinnedAsync(int playlistId, bool isPinned, CancellationToken ct = default);
+    Task ReorderPlaylistsAsync(IReadOnlyList<(int PlaylistId, int NewOrder)> ordering, CancellationToken ct = default);
 }

@@ -3,36 +3,67 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Listen2MeRefined.WPF.Views.DefaultHomeViews"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="10" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="10" />
-            <RowDefinition Height="*" MinHeight="150" />
-            <RowDefinition Height="10" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
-        </Grid.ColumnDefinitions>
 
-        <ContentControl Content="{Binding TrackInfoViewModel}" Grid.Row="1" Grid.Column="1"/>
-        <ContentControl Content="{Binding PlaybackControlsViewModel}" Grid.Row="1" Grid.Column="3"/>
-            
-        <ContentControl Content="{Binding SearchResultsPaneViewModel}" Grid.Row="3" Grid.Column="1"/>
-        <ContentControl Content="{Binding PlaylistPaneViewModel}" Grid.Row="3" Grid.Column="3"/>
-        <ContentControl Content="{Binding SearchbarViewModel}" Grid.Row="5" Grid.ColumnSpan="3" Grid.Column="1" />
-            
+        <!-- Now Playing strip -->
+        <Border Style="{DynamicResource NowPlayingStripBorder}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="6" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ContentControl Grid.Row="0"
+                                Content="{Binding NowPlayingWaveformViewModel}" />
+
+                <!-- Transport strip: TrackInfo | Buttons+Time | Volume -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" MaxWidth="300" />
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="2*" MaxWidth="300" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Track info -->
+                    <ContentControl Grid.Column="0"
+                                    Content="{Binding TrackInfoViewModel}"
+                                    VerticalAlignment="Center" />
+
+                    <!-- Center: Transport controls + time -->
+                    <ContentControl Grid.Column="1"
+                                    Content="{Binding PlaybackControlsViewModel}"
+                                    VerticalAlignment="Center" />
+
+                    <!-- Right: Volume -->
+                    <ContentControl Grid.Column="2"
+                                    Content="{Binding NowPlayingVolumeViewModel}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Content view toggle -->
+        <ContentControl Grid.Row="1"
+                        Content="{Binding MainHomeContentToggleViewModel}" />
+
+        <!-- Content panel (switches between search results and playlist pane) -->
+        <ContentControl Grid.Row="2"
+                        Content="{Binding CurrentContentViewModel}"
+                        Margin="12,8,12,8"/>
+
+        <!-- Search bar -->
+        <ContentControl Grid.Row="3" Content="{Binding SearchbarViewModel}" />
     </Grid>
 </UserControl>

@@ -5,7 +5,7 @@ namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWaveformPaletteAware
 {
     private static readonly SKColor DefaultWaveLineColor = new(255, 138, 61); // Matches default accent (#FF8A3D).
-    private static readonly SKColor DefaultWaveBackgroundColor = new(35, 35, 35); // Matches default dark panel (#232323).
+    private static readonly SKColor DefaultWaveBackgroundColor = new(36, 36, 36); // Matches default dark panel (#242424).
 
     private SKBitmap? _bitmap;
     private SKCanvas? _canvas;
@@ -54,15 +54,14 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWavef
     public void Reset(int width, int height)
     {
         var oldCanvas = _canvas;
-        var oldBitmap = _bitmap;
     
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         _canvas.Clear(_backgroundColor);
 
-        // Dispose of old objects after new ones are created successfully
+        // The old bitmap may still be bound to SKElement and painted by WPF.
+        // Its owner (view model) disposes it after the UI swap is complete.
         oldCanvas?.Dispose();
-        oldBitmap?.Dispose();
     }
 
     public void Dispose()

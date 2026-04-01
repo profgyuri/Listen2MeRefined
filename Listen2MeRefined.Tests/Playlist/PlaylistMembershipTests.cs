@@ -36,7 +36,7 @@ public class PlaylistMembershipTests
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
             .Setup(x => x.GetAllPlaylistsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([new PlaylistSummary(1, "One"), new PlaylistSummary(2, "Two")]);
+            .ReturnsAsync([new PlaylistSummary(1, "One", false, 0), new PlaylistSummary(2, "Two", false, 1)]);
 
         var sut = new PlaylistMembership(
             playlistLibrary.Object,
@@ -90,7 +90,7 @@ public class PlaylistMembershipTests
 
         playlistLibrary
             .Setup(x => x.CreatePlaylistAsync("Fresh", It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new PlaylistSummary(55, "Fresh"));
+            .ReturnsAsync(new PlaylistSummary(55, "Fresh", false, 0));
 
         var sut = new PlaylistMembership(
             playlistLibrary.Object,

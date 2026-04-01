@@ -17,8 +17,10 @@ public sealed class PlaylistLibraryService(
         await using var context = await dataContextFactory.CreateDbContextAsync(ct);
         return await context.Playlists
             .AsNoTracking()
-            .OrderBy(x => x.Name)
-            .Select(x => new PlaylistSummary(x.Id, x.Name!))
+            .OrderByDescending(x => x.IsPinned)
+            .ThenBy(x => x.DisplayOrder)
+            .ThenBy(x => x.Name)
+            .Select(x => new PlaylistSummary(x.Id, x.Name!, x.IsPinned, x.DisplayOrder))
             .ToArrayAsync(ct);
     }
 
@@ -52,16 +54,19 @@ public sealed class PlaylistLibraryService(
             throw new InvalidOperationException($"Playlist '{normalizedName}' already exists.");
         }
 
+        var maxOrder = await context.Playlists.MaxAsync(x => (int?)x.DisplayOrder, ct) ?? 0;
+
         var playlist = new PlaylistModel
         {
-            Name = normalizedName
+            Name = normalizedName,
+            DisplayOrder = maxOrder + 1
         };
 
         context.Playlists.Add(playlist);
         await context.SaveChangesAsync(ct);
 
         logger.Information("[PlaylistLibraryService] Created playlist {PlaylistName}", normalizedName);
-        return new PlaylistSummary(playlist.Id, normalizedName);
+        return new PlaylistSummary(playlist.Id, normalizedName, false, playlist.DisplayOrder);
     }
 
     public async Task RenamePlaylistAsync(int playlistId, string newName, CancellationToken ct = default)
@@ -210,8 +215,10 @@ public sealed class PlaylistLibraryService(
         await using var context = await dataContextFactory.CreateDbContextAsync(ct);
         var allPlaylists = await context.Playlists
             .AsNoTracking()
-            .OrderBy(x => x.Name)
-            .Select(x => new PlaylistSummary(x.Id, x.Name!))
+            .OrderByDescending(x => x.IsPinned)
+            .ThenBy(x => x.DisplayOrder)
+            .ThenBy(x => x.Name)
+            .Select(x => new PlaylistSummary(x.Id, x.Name!, x.IsPinned, x.DisplayOrder))
             .ToArrayAsync(ct);
 
         if (allPlaylists.Length == 0)
@@ -229,6 +236,47 @@ public sealed class PlaylistLibraryService(
         return allPlaylists
             .Select(x => new PlaylistMembershipInfo(x.Id, x.Name, containedSet.Contains(x.Id)))
             .ToArray();
+    }
+
+    public async Task SetPinnedAsync(int playlistId, bool isPinned, CancellationToken ct = default)
+    {
+        await using var context = await dataContextFactory.CreateDbContextAsync(ct);
+        var playlist = await context.Playlists.FirstOrDefaultAsync(x => x.Id == playlistId, ct);
+        if (playlist is null)
+        {
+            return;
+        }
+
+        playlist.IsPinned = isPinned;
+        await context.SaveChangesAsync(ct);
+
+        logger.Information("[PlaylistLibraryService] Set playlist {PlaylistId} pinned={IsPinned}", playlistId, isPinned);
+    }
+
+    public async Task ReorderPlaylistsAsync(IReadOnlyList<(int PlaylistId, int NewOrder)> ordering, CancellationToken ct = default)
+    {
+        if (ordering.Count == 0)
+        {
+            return;
+        }
+
+        await using var context = await dataContextFactory.CreateDbContextAsync(ct);
+        var ids = ordering.Select(x => x.PlaylistId).ToArray();
+        var playlists = await context.Playlists
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync(ct);
+
+        var orderMap = ordering.ToDictionary(x => x.PlaylistId, x => x.NewOrder);
+        foreach (var playlist in playlists)
+        {
+            if (orderMap.TryGetValue(playlist.Id, out var newOrder))
+            {
+                playlist.DisplayOrder = newOrder;
+            }
+        }
+
+        await context.SaveChangesAsync(ct);
+        logger.Information("[PlaylistLibraryService] Reordered {Count} playlists", ordering.Count);
     }
 
     private static string NormalizeAndValidateName(string name)

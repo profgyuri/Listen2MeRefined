@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance popups:SongDroppedPopupViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Margin="12">
+    <Grid Margin="14,10,14,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

@@ -13,79 +13,76 @@
              d:DesignWidth="300">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="12,0,0,0">
-            <Border Style="{DynamicResource DarkBorderContainer}">
-                <StackPanel>
-                    <TextBlock Style="{DynamicResource SettingsSectionHeaderText}" Text="Playlists" />
-                    <TextBlock Style="{DynamicResource SettingsSectionDescriptionText}" Text="Manage playlist names and search transfer behavior." />
+            <components:SectionHeader IconKind="PlaylistMusic"
+                                      Title="Playlists"
+                                      ShowSubtitle="True"
+                                      Subtitle="Manage playlist names and search transfer behavior." />
+
+            <StackPanel Margin="0,16,0,0">
+                <components:FormFieldRow Margin="0,0,0,12"
+                                         Label="Search to default tab:"
+                                         LabelWidth="190">
+                    <components:FormFieldRow.FieldContent>
+                        <ComboBox Style="{DynamicResource CustomComboBox}"
+                                  SelectedItem="{Binding SelectedSearchResultsTransferMode}"
+                                  ItemsSource="{Binding SearchResultsTransferModes}" />
+                    </components:FormFieldRow.FieldContent>
+                </components:FormFieldRow>
+
+                <Grid Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ListView Grid.RowSpan="2"
+                              Height="170"
+                              Margin="0,0,10,0"
+                              Style="{DynamicResource ContentListViewStyle}"
+                              ItemContainerStyle="{DynamicResource ContentListItemStyle}"
+                              ItemsSource="{Binding Playlists}"
+                              SelectedItem="{Binding SelectedPlaylist}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"
+                                           Foreground="{DynamicResource SecondaryBrush}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Button Grid.Column="1"
+                            Style="{DynamicResource SettingsSurfaceIconButton}"
+                            Command="{Binding DeleteSelectedPlaylistCommand}"
+                            Content="{materialDesign:PackIcon Kind=DeleteOutline, Size=18}"
+                            ToolTip="Delete selected playlist" />
+                </Grid>
+
+                <components:FormFieldRow Margin="0,0,0,10"
+                                         Label="Playlist name:"
+                                         LabelWidth="190">
+                    <components:FormFieldRow.FieldContent>
+                        <TextBox Text="{Binding PlaylistNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{DynamicResource AdvancedSearchTextBoxStyle}" />
+                    </components:FormFieldRow.FieldContent>
+                </components:FormFieldRow>
+
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{DynamicResource SettingsSurfaceButton}"
+                            MinWidth="110"
+                            Content="Create"
+                            Command="{Binding CreatePlaylistCommand}" />
+                    <Button Style="{DynamicResource SettingsSurfaceButton}"
+                            MinWidth="110"
+                            Margin="8,0,0,0"
+                            Content="Rename"
+                            Command="{Binding RenameSelectedPlaylistCommand}" />
                 </StackPanel>
-            </Border>
-
-            <Border Style="{DynamicResource DarkBorderContainer}" Margin="0,10,0,0">
-                <StackPanel>
-                    <components:FormFieldRow Margin="0,0,0,12"
-                                             Label="Search to default tab:"
-                                             LabelWidth="190">
-                        <components:FormFieldRow.FieldContent>
-                            <ComboBox Style="{DynamicResource CustomComboBox}"
-                                      SelectedItem="{Binding SelectedSearchResultsTransferMode}"
-                                      ItemsSource="{Binding SearchResultsTransferModes}" />
-                        </components:FormFieldRow.FieldContent>
-                    </components:FormFieldRow>
-
-                    <Grid Margin="0,0,0,10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <ListView Grid.RowSpan="2"
-                                  Height="170"
-                                  Margin="0,0,10,0"
-                                  Style="{DynamicResource VirtualizedListView}"
-                                  ItemsSource="{Binding Playlists}"
-                                  SelectedItem="{Binding SelectedPlaylist}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"
-                                               Foreground="{StaticResource SecondaryBrush}"
-                                               TextTrimming="CharacterEllipsis" />
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-                        <Button Grid.Column="1"
-                                Style="{DynamicResource SettingsIconActionButton}"
-                                Command="{Binding DeleteSelectedPlaylistCommand}"
-                                Content="{materialDesign:PackIcon Kind=DeleteOutline, Size=18}"
-                                ToolTip="Delete selected playlist" />
-                    </Grid>
-
-                    <components:FormFieldRow Margin="0,0,0,10"
-                                             Label="Playlist name:"
-                                             LabelWidth="190">
-                        <components:FormFieldRow.FieldContent>
-                            <TextBox Text="{Binding PlaylistNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Foreground="{StaticResource SecondaryBrush}" />
-                        </components:FormFieldRow.FieldContent>
-                    </components:FormFieldRow>
-
-                    <StackPanel Orientation="Horizontal">
-                        <Button Style="{DynamicResource SettingsActionButton}"
-                                MinWidth="110"
-                                Content="Create"
-                                Command="{Binding CreatePlaylistCommand}" />
-                        <Button Style="{DynamicResource SettingsActionButton}"
-                                MinWidth="110"
-                                Margin="8,0,0,0"
-                                Content="Rename"
-                                Command="{Binding RenameSelectedPlaylistCommand}" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

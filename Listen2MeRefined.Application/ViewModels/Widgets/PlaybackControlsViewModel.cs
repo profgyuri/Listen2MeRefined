@@ -6,35 +6,23 @@ using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
+using Listen2MeRefined.Core.Enums;
 using Serilog;
-using SkiaSharp;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewportAware
+public partial class PlaybackControlsViewModel : ViewModelBase
 {
-    private const float VolumeEpsilon = 0.0001f;
-    private const int DefaultWaveFormWidth = 480;
-    private const int DefaultWaveFormHeight = 70;
-
     private readonly ILogger _logger;
-    private readonly IWaveformRenderer _waveformRenderer;
-    private readonly IWaveformViewportPolicy _waveformViewportPolicy;
-    private readonly IWaveformResizeScheduler _waveformResizeScheduler;
-    private readonly IPlaybackVolumeSetter _playbackVolumeSetter;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly TimedTask _timedTask;
     private readonly IAppSettingsReader _settingsReader;
-    private string? _currentTrackPath;
+    private readonly IUiDispatcher _uiDispatcher;
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
-    [ObservableProperty] private SKBitmap _waveForm = new(1, 1);
-    [ObservableProperty] private int _waveFormWidth;
-    [ObservableProperty] private int _waveFormHeight;
     [ObservableProperty] private double _totalTime;
     [ObservableProperty] private bool _arePlaybackButtonsEnabled = true;
-    [ObservableProperty] private bool _isMuted;
-    
+
     public double CurrentTime
     {
         get => _musicPlayerController.CurrentTime;
@@ -49,125 +37,56 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
     public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
-    public float Volume
-    {
-        get => _musicPlayerController.Volume;
-        set
-        {
-            var previousMutedState = IsMuted;
-            var change = _playbackVolumeSetter.SetVolume(value);
-            if (!change.HasVolumeChanged)
-            {
-                return;
-            }
+    public RepeatMode RepeatMode => _musicPlayerController.RepeatMode;
 
-            if (previousMutedState != change.IsMuted)
-            {
-                SetMuted(change.IsMuted);
-            }
+    public string RepeatIconKind => _musicPlayerController.RepeatMode == RepeatMode.One
+        ? "RepeatOnce"
+        : "Repeat";
 
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(VolumeIconKind));
-        }
-    }
-
-    public string VolumeIconKind => _playbackVolumeSetter.GetVolumeIconKind();
+    public bool IsRepeatActive => _musicPlayerController.RepeatMode != RepeatMode.Off;
 
     public PlaybackControlsViewModel(
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        IWaveformRenderer waveformRenderer,
-        IWaveformViewportPolicy waveformViewportPolicy,
-        IWaveformResizeScheduler waveformResizeScheduler,
-        IPlaybackVolumeSetter playbackVolumeSetter,
         IMusicPlayerController musicPlayerController,
         IAppSettingsReader settingsReader,
+        IUiDispatcher uiDispatcher,
         TimedTask timedTask) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
-        _waveformRenderer = waveformRenderer;
-        _waveformViewportPolicy = waveformViewportPolicy;
-        _waveformResizeScheduler = waveformResizeScheduler;
-        _playbackVolumeSetter = playbackVolumeSetter;
         _musicPlayerController = musicPlayerController;
         _settingsReader = settingsReader;
+        _uiDispatcher = uiDispatcher;
         _timedTask = timedTask;
 
         _logger.Debug("[PlayerControlsViewModel] initialized");
     }
 
-    public override async Task InitializeAsync(CancellationToken ct = default)
+    public override Task InitializeAsync(CancellationToken ct = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
-        RegisterMessage<AppThemeChangedMessage>(OnAppThemeChangedMessage);
-        
+
         FontFamilyName = _settingsReader.GetFontFamily();
-        
-        ApplyStartupPlaybackDefaults();
 
         _timedTask.Start(
             TimeSpan.FromMilliseconds(100),
             () =>
             {
-                OnPropertyChanged(nameof(CurrentTime));
-                OnPropertyChanged(nameof(CurrentTimeDisplay));
+                _ = _uiDispatcher.InvokeAsync(() =>
+                {
+                    OnPropertyChanged(nameof(CurrentTime));
+                    OnPropertyChanged(nameof(CurrentTimeDisplay));
+                }, ct);
             });
 
-        OnPropertyChanged(nameof(Volume));
-        SetMuted(Volume <= VolumeEpsilon);
-
-        OnPropertyChanged(nameof(VolumeIconKind));
-        OnPropertyChanged(nameof(IsMuted));
         OnPropertyChanged(nameof(TotalTimeDisplay));
 
-        if (WaveFormWidth <= 0 || WaveFormHeight <= 0)
-        {
-            WaveFormWidth = DefaultWaveFormWidth;
-            WaveFormHeight = DefaultWaveFormHeight;
-        }
-
-        _waveformRenderer.SetSize(WaveFormWidth, WaveFormHeight);
-        if (string.IsNullOrWhiteSpace(_currentTrackPath))
-        {
-            await DrawPlaceholderLineAsync(ct);
-        }
-        else
-        {
-            await DrawTrackWaveFormAsync(_currentTrackPath, ct);
-        }
-
         _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
+
+        return Task.CompletedTask;
     }
-
-    /// <summary>
-    /// Updates the waveform viewport dimensions and schedules a redraw when the change is meaningful.
-    /// </summary>
-    /// <param name="availableWidth">The available viewport width.</param>
-    /// <param name="availableHeight">The available viewport height.</param>
-    public void UpdateWaveformViewport(double availableWidth, double availableHeight)
-    {
-        var normalizedViewport = _waveformViewportPolicy.TryNormalizeViewport(availableWidth, availableHeight);
-        if (normalizedViewport is null)
-        {
-            return;
-        }
-
-        var (width, height) = normalizedViewport.Value;
-        if (!_waveformViewportPolicy.HasMeaningfulChange(WaveFormWidth, WaveFormHeight, width, height))
-        {
-            return;
-        }
-
-        WaveFormWidth = width;
-        WaveFormHeight = height;
-        _waveformRenderer.SetSize(width, height);
-
-        ScheduleWaveformRedraw();
-    }
-
-    public Task WaitForPendingWaveformRedrawAsync() => _waveformResizeScheduler.PendingTask;
 
     [RelayCommand]
     private async Task PlayPause()
@@ -186,7 +105,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
         {
             _logger.Debug("[PlayerControlsViewModel] Stopping playback");
             _musicPlayerController.Stop();
-            
+
             return Task.CompletedTask;
         });
     }
@@ -222,74 +141,21 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     }
 
     [RelayCommand]
-    private async Task ToggleMute()
+    private void ToggleRepeat()
     {
-        await ExecuteSafeAsync(_ =>
+        _musicPlayerController.RepeatMode = _musicPlayerController.RepeatMode switch
         {
-            var change = _playbackVolumeSetter.ToggleMute();
-            SetMuted(change.IsMuted);
-            OnPropertyChanged(nameof(Volume));
-            OnPropertyChanged(nameof(VolumeIconKind));
-            
-            return Task.CompletedTask;
-        });
+            RepeatMode.Off => RepeatMode.All,
+            RepeatMode.All => RepeatMode.One,
+            RepeatMode.One => RepeatMode.Off,
+            _ => RepeatMode.Off
+        };
+        OnPropertyChanged(nameof(RepeatMode));
+        OnPropertyChanged(nameof(RepeatIconKind));
+        OnPropertyChanged(nameof(IsRepeatActive));
+        _logger.Debug("[PlayerControlsViewModel] Repeat mode changed to: {Mode}", _musicPlayerController.RepeatMode);
     }
 
-    private void ScheduleWaveformRedraw()
-    {
-        _ = _waveformResizeScheduler.ScheduleResizeAsync(RedrawWaveformAsync);
-    }
-
-    private async Task RedrawWaveformAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var trackPath = _currentTrackPath;
-            if (string.IsNullOrWhiteSpace(trackPath))
-            {
-                await DrawPlaceholderLineAsync(cancellationToken);
-                return;
-            }
-
-            await DrawTrackWaveFormAsync(trackPath, cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            // Ignore canceled resize redraws.
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "[PlayerControlsViewModel] Failed to redraw waveform after resize.");
-        }
-    }
-
-    private async Task DrawPlaceholderLineAsync(CancellationToken cancellationToken = default)
-    {
-        WaveForm = await _waveformRenderer.DrawPlaceholderAsync(cancellationToken);
-    }
-
-    private async Task DrawTrackWaveFormAsync(string trackPath, CancellationToken cancellationToken = default)
-    {
-        WaveForm = await _waveformRenderer.DrawTrackAsync(trackPath, cancellationToken);
-    }
-
-    private void SetMuted(bool isMuted)
-    {
-        if (IsMuted == isMuted)
-        {
-            return;
-        }
-
-        IsMuted = isMuted;
-        OnPropertyChanged(nameof(VolumeIconKind));
-    }
-
-    private void ApplyStartupPlaybackDefaults()
-    {
-        var state = _playbackVolumeSetter.ApplyStartupDefaults();
-        SetMuted(state.IsMuted);
-    }
-    
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         _logger.Debug("[PlayerControlsViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
@@ -300,37 +166,16 @@ public partial class PlaybackControlsViewModel : ViewModelBase, IWaveformViewpor
     {
         try
         {
-            if (string.Equals(_currentTrackPath, message.Value.Path, StringComparison.OrdinalIgnoreCase))
+            await _uiDispatcher.InvokeAsync(() =>
             {
-                // Same track notification (for example after queue-only operations) should not redraw waveform.
-                return;
-            }
-
-            ArePlaybackButtonsEnabled = false;
-            _currentTrackPath = message.Value.Path;
-            await DrawPlaceholderLineAsync();
-
-            if (!string.IsNullOrWhiteSpace(_currentTrackPath))
-            {
-                await DrawTrackWaveFormAsync(_currentTrackPath);
-            }
-
-            TotalTime = message.Value.Length.TotalMilliseconds;
-            OnPropertyChanged(nameof(TotalTimeDisplay));
+                ArePlaybackButtonsEnabled = true;
+                TotalTime = message.Value.Length.TotalMilliseconds;
+                OnPropertyChanged(nameof(TotalTimeDisplay));
+            });
         }
         catch (Exception e)
         {
-            _logger.Error(e, "[PlayerControlsViewModel] Failed to draw waveform.");
+            _logger.Error(e, "[PlayerControlsViewModel] Failed to update total time.");
         }
-        finally
-        {
-            ArePlaybackButtonsEnabled = true;
-        }
-    }
-
-    private void OnAppThemeChangedMessage(AppThemeChangedMessage message)
-    {
-        _logger.Debug("[PlayerControlsViewModel] Received AppThemeChangedMessage");
-        ScheduleWaveformRedraw();
     }
 }

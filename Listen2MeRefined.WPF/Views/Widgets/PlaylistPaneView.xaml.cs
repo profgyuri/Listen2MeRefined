@@ -1,6 +1,5 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using Listen2MeRefined.Application.ViewModels.Widgets;
@@ -12,18 +11,6 @@ public partial class PlaylistPaneView : UserControl
     public PlaylistPaneView()
     {
         InitializeComponent();
-    }
-
-    private void OpenPlaylistPickerButton_OnClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button button || button.ContextMenu is null)
-        {
-            return;
-        }
-
-        button.ContextMenu.PlacementTarget = button;
-        button.ContextMenu.Placement = PlacementMode.Bottom;
-        button.ContextMenu.IsOpen = true;
     }
 
     private void PlaylistListView_OnPreviewDragOver(object sender, DragEventArgs e)

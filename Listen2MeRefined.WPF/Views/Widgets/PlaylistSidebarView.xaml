@@ -1,0 +1,232 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Widgets.PlaylistSidebarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application"
+             xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance widgetViewModels:PlaylistSidebarViewModel}"
+             d:DesignHeight="400" d:DesignWidth="180">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+
+                <!-- QUEUE group -->
+                <TextBlock Text="QUEUE"
+                           Style="{DynamicResource PlaylistSidebarGroupHeader}"/>
+
+                <Border DataContext="{Binding DefaultPlaylist}"
+                        Style="{DynamicResource PlaylistSidebarItem}"
+                        MouseLeftButtonDown="SidebarItem_OnMouseLeftButtonDown">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Pulsating active dot -->
+                        <Ellipse x:Name="DefaultActiveDot"
+                                 Grid.Column="0"
+                                 Width="6" Height="6"
+                                 Fill="{DynamicResource TertiaryBrush}"
+                                 VerticalAlignment="Top"
+                                 Margin="0,5,8,0"
+                                 Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard RepeatBehavior="Forever">
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         From="1" To="0.3"
+                                                                         Duration="0:0:1"
+                                                                         AutoReverse="True"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Default"
+                                       Style="{DynamicResource PlaylistSidebarItemText}"/>
+                            <TextBlock Text="Drop files or open from system"
+                                       Style="{DynamicResource PlaylistSidebarItemSubtitle}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- PLAYLISTS group -->
+                <TextBlock Text="PLAYLISTS"
+                           Style="{DynamicResource PlaylistSidebarGroupHeader}"/>
+
+                <ItemsControl ItemsSource="{Binding ManualPlaylists}"
+                              dd:DragDrop.IsDragSource="True"
+                              dd:DragDrop.IsDropTarget="True"
+                              Drop="ManualPlaylists_OnDrop"
+                              x:Name="ManualPlaylistsControl">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type widgetViewModels:PlaylistSidebarViewModel+PlaylistSidebarItem}">
+                            <Border Style="{DynamicResource PlaylistSidebarItem}"
+                                    MouseLeftButtonDown="SidebarItem_OnMouseLeftButtonDown"
+                                    PreviewKeyDown="SidebarItem_OnPreviewKeyDown">
+                                <Border.ContextMenu>
+                                    <ContextMenu Style="{DynamicResource PlaylistContextMenuStyle}">
+                                        <MenuItem Header="Rename"
+                                                  Style="{DynamicResource PlaylistContextMenuItemStyle}"
+                                                  Command="{Binding DataContext.BeginRenameCommand, Source={x:Reference ManualPlaylistsControl}}"
+                                                  CommandParameter="{Binding}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="Pencil" Width="14" Height="14"
+                                                                         Foreground="{DynamicResource SecondaryDarkBrush}"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding DataContext.TogglePinCommand, Source={x:Reference ManualPlaylistsControl}}"
+                                                  CommandParameter="{Binding}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="Pin" Width="14" Height="14"
+                                                                         Foreground="{DynamicResource SecondaryDarkBrush}"/>
+                                            </MenuItem.Icon>
+                                            <MenuItem.Style>
+                                                <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
+                                                    <Setter Property="Header" Value="Pin"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsPinned}" Value="True">
+                                                            <Setter Property="Header" Value="Unpin"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </MenuItem.Style>
+                                        </MenuItem>
+                                        <Separator Style="{DynamicResource PlaylistContextMenuSeparator}"/>
+                                        <MenuItem Header="Delete"
+                                                  Style="{DynamicResource PlaylistContextMenuItemStyle}"
+                                                  Command="{Binding DataContext.DeletePlaylistCommand, Source={x:Reference ManualPlaylistsControl}}"
+                                                  CommandParameter="{Binding}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="Delete" Width="14" Height="14"
+                                                                         Foreground="{DynamicResource SecondaryDarkBrush}"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Pulsating active dot -->
+                                    <Ellipse Grid.Column="0"
+                                             Width="6" Height="6"
+                                             Fill="{DynamicResource TertiaryBrush}"
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,8,0"
+                                             Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard RepeatBehavior="Forever">
+                                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                                     From="1" To="0.3"
+                                                                                     Duration="0:0:1"
+                                                                                     AutoReverse="True"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+
+                                    <!-- Pin icon -->
+                                    <materialDesign:PackIcon Grid.Column="1"
+                                                             Kind="Pin"
+                                                             Style="{DynamicResource PlaylistSidebarPinIcon}"
+                                                             Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                                    <!-- Name: TextBlock (display) or TextBox (rename) -->
+                                    <Grid Grid.Column="2">
+                                        <!-- Display mode -->
+                                        <TextBlock Text="{Binding Name}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock" BasedOn="{StaticResource PlaylistSidebarItemText}">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsRenaming}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+
+                                        <!-- Rename mode -->
+                                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                                 Style="{DynamicResource PlaylistSidebarRenameTextBox}"
+                                                 Loaded="RenameTextBox_OnLoaded"
+                                                 LostFocus="RenameTextBox_OnLostFocus"
+                                                 PreviewKeyDown="RenameTextBox_OnPreviewKeyDown">
+                                            <TextBox.Visibility>
+                                                <Binding Path="IsRenaming"
+                                                         Converter="{StaticResource BoolToVisibilityConverter}"/>
+                                            </TextBox.Visibility>
+                                        </TextBox>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Empty playlists hint -->
+                <TextBlock Text="No playlists yet">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource PlaylistSidebarEmptyHint}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ManualPlaylists.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- SMART group (placeholder) -->
+                <TextBlock Text="SMART"
+                           Style="{DynamicResource PlaylistSidebarGroupHeader}"/>
+                <TextBlock Text="Coming soon"
+                           Style="{DynamicResource PlaylistSidebarEmptyHint}"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- New playlist button -->
+        <Button Grid.Row="1"
+                Content="+ New Playlist"
+                Style="{DynamicResource PlaylistSidebarNewButton}"
+                Command="{Binding CreatePlaylistCommand}"/>
+    </Grid>
+</UserControl>

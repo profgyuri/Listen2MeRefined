@@ -105,6 +105,41 @@ public class PlaybackQueueServiceTests
         return new AudioModel { Path = path };
     }
 
+    [Fact]
+    public void IsAtLastTrack_WhenAtLastIndex_ReturnsTrue()
+    {
+        var tracks = CreateTracks(3);
+        var playlist = CreatePlaylist(tracks);
+        playlist.CurrentIndex = 2;
+
+        var service = new PlaybackQueueService(playlist);
+
+        Assert.True(service.IsAtLastTrack());
+        DeleteTracks(tracks);
+    }
+
+    [Fact]
+    public void IsAtLastTrack_WhenNotAtLastIndex_ReturnsFalse()
+    {
+        var tracks = CreateTracks(3);
+        var playlist = CreatePlaylist(tracks);
+        playlist.CurrentIndex = 1;
+
+        var service = new PlaybackQueueService(playlist);
+
+        Assert.False(service.IsAtLastTrack());
+        DeleteTracks(tracks);
+    }
+
+    [Fact]
+    public void IsAtLastTrack_WhenQueueIsEmpty_ReturnsFalse()
+    {
+        var playlist = new PlaylistQueue();
+        var service = new PlaybackQueueService(playlist);
+
+        Assert.False(service.IsAtLastTrack());
+    }
+
     private static void DeleteTracks(IEnumerable<AudioModel> tracks)
     {
         foreach (var track in tracks)

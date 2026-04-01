@@ -34,6 +34,7 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
     [ObservableProperty] private bool _autoCheckUpdatesOnStartup = true;
     [ObservableProperty] private string _updateAvailableText = string.Empty;
     [ObservableProperty] private bool _isUpdateButtonVisible;
+    [ObservableProperty] private bool _autoFlowTrackText;
 
     public ObservableCollection<string> PlaylistViewModes { get; } =
         new([DetailedPlaylistViewMode, CompactPlaylistViewMode]);
@@ -76,6 +77,7 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
             AutoCheckUpdatesOnStartup = _settingsReader.GetAutoCheckUpdatesOnStartup();
             SelectedThemeMode = _settingsReader.GetThemeMode();
             SelectedAccentColor = _settingsReader.GetAccentColor();
+            AutoFlowTrackText = _settingsReader.GetAutoFlowTrackText();
         }
         finally
         {
@@ -151,6 +153,17 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
             UpdateAvailableText = "Automatic update checks are disabled.";
             IsUpdateButtonVisible = false;
         }
+    }
+
+    partial void OnAutoFlowTrackTextChanged(bool value)
+    {
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriter.SetAutoFlowTrackText(value);
+        Messenger.Send(new AutoFlowTrackTextChangedMessage(value));
     }
 
     [RelayCommand]

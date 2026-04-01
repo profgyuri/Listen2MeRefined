@@ -62,4 +62,6 @@ public interface IAppSettingsReader
     string GetThemeMode();
     /// <summary>Gets current accent color name.</summary>
     string GetAccentColor();
+    /// <summary>Gets whether track title/artist auto-scrolls on song change instead of on hover.</summary>
+    bool GetAutoFlowTrackText();
 }

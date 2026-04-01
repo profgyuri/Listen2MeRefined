@@ -11,6 +11,7 @@ using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Moq;
 using NAudio.Wave;
 using Serilog;
+using RepeatMode = Listen2MeRefined.Core.Enums.RepeatMode;
 
 namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
@@ -380,6 +381,182 @@ public class NAudioMusicPlayerOrchestrationTests
         await timedTask.StopAsync();
     }
 
+    [Fact]
+    public async Task CheckPlaybackProgressAsync_RepeatOne_RestartsCurrentTrackWithoutAdvancing()
+    {
+        var track = new AudioModel { Path = "repeat-one-track.mp3" };
+        using var stream = CreateWaveStream(durationMs: 100);
+
+        var queue = new Mock<IPlaybackQueueService>();
+        queue.Setup(x => x.GetCurrentTrack()).Returns(track);
+
+        var loader = new Mock<ITrackLoader>();
+        loader.Setup(x => x.Load(track)).Returns(TrackLoadResult.Success(stream));
+
+        var output = new Mock<IPlaybackOutput>();
+        output.SetupProperty(x => x.Volume, 1f);
+        output
+            .Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
+            .Returns(new PlaybackOutputReconfigureResult(true, false));
+
+        var monitor = new Mock<IPlaybackProgressMonitor>();
+        monitor.Setup(x => x.ShouldAdvance(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>(), It.IsAny<bool>())).Returns(true);
+
+        var timedTask = new TimedTask();
+
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            timedTask,
+            queue.Object,
+            loader.Object,
+            output.Object,
+            monitor.Object,
+            CreateSettingsReader(),
+            CreateOutputDevice(),
+            new WeakReferenceMessenger());
+
+        await player.PlayPauseAsync();
+        player.RepeatMode = RepeatMode.One;
+
+        await player.CheckPlaybackProgressAsync();
+
+        queue.Verify(x => x.GetNextTrack(), Times.Never);
+        monitor.Verify(x => x.Reset(), Times.AtLeastOnce);
+        output.Verify(x => x.Play(), Times.AtLeast(2));
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task CheckPlaybackProgressAsync_RepeatOff_AtLastTrack_StopsPlayback()
+    {
+        var track = new AudioModel { Path = "repeat-off-last-track.mp3" };
+        using var stream = CreateWaveStream();
+
+        var queue = new Mock<IPlaybackQueueService>();
+        queue.Setup(x => x.GetCurrentTrack()).Returns(track);
+        queue.Setup(x => x.IsAtLastTrack()).Returns(true);
+
+        var loader = new Mock<ITrackLoader>();
+        loader.Setup(x => x.Load(track)).Returns(TrackLoadResult.Success(stream));
+
+        var output = new Mock<IPlaybackOutput>();
+        output.SetupProperty(x => x.Volume, 1f);
+        output
+            .Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
+            .Returns(new PlaybackOutputReconfigureResult(true, false));
+
+        var monitor = new Mock<IPlaybackProgressMonitor>();
+        monitor.Setup(x => x.ShouldAdvance(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>(), It.IsAny<bool>())).Returns(true);
+
+        var messenger = new WeakReferenceMessenger();
+        var stateProbe = new PlayerStateProbe();
+        messenger.Register<PlayerStateProbe, PlayerStateChangedMessage>(
+            stateProbe,
+            static (recipient, message) => recipient.LastState = message.Value);
+
+        var timedTask = new TimedTask();
+
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            timedTask,
+            queue.Object,
+            loader.Object,
+            output.Object,
+            monitor.Object,
+            CreateSettingsReader(),
+            CreateOutputDevice(),
+            messenger);
+
+        await player.PlayPauseAsync();
+        player.RepeatMode = RepeatMode.Off;
+
+        await player.CheckPlaybackProgressAsync();
+
+        queue.Verify(x => x.GetNextTrack(), Times.Never);
+        output.Verify(x => x.Stop(), Times.AtLeastOnce);
+        Assert.Equal(PlayerState.Stopped, stateProbe.LastState);
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public async Task CheckPlaybackProgressAsync_RepeatAll_AtLastTrack_WrapsToNextTrack()
+    {
+        var current = new AudioModel { Path = "repeat-all-last.mp3" };
+        var next = new AudioModel { Path = "repeat-all-first.mp3" };
+        using var currentStream = CreateWaveStream();
+        using var nextStream = CreateWaveStream();
+
+        var queue = new Mock<IPlaybackQueueService>();
+        queue.Setup(x => x.GetCurrentTrack()).Returns(current);
+        queue.Setup(x => x.GetNextTrack()).Returns(next);
+        queue.Setup(x => x.IsAtLastTrack()).Returns(true);
+
+        var loader = new Mock<ITrackLoader>();
+        loader.Setup(x => x.Load(current)).Returns(TrackLoadResult.Success(currentStream));
+        loader.Setup(x => x.Load(next)).Returns(TrackLoadResult.Success(nextStream));
+
+        var output = new Mock<IPlaybackOutput>();
+        output.SetupProperty(x => x.Volume, 1f);
+        output
+            .Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
+            .Returns(new PlaybackOutputReconfigureResult(true, false));
+
+        var monitor = new Mock<IPlaybackProgressMonitor>();
+        monitor.Setup(x => x.ShouldAdvance(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>(), It.IsAny<bool>())).Returns(true);
+
+        var messenger = new WeakReferenceMessenger();
+        var songProbe = new CurrentSongProbe();
+        messenger.Register<CurrentSongProbe, CurrentSongChangedMessage>(
+            songProbe,
+            static (recipient, message) => recipient.Song = message.Value);
+
+        var timedTask = new TimedTask();
+
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            timedTask,
+            queue.Object,
+            loader.Object,
+            output.Object,
+            monitor.Object,
+            CreateSettingsReader(),
+            CreateOutputDevice(),
+            messenger);
+
+        await player.PlayPauseAsync();
+        player.RepeatMode = RepeatMode.All;
+
+        await player.CheckPlaybackProgressAsync();
+
+        queue.Verify(x => x.GetNextTrack(), Times.Once);
+        Assert.Same(next, songProbe.Song);
+        await timedTask.StopAsync();
+    }
+
+    [Fact]
+    public void RepeatMode_DefaultsToOff()
+    {
+        var player = new NAudioMusicPlayer(
+            Mock.Of<ILogger>(),
+            new TimedTask(),
+            Mock.Of<IPlaybackQueueService>(),
+            Mock.Of<ITrackLoader>(),
+            CreateOutput(),
+            Mock.Of<IPlaybackProgressMonitor>(),
+            CreateSettingsReader(),
+            CreateOutputDevice(),
+            new WeakReferenceMessenger());
+
+        Assert.Equal(RepeatMode.Off, player.RepeatMode);
+    }
+
+    private static IPlaybackOutput CreateOutput()
+    {
+        var output = new Mock<IPlaybackOutput>();
+        output.SetupProperty(x => x.Volume, 1f);
+        return output.Object;
+    }
+
     private static WaveStream CreateWaveStream(int durationMs = 5_000)
     {
         var format = new WaveFormat(44100, 16, 2);
@@ -409,5 +586,10 @@ public class NAudioMusicPlayerOrchestrationTests
         public AudioModel? Song { get; set; }
         public int CurrentSongMessageCount { get; set; }
         public int PlaylistShuffledCount { get; set; }
+    }
+
+    private sealed class PlayerStateProbe
+    {
+        public PlayerState LastState { get; set; } = PlayerState.Stopped;
     }
 }

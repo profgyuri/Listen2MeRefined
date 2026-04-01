@@ -5,6 +5,8 @@
     <Color x:Key="SecondaryColor">#141414</Color>
     <Color x:Key="SecondaryDarkColor">#5A5A5A</Color>
     <Color x:Key="BorderColor">#C4BFBA</Color>
-    <Color x:Key="DefaultBorderBackgroundColor">#DDD6D0</Color>
-    <Color x:Key="DarkBorderBackgroundColor">#D3CBC4</Color>
+    <Color x:Key="SurfaceColor">#F0ECE8</Color>
+    <Color x:Key="SurfaceElevatedColor">#E5E0DB</Color>
+    <Color x:Key="SurfaceRaisedColor">#D8D3CE</Color>
+    <Color x:Key="SeparatorColor">#D0CBC6</Color>
 </ResourceDictionary>

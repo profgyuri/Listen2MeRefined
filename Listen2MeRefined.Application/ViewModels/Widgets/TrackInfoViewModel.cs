@@ -15,6 +15,7 @@ public partial class TrackInfoViewModel : ViewModelBase
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private PlayerState _playerState = PlayerState.Stopped;
+    [ObservableProperty] private bool _autoFlowTrackText;
     [ObservableProperty] private AudioModel _song = new()
     {
         Artist = "Artist",
@@ -37,9 +38,11 @@ public partial class TrackInfoViewModel : ViewModelBase
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<PlayerStateChangedMessage>(OnPlayerStateChangedMessage);
-        
+        RegisterMessage<AutoFlowTrackTextChangedMessage>(OnAutoFlowTrackTextChangedMessage);
+
         FontFamilyName = _settingsReader.GetFontFamily();
-        
+        AutoFlowTrackText = _settingsReader.GetAutoFlowTrackText();
+
         return base.InitializeAsync(cancellationToken);
     }
 
@@ -59,5 +62,11 @@ public partial class TrackInfoViewModel : ViewModelBase
     {
         Logger.Debug("[TrackInfoViewModel] Received PlayerStateChangedMessage: {state}", message.Value);
         PlayerState = message.Value;
+    }
+
+    private void OnAutoFlowTrackTextChangedMessage(AutoFlowTrackTextChangedMessage message)
+    {
+        Logger.Debug("[TrackInfoViewModel] Received AutoFlowTrackTextChangedMessage: {enabled}", message.Value);
+        AutoFlowTrackText = message.Value;
     }
 }

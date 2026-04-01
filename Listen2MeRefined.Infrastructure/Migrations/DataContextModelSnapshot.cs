@@ -15,9 +15,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.5");
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", b =>
+            modelBuilder.Entity("Listen2MeRefined.Core.Models.AudioModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -26,7 +26,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.Property<string>("Artist")
                         .HasColumnType("TEXT");
 
-                    b.Property<short>("BPM")
+                    b.Property<uint>("BPM")
                         .HasColumnType("INTEGER");
 
                     b.Property<short>("Bitrate")
@@ -58,7 +58,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.ToTable("Songs");
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.MusicFolderModel", b =>
+            modelBuilder.Entity("Listen2MeRefined.Core.Models.MusicFolderModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -81,11 +81,21 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.ToTable("MusicFolders");
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", b =>
+            modelBuilder.Entity("Listen2MeRefined.Core.Models.PlaylistModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("IsPinned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -116,6 +126,9 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("AutoCheckUpdatesOnStartup")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("AutoFlowTrackText")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("AutoScanOnFolderAdd")
@@ -210,7 +223,7 @@ namespace Listen2MeRefined.Infrastructure.Migrations
                     b.ToTable("PlaylistSongs", (string)null);
                 });
 
-            modelBuilder.Entity("Listen2MeRefined.Infrastructure.Data.Models.MusicFolderModel", b =>
+            modelBuilder.Entity("Listen2MeRefined.Core.Models.MusicFolderModel", b =>
                 {
                     b.HasOne("Listen2MeRefined.Infrastructure.Settings.AppSettings", null)
                         .WithMany("MusicFolders")
@@ -219,13 +232,13 @@ namespace Listen2MeRefined.Infrastructure.Migrations
 
             modelBuilder.Entity("PlaylistSongs", b =>
                 {
-                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.PlaylistModel", null)
+                    b.HasOne("Listen2MeRefined.Core.Models.PlaylistModel", null)
                         .WithMany()
                         .HasForeignKey("PlaylistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Listen2MeRefined.Infrastructure.Data.Models.AudioModel", null)
+                    b.HasOne("Listen2MeRefined.Core.Models.AudioModel", null)
                         .WithMany()
                         .HasForeignKey("SongId")
                         .OnDelete(DeleteBehavior.Cascade)

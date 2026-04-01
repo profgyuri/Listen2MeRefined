@@ -7,76 +7,62 @@
              d:DataContext="{d:DesignInstance widgets:PlaybackControlsViewModel}"
              FontFamily="{Binding FontFamilyName, Converter={StaticResource StringToFontFamily}}"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
-             xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
              xmlns:widgets="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
-    <Border Style="{DynamicResource BorderContainer}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="6" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <Border Grid.Row="0" Style="{DynamicResource DarkBorderContainer}" Padding="4">
-                <Grid x:Name="WaveAreaGrid">
-                    <wpf:WaveSlider Style="{DynamicResource NoHaloSlider}"
-                                    Foreground="{DynamicResource TertiaryBrush}"
-                                    utils:WaveformViewportSyncBehavior.IsEnabled="True"
-                                    WaveBitmap="{Binding WaveForm}"
-                                    Minimum="0"
-                                    Maximum="{Binding TotalTime}"
-                                    Value="{Binding CurrentTime}"
-                                    MinHeight="24"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    Margin="6,0" />
-                </Grid>
-            </Border>
+        <!-- Time display -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+            <TextBlock x:Name="ElapsedTimeText"
+                       Style="{DynamicResource NowPlayingTimeText}"
+                       Text="{Binding CurrentTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
+            <TextBlock Style="{DynamicResource NowPlayingTimeText}" Text="/" Margin="4,0" />
+            <TextBlock x:Name="TotalTimeText"
+                       Style="{DynamicResource NowPlayingTimeText}"
+                       Text="{Binding TotalTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
+        </StackPanel>
 
-            <Border Grid.Row="2"
-                    Style="{DynamicResource DarkBorderContainer}"
-                    Padding="6,5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+        <!-- Transport buttons -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Command="{Binding PreviousCommand}"
+                    Style="{DynamicResource NowPlayingTransportButton}"
+                    Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"
+                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    ToolTip="Previous" />
+            <Button Command="{Binding StopCommand}"
+                    Style="{DynamicResource NowPlayingTransportButton}"
+                    Content="{materialDesign:PackIcon Kind=Stop,Size=14}"
+                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    ToolTip="Stop" />
+            <Button Command="{Binding PlayPauseCommand}"
+                    Style="{DynamicResource NowPlayingPrimaryTransportButton}"
+                    Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}"
+                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    ToolTip="Play / Pause" />
+            <Button Command="{Binding NextCommand}"
+                    Style="{DynamicResource NowPlayingTransportButton}"
+                    Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}"
+                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    ToolTip="Next" />
+            <Button Command="{Binding ShuffleCommand}"
+                    Style="{DynamicResource NowPlayingTransportButton}"
+                    Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}"
+                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    ToolTip="Shuffle" />
+            <Button Command="{Binding ToggleRepeatCommand}"
+                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    ToolTip="Repeat (Off → All → One)">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource NowPlayingTransportButton}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRepeatActive}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <materialDesign:PackIcon Kind="{Binding RepeatIconKind}" Width="14" Height="14" />
+            </Button>
+        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Command="{Binding PreviousCommand}" Style="{DynamicResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}" IsEnabled="{Binding ArePlaybackButtonsEnabled}"/>
-                        <Button Command="{Binding StopCommand}" Style="{DynamicResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Stop,Size=14}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
-                        <Button Command="{Binding PlayPauseCommand}" Style="{DynamicResource PlaybackPrimaryTransportButton}" Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
-                        <Button Command="{Binding NextCommand}" Style="{DynamicResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
-                        <Button Command="{Binding ShuffleCommand}" Style="{DynamicResource PlaybackTransportButton}" Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}" IsEnabled="{Binding ArePlaybackButtonsEnabled}" />
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,0,10,0">
-                        <TextBlock x:Name="ElapsedTimeText"
-                                   Style="{DynamicResource PlaybackTimeText}"
-                                   Text="{Binding CurrentTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
-                        <TextBlock Style="{DynamicResource PlaybackTimeText}" Text="/" Margin="4,0" />
-                        <TextBlock x:Name="TotalTimeText"
-                                   Style="{DynamicResource PlaybackTimeText}"
-                                   Text="{Binding TotalTimeDisplay, StringFormat={}{0:mm\\:ss}}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Button Style="{DynamicResource PlaybackVolumeIconButton}"
-                                Command="{Binding ToggleMuteCommand}">
-                            <materialDesign:PackIcon Kind="{Binding VolumeIconKind}" Width="14" Height="14" />
-                        </Button>
-                        <Slider Width="84"
-                                Margin="8,0"
-                                Minimum="0"
-                                Maximum="1"
-                                Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                VerticalAlignment="Center" />
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </Grid>
-    </Border>
+    </StackPanel>
 </UserControl>
-

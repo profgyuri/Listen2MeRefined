@@ -18,11 +18,11 @@
         ShowInTaskbar="False"
         Topmost="True"
         Title="Unexpected Error">
-    <Border BorderThickness="2"
+    <Border BorderThickness="1"
             BorderBrush="{DynamicResource TertiaryBrush}"
             Background="{DynamicResource PrimaryBrush}"
             CornerRadius="0,0,8,8">
-        <Grid Margin="8">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -30,20 +30,29 @@
 
             <popups:CrashReportPopup x:Name="CrashReportContent" />
 
-            <StackPanel Grid.Row="1"
-                        Margin="12,6,12,12"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-                <Button x:Name="PrimaryActionButton"
-                        MinWidth="170"
-                        Margin="0,0,10,0"
-                        Style="{DynamicResource WindowFooterActionButton}"
-                        Click="PrimaryActionButton_OnClick" />
-                <Button x:Name="SecondaryActionButton"
-                        MinWidth="120"
-                        Style="{DynamicResource WindowFooterActionButton}"
-                        Click="SecondaryActionButton_OnClick" />
-            </StackPanel>
+            <!-- Footer strip -->
+            <Border Grid.Row="1"
+                    Style="{DynamicResource CrashReportFooterStripBorder}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="PrimaryActionButton"
+                            Grid.Column="1"
+                            MinWidth="170"
+                            Style="{DynamicResource CrashReportFooterPrimaryActionButton}"
+                            Click="PrimaryActionButton_OnClick" />
+                    <Button x:Name="SecondaryActionButton"
+                            Grid.Column="2"
+                            MinWidth="120"
+                            Margin="6,0,0,0"
+                            Style="{DynamicResource CrashReportFooterActionButton}"
+                            Click="SecondaryActionButton_OnClick" />
+                </Grid>
+            </Border>
         </Grid>
     </Border>
 </Window>

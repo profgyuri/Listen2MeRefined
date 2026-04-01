@@ -49,8 +49,12 @@ public sealed class PlaybackModule : IModule
 
         services.AddTransient<TrackInfoViewModel>();
         services.AddTransient<TrackInfoView>();
+        services.AddTransient<NowPlayingWaveformViewModel>();
+        services.AddTransient<NowPlayingWaveformView>();
         services.AddTransient<PlaybackControlsViewModel>();
         services.AddTransient<PlaybackControlsView>();
+        services.AddTransient<NowPlayingVolumeViewModel>();
+        services.AddTransient<NowPlayingVolumeView>();
     }
 
     public void RegisterNavigation(INavigationRegistry registry)

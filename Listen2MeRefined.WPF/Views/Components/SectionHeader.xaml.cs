@@ -63,6 +63,13 @@ public partial class SectionHeader : UserControl
             typeof(SectionHeader),
             new PropertyMetadata(string.Empty));
 
+    public static readonly DependencyProperty ActionButtonTextProperty =
+        DependencyProperty.Register(
+            nameof(ActionButtonText),
+            typeof(string),
+            typeof(SectionHeader),
+            new PropertyMetadata(string.Empty));
+
     public SectionHeader()
     {
         InitializeComponent();
@@ -114,5 +121,11 @@ public partial class SectionHeader : UserControl
     {
         get => (string)GetValue(ActionToolTipProperty);
         set => SetValue(ActionToolTipProperty, value);
+    }
+
+    public string ActionButtonText
+    {
+        get => (string)GetValue(ActionButtonTextProperty);
+        set => SetValue(ActionButtonTextProperty, value);
     }
 }
