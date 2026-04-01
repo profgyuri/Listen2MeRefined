@@ -49,8 +49,6 @@ Examples:
 
 ## Contribution
 
-**I can't accept any contributions for the next couple of days/weeks, as long as the backend refactoring lasts. This line will be removed, when I finish this PR.**
-
 I try to keep the code as simple as I can, but that doesn't mean there are no hundreds of lines in a file. This is mainly true for viewmodel files, since I don't want to add extra confusion with self-made partial classes. Sorry, if it differs from your preferences.
 
 **Some** harder concepts are documented in the [wiki](https://github.com/profgyuri/Listen2MeRefined/wiki).
