@@ -374,3 +374,4 @@ FodyWeavers.xsd
 *.db
 *.txt
 /Listen2MeRefined.WPF/Properties/launchSettings.json
+UX_AUDIT.md

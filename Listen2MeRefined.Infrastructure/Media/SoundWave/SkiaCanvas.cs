@@ -5,7 +5,7 @@ namespace Listen2MeRefined.Infrastructure.Media.SoundWave;
 public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWaveformPaletteAware
 {
     private static readonly SKColor DefaultWaveLineColor = new(255, 138, 61); // Matches default accent (#FF8A3D).
-    private static readonly SKColor DefaultWaveBackgroundColor = new(35, 35, 35); // Matches default dark panel (#232323).
+    private static readonly SKColor DefaultWaveBackgroundColor = new(36, 36, 36); // Matches default dark panel (#242424).
 
     private SKBitmap? _bitmap;
     private SKCanvas? _canvas;

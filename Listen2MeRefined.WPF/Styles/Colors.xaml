@@ -7,8 +7,6 @@
     <Color x:Key="SecondaryDarkColor">#A8A8A8</Color>
     <Color x:Key="TertiaryColor">#FF8A3D</Color>
     <Color x:Key="BorderColor">#393939</Color>
-    <Color x:Key="DefaultBorderBackgroundColor">#282828</Color>
-    <Color x:Key="DarkBorderBackgroundColor">#232323</Color>
     <Color x:Key="TertiaryLightColor">#FFB37A</Color>
     <Color x:Key="TertiaryLightMidColor">#D07A42</Color>
     <Color x:Key="TertiaryMidColor">#33FF8A3D</Color>
@@ -21,8 +19,6 @@
     <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}" />
     <SolidColorBrush x:Key="PrimaryLightBrush" Color="{DynamicResource PrimaryLightColor}" />
     <SolidColorBrush x:Key="BorderBrush" Color="{DynamicResource BorderColor}" />
-    <SolidColorBrush x:Key="DefaultBorderBackgroundBrush" Color="{DynamicResource DefaultBorderBackgroundColor}" />
-    <SolidColorBrush x:Key="DarkBorderBackgroundBrush" Color="{DynamicResource DarkBorderBackgroundColor}" />
     <SolidColorBrush x:Key="SecondaryBrush" Color="{DynamicResource SecondaryColor}" />
     <SolidColorBrush x:Key="SecondaryDarkBrush" Color="{DynamicResource SecondaryDarkColor}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{DynamicResource TertiaryColor}" />

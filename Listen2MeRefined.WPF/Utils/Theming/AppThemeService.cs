@@ -46,8 +46,6 @@ public sealed class AppThemeService : IAppThemeService
         "SecondaryColor",
         "SecondaryDarkColor",
         "BorderColor",
-        "DefaultBorderBackgroundColor",
-        "DarkBorderBackgroundColor",
         "SurfaceColor",
         "SurfaceElevatedColor",
         "SurfaceRaisedColor",
@@ -69,8 +67,6 @@ public sealed class AppThemeService : IAppThemeService
         ["SecondaryColor"] = "SecondaryBrush",
         ["SecondaryDarkColor"] = "SecondaryDarkBrush",
         ["BorderColor"] = "BorderBrush",
-        ["DefaultBorderBackgroundColor"] = "DefaultBorderBackgroundBrush",
-        ["DarkBorderBackgroundColor"] = "DarkBorderBackgroundBrush",
         ["SurfaceColor"] = "SurfaceBrush",
         ["SurfaceElevatedColor"] = "SurfaceElevatedBrush",
         ["SurfaceRaisedColor"] = "SurfaceRaisedBrush",
@@ -124,7 +120,7 @@ public sealed class AppThemeService : IAppThemeService
         var waveformLineColor = System.Windows.Application.Current.Resources["TertiaryColor"] is Color accent
             ? ToSkColor(accent)
             : new SKColor(255, 138, 61);
-        var waveformBackgroundColor = System.Windows.Application.Current.Resources["DarkBorderBackgroundColor"] is Color background
+        var waveformBackgroundColor = System.Windows.Application.Current.Resources["SurfaceElevatedColor"] is Color background
             ? ToSkColor(background)
             : new SKColor(35, 35, 35);
 
