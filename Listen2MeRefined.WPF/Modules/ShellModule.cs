@@ -5,12 +5,14 @@ using Listen2MeRefined.Application.Startup;
 using Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;
 using Listen2MeRefined.Application.ViewModels.Popups;
 using Listen2MeRefined.Application.ViewModels.Shells;
+using Listen2MeRefined.Application.ViewModels.Widgets;
 using Listen2MeRefined.Infrastructure.Startup;
 using Listen2MeRefined.Infrastructure.Startup.Tasks;
 using Listen2MeRefined.WPF.Startup;
 using Listen2MeRefined.WPF.Views.DefaultHomeViews;
 using Listen2MeRefined.WPF.Views.Popups;
 using Listen2MeRefined.WPF.Views.Shells;
+using Listen2MeRefined.WPF.Views.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Listen2MeRefined.WPF.Modules;
@@ -25,6 +27,8 @@ public sealed class ShellModule : IModule
         services.AddTransient<MainShell>();
         services.AddTransient<MainShellDefaultHomeViewModel>();
         services.AddTransient<MainShellDefaultHomeView>();
+        services.AddTransient<MainHomeContentToggleViewModel>();
+        services.AddTransient<MainHomeContentToggleView>();
 
         services.AddTransient<PopupShell>();
         services.AddTransient<PopupShellViewModel>();

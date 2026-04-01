@@ -63,8 +63,14 @@
             <DataTemplate DataType="{x:Type widgetViewModels:NowPlayingWaveformViewModel}">
                 <widgets:NowPlayingWaveformView/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:NowPlayingVolumeViewModel}">
+                <widgets:NowPlayingVolumeView/>
+            </DataTemplate>
             <DataTemplate DataType="{x:Type widgetViewModels:PlaybackControlsViewModel}">
                 <widgets:PlaybackControlsView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type widgetViewModels:MainHomeContentToggleViewModel}">
+                <widgets:MainHomeContentToggleView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type widgetViewModels:PlaylistPaneViewModel}">
                 <widgets:PlaylistPaneView/>

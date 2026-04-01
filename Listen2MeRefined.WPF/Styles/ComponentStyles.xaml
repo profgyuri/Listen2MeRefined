@@ -1217,6 +1217,63 @@
     </Style>
     <!--#endregion-->
 
+    <!--#region Main Home Content Toggle -->
+    <Style x:Key="MainHomeContentToggleContainer" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="Margin" Value="12,8,12,0" />
+    </Style>
+
+    <Style x:Key="MainHomeContentToggleButton" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Margin" Value="0,0,4,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ToggleBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MainHomeContentPlaylistToggleButton"
+           TargetType="Button"
+           BasedOn="{StaticResource MainHomeContentToggleButton}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPlaylistActive}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MainHomeContentSearchResultsToggleButton"
+           TargetType="Button"
+           BasedOn="{StaticResource MainHomeContentToggleButton}">
+        <Setter Property="Margin" Value="0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSearchResultsActive}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <!--#endregion-->
+
     <!--#region Content Panel -->
     <Style x:Key="ContentPanelSeparator" TargetType="Border">
         <Setter Property="Width" Value="1" />

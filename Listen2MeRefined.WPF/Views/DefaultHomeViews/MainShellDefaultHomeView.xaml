@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:defaultHomeViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.DefaultHomeViewModels;assembly=Listen2MeRefined.Application"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
@@ -47,113 +46,17 @@
                                     VerticalAlignment="Center" />
 
                     <!-- Right: Volume -->
-                    <StackPanel Grid.Column="2"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Right"
-                                DataContext="{Binding PlaybackControlsViewModel}">
-                        <Button Style="{DynamicResource NowPlayingVolumeButton}"
-                                Command="{Binding ToggleMuteCommand}"
-                                ToolTip="Mute / Unmute">
-                            <materialDesign:PackIcon Kind="{Binding VolumeIconKind}" Width="14" Height="14" />
-                        </Button>
-                        <Slider Width="84"
-                                Margin="8,0,0,0"
-                                Minimum="0"
-                                Maximum="1"
-                                Value="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                VerticalAlignment="Center" />
-                    </StackPanel>
+                    <ContentControl Grid.Column="2"
+                                    Content="{Binding NowPlayingVolumeViewModel}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right" />
                 </Grid>
             </Grid>
         </Border>
 
         <!-- Content view toggle -->
-        <StackPanel Grid.Row="1"
-                    Orientation="Horizontal"
-                    Margin="12,8,12,0">
-            <Button Command="{Binding ShowPlaylistViewCommand}"
-                    Cursor="Hand"
-                    Margin="0,0,4,0">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Padding" Value="10,5"/>
-                        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="ToggleBorder"
-                                            Background="{TemplateBinding Background}"
-                                            CornerRadius="6"
-                                            Padding="{TemplateBinding Padding}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <materialDesign:PackIcon Kind="PlaylistMusic" Width="14" Height="14"
-                                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                            <TextBlock Text="Playlist" FontSize="12" FontWeight="SemiBold"
-                                                       VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsPlaylistViewActive}" Value="True">
-                                <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-            <Button Command="{Binding ShowSearchResultsViewCommand}"
-                    Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="Foreground" Value="{DynamicResource SecondaryDarkBrush}"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="Padding" Value="10,5"/>
-                        <Setter Property="materialDesign:RippleAssist.IsDisabled" Value="True"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="ToggleBorder"
-                                            Background="{TemplateBinding Background}"
-                                            CornerRadius="6"
-                                            Padding="{TemplateBinding Padding}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <materialDesign:PackIcon Kind="Magnify" Width="14" Height="14"
-                                                                     VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                            <TextBlock Text="Search Results" FontSize="12" FontWeight="SemiBold"
-                                                       VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="ToggleBorder" Property="Background" Value="{DynamicResource SurfaceRaisedBrush}"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsPlaylistViewActive}" Value="False">
-                                <Setter Property="Background" Value="{DynamicResource SurfaceElevatedBrush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </StackPanel>
+        <ContentControl Grid.Row="1"
+                        Content="{Binding MainHomeContentToggleViewModel}" />
 
         <!-- Content panel (switches between search results and playlist pane) -->
         <ContentControl Grid.Row="2"

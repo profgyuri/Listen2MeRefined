@@ -13,10 +13,7 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class PlaybackControlsViewModel : ViewModelBase
 {
-    private const float VolumeEpsilon = 0.0001f;
-
     private readonly ILogger _logger;
-    private readonly IPlaybackVolumeSetter _playbackVolumeSetter;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly TimedTask _timedTask;
     private readonly IAppSettingsReader _settingsReader;
@@ -25,7 +22,6 @@ public partial class PlaybackControlsViewModel : ViewModelBase
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private double _totalTime;
     [ObservableProperty] private bool _arePlaybackButtonsEnabled = true;
-    [ObservableProperty] private bool _isMuted;
 
     public double CurrentTime
     {
@@ -41,30 +37,6 @@ public partial class PlaybackControlsViewModel : ViewModelBase
     public TimeSpan TotalTimeDisplay => TimeSpan.FromMilliseconds(TotalTime);
     public TimeSpan CurrentTimeDisplay => TimeSpan.FromMilliseconds(CurrentTime);
 
-    public float Volume
-    {
-        get => _musicPlayerController.Volume;
-        set
-        {
-            var previousMutedState = IsMuted;
-            var change = _playbackVolumeSetter.SetVolume(value);
-            if (!change.HasVolumeChanged)
-            {
-                return;
-            }
-
-            if (previousMutedState != change.IsMuted)
-            {
-                SetMuted(change.IsMuted);
-            }
-
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(VolumeIconKind));
-        }
-    }
-
-    public string VolumeIconKind => _playbackVolumeSetter.GetVolumeIconKind();
-
     public RepeatMode RepeatMode => _musicPlayerController.RepeatMode;
 
     public string RepeatIconKind => _musicPlayerController.RepeatMode == RepeatMode.One
@@ -77,14 +49,12 @@ public partial class PlaybackControlsViewModel : ViewModelBase
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
-        IPlaybackVolumeSetter playbackVolumeSetter,
         IMusicPlayerController musicPlayerController,
         IAppSettingsReader settingsReader,
         IUiDispatcher uiDispatcher,
         TimedTask timedTask) : base(errorHandler, logger, messenger)
     {
         _logger = logger;
-        _playbackVolumeSetter = playbackVolumeSetter;
         _musicPlayerController = musicPlayerController;
         _settingsReader = settingsReader;
         _uiDispatcher = uiDispatcher;
@@ -93,14 +63,12 @@ public partial class PlaybackControlsViewModel : ViewModelBase
         _logger.Debug("[PlayerControlsViewModel] initialized");
     }
 
-    public override async Task InitializeAsync(CancellationToken ct = default)
+    public override Task InitializeAsync(CancellationToken ct = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
 
         FontFamilyName = _settingsReader.GetFontFamily();
-
-        ApplyStartupPlaybackDefaults();
 
         _timedTask.Start(
             TimeSpan.FromMilliseconds(100),
@@ -113,16 +81,11 @@ public partial class PlaybackControlsViewModel : ViewModelBase
                 }, ct);
             });
 
-        OnPropertyChanged(nameof(Volume));
-        SetMuted(Volume <= VolumeEpsilon);
-
-        OnPropertyChanged(nameof(VolumeIconKind));
-        OnPropertyChanged(nameof(IsMuted));
         OnPropertyChanged(nameof(TotalTimeDisplay));
 
         _logger.Debug("[PlayerControlsViewModel] Finished InitializeCoreAsync");
 
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -191,37 +154,6 @@ public partial class PlaybackControlsViewModel : ViewModelBase
         OnPropertyChanged(nameof(RepeatIconKind));
         OnPropertyChanged(nameof(IsRepeatActive));
         _logger.Debug("[PlayerControlsViewModel] Repeat mode changed to: {Mode}", _musicPlayerController.RepeatMode);
-    }
-
-    [RelayCommand]
-    private async Task ToggleMute()
-    {
-        await ExecuteSafeAsync(_ =>
-        {
-            var change = _playbackVolumeSetter.ToggleMute();
-            SetMuted(change.IsMuted);
-            OnPropertyChanged(nameof(Volume));
-            OnPropertyChanged(nameof(VolumeIconKind));
-
-            return Task.CompletedTask;
-        });
-    }
-
-    private void SetMuted(bool isMuted)
-    {
-        if (IsMuted == isMuted)
-        {
-            return;
-        }
-
-        IsMuted = isMuted;
-        OnPropertyChanged(nameof(VolumeIconKind));
-    }
-
-    private void ApplyStartupPlaybackDefaults()
-    {
-        var state = _playbackVolumeSetter.ApplyStartupDefaults();
-        SetMuted(state.IsMuted);
     }
 
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
