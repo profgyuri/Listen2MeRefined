@@ -4,6 +4,5 @@ public enum TrackLoadStatus
 {
     Success,
     MissingFile,
-    UnsupportedFormat,
     CorruptFile
 }
