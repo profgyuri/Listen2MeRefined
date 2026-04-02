@@ -6,8 +6,6 @@ using Listen2MeRefined.Application.Threading;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Core.Repositories;
-using Listen2MeRefined.Infrastructure.Scanning.Files;
-using NAudio.Wave;
 
 namespace Listen2MeRefined.Infrastructure.Scanning.Folders;
 
@@ -241,12 +239,6 @@ public sealed class FolderScanner : IFolderScanner
         {
             ct.ThrowIfCancellationRequested();
 
-            if (IsUnsupportedForNow(filePath))
-            {
-                onSkipped();
-                return;
-            }
-
             var hasExisting = existingByPath.TryGetValue(filePath, out var existing);
             var shouldAnalyze = mode == ScanMode.FullRefresh
                                 || !hasExisting
@@ -298,25 +290,6 @@ public sealed class FolderScanner : IFolderScanner
     {
         var info = new FileInfo(path);
         return existing.LastWriteUtc != info.LastWriteTimeUtc || existing.LengthBytes != info.Length;
-    }
-
-    private bool IsUnsupportedForNow(string path)
-    {
-        if (!path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        try
-        {
-            using var reader = new WaveFileReader(path);
-            return reader.WaveFormat.Encoding == WaveFormatEncoding.Extensible;
-        }
-        catch (Exception ex)
-        {
-            _logger.Debug(ex, "[FolderScannerService] Could not pre-check wav format for {Path}", path);
-            return false;
-        }
     }
 
     private static IReadOnlyList<FolderScanRequest> NormalizeRequests(IEnumerable<FolderScanRequest> requests)

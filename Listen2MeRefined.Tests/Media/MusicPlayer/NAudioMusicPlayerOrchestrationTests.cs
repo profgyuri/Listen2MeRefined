@@ -203,19 +203,19 @@ public class NAudioMusicPlayerOrchestrationTests
     }
 
     [Fact]
-    public async Task UnsupportedFormat_RemovesTrackAndRetriesCurrent()
+    public async Task CorruptFile_RemovesTrackAndRetriesCurrent()
     {
-        var unsupported = new AudioModel { Path = "unsupported.wav" };
+        var corrupt = new AudioModel { Path = "broken.wav" };
         var fallback = new AudioModel { Path = "fallback.mp3" };
         using var fallbackStream = CreateWaveStream();
 
         var queue = new Mock<IPlaybackQueueService>();
         queue.SetupSequence(x => x.GetCurrentTrack())
-            .Returns(unsupported)
+            .Returns(corrupt)
             .Returns(fallback);
 
         var loader = new Mock<ITrackLoader>();
-        loader.Setup(x => x.Load(unsupported)).Returns(new TrackLoadResult(TrackLoadStatus.UnsupportedFormat, Reason: "Extensible"));
+        loader.Setup(x => x.Load(corrupt)).Returns(new TrackLoadResult(TrackLoadStatus.CorruptFile, Reason: "Invalid RIFF"));
         loader.Setup(x => x.Load(fallback)).Returns(TrackLoadResult.Success(fallbackStream));
 
         var messenger = new WeakReferenceMessenger();
@@ -243,7 +243,7 @@ public class NAudioMusicPlayerOrchestrationTests
 
         await player.PlayPauseAsync();
 
-        queue.Verify(x => x.RemoveTrack(unsupported), Times.Once);
+        queue.Verify(x => x.RemoveTrack(corrupt), Times.Once);
         Assert.Same(fallback, probe.Song);
         await timedTask.StopAsync();
     }
