@@ -101,6 +101,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         RegisterMessage<PlaylistShuffledMessage>(OnPlaylistShuffledMessage);
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
         RegisterMessage<PlaylistSidebarSelectionChangedMessage>(OnPlaylistSidebarSelectionChanged);
+        RegisterMessage<SongMetadataUpdatedMessage>(OnSongMetadataUpdatedMessage);
 
         // Initialize sidebar first so playlists are loaded
         await PlaylistSidebarViewModel.EnsureInitializedAsync(ct);
@@ -410,6 +411,16 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         catch (Exception e)
         {
             Logger.Error(e, "Failed to shuffle playlist");
+        }
+    }
+
+    private void OnSongMetadataUpdatedMessage(SongMetadataUpdatedMessage message)
+    {
+        var updated = message.Value;
+        var index = CurrentPlaylistSongs.IndexOf(updated);
+        if (index >= 0)
+        {
+            CurrentPlaylistSongs[index] = updated;
         }
     }
 

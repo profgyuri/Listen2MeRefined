@@ -263,14 +263,26 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
             }
 
             var updated = await _fileScanner.ScanAsync(song.Path);
-            var index = SearchResults.IndexOf(song);
-            if (index >= 0)
-            {
-                SearchResults[index] = updated;
-            }
+
+            ReplaceSongInCollection(SearchResults, updated);
+            ReplaceSongInCollection(_playlistQueueState.PlayList, updated);
+            ReplaceSongInCollection(_playlistQueueState.DefaultPlaylist, updated);
 
             _selectedSearchResults.Remove(song);
             _selectedSearchResults.Add(updated);
+
+            Messenger.Send(new SongMetadataUpdatedMessage(updated));
+        }
+    }
+
+    private static void ReplaceSongInCollection(
+        ObservableCollection<AudioModel> collection,
+        AudioModel updated)
+    {
+        var index = collection.IndexOf(updated);
+        if (index >= 0)
+        {
+            collection[index] = updated;
         }
     }
 
