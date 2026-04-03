@@ -56,6 +56,7 @@ public class SongContextMenuViewModelTests
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             songContextMenuVm);
 
@@ -115,6 +116,7 @@ public class SongContextMenuViewModelTests
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             songContextMenuVm);
 

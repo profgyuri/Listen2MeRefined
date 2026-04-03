@@ -322,6 +322,7 @@ public sealed class MainShellDefaultHomeViewModelTests
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             songContextMenuViewModel)
     {

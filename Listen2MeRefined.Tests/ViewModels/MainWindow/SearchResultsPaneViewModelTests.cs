@@ -38,6 +38,7 @@ public class SearchResultsPaneViewModelTests
             transferService.Object,
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             contextMenu);
 
@@ -88,6 +89,7 @@ public class SearchResultsPaneViewModelTests
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             contextMenu);
 
@@ -122,6 +124,7 @@ public class SearchResultsPaneViewModelTests
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             contextMenu);
         await vm.EnsureInitializedAsync();

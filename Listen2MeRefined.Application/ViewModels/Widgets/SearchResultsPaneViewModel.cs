@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
@@ -25,8 +26,10 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
     private readonly ISearchResultsTransferService _searchResultsTransferService;
     private readonly IDefaultPlaylistService _defaultPlaylistService;
     private readonly IPlaybackQueueActionsService _playbackQueueActionsService;
+    private readonly IMusicPlayerController _musicPlayerController;
     private readonly IFileScanner _fileScanner;
     private readonly HashSet<AudioModel> _selectedSearchResults = new();
+    private PlayerState _playerState = PlayerState.Stopped;
     
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
@@ -43,6 +46,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         ISearchResultsTransferService searchResultsTransferService,
         IDefaultPlaylistService defaultPlaylistService,
         IPlaybackQueueActionsService playbackQueueActionsService,
+        IMusicPlayerController musicPlayerController,
         IFileScanner fileScanner,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
@@ -52,6 +56,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         _searchResultsTransferService = searchResultsTransferService;
         _defaultPlaylistService = defaultPlaylistService;
         _playbackQueueActionsService = playbackQueueActionsService;
+        _musicPlayerController = musicPlayerController;
         _fileScanner = fileScanner;
         SongContextMenuViewModel = songContextMenuViewModel;
     }
@@ -65,6 +70,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         RegisterMessage<SearchResultsUpdatedMessage>(OnSearchResultsUpdatedMessage);
         RegisterMessage<AdvancedSearchRequestedMessage>(OnAdvancedSearchRequestedMessage);
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
+        RegisterMessage<PlayerStateChangedMessage>(m => _playerState = m.Value);
         
         FontFamilyName = _settingsReader.GetFontFamily();
         
@@ -318,6 +324,11 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         _playlistQueueState.SelectedIndex = jumpIndex;
         _playlistQueueState.SelectedSong = _playlistQueueState.PlayList[jumpIndex];
         await _playbackQueueActionsService.JumpToSelectedSongAsync();
+
+        if (_playerState != PlayerState.Playing)
+        {
+            await _musicPlayerController.PlayPauseAsync();
+        }
     }
 
     private Task PlayAfterCurrentAsync()
