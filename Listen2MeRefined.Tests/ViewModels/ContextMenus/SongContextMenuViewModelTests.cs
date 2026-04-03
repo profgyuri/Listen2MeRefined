@@ -54,6 +54,9 @@ public class SongContextMenuViewModelTests
             CreateSettingsReader(),
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             songContextMenuVm);
 
         searchVm.SearchResultsSelectionAddedCommand.Execute(new ArrayList
@@ -66,8 +69,9 @@ public class SongContextMenuViewModelTests
 
         Assert.Single(songContextMenuVm.Playlists);
         Assert.Equal("Workout", songContextMenuVm.Playlists[0].PlaylistName);
-        Assert.False(songContextMenuVm.ShowPlaylistActions);
+        Assert.True(songContextMenuVm.ShowPlaylistActions);
         Assert.False(songContextMenuVm.ShowRemoveFromPlaylistAction);
+        Assert.True(songContextMenuVm.ShowAddToDefaultPlaylistAction);
         contextMenuService.Verify(
             x => x.GetPlaylistMembershipInfoAsync(
                 It.Is<IReadOnlyList<string>>(paths => paths.SequenceEqual(new[] { "a.mp3" })),
@@ -109,6 +113,9 @@ public class SongContextMenuViewModelTests
             CreateSettingsReader(),
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             songContextMenuVm);
 
         await searchVm.InitializeAsync();

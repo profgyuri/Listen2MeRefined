@@ -47,12 +47,23 @@ public partial class SongContextMenu : ContextMenu
 
         Items.Add(CreateStyledSeparator());
         Items.Add(CreateActionMenuItem("Rescan", () => viewModel.RescanAsync()));
-        Items.Add(CreateActionMenuItem("Play now", () => viewModel.PlayNowAsync()));
-        Items.Add(CreateActionMenuItem("Play after current", () => viewModel.PlayAfterCurrentAsync()));
+
+        var playNow = CreateActionMenuItem("Play now", () => viewModel.PlayNowAsync());
+        playNow.IsEnabled = viewModel.ArePlaybackActionsEnabled;
+        Items.Add(playNow);
+
+        var playAfterCurrent = CreateActionMenuItem("Play after current", () => viewModel.PlayAfterCurrentAsync());
+        playAfterCurrent.IsEnabled = viewModel.ArePlaybackActionsEnabled;
+        Items.Add(playAfterCurrent);
 
         if (viewModel.ShowRemoveFromPlaylistAction)
         {
             Items.Add(CreateActionMenuItem("Remove from playlist", () => viewModel.RemoveFromPlaylistAsync()));
+        }
+
+        if (viewModel.ShowAddToDefaultPlaylistAction)
+        {
+            Items.Add(CreateActionMenuItem("Add to Default Playlist", () => viewModel.AddToDefaultPlaylistAsync()));
         }
     }
 

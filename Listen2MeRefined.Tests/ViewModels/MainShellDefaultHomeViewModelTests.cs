@@ -320,6 +320,9 @@ public sealed class MainShellDefaultHomeViewModelTests
             settingsReader,
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             songContextMenuViewModel)
     {
         public override Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;

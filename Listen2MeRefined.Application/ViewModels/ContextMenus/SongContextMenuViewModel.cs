@@ -21,6 +21,8 @@ public partial class SongContextMenuViewModel : ViewModelBase
 
     public bool ShowPlaylistActions { get; private set; }
     public bool ShowRemoveFromPlaylistAction { get; private set; }
+    public bool ShowAddToDefaultPlaylistAction { get; private set; }
+    public bool ArePlaybackActionsEnabled { get; private set; }
 
     public SongContextMenuViewModel(
         IErrorHandler errorHandler,
@@ -116,11 +118,19 @@ public partial class SongContextMenuViewModel : ViewModelBase
             requireDefaultPlaylistHost: true);
     }
 
+    public Task AddToDefaultPlaylistAsync(CancellationToken ct = default)
+    {
+        return SendPlaylistActionRequest(PlaylistContextMenuAction.AddToDefaultPlaylist);
+    }
+
     private async Task RefreshAsync(CancellationToken ct = default)
     {
         var context = GetContext();
         ShowPlaylistActions = context.IsPlaylistHost;
         ShowRemoveFromPlaylistAction = context.IsDefaultPlaylistHost;
+        ShowAddToDefaultPlaylistAction = _hostViewModel is SearchResultsPaneViewModel;
+        ArePlaybackActionsEnabled = _hostViewModel is not SearchResultsPaneViewModel srVm
+            || srVm.GetIsDefaultPlaylistActive();
 
         if (context.SelectedSongPaths.Count == 0)
         {
@@ -151,7 +161,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
                     searchResultsPaneViewModel.GetDirectSongContextSelection(),
                     searchResultsPaneViewModel.GetFallbackSongContextSelection()),
                 searchResultsPaneViewModel.GetSongContextActivePlaylistId(),
-                IsPlaylistHost: false,
+                IsPlaylistHost: true,
                 IsDefaultPlaylistHost: false);
         }
 
@@ -190,18 +200,25 @@ public partial class SongContextMenuViewModel : ViewModelBase
         PlaylistContextMenuAction action,
         bool requireDefaultPlaylistHost = false)
     {
-        if (_hostViewModel is not PlaylistPaneViewModel playlistHost)
+        if (_hostViewModel is PlaylistPaneViewModel playlistHost)
         {
+            if (requireDefaultPlaylistHost && !playlistHost.IsDefaultPlaylist)
+            {
+                return Task.CompletedTask;
+            }
+
+            Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
+                new PlaylistContextMenuActionRequest(playlistHost, action)));
+
             return Task.CompletedTask;
         }
 
-        if (requireDefaultPlaylistHost && !playlistHost.IsDefaultPlaylist)
+        if (_hostViewModel is SearchResultsPaneViewModel searchHost &&
+            action != PlaylistContextMenuAction.RemoveFromPlaylist)
         {
-            return Task.CompletedTask;
+            Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
+                new PlaylistContextMenuActionRequest(searchHost, action)));
         }
-
-        Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
-            new PlaylistContextMenuActionRequest(playlistHost, action)));
 
         return Task.CompletedTask;
     }

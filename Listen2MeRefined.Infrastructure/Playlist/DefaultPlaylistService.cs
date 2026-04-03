@@ -44,6 +44,49 @@ public sealed class DefaultPlaylistService : IDefaultPlaylistService
     }
 
     /// <inheritdoc />
+    public void InsertAfterCurrentInDefaultPlaylist(IEnumerable<AudioModel> songs)
+    {
+        var existingPaths = _queueState.DefaultPlaylist
+            .Where(x => !string.IsNullOrWhiteSpace(x.Path))
+            .Select(x => x.Path!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var toInsert = songs
+            .Where(s => !string.IsNullOrWhiteSpace(s.Path) && !existingPaths.Contains(s.Path!))
+            .ToArray();
+
+        if (toInsert.Length == 0)
+        {
+            return;
+        }
+
+        var currentIndex = _queueState.CurrentSongIndex;
+
+        var defaultInsertAt = currentIndex >= 0
+            ? Math.Min(currentIndex + 1, _queueState.DefaultPlaylist.Count)
+            : _queueState.DefaultPlaylist.Count;
+
+        for (var i = 0; i < toInsert.Length; i++)
+        {
+            _queueState.DefaultPlaylist.Insert(defaultInsertAt + i, toInsert[i]);
+        }
+
+        if (!_queueState.IsDefaultPlaylistActive)
+        {
+            return;
+        }
+
+        var playListInsertAt = currentIndex >= 0
+            ? Math.Min(currentIndex + 1, _queueState.PlayList.Count)
+            : _queueState.PlayList.Count;
+
+        for (var i = 0; i < toInsert.Length; i++)
+        {
+            _queueState.PlayList.Insert(playListInsertAt + i, toInsert[i]);
+        }
+    }
+
+    /// <inheritdoc />
     public void RemoveFromDefaultPlaylist(IEnumerable<AudioModel> songs)
     {
         var candidates = songs

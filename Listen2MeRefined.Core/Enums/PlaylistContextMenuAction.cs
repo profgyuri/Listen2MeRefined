@@ -5,5 +5,6 @@ public enum PlaylistContextMenuAction
     Rescan,
     PlayNow,
     PlayAfterCurrent,
-    RemoveFromPlaylist
+    RemoveFromPlaylist,
+    AddToDefaultPlaylist
 }
