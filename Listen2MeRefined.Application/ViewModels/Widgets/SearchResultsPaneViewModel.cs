@@ -286,9 +286,11 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         AudioModel updated)
     {
         var index = collection.IndexOf(updated);
+        
         if (index >= 0)
         {
-            collection[index] = updated;
+            collection.RemoveAt(index);
+            collection.Insert(index, updated);
         }
     }
 

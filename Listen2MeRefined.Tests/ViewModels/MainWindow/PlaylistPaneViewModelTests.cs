@@ -212,6 +212,55 @@ public class PlaylistPaneViewModelTests
     }
 
     [Fact]
+    public async Task ScanSelectedSongCommand_ReplacesVisibleSongWithScannedInstance()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var scanner = new Mock<IFileScanner>();
+        var queueServices = CreateQueueServices(logger.Object, fileScanner: scanner);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var original = new AudioModel { Title = "Original", Path = "song.mp3" };
+        var rescanned = new AudioModel { Title = "Updated", Path = "song.mp3" };
+
+        scanner
+            .Setup(x => x.ScanAsync("song.mp3", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(rescanned);
+
+        queueServices.State.DefaultPlaylist.Add(original);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = original;
+
+        await pane.ScanSelectedSongCommand.ExecuteAsync(null);
+
+        Assert.Single(pane.CurrentPlaylistSongs);
+        Assert.Same(rescanned, pane.CurrentPlaylistSongs[0]);
+        Assert.Same(rescanned, pane.SelectedSong);
+    }
+
+    [Fact]
+    public async Task SongMetadataUpdatedMessage_ReplacesVisibleSongByPath()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var original = new AudioModel { Title = "Original", Path = "song.mp3" };
+        var rescanned = new AudioModel { Title = "Updated", Path = "song.mp3" };
+
+        queueServices.State.DefaultPlaylist.Add(original);
+        await pane.InitializeAsync();
+
+        messenger.Send(new SongMetadataUpdatedMessage(rescanned));
+
+        Assert.Single(pane.CurrentPlaylistSongs);
+        Assert.Same(rescanned, pane.CurrentPlaylistSongs[0]);
+    }
+
+    [Fact]
     public async Task InitializeAsync_LoadsCompactViewModeFromSettings()
     {
         var logger = CreateLogger();

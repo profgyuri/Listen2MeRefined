@@ -198,7 +198,23 @@ public partial class PlaylistPaneViewModel : ViewModelBase
 
     [RelayCommand]
     private Task ScanSelectedSong() =>
-        ExecuteSafeAsync(_ => _playbackQueueActionsService.ScanSelectedSongAsync());
+        ExecuteSafeAsync(async _ =>
+        {
+            await _playbackQueueActionsService.ScanSelectedSongAsync();
+
+            var updated = _playlistQueueState.SelectedSong;
+            if (updated is null)
+            {
+                return;
+            }
+
+            var index = CurrentPlaylistSongs.IndexOf(updated);
+            if (index >= 0)
+            {
+                CurrentPlaylistSongs.RemoveAt(index);
+                CurrentPlaylistSongs.Insert(index, updated);
+            }
+        });
 
     /// <summary>
     /// Removes only the current selection from the default playlist.
@@ -418,9 +434,11 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     {
         var updated = message.Value;
         var index = CurrentPlaylistSongs.IndexOf(updated);
+        
         if (index >= 0)
         {
-            CurrentPlaylistSongs[index] = updated;
+            CurrentPlaylistSongs.RemoveAt(index);
+            CurrentPlaylistSongs.Insert(index, updated);
         }
     }
 
