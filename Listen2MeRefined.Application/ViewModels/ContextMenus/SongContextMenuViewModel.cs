@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playlist;
-using Listen2MeRefined.Application.ViewModels.Widgets;
 using Listen2MeRefined.Core.Enums;
 using Serilog;
 
@@ -14,7 +13,7 @@ public partial class SongContextMenuViewModel : ViewModelBase
 {
     private readonly IPlaylistMembership _playlistMembership;
     private readonly ISongContextSelectionService _songContextSelectionService;
-    private ViewModelBase? _hostViewModel;
+    private ISongContextMenuHost? _host;
     private bool _isMenuOpen;
 
     [ObservableProperty] private ObservableCollection<SongContextMenuItemViewModel> _playlists = [];
@@ -41,9 +40,9 @@ public partial class SongContextMenuViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
-    public void SetHost(ViewModelBase hostViewModel)
+    public void SetHost(ISongContextMenuHost host)
     {
-        _hostViewModel = hostViewModel;
+        _host = host;
     }
 
     public async Task HandleOpenedAsync(CancellationToken ct = default)
@@ -126,11 +125,10 @@ public partial class SongContextMenuViewModel : ViewModelBase
     private async Task RefreshAsync(CancellationToken ct = default)
     {
         var context = GetContext();
-        ShowPlaylistActions = context.IsPlaylistHost;
-        ShowRemoveFromPlaylistAction = context.IsDefaultPlaylistHost;
-        ShowAddToDefaultPlaylistAction = _hostViewModel is SearchResultsPaneViewModel;
-        ArePlaybackActionsEnabled = _hostViewModel is not SearchResultsPaneViewModel srVm
-            || srVm.GetIsDefaultPlaylistActive();
+        ShowPlaylistActions = context.ShowPlaylistMembershipActions;
+        ShowRemoveFromPlaylistAction = context.ShowRemoveFromPlaylistAction;
+        ShowAddToDefaultPlaylistAction = context.ShowAddToDefaultPlaylistAction;
+        ArePlaybackActionsEnabled = _host?.ArePlaybackActionsAvailable ?? false;
 
         if (context.SelectedSongPaths.Count == 0)
         {
@@ -154,35 +152,27 @@ public partial class SongContextMenuViewModel : ViewModelBase
 
     private SongContextSelectionContext GetContext()
     {
-        if (_hostViewModel is SearchResultsPaneViewModel searchResultsPaneViewModel)
+        if (_host is null)
         {
-            return new SongContextSelectionContext(
-                _songContextSelectionService.ResolveSearchSelectionPaths(
-                    searchResultsPaneViewModel.GetDirectSongContextSelection(),
-                    searchResultsPaneViewModel.GetFallbackSongContextSelection()),
-                searchResultsPaneViewModel.GetSongContextActivePlaylistId(),
-                IsPlaylistHost: true,
-                IsDefaultPlaylistHost: false);
+            return new SongContextSelectionContext([], null, false, false, false);
         }
 
-        if (_hostViewModel is PlaylistPaneViewModel playlistPaneViewModel)
-        {
-            return new SongContextSelectionContext(
-                _songContextSelectionService.ResolvePlaylistSelectionPaths(
-                    playlistPaneViewModel.GetSelectedTabSongContextSelection(),
-                    playlistPaneViewModel.GetCurrentTabSongContextSelection(),
-                    playlistPaneViewModel.SelectedSong),
-                playlistPaneViewModel.GetSongContextActivePlaylistId(),
-                IsPlaylistHost: true,
-                IsDefaultPlaylistHost: playlistPaneViewModel.IsDefaultPlaylist);
-        }
+        var paths = _songContextSelectionService.ResolveSelectionPaths(
+            _host.GetDirectSongContextSelection(),
+            _host.GetFallbackSongContextSelection(),
+            _host.GetFocusedSong());
 
-        return new SongContextSelectionContext([], null, IsPlaylistHost: false, IsDefaultPlaylistHost: false);
+        return new SongContextSelectionContext(
+            paths,
+            _host.GetSongContextActivePlaylistId(),
+            _host.ShowPlaylistMembershipActions,
+            _host.ShowRemoveFromPlaylistAction,
+            _host.ShowAddToDefaultPlaylistAction);
     }
 
     private void OnSelectionChangedMessage(SongContextMenuSelectionChangedMessage message)
     {
-        if (!_isMenuOpen || !ReferenceEquals(message.Value, _hostViewModel))
+        if (!_isMenuOpen || !ReferenceEquals(message.Value, _host))
         {
             return;
         }
@@ -193,32 +183,31 @@ public partial class SongContextMenuViewModel : ViewModelBase
     private sealed record SongContextSelectionContext(
         IReadOnlyList<string> SelectedSongPaths,
         int? ActivePlaylistId,
-        bool IsPlaylistHost,
-        bool IsDefaultPlaylistHost);
+        bool ShowPlaylistMembershipActions,
+        bool ShowRemoveFromPlaylistAction,
+        bool ShowAddToDefaultPlaylistAction);
 
     private Task SendPlaylistActionRequest(
         PlaylistContextMenuAction action,
         bool requireDefaultPlaylistHost = false)
     {
-        if (_hostViewModel is PlaylistPaneViewModel playlistHost)
+        if (_host is null)
         {
-            if (requireDefaultPlaylistHost && !playlistHost.IsDefaultPlaylist)
-            {
-                return Task.CompletedTask;
-            }
-
-            Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
-                new PlaylistContextMenuActionRequest(playlistHost, action)));
-
             return Task.CompletedTask;
         }
 
-        if (_hostViewModel is SearchResultsPaneViewModel searchHost &&
-            action != PlaylistContextMenuAction.RemoveFromPlaylist)
+        if (requireDefaultPlaylistHost && !_host.ShowRemoveFromPlaylistAction)
         {
-            Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
-                new PlaylistContextMenuActionRequest(searchHost, action)));
+            return Task.CompletedTask;
         }
+
+        if (action == PlaylistContextMenuAction.RemoveFromPlaylist && !_host.ShowRemoveFromPlaylistAction)
+        {
+            return Task.CompletedTask;
+        }
+
+        Messenger.Send(new PlaylistContextMenuActionRequestedMessage(
+            new PlaylistContextMenuActionRequest(_host, action)));
 
         return Task.CompletedTask;
     }

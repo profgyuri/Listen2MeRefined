@@ -5,46 +5,36 @@ namespace Listen2MeRefined.Infrastructure.Playlist;
 
 public sealed class SongContextSelectionService : ISongContextSelectionService
 {
-    public IReadOnlyList<string> ResolveSearchSelectionPaths(
+    public IReadOnlyList<string> ResolveSelectionPaths(
         IEnumerable<AudioModel> directSelection,
-        IEnumerable<AudioModel> fallbackSelection)
+        IEnumerable<AudioModel> fallbackSelection,
+        AudioModel? focusedSong)
     {
         var direct = NormalizePaths(directSelection);
-        if (direct.Count > 0)
+        var scope = NormalizePaths(fallbackSelection).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // When a scope set exists (e.g. current tab songs), filter direct selection against it.
+        if (scope.Count > 0)
+        {
+            var scoped = direct.Where(scope.Contains).ToArray();
+            if (scoped.Length > 0)
+            {
+                return scoped;
+            }
+        }
+        else if (direct.Count > 0)
         {
             return direct;
         }
 
-        return NormalizePaths(fallbackSelection);
-    }
-
-    public IReadOnlyList<string> ResolvePlaylistSelectionPaths(
-        IEnumerable<AudioModel> selectedTabSongs,
-        IEnumerable<AudioModel> currentTabSongs,
-        AudioModel? selectedSong)
-    {
-        var currentTabPaths = NormalizePaths(currentTabSongs).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        if (currentTabPaths.Count == 0)
+        // Fall back to the focused song.
+        if (focusedSong is null || string.IsNullOrWhiteSpace(focusedSong.Path))
         {
             return [];
         }
 
-        var selected = NormalizePaths(selectedTabSongs)
-            .Where(currentTabPaths.Contains)
-            .ToArray();
-
-        if (selected.Length > 0)
-        {
-            return selected;
-        }
-
-        if (selectedSong is null || string.IsNullOrWhiteSpace(selectedSong.Path))
-        {
-            return [];
-        }
-
-        var selectedPath = selectedSong.Path.Trim();
-        return currentTabPaths.Contains(selectedPath) ? [selectedPath] : [];
+        var focusedPath = focusedSong.Path.Trim();
+        return scope.Count == 0 || scope.Contains(focusedPath) ? [focusedPath] : [];
     }
 
     private static IReadOnlyList<string> NormalizePaths(IEnumerable<AudioModel> songs)

@@ -29,7 +29,7 @@ public class SongContextMenuViewModelTests
         var contextMenuService = new Mock<IPlaylistMembership>();
         var selectionService = new Mock<ISongContextSelectionService>();
         selectionService
-            .Setup(x => x.ResolveSearchSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>()))
+            .Setup(x => x.ResolveSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<AudioModel?>()))
             .Returns(["a.mp3"]);
         contextMenuService
             .Setup(x => x.GetPlaylistMembershipInfoAsync(
@@ -58,6 +58,7 @@ public class SongContextMenuViewModelTests
             Mock.Of<IPlaybackQueueActionsService>(),
             Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<IObservableCollectionUpdater>(),
             songContextMenuVm);
 
         searchVm.SearchResultsSelectionAddedCommand.Execute(new ArrayList
@@ -89,7 +90,7 @@ public class SongContextMenuViewModelTests
         var contextMenuService = new Mock<IPlaylistMembership>();
         var selectionService = new Mock<ISongContextSelectionService>();
         selectionService
-            .Setup(x => x.ResolveSearchSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>()))
+            .Setup(x => x.ResolveSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<AudioModel?>()))
             .Returns(["a.mp3", "b.mp3"]);
         contextMenuService
             .Setup(x => x.GetPlaylistMembershipInfoAsync(
@@ -118,6 +119,7 @@ public class SongContextMenuViewModelTests
             Mock.Of<IPlaybackQueueActionsService>(),
             Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<IObservableCollectionUpdater>(),
             songContextMenuVm);
 
         await searchVm.InitializeAsync();
@@ -316,6 +318,7 @@ public class SongContextMenuViewModelTests
             new PlaybackContextSyncService(queueState),
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             songContextMenuViewModel);

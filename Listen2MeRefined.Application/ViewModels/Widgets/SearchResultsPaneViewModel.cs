@@ -18,7 +18,7 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class SearchResultsPaneViewModel : ViewModelBase
+public partial class SearchResultsPaneViewModel : ViewModelBase, ISongContextMenuHost
 {
     private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IAppSettingsReader _settingsReader;
@@ -28,12 +28,13 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
     private readonly IPlaybackQueueActionsService _playbackQueueActionsService;
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IFileScanner _fileScanner;
-    private readonly HashSet<AudioModel> _selectedSearchResults = new();
+    private readonly IObservableCollectionUpdater _collectionUpdater;
+    private readonly ISongSelectionTracker _selectionTracker;
     private PlayerState _playerState = PlayerState.Stopped;
-    
+
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private ObservableCollection<AudioModel> _searchResults = new();
-    
+
     public SongContextMenuViewModel SongContextMenuViewModel { get; }
 
     public SearchResultsPaneViewModel(
@@ -48,6 +49,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         IPlaybackQueueActionsService playbackQueueActionsService,
         IMusicPlayerController musicPlayerController,
         IFileScanner fileScanner,
+        IObservableCollectionUpdater collectionUpdater,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
         _playlistQueueState = playlistQueueState;
@@ -58,10 +60,10 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
         _playbackQueueActionsService = playbackQueueActionsService;
         _musicPlayerController = musicPlayerController;
         _fileScanner = fileScanner;
+        _collectionUpdater = collectionUpdater;
+        _selectionTracker = new SongSelectionTracker(PublishSongContextSelectionChanged);
         SongContextMenuViewModel = songContextMenuViewModel;
     }
-
-    public bool GetIsDefaultPlaylistActive() => _playlistQueueState.IsDefaultPlaylistActive;
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -92,7 +94,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
             var transferMode = _settingsReader.GetSearchResultsTransferMode();
             var decision = _searchResultsTransferService.ResolveTransfer(
                 SearchResults,
-                _selectedSearchResults,
+                _selectionTracker.SelectedSongs,
                 transferMode);
 
             Logger.Debug(
@@ -111,44 +113,36 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task SearchResultsSelectionAdded(IList items)
-    {
-        await ExecuteSafeAsync(_ =>
+    private Task SearchResultsSelectionAdded(IList items) =>
+        ExecuteSafeAsync(_ =>
         {
-            var selectedSongs = items.Cast<AudioModel>().ToArray();
-            foreach (var song in selectedSongs)
-            {
-                _selectedSearchResults.Add(song);
-            }
-
-            PublishSongContextSelectionChanged();
-            
+            _selectionTracker.AddSelection(items);
             return Task.CompletedTask;
         });
-    }
 
     [RelayCommand]
-    private async Task SearchResultsSelectionRemoved(IList items)
-    {
-        await ExecuteSafeAsync(_ =>
+    private Task SearchResultsSelectionRemoved(IList items) =>
+        ExecuteSafeAsync(_ =>
         {
-            var selectedSongs = items.Cast<AudioModel>().ToArray();
-            foreach (var song in selectedSongs)
-            {
-                _selectedSearchResults.Remove(song);
-            }
-
-            PublishSongContextSelectionChanged();
-
+            _selectionTracker.RemoveSelection(items);
             return Task.CompletedTask;
         });
-    }
 
-    public IReadOnlyCollection<AudioModel> GetDirectSongContextSelection() => _selectedSearchResults.ToArray();
+    public IReadOnlyCollection<AudioModel> GetDirectSongContextSelection() => _selectionTracker.SelectedSongs;
 
     public IReadOnlyCollection<AudioModel> GetFallbackSongContextSelection() => [];
 
+    public AudioModel? GetFocusedSong() => null;
+
     public int? GetSongContextActivePlaylistId() => _playlistQueueState.ActiveNamedPlaylistId;
+
+    bool ISongContextMenuHost.ShowPlaylistMembershipActions => true;
+
+    bool ISongContextMenuHost.ShowRemoveFromPlaylistAction => false;
+
+    bool ISongContextMenuHost.ShowAddToDefaultPlaylistAction => true;
+
+    bool ISongContextMenuHost.ArePlaybackActionsAvailable => _playlistQueueState.IsDefaultPlaylistActive;
     
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
@@ -214,8 +208,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
     {
         SearchResults.Clear();
         SearchResults.AddRange(results);
-        _selectedSearchResults.Clear();
-        PublishSongContextSelectionChanged();
+        _selectionTracker.Clear();
     }
 
     /// <summary>
@@ -234,16 +227,14 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
         if (decision.ClearSelection)
         {
-            _selectedSearchResults.Clear();
+            _selectionTracker.Clear();
         }
-
-        PublishSongContextSelectionChanged();
     }
 
     private void OnPlaylistContextMenuActionRequestedMessage(PlaylistContextMenuActionRequestedMessage message)
     {
         var request = message.Value;
-        if (!ReferenceEquals(request.SourceViewModel, this))
+        if (!ReferenceEquals(request.SourceHost, this))
         {
             return;
         }
@@ -260,7 +251,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
     private async Task RescanSelectedSongsAsync()
     {
-        var songs = _selectedSearchResults.ToArray();
+        var songs = _selectionTracker.SelectedSongs.ToArray();
         foreach (var song in songs)
         {
             if (string.IsNullOrWhiteSpace(song.Path))
@@ -270,28 +261,14 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
             var updated = await _fileScanner.ScanAsync(song.Path);
 
-            ReplaceSongInCollection(SearchResults, updated);
-            ReplaceSongInCollection(_playlistQueueState.PlayList, updated);
-            ReplaceSongInCollection(_playlistQueueState.DefaultPlaylist, updated);
-
-            _selectedSearchResults.Remove(song);
-            _selectedSearchResults.Add(updated);
+            _collectionUpdater.ReplaceIfPresent(SearchResults, updated);
+            _collectionUpdater.ReplaceIfPresent(_playlistQueueState.PlayList, updated);
+            _collectionUpdater.ReplaceIfPresent(_playlistQueueState.DefaultPlaylist, updated);
 
             Messenger.Send(new SongMetadataUpdatedMessage(updated));
         }
-    }
 
-    private static void ReplaceSongInCollection(
-        ObservableCollection<AudioModel> collection,
-        AudioModel updated)
-    {
-        var index = collection.IndexOf(updated);
-        
-        if (index >= 0)
-        {
-            collection.RemoveAt(index);
-            collection.Insert(index, updated);
-        }
+        _selectionTracker.Clear();
     }
 
     private async Task PlayNowAsync()
@@ -301,7 +278,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
             return;
         }
 
-        var songs = _selectedSearchResults.ToArray();
+        var songs = _selectionTracker.SelectedSongs.ToArray();
         if (songs.Length == 0)
         {
             return;
@@ -340,7 +317,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
             return Task.CompletedTask;
         }
 
-        var songs = _selectedSearchResults.ToArray();
+        var songs = _selectionTracker.SelectedSongs.ToArray();
         if (songs.Length > 0)
         {
             _defaultPlaylistService.InsertAfterCurrentInDefaultPlaylist(songs);
@@ -351,7 +328,7 @@ public partial class SearchResultsPaneViewModel : ViewModelBase
 
     private Task AddToDefaultPlaylistAsync()
     {
-        var songs = _selectedSearchResults.ToArray();
+        var songs = _selectionTracker.SelectedSongs.ToArray();
         if (songs.Length > 0)
         {
             _defaultPlaylistService.AddSearchResultsToDefaultPlaylist(songs);

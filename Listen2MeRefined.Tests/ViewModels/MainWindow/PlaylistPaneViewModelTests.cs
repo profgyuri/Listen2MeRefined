@@ -187,6 +187,7 @@ public class PlaylistPaneViewModelTests
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -294,6 +295,7 @@ public class PlaylistPaneViewModelTests
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -468,6 +470,7 @@ public class PlaylistPaneViewModelTests
             queueServices.PlaybackContextSyncService,
             externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
             externalAudioOpenInbox ?? Mock.Of<IExternalAudioOpenInbox>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger, messenger));
