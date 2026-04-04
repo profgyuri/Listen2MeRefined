@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
@@ -199,9 +200,10 @@ public class SongContextMenuViewModelTests
         playbackQueueActionsService
             .Setup(x => x.JumpToSelectedSongAsync())
             .Returns(Task.CompletedTask);
-        playbackQueueActionsService
-            .Setup(x => x.ScanSelectedSongAsync())
-            .Returns(Task.CompletedTask);
+        var fileScanner = new Mock<IFileScanner>();
+        fileScanner
+            .Setup(x => x.ScanAsync("default.mp3", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AudioModel { Path = "default.mp3", Title = "Default track (rescanned)" });
 
         var songContextMenuVm = new SongContextMenuViewModel(
             Mock.Of<IErrorHandler>(),
@@ -220,7 +222,8 @@ public class SongContextMenuViewModelTests
             queueState,
             songContextMenuVm,
             defaultPlaylistService.Object,
-            playbackQueueActionsService.Object);
+            playbackQueueActionsService.Object,
+            fileScanner.Object);
 
         await pane.InitializeAsync();
         pane.SelectedSong = song;
@@ -233,7 +236,7 @@ public class SongContextMenuViewModelTests
         await songContextMenuVm.RemoveFromPlaylistAsync();
 
         await AssertEventuallyAsync(() =>
-            playbackQueueActionsService.Invocations.Any(x => x.Method.Name == nameof(IPlaybackQueueActionsService.ScanSelectedSongAsync)) &&
+            fileScanner.Invocations.Any(x => x.Method.Name == nameof(IFileScanner.ScanAsync)) &&
             playbackQueueActionsService.Invocations.Any(x => x.Method.Name == nameof(IPlaybackQueueActionsService.SetSelectedSongAsNext)) &&
             playbackQueueActionsService.Invocations.Any(x => x.Method.Name == nameof(IPlaybackQueueActionsService.JumpToSelectedSongAsync)));
         await AssertEventuallyAsync(() => defaultPlaylistService.Invocations.Any(x =>
@@ -241,7 +244,7 @@ public class SongContextMenuViewModelTests
 
         Assert.True(songContextMenuVm.ShowPlaylistActions);
         Assert.True(songContextMenuVm.ShowRemoveFromPlaylistAction);
-        playbackQueueActionsService.Verify(x => x.ScanSelectedSongAsync(), Times.Once);
+        fileScanner.Verify(x => x.ScanAsync("default.mp3", It.IsAny<CancellationToken>()), Times.Once);
         playbackQueueActionsService.Verify(x => x.SetSelectedSongAsNext(), Times.Once);
         playbackQueueActionsService.Verify(x => x.JumpToSelectedSongAsync(), Times.Once);
         defaultPlaylistService.Verify(
@@ -278,7 +281,8 @@ public class SongContextMenuViewModelTests
         PlaylistQueueState queueState,
         SongContextMenuViewModel songContextMenuViewModel,
         IDefaultPlaylistService defaultPlaylistService,
-        IPlaybackQueueActionsService playbackQueueActionsService)
+        IPlaybackQueueActionsService playbackQueueActionsService,
+        IFileScanner? fileScanner = null)
     {
         var playlistLibraryService = new Mock<IPlaylistLibraryService>();
         playlistLibraryService
@@ -318,6 +322,7 @@ public class SongContextMenuViewModelTests
             new PlaybackContextSyncService(queueState),
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            fileScanner ?? Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,

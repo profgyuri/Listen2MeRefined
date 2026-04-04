@@ -299,6 +299,7 @@ public sealed class MainShellDefaultHomeViewModelTests
             Mock.Of<IPlaybackContextSyncService>(),
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             Mock.Of<IObservableCollectionUpdater>(),
             settingsReader,
             playlistSidebarViewModel,
