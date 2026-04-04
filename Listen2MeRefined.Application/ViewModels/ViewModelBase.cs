@@ -143,12 +143,12 @@ public abstract class ViewModelBase : ObservableObject, IInitializeAsync, IDispo
     {
         try
         {
-            await action(cancellationToken).ConfigureAwait(false);
+            await action(cancellationToken);
         }
         catch (Exception exception)
         {
             Logger.Error(exception, "ViewModel operation failed in {Context}.", context);
-            await _errorHandler.HandleAsync(exception, context, cancellationToken).ConfigureAwait(false);
+            await _errorHandler.HandleAsync(exception, context, cancellationToken);
         }
     }
 

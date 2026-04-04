@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
@@ -29,7 +30,7 @@ public class SongContextMenuViewModelTests
         var contextMenuService = new Mock<IPlaylistMembership>();
         var selectionService = new Mock<ISongContextSelectionService>();
         selectionService
-            .Setup(x => x.ResolveSearchSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>()))
+            .Setup(x => x.ResolveSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<AudioModel?>()))
             .Returns(["a.mp3"]);
         contextMenuService
             .Setup(x => x.GetPlaylistMembershipInfoAsync(
@@ -54,6 +55,11 @@ public class SongContextMenuViewModelTests
             CreateSettingsReader(),
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<IObservableCollectionUpdater>(),
             songContextMenuVm);
 
         searchVm.SearchResultsSelectionAddedCommand.Execute(new ArrayList
@@ -66,8 +72,9 @@ public class SongContextMenuViewModelTests
 
         Assert.Single(songContextMenuVm.Playlists);
         Assert.Equal("Workout", songContextMenuVm.Playlists[0].PlaylistName);
-        Assert.False(songContextMenuVm.ShowPlaylistActions);
+        Assert.True(songContextMenuVm.ShowPlaylistActions);
         Assert.False(songContextMenuVm.ShowRemoveFromPlaylistAction);
+        Assert.True(songContextMenuVm.ShowAddToDefaultPlaylistAction);
         contextMenuService.Verify(
             x => x.GetPlaylistMembershipInfoAsync(
                 It.Is<IReadOnlyList<string>>(paths => paths.SequenceEqual(new[] { "a.mp3" })),
@@ -84,7 +91,7 @@ public class SongContextMenuViewModelTests
         var contextMenuService = new Mock<IPlaylistMembership>();
         var selectionService = new Mock<ISongContextSelectionService>();
         selectionService
-            .Setup(x => x.ResolveSearchSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>()))
+            .Setup(x => x.ResolveSelectionPaths(It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<IEnumerable<AudioModel>>(), It.IsAny<AudioModel?>()))
             .Returns(["a.mp3", "b.mp3"]);
         contextMenuService
             .Setup(x => x.GetPlaylistMembershipInfoAsync(
@@ -109,6 +116,11 @@ public class SongContextMenuViewModelTests
             CreateSettingsReader(),
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<IObservableCollectionUpdater>(),
             songContextMenuVm);
 
         await searchVm.InitializeAsync();
@@ -188,9 +200,10 @@ public class SongContextMenuViewModelTests
         playbackQueueActionsService
             .Setup(x => x.JumpToSelectedSongAsync())
             .Returns(Task.CompletedTask);
-        playbackQueueActionsService
-            .Setup(x => x.ScanSelectedSongAsync())
-            .Returns(Task.CompletedTask);
+        var fileScanner = new Mock<IFileScanner>();
+        fileScanner
+            .Setup(x => x.ScanAsync("default.mp3", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AudioModel { Path = "default.mp3", Title = "Default track (rescanned)" });
 
         var songContextMenuVm = new SongContextMenuViewModel(
             Mock.Of<IErrorHandler>(),
@@ -209,7 +222,8 @@ public class SongContextMenuViewModelTests
             queueState,
             songContextMenuVm,
             defaultPlaylistService.Object,
-            playbackQueueActionsService.Object);
+            playbackQueueActionsService.Object,
+            fileScanner.Object);
 
         await pane.InitializeAsync();
         pane.SelectedSong = song;
@@ -222,7 +236,7 @@ public class SongContextMenuViewModelTests
         await songContextMenuVm.RemoveFromPlaylistAsync();
 
         await AssertEventuallyAsync(() =>
-            playbackQueueActionsService.Invocations.Any(x => x.Method.Name == nameof(IPlaybackQueueActionsService.ScanSelectedSongAsync)) &&
+            fileScanner.Invocations.Any(x => x.Method.Name == nameof(IFileScanner.ScanAsync)) &&
             playbackQueueActionsService.Invocations.Any(x => x.Method.Name == nameof(IPlaybackQueueActionsService.SetSelectedSongAsNext)) &&
             playbackQueueActionsService.Invocations.Any(x => x.Method.Name == nameof(IPlaybackQueueActionsService.JumpToSelectedSongAsync)));
         await AssertEventuallyAsync(() => defaultPlaylistService.Invocations.Any(x =>
@@ -230,7 +244,7 @@ public class SongContextMenuViewModelTests
 
         Assert.True(songContextMenuVm.ShowPlaylistActions);
         Assert.True(songContextMenuVm.ShowRemoveFromPlaylistAction);
-        playbackQueueActionsService.Verify(x => x.ScanSelectedSongAsync(), Times.Once);
+        fileScanner.Verify(x => x.ScanAsync("default.mp3", It.IsAny<CancellationToken>()), Times.Once);
         playbackQueueActionsService.Verify(x => x.SetSelectedSongAsNext(), Times.Once);
         playbackQueueActionsService.Verify(x => x.JumpToSelectedSongAsync(), Times.Once);
         defaultPlaylistService.Verify(
@@ -267,7 +281,8 @@ public class SongContextMenuViewModelTests
         PlaylistQueueState queueState,
         SongContextMenuViewModel songContextMenuViewModel,
         IDefaultPlaylistService defaultPlaylistService,
-        IPlaybackQueueActionsService playbackQueueActionsService)
+        IPlaybackQueueActionsService playbackQueueActionsService,
+        IFileScanner? fileScanner = null)
     {
         var playlistLibraryService = new Mock<IPlaylistLibraryService>();
         playlistLibraryService
@@ -307,6 +322,8 @@ public class SongContextMenuViewModelTests
             new PlaybackContextSyncService(queueState),
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            fileScanner ?? Mock.Of<IFileScanner>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             songContextMenuViewModel);

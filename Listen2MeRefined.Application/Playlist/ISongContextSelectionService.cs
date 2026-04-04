@@ -8,24 +8,14 @@ namespace Listen2MeRefined.Application.Playlist;
 public interface ISongContextSelectionService
 {
     /// <summary>
-    /// Resolves a search-selection path set from direct and fallback selections.
+    /// Resolves a unified selection path set from direct, fallback, and focused-song sources.
     /// </summary>
     /// <param name="directSelection">A directly selected set of songs.</param>
-    /// <param name="fallbackSelection">A fallback set of songs used when direct selection is empty.</param>
+    /// <param name="fallbackSelection">A fallback set of songs used to scope the selection (empty to skip scoping).</param>
+    /// <param name="focusedSong">The currently focused single song, used as a last-resort fallback.</param>
     /// <returns>A normalized collection of selected song paths.</returns>
-    IReadOnlyList<string> ResolveSearchSelectionPaths(
+    IReadOnlyList<string> ResolveSelectionPaths(
         IEnumerable<AudioModel> directSelection,
-        IEnumerable<AudioModel> fallbackSelection);
-
-    /// <summary>
-    /// Resolves a playlist-selection path set for context-menu actions.
-    /// </summary>
-    /// <param name="selectedTabSongs">A selected set of songs in the current tab.</param>
-    /// <param name="currentTabSongs">A complete set of songs in the current tab.</param>
-    /// <param name="selectedSong">The currently focused song.</param>
-    /// <returns>A normalized collection of selected song paths.</returns>
-    IReadOnlyList<string> ResolvePlaylistSelectionPaths(
-        IEnumerable<AudioModel> selectedTabSongs,
-        IEnumerable<AudioModel> currentTabSongs,
-        AudioModel? selectedSong);
+        IEnumerable<AudioModel> fallbackSelection,
+        AudioModel? focusedSong);
 }

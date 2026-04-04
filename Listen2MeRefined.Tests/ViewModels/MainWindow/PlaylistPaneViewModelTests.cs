@@ -187,6 +187,8 @@ public class PlaylistPaneViewModelTests
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            Mock.Of<IFileScanner>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -209,6 +211,54 @@ public class PlaylistPaneViewModelTests
         await pane.SetSelectedSongAsNextCommand.ExecuteAsync(null);
 
         Assert.Equal(["B", "C", "A", "D"], pane.CurrentPlaylistSongs.Select(x => x.Title ?? string.Empty).ToArray());
+    }
+
+    [Fact]
+    public async Task ScanSelectedSongsCommand_ReplacesVisibleSongWithScannedInstance()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var scanner = new Mock<IFileScanner>();
+        var queueServices = CreateQueueServices(logger.Object, fileScanner: scanner);
+        var pane = CreatePane(logger.Object, messenger, queueServices, fileScanner: scanner.Object);
+
+        var original = new AudioModel { Title = "Original", Path = "song.mp3" };
+        var rescanned = new AudioModel { Title = "Updated", Path = "song.mp3" };
+
+        scanner
+            .Setup(x => x.ScanAsync("song.mp3", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(rescanned);
+
+        queueServices.State.DefaultPlaylist.Add(original);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSong = original;
+
+        await pane.ScanSelectedSongsCommand.ExecuteAsync(null);
+
+        Assert.Single(pane.CurrentPlaylistSongs);
+        Assert.Same(rescanned, pane.CurrentPlaylistSongs[0]);
+    }
+
+    [Fact]
+    public async Task SongMetadataUpdatedMessage_ReplacesVisibleSongByPath()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var original = new AudioModel { Title = "Original", Path = "song.mp3" };
+        var rescanned = new AudioModel { Title = "Updated", Path = "song.mp3" };
+
+        queueServices.State.DefaultPlaylist.Add(original);
+        await pane.InitializeAsync();
+
+        messenger.Send(new SongMetadataUpdatedMessage(rescanned));
+
+        Assert.Single(pane.CurrentPlaylistSongs);
+        Assert.Same(rescanned, pane.CurrentPlaylistSongs[0]);
     }
 
     [Fact]
@@ -245,6 +295,8 @@ public class PlaylistPaneViewModelTests
             queueServices.PlaybackContextSyncService,
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            Mock.Of<IFileScanner>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -389,7 +441,8 @@ public class PlaylistPaneViewModelTests
         IMessenger messenger,
         QueueServices queueServices,
         IExternalAudioOpenService? externalAudioOpenService = null,
-        IExternalAudioOpenInbox? externalAudioOpenInbox = null)
+        IExternalAudioOpenInbox? externalAudioOpenInbox = null,
+        IFileScanner? fileScanner = null)
     {
         var playlistLibrary = new Mock<IPlaylistLibraryService>();
         playlistLibrary
@@ -419,6 +472,8 @@ public class PlaylistPaneViewModelTests
             queueServices.PlaybackContextSyncService,
             externalAudioOpenService ?? Mock.Of<IExternalAudioOpenService>(),
             externalAudioOpenInbox ?? Mock.Of<IExternalAudioOpenInbox>(),
+            fileScanner ?? Mock.Of<IFileScanner>(),
+            new ObservableCollectionUpdater(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger, messenger));

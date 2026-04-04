@@ -1,8 +1,8 @@
-using Listen2MeRefined.Application.ViewModels;
+using Listen2MeRefined.Application.ViewModels.ContextMenus;
 using Listen2MeRefined.Core.Enums;
 
 namespace Listen2MeRefined.Application.Playlist;
 
 public sealed record PlaylistContextMenuActionRequest(
-    ViewModelBase SourceViewModel,
+    ISongContextMenuHost SourceHost,
     PlaylistContextMenuAction Action);

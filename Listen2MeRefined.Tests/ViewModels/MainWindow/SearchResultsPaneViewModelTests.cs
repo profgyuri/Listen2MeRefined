@@ -36,6 +36,11 @@ public class SearchResultsPaneViewModelTests
             settingsReader.Object,
             Mock.Of<IAudioSearchExecutionService>(),
             transferService.Object,
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<Listen2MeRefined.Application.Utils.IObservableCollectionUpdater>(),
             contextMenu);
 
         var first = new AudioModel { Title = "First", Path = "a.mp3" };
@@ -83,6 +88,11 @@ public class SearchResultsPaneViewModelTests
             CreateSettingsReader(SearchResultsTransferMode.Move).Object,
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<Listen2MeRefined.Application.Utils.IObservableCollectionUpdater>(),
             contextMenu);
 
         var original = new AudioModel { Title = "Original", Path = "original.mp3" };
@@ -114,6 +124,11 @@ public class SearchResultsPaneViewModelTests
             CreateSettingsReader(SearchResultsTransferMode.Move).Object,
             audioSearchExecutionService.Object,
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<Listen2MeRefined.Application.Utils.IObservableCollectionUpdater>(),
             contextMenu);
         await vm.EnsureInitializedAsync();
 

@@ -14,6 +14,13 @@ public interface IDefaultPlaylistService
     void AddSearchResultsToDefaultPlaylist(IEnumerable<AudioModel> songs);
 
     /// <summary>
+    /// Inserts songs into the default playlist immediately after the currently playing song,
+    /// skipping any songs already present. Also inserts into the active queue when default is active.
+    /// </summary>
+    /// <param name="songs">The songs to insert.</param>
+    void InsertAfterCurrentInDefaultPlaylist(IEnumerable<AudioModel> songs);
+
+    /// <summary>
     /// Removes songs from the default playlist and from the active queue when default is active.
     /// </summary>
     /// <param name="songs">The songs to remove.</param>

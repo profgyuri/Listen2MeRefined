@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
+using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Playlist;
@@ -17,7 +18,7 @@ using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
-public partial class PlaylistPaneViewModel : ViewModelBase
+public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
 {
     private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IPlaylistQueueRoutingService _playlistQueueRoutingService;
@@ -30,7 +31,9 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     private readonly IPlaybackContextSyncService _playbackContextSyncService;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
     private readonly IExternalAudioOpenInbox _externalAudioOpenInbox;
-    private readonly HashSet<AudioModel> _selectedTabSongs = [];
+    private readonly IFileScanner _fileScanner;
+    private readonly IObservableCollectionUpdater _collectionUpdater;
+    private readonly ISongSelectionTracker _selectionTracker;
 
     private int? _currentPlaylistId;
 
@@ -71,6 +74,8 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         IPlaybackContextSyncService playbackContextSyncService,
         IExternalAudioOpenService externalAudioOpenService,
         IExternalAudioOpenInbox externalAudioOpenInbox,
+        IFileScanner fileScanner,
+        IObservableCollectionUpdater collectionUpdater,
         IAppSettingsReader settingsReader,
         PlaylistSidebarViewModel playlistSidebarViewModel,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
@@ -86,6 +91,9 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         _playbackContextSyncService = playbackContextSyncService;
         _externalAudioOpenService = externalAudioOpenService;
         _externalAudioOpenInbox = externalAudioOpenInbox;
+        _fileScanner = fileScanner;
+        _collectionUpdater = collectionUpdater;
+        _selectionTracker = new SongSelectionTracker(PublishSongContextSelectionChanged);
         PlaylistSidebarViewModel = playlistSidebarViewModel;
         SongContextMenuViewModel = songContextMenuViewModel;
         _playlistQueueState.PropertyChanged += PlaylistQueueStateOnPropertyChanged;
@@ -101,6 +109,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         RegisterMessage<PlaylistShuffledMessage>(OnPlaylistShuffledMessage);
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
         RegisterMessage<PlaylistSidebarSelectionChangedMessage>(OnPlaylistSidebarSelectionChanged);
+        RegisterMessage<SongMetadataUpdatedMessage>(OnSongMetadataUpdatedMessage);
 
         // Initialize sidebar first so playlists are loaded
         await PlaylistSidebarViewModel.EnsureInitializedAsync(ct);
@@ -126,7 +135,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         ExecuteSafeAsync(async _ =>
         {
             var selectedSongs = _playlistSelectionService.ResolveSelectedSongs(
-                _selectedTabSongs,
+                _selectionTracker.SelectedSongs,
                 CurrentPlaylistSongs,
                 SelectedSong);
 
@@ -135,7 +144,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
                 if (IsDefaultPlaylist)
                 {
                     _defaultPlaylistService.RemoveFromDefaultPlaylist(_playlistQueueState.DefaultPlaylist.ToArray());
-                    _selectedTabSongs.Clear();
+                    _selectionTracker.Clear();
                     return;
                 }
 
@@ -158,7 +167,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
             if (IsDefaultPlaylist)
             {
                 _defaultPlaylistService.RemoveFromDefaultPlaylist(selectedSongs);
-                _selectedTabSongs.Clear();
+                _selectionTracker.Clear();
                 return;
             }
 
@@ -178,7 +187,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
                 _playlistQueueRoutingService.ActivateNamedPlaylistQueue(_currentPlaylistId.Value, CurrentPlaylistSongs);
             }
 
-            _selectedTabSongs.Clear();
+            _selectionTracker.Clear();
             Messenger.Send(new PlaylistMembershipChangedMessage(_currentPlaylistId.Value));
         });
 
@@ -196,8 +205,32 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         });
 
     [RelayCommand]
-    private Task ScanSelectedSong() =>
-        ExecuteSafeAsync(_ => _playbackQueueActionsService.ScanSelectedSongAsync());
+    private Task ScanSelectedSongs() =>
+        ExecuteSafeAsync(async _ =>
+        {
+            var songs = _playlistSelectionService.ResolveSelectedSongs(
+                _selectionTracker.SelectedSongs,
+                CurrentPlaylistSongs,
+                SelectedSong);
+
+            foreach (var song in songs)
+            {
+                if (string.IsNullOrWhiteSpace(song.Path))
+                {
+                    continue;
+                }
+
+                var updated = await _fileScanner.ScanAsync(song.Path);
+
+                _collectionUpdater.ReplaceIfPresent(CurrentPlaylistSongs, updated);
+                _collectionUpdater.ReplaceIfPresent(_playlistQueueState.PlayList, updated);
+                _collectionUpdater.ReplaceIfPresent(_playlistQueueState.DefaultPlaylist, updated);
+
+                Messenger.Send(new SongMetadataUpdatedMessage(updated));
+            }
+
+            _selectionTracker.Clear();
+        });
 
     /// <summary>
     /// Removes only the current selection from the default playlist.
@@ -211,7 +244,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
             }
 
             var selectedSongs = _playlistSelectionService.ResolveSelectedSongs(
-                _selectedTabSongs,
+                _selectionTracker.SelectedSongs,
                 CurrentPlaylistSongs,
                 SelectedSong);
 
@@ -221,12 +254,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
             }
 
             _defaultPlaylistService.RemoveFromDefaultPlaylist(selectedSongs);
-            foreach (var song in selectedSongs)
-            {
-                _selectedTabSongs.Remove(song);
-            }
-
-            PublishSongContextSelectionChanged();
+            _selectionTracker.Clear();
             return Task.CompletedTask;
         });
 
@@ -266,13 +294,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     private Task PlaylistSelectionAdded(IList items) =>
         ExecuteSafeAsync(_ =>
         {
-            var songs = items.Cast<AudioModel>().ToArray();
-            foreach (var song in songs)
-            {
-                _selectedTabSongs.Add(song);
-            }
-
-            PublishSongContextSelectionChanged();
+            _selectionTracker.AddSelection(items);
             return Task.CompletedTask;
         });
 
@@ -280,23 +302,27 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     private Task PlaylistSelectionRemoved(IList items) =>
         ExecuteSafeAsync(_ =>
         {
-            var songs = items.Cast<AudioModel>().ToArray();
-            foreach (var song in songs)
-            {
-                _selectedTabSongs.Remove(song);
-            }
-
-            PublishSongContextSelectionChanged();
+            _selectionTracker.RemoveSelection(items);
             return Task.CompletedTask;
         });
 
-    public IReadOnlyCollection<AudioModel> GetSelectedTabSongContextSelection() => _selectedTabSongs.ToArray();
+    public IReadOnlyCollection<AudioModel> GetDirectSongContextSelection() => _selectionTracker.SelectedSongs;
 
-    public IReadOnlyCollection<AudioModel> GetCurrentTabSongContextSelection() =>
+    public IReadOnlyCollection<AudioModel> GetFallbackSongContextSelection() =>
         CurrentPlaylistSongs?.ToArray() ?? [];
+
+    public AudioModel? GetFocusedSong() => SelectedSong;
 
     public int? GetSongContextActivePlaylistId() =>
         IsDefaultPlaylist ? null : _currentPlaylistId;
+
+    bool ISongContextMenuHost.ShowPlaylistMembershipActions => true;
+
+    bool ISongContextMenuHost.ShowRemoveFromPlaylistAction => IsDefaultPlaylist;
+
+    bool ISongContextMenuHost.ShowAddToDefaultPlaylistAction => false;
+
+    bool ISongContextMenuHost.ArePlaybackActionsAvailable => true;
 
     public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default) =>
         _externalDropImportService.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
@@ -338,10 +364,8 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         return -1;
     }
 
-    private void PublishSongContextSelectionChanged()
-    {
+    private void PublishSongContextSelectionChanged() =>
         Messenger.Send(new SongContextMenuSelectionChangedMessage(this));
-    }
 
     private bool CanJumpToSelectedSong()
     {
@@ -354,8 +378,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         {
             var playlistId = message.Value.PlaylistId;
 
-            _selectedTabSongs.Clear();
-            PublishSongContextSelectionChanged();
+            _selectionTracker.Clear();
 
             if (playlistId is null)
             {
@@ -413,6 +436,11 @@ public partial class PlaylistPaneViewModel : ViewModelBase
         }
     }
 
+    private void OnSongMetadataUpdatedMessage(SongMetadataUpdatedMessage message)
+    {
+        _collectionUpdater.ReplaceIfPresent(CurrentPlaylistSongs, message.Value);
+    }
+
     private void SyncVisiblePlaylistOrderWithActiveQueue()
     {
         _playlistQueueRoutingService.SyncDefaultPlaylistOrder();
@@ -438,14 +466,14 @@ public partial class PlaylistPaneViewModel : ViewModelBase
     private void OnPlaylistContextMenuActionRequestedMessage(PlaylistContextMenuActionRequestedMessage message)
     {
         var request = message.Value;
-        if (!ReferenceEquals(request.SourceViewModel, this))
+        if (!ReferenceEquals(request.SourceHost, this))
         {
             return;
         }
 
         _ = request.Action switch
         {
-            PlaylistContextMenuAction.Rescan => ScanSelectedSong(),
+            PlaylistContextMenuAction.Rescan => ScanSelectedSongs(),
             PlaylistContextMenuAction.PlayNow => PlaySelectedFromActiveTab(),
             PlaylistContextMenuAction.PlayAfterCurrent => SetSelectedSongAsNext(),
             PlaylistContextMenuAction.RemoveFromPlaylist => RemoveSelectedFromDefaultPlaylistSelectionAsync(),

@@ -299,6 +299,8 @@ public sealed class MainShellDefaultHomeViewModelTests
             Mock.Of<IPlaybackContextSyncService>(),
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<IObservableCollectionUpdater>(),
             settingsReader,
             playlistSidebarViewModel,
             songContextMenuViewModel)
@@ -320,6 +322,11 @@ public sealed class MainShellDefaultHomeViewModelTests
             settingsReader,
             Mock.Of<IAudioSearchExecutionService>(),
             Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<IObservableCollectionUpdater>(),
             songContextMenuViewModel)
     {
         public override Task InitializeAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
