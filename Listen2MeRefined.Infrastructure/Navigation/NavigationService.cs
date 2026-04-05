@@ -72,8 +72,14 @@ public sealed class NavigationService : INavigationService
                 await _initializationTracker.EnsureInitializedAsync(initializable, cancellationToken).ConfigureAwait(false);
             }
 
+            var previous = _state.CurrentViewModel;
             _state.CurrentRoute = target.Route;
             _state.CurrentViewModel = viewModel;
+
+            if (previous is IDisposable disposable && !ReferenceEquals(previous, viewModel))
+            {
+                disposable.Dispose();
+            }
         }
         catch (Exception exception)
         {

@@ -99,6 +99,26 @@ public sealed class SettingsAdvancedTabViewModelTests
     }
 
     [Fact]
+    public async Task Dispose_DuringCountdown_CancelsWithoutClearing()
+    {
+        var settings = new AppSettings();
+        var (viewModel, audioRepository, musicFolderRepository, playlistRepository, _, _) = CreateViewModel(
+            settings,
+            countdownStartSeconds: 5,
+            countdownTickInterval: TimeSpan.FromMilliseconds(80));
+        await viewModel.InitializeAsync();
+
+        var clearTask = viewModel.ClearMetadataCommand.ExecuteAsync(null);
+
+        viewModel.Dispose();
+        await clearTask;
+
+        audioRepository.Verify(x => x.RemoveAllAsync(), Times.Never);
+        musicFolderRepository.Verify(x => x.RemoveAllAsync(), Times.Never);
+        playlistRepository.Verify(x => x.RemoveAllAsync(), Times.Never);
+    }
+
+    [Fact]
     public async Task FontFamilyChangedMessage_State_UpdatesFontFamilyName()
     {
         var settings = new AppSettings

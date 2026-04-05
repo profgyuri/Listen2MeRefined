@@ -153,6 +153,18 @@ public partial class SettingsAdvancedTabViewModel : ViewModelBase
         Logger.Debug("[SettingsAdvancedTabViewModel] Metadata cleared.");
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _clearMetadataCts?.Cancel();
+            _clearMetadataCts?.Dispose();
+            _clearMetadataCts = null;
+        }
+
+        base.Dispose(disposing);
+    }
+
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         FontFamilyName = message.Value;
