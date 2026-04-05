@@ -89,6 +89,63 @@ public sealed class NavigationServiceTests
         Assert.Null(state.CurrentViewModel);
     }
 
+    [Fact]
+    public async Task NavigateAsync_PreviousViewModelIsDisposable_DisposesPrevious()
+    {
+        var first = new DisposableViewModel();
+        var second = new PlainViewModel();
+
+        var services = new ServiceCollection();
+        services.AddSingleton(first);
+        services.AddSingleton(second);
+        var serviceProvider = services.BuildServiceProvider();
+
+        var registry = new NavigationRegistry();
+        registry.Register<DisposableViewModel>("tab/first");
+        registry.Register<PlainViewModel>("tab/second");
+
+        var state = new NavigationState();
+        var sut = new NavigationService(
+            serviceProvider,
+            registry,
+            state,
+            Mock.Of<IInitializationTracker>(),
+            Mock.Of<IErrorHandler>(),
+            CreateLogger().Object);
+
+        await sut.NavigateAsync<DisposableViewModel>();
+        Assert.False(first.IsDisposed);
+
+        await sut.NavigateAsync<PlainViewModel>();
+        Assert.True(first.IsDisposed);
+    }
+
+    [Fact]
+    public async Task NavigateAsync_SameViewModel_DoesNotDispose()
+    {
+        var viewModel = new DisposableViewModel();
+        var services = new ServiceCollection();
+        services.AddSingleton(viewModel);
+        var serviceProvider = services.BuildServiceProvider();
+
+        var registry = new NavigationRegistry();
+        registry.Register<DisposableViewModel>("tab/home");
+
+        var state = new NavigationState();
+        var sut = new NavigationService(
+            serviceProvider,
+            registry,
+            state,
+            Mock.Of<IInitializationTracker>(),
+            Mock.Of<IErrorHandler>(),
+            CreateLogger().Object);
+
+        await sut.NavigateAsync<DisposableViewModel>();
+        await sut.NavigateAsync<DisposableViewModel>();
+
+        Assert.False(viewModel.IsDisposed);
+    }
+
     private static Mock<ILogger> CreateLogger()
     {
         var logger = new Mock<ILogger>();
@@ -110,5 +167,11 @@ public sealed class NavigationServiceTests
 
     private sealed class MissingViewModel
     {
+    }
+
+    private sealed class DisposableViewModel : IDisposable
+    {
+        public bool IsDisposed { get; private set; }
+        public void Dispose() => IsDisposed = true;
     }
 }

@@ -124,9 +124,18 @@ public abstract class ViewModelBase : ObservableObject, IInitializeAsync, IDispo
             return;
         }
 
+        Dispose(disposing: true);
         UnregisterAllMessages();
         _initializeSync.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Called during disposal. Override to release subclass-specific resources.
+    /// </summary>
+    /// <param name="disposing"><see langword="true"/> when called from <see cref="Dispose"/>.</param>
+    protected virtual void Dispose(bool disposing)
+    {
     }
 
     /// <summary>
