@@ -21,7 +21,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase
 
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private double _totalTime;
-    [ObservableProperty] private bool _arePlaybackButtonsEnabled = true;
+    [ObservableProperty] private bool _isSongLoaded;
 
     public double CurrentTime
     {
@@ -94,6 +94,12 @@ public partial class PlaybackControlsViewModel : ViewModelBase
         await ExecuteSafeAsync(async _ =>
         {
             _logger.Debug("[PlayerControlsViewModel] Toggling play/pause");
+
+            if (!_musicPlayerController.HasCurrentSong)
+            {
+                Messenger.Send(new ActivateViewedPlaylistMessage());
+            }
+
             await _musicPlayerController.PlayPauseAsync();
         });
     }
@@ -131,12 +137,13 @@ public partial class PlaybackControlsViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task Shuffle()
+    private Task Shuffle()
     {
-        await ExecuteSafeAsync(async _ =>
+        return ExecuteSafeAsync(_ =>
         {
             _logger.Debug("[PlayerControlsViewModel] Shuffling playlist");
-            await _musicPlayerController.Shuffle();
+            Messenger.Send(new ShuffleRequestedMessage());
+            return Task.CompletedTask;
         });
     }
 
@@ -168,7 +175,7 @@ public partial class PlaybackControlsViewModel : ViewModelBase
         {
             await _uiDispatcher.InvokeAsync(() =>
             {
-                ArePlaybackButtonsEnabled = true;
+                IsSongLoaded = true;
                 TotalTime = message.Value.Length.TotalMilliseconds;
                 OnPropertyChanged(nameof(TotalTimeDisplay));
             });
