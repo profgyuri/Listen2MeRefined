@@ -322,6 +322,7 @@ public class SongContextMenuViewModelTests
             new PlaybackContextSyncService(queueState),
             Mock.Of<IExternalAudioOpenService>(),
             Mock.Of<IExternalAudioOpenInbox>(),
+            Mock.Of<IMusicPlayerController>(),
             fileScanner ?? Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
             settingsReader.Object,

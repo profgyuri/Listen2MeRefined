@@ -14,6 +14,11 @@ public interface IMusicPlayerController
     RepeatMode RepeatMode { get; set; }
 
     /// <summary>
+    ///     Gets a value indicating whether a song is currently loaded in the player.
+    /// </summary>
+    bool HasCurrentSong { get; }
+
+    /// <summary>
     ///     Play or pause the playback.
     /// </summary>
     Task PlayPauseAsync();

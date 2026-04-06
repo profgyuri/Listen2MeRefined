@@ -26,30 +26,27 @@
             <Button Command="{Binding PreviousCommand}"
                     Style="{DynamicResource NowPlayingTransportButton}"
                     Content="{materialDesign:PackIcon Kind=SkipPrevious,Size=16}"
-                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    IsEnabled="{Binding IsSongLoaded}"
                     ToolTip="Previous" />
             <Button Command="{Binding StopCommand}"
                     Style="{DynamicResource NowPlayingTransportButton}"
                     Content="{materialDesign:PackIcon Kind=Stop,Size=14}"
-                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    IsEnabled="{Binding IsSongLoaded}"
                     ToolTip="Stop" />
             <Button Command="{Binding PlayPauseCommand}"
                     Style="{DynamicResource NowPlayingPrimaryTransportButton}"
                     Content="{materialDesign:PackIcon Kind=PlayPause,Size=19}"
-                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
                     ToolTip="Play / Pause" />
             <Button Command="{Binding NextCommand}"
                     Style="{DynamicResource NowPlayingTransportButton}"
                     Content="{materialDesign:PackIcon Kind=SkipNext,Size=16}"
-                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
+                    IsEnabled="{Binding IsSongLoaded}"
                     ToolTip="Next" />
             <Button Command="{Binding ShuffleCommand}"
                     Style="{DynamicResource NowPlayingTransportButton}"
                     Content="{materialDesign:PackIcon Kind=Shuffle,Size=14}"
-                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
                     ToolTip="Shuffle" />
             <Button Command="{Binding ToggleRepeatCommand}"
-                    IsEnabled="{Binding ArePlaybackButtonsEnabled}"
                     ToolTip="Repeat (Off → All → One)">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource NowPlayingTransportButton}">

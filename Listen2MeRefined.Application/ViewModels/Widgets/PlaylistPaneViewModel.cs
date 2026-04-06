@@ -8,6 +8,7 @@ using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation;
+using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
@@ -31,9 +32,11 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     private readonly IPlaybackContextSyncService _playbackContextSyncService;
     private readonly IExternalAudioOpenService _externalAudioOpenService;
     private readonly IExternalAudioOpenInbox _externalAudioOpenInbox;
+    private readonly IMusicPlayerController _musicPlayerController;
     private readonly IFileScanner _fileScanner;
     private readonly IObservableCollectionUpdater _collectionUpdater;
     private readonly ISongSelectionTracker _selectionTracker;
+    private readonly Dictionary<int, ObservableCollection<AudioModel>> _playlistCache = new();
 
     private int? _currentPlaylistId;
 
@@ -74,6 +77,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         IPlaybackContextSyncService playbackContextSyncService,
         IExternalAudioOpenService externalAudioOpenService,
         IExternalAudioOpenInbox externalAudioOpenInbox,
+        IMusicPlayerController musicPlayerController,
         IFileScanner fileScanner,
         IObservableCollectionUpdater collectionUpdater,
         IAppSettingsReader settingsReader,
@@ -91,6 +95,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         _playbackContextSyncService = playbackContextSyncService;
         _externalAudioOpenService = externalAudioOpenService;
         _externalAudioOpenInbox = externalAudioOpenInbox;
+        _musicPlayerController = musicPlayerController;
         _fileScanner = fileScanner;
         _collectionUpdater = collectionUpdater;
         _selectionTracker = new SongSelectionTracker(PublishSongContextSelectionChanged);
@@ -110,6 +115,9 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
         RegisterMessage<PlaylistSidebarSelectionChangedMessage>(OnPlaylistSidebarSelectionChanged);
         RegisterMessage<SongMetadataUpdatedMessage>(OnSongMetadataUpdatedMessage);
+        RegisterMessage<ShuffleRequestedMessage>(OnShuffleRequested);
+        RegisterMessage<ActivateViewedPlaylistMessage>(OnActivateViewedPlaylist);
+        RegisterMessage<PlaylistDeletedMessage>(OnPlaylistDeleted);
 
         // Initialize sidebar first so playlists are loaded
         await PlaylistSidebarViewModel.EnsureInitializedAsync(ct);
@@ -388,9 +396,19 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
                 return;
             }
 
-            var songs = await _playlistLibraryService.GetPlaylistSongsAsync(playlistId.Value);
             _currentPlaylistId = playlistId;
-            CurrentPlaylistSongs = new ObservableCollection<AudioModel>(songs);
+
+            if (_playlistCache.TryGetValue(playlistId.Value, out var cached))
+            {
+                CurrentPlaylistSongs = cached;
+            }
+            else
+            {
+                var songs = await _playlistLibraryService.GetPlaylistSongsAsync(playlistId.Value);
+                CurrentPlaylistSongs = new ObservableCollection<AudioModel>(songs);
+                _playlistCache[playlistId.Value] = CurrentPlaylistSongs;
+            }
+
             ActivePlaylistName = PlaylistSidebarViewModel.SelectedItem?.Name ?? "Playlist";
         }
         catch (Exception e)
@@ -404,6 +422,8 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         try
         {
             var playlistId = message.Value;
+            _playlistCache.Remove(playlistId);
+
             if (_currentPlaylistId != playlistId)
             {
                 return;
@@ -412,6 +432,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
             var songs = await _playlistLibraryService.GetPlaylistSongsAsync(playlistId);
             CurrentPlaylistSongs.Clear();
             CurrentPlaylistSongs.AddRange(songs);
+            _playlistCache[playlistId] = CurrentPlaylistSongs;
 
             if (_playlistQueueState.ActiveNamedPlaylistId == playlistId)
             {
@@ -479,6 +500,71 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
             PlaylistContextMenuAction.RemoveFromPlaylist => RemoveSelectedFromDefaultPlaylistSelectionAsync(),
             _ => Task.CompletedTask
         };
+    }
+
+    private async void OnShuffleRequested(ShuffleRequestedMessage message)
+    {
+        try
+        {
+            ShuffleCurrentPlaylistSongsInPlace();
+
+            if (_musicPlayerController.HasCurrentSong)
+            {
+                return;
+            }
+
+            ActivateViewedPlaylistAsQueue();
+            await _musicPlayerController.JumpToIndexAsync(0);
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e, "Failed to handle shuffle request");
+        }
+    }
+
+    private void OnActivateViewedPlaylist(ActivateViewedPlaylistMessage message)
+    {
+        try
+        {
+            ActivateViewedPlaylistAsQueue();
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e, "Failed to activate viewed playlist");
+        }
+    }
+
+    private void OnPlaylistDeleted(PlaylistDeletedMessage message)
+    {
+        _playlistCache.Remove(message.Value.PlaylistId);
+    }
+
+    private void ActivateViewedPlaylistAsQueue()
+    {
+        if (IsDefaultPlaylist)
+        {
+            _playlistQueueRoutingService.ActivateDefaultPlaylistQueue();
+        }
+        else if (_currentPlaylistId is not null)
+        {
+            _playlistQueueRoutingService.ActivateNamedPlaylistQueue(_currentPlaylistId.Value, CurrentPlaylistSongs);
+        }
+    }
+
+    private void ShuffleCurrentPlaylistSongsInPlace()
+    {
+        var songs = CurrentPlaylistSongs;
+        var count = songs.Count;
+        var rng = Random.Shared;
+
+        for (var i = count - 1; i > 0; i--)
+        {
+            var j = rng.Next(i + 1);
+            if (i != j)
+            {
+                songs.Move(j, i);
+            }
+        }
     }
 
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)

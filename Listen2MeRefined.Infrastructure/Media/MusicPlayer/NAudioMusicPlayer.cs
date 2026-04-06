@@ -64,6 +64,9 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         set => _repeatMode = value;
     }
 
+    /// <inheritdoc />
+    public bool HasCurrentSong => _currentSong is not null;
+
     /// <summary>
     /// Initializes a new player orchestrator with the required playback collaborators.
     /// </summary>
