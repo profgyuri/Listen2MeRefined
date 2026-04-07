@@ -166,10 +166,12 @@
             </ListView>
 
             <!-- Empty state overlay -->
-            <Grid Grid.Row="2"
-                  IsHitTestVisible="False">
-                <Grid.Style>
-                    <Style TargetType="Grid">
+            <components:EmptyStateOverlay Grid.Row="2"
+                                          IconKind="MusicNote"
+                                          PrimaryText="Drop tracks here"
+                                          SecondaryText="or double-click from the library">
+                <components:EmptyStateOverlay.Style>
+                    <Style TargetType="components:EmptyStateOverlay">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding CurrentPlaylistSongs.Count}" Value="0">
@@ -177,27 +179,8 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Grid.Style>
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Opacity="0.35">
-                    <materialDesign:PackIcon Kind="MusicNote"
-                                             Width="40" Height="40"
-                                             Foreground="{DynamicResource TertiaryBrush}"
-                                             HorizontalAlignment="Center"/>
-                    <TextBlock Text="Drop tracks here"
-                               Foreground="{DynamicResource SecondaryDarkBrush}"
-                               FontSize="13"
-                               FontWeight="SemiBold"
-                               HorizontalAlignment="Center"
-                               Margin="0,10,0,4"/>
-                    <TextBlock Text="or double-click from the library"
-                               Foreground="{DynamicResource SecondaryDarkBrush}"
-                               FontSize="11"
-                               HorizontalAlignment="Center"
-                               Opacity="0.7"/>
-                </StackPanel>
-            </Grid>
+                </components:EmptyStateOverlay.Style>
+            </components:EmptyStateOverlay>
         </Grid>
     </Grid>
 </UserControl>

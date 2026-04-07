@@ -1,0 +1,27 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Components.EmptyStateOverlay"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             IsHitTestVisible="False">
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Opacity="0.35">
+        <materialDesign:PackIcon Kind="{Binding IconKind, ElementName=Root}"
+                                 Width="40" Height="40"
+                                 Foreground="{DynamicResource TertiaryBrush}"
+                                 HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding PrimaryText, ElementName=Root}"
+                   Foreground="{DynamicResource SecondaryDarkBrush}"
+                   FontSize="13"
+                   FontWeight="SemiBold"
+                   HorizontalAlignment="Center"
+                   Margin="0,10,0,4"/>
+        <TextBlock Text="{Binding SecondaryText, ElementName=Root}"
+                   Foreground="{DynamicResource SecondaryDarkBrush}"
+                   FontSize="11"
+                   HorizontalAlignment="Center"
+                   Opacity="0.7"
+                   Visibility="{Binding ShowSecondaryText, ElementName=Root, Converter={StaticResource BoolToVisibilityConverter}}"/>
+    </StackPanel>
+</UserControl>
