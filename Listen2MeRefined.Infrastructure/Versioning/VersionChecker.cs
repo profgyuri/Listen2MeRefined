@@ -7,7 +7,7 @@ namespace Listen2MeRefined.Infrastructure.Versioning;
 
 public class VersionChecker : IVersionChecker
 {
-    private readonly Version versionNumber = Version.FromVersionNumbers(0, 8, 1);
+    private readonly Version versionNumber = Version.FromVersionNumbers(0, 9, 1);
     private const string apiUrl = "https://api.github.com/repos/profgyuri/Listen2MeRefined/releases";
     private Release? _latest;
 
