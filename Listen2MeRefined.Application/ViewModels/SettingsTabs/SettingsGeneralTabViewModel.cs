@@ -15,6 +15,8 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
 {
     private const string CompactPlaylistViewMode = "Compact";
     private const string DetailedPlaylistViewMode = "Detailed";
+    private const int MinSearchDebounceMs = 100;
+    private const int MaxSearchDebounceMs = 2000;
 
     private readonly FontFamilies _installedFontFamilies;
     private readonly IAppSettingsReader _settingsReader;
@@ -35,6 +37,7 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
     [ObservableProperty] private string _updateAvailableText = string.Empty;
     [ObservableProperty] private bool _isUpdateButtonVisible;
     [ObservableProperty] private bool _autoFlowTrackText;
+    [ObservableProperty] private int _searchDebounceMs = 300;
 
     public ObservableCollection<string> PlaylistViewModes { get; } =
         new([DetailedPlaylistViewMode, CompactPlaylistViewMode]);
@@ -78,6 +81,7 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
             SelectedThemeMode = _settingsReader.GetThemeMode();
             SelectedAccentColor = _settingsReader.GetAccentColor();
             AutoFlowTrackText = _settingsReader.GetAutoFlowTrackText();
+            SearchDebounceMs = _settingsReader.GetSearchDebounceMs();
         }
         finally
         {
@@ -164,6 +168,24 @@ public partial class SettingsGeneralTabViewModel : ViewModelBase
 
         _settingsWriter.SetAutoFlowTrackText(value);
         Messenger.Send(new AutoFlowTrackTextChangedMessage(value));
+    }
+
+    partial void OnSearchDebounceMsChanged(int value)
+    {
+        var clamped = Math.Clamp(value, MinSearchDebounceMs, MaxSearchDebounceMs);
+        if (clamped != value)
+        {
+            SearchDebounceMs = clamped;
+            return;
+        }
+
+        if (_isLoadingSettings)
+        {
+            return;
+        }
+
+        _settingsWriter.SetSearchDebounceMs((short)clamped);
+        Messenger.Send(new SearchDebounceChangedMessage((short)clamped));
     }
 
     [RelayCommand]

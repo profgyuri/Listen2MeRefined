@@ -88,6 +88,57 @@ public sealed class SettingsGeneralTabViewModelTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task SearchDebounceMs_Changed_PersistsAndSendsMessage()
+    {
+        var settings = new AppSettings
+        {
+            SearchDebounceMs = 300,
+            AutoCheckUpdatesOnStartup = false
+        };
+        var (viewModel, _, _, _, _, probe) = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        viewModel.SearchDebounceMs = 500;
+
+        Assert.Equal(500, settings.SearchDebounceMs);
+        Assert.Equal(500, probe.SearchDebounceMs);
+    }
+
+    [Fact]
+    public async Task SearchDebounceMs_BelowMinimum_ClampedToMinimum()
+    {
+        var settings = new AppSettings
+        {
+            SearchDebounceMs = 300,
+            AutoCheckUpdatesOnStartup = false
+        };
+        var (viewModel, _, _, _, _, _) = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        viewModel.SearchDebounceMs = 10;
+
+        Assert.Equal(100, viewModel.SearchDebounceMs);
+        Assert.Equal(100, settings.SearchDebounceMs);
+    }
+
+    [Fact]
+    public async Task SearchDebounceMs_AboveMaximum_ClampedToMaximum()
+    {
+        var settings = new AppSettings
+        {
+            SearchDebounceMs = 300,
+            AutoCheckUpdatesOnStartup = false
+        };
+        var (viewModel, _, _, _, _, _) = CreateViewModel(settings);
+        await viewModel.InitializeAsync();
+
+        viewModel.SearchDebounceMs = 5000;
+
+        Assert.Equal(2000, viewModel.SearchDebounceMs);
+        Assert.Equal(2000, settings.SearchDebounceMs);
+    }
+
     private static (
         SettingsGeneralTabViewModel ViewModel,
         AppSettings Settings,
@@ -146,6 +197,9 @@ public sealed class SettingsGeneralTabViewModelTests
         messenger.Register<MessageProbe, PlaylistViewModeChangedMessage>(
             probe,
             static (recipient, message) => recipient.UseCompactPlaylistView = message.Value);
+        messenger.Register<MessageProbe, SearchDebounceChangedMessage>(
+            probe,
+            static (recipient, message) => recipient.SearchDebounceMs = message.Value);
 
         var viewModel = new SettingsGeneralTabViewModel(
             errorHandler.Object,
@@ -166,5 +220,7 @@ public sealed class SettingsGeneralTabViewModelTests
         public string? FontFamily { get; set; }
 
         public bool UseCompactPlaylistView { get; set; }
+
+        public short SearchDebounceMs { get; set; }
     }
 }

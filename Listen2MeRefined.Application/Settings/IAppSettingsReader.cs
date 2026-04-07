@@ -64,4 +64,6 @@ public interface IAppSettingsReader
     string GetAccentColor();
     /// <summary>Gets whether track title/artist auto-scrolls on song change instead of on hover.</summary>
     bool GetAutoFlowTrackText();
+    /// <summary>Gets the search debounce delay in milliseconds.</summary>
+    short GetSearchDebounceMs();
 }

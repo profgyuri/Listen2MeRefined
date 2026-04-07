@@ -66,4 +66,6 @@ public interface IAppSettingsWriter
     void SetAccentColor(string value);
     /// <summary>Sets whether track title/artist auto-scrolls on song change instead of on hover.</summary>
     void SetAutoFlowTrackText(bool value);
+    /// <summary>Sets the search debounce delay in milliseconds.</summary>
+    void SetSearchDebounceMs(short value);
 }

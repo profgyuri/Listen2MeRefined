@@ -180,6 +180,11 @@ public sealed class AppSettingsWriter : IAppSettingsWriter
         _settingsManager.SaveSettings(s => s.AutoFlowTrackText = value);
     }
 
+    public void SetSearchDebounceMs(short value)
+    {
+        _settingsManager.SaveSettings(s => s.SearchDebounceMs = value);
+    }
+
     private static List<string> Normalize(IEnumerable<string> folders)
     {
         return folders

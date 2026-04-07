@@ -47,4 +47,5 @@ public sealed class AppSettingsReader : IAppSettingsReader
     public string GetThemeMode() => _settingsManager.Settings.ThemeMode;
     public string GetAccentColor() => _settingsManager.Settings.AccentColor;
     public bool GetAutoFlowTrackText() => _settingsManager.Settings.AutoFlowTrackText;
+    public short GetSearchDebounceMs() => _settingsManager.Settings.SearchDebounceMs;
 }
