@@ -13,7 +13,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <Border Style="{DynamicResource SearchBarStripTextBoxBorder}">
@@ -39,20 +38,11 @@
                              VerticalContentAlignment="Center"
                              materialDesign:HintAssist.Hint="Quick Search"
                              materialDesign:HintAssist.Foreground="{DynamicResource SecondaryDarkBrush}"
-                             Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding QuickSearchCommand}" />
-                        </TextBox.InputBindings>
-                    </TextBox>
+                             Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
             </Border>
 
             <Button Grid.Column="1"
-                    Command="{Binding QuickSearchCommand}"
-                    Style="{DynamicResource SearchBarStripActionButton}"
-                    ToolTip="Quick Search"
-                    Content="{materialDesign:PackIcon Kind=Search,Size=18}" />
-            <Button Grid.Column="2"
                     Command="{Binding DataContext.OpenAdvancedSearchWindowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Style="{DynamicResource SearchBarStripActionButton}"
                     ToolTip="Advanced Search"

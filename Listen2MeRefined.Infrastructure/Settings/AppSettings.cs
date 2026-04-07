@@ -37,6 +37,7 @@ public sealed class AppSettings : Application.Settings.Settings
     public string ThemeMode { get; set; } = "Dark";
     public string AccentColor { get; set; } = "Orange";
     public bool AutoFlowTrackText { get; set; }
+    public short SearchDebounceMs { get; set; } = 300;
 
     [NotMapped]
     public List<string> PinnedFolders

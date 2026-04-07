@@ -70,6 +70,18 @@
                           ToolTip="When enabled, title and artist scroll automatically when a new song starts instead of on hover."
                           Margin="0,0,0,10" />
 
+                <components:LabeledSliderRow
+                    Margin="0,0,0,10"
+                    Label="Search debounce:"
+                    LabelWidth="170"
+                    SliderWidth="240"
+                    Minimum="100"
+                    Maximum="2000"
+                    TickFrequency="50"
+                    IsSnapToTickEnabled="True"
+                    Value="{Binding SearchDebounceMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ValueSuffix=" ms" />
+
                 <CheckBox IsChecked="{Binding AutoCheckUpdatesOnStartup}"
                           Content="Automatically check for updates on startup"
                           Margin="0,0,0,10" />
