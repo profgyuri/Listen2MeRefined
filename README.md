@@ -98,7 +98,6 @@ See [this milestone](https://github.com/profgyuri/Listen2MeRefined/milestone/1) 
 ## Known issues
 
  - Multiple display setup is currently not supported in any form. (Fix is not planned as per now.)
- - Exstensible .wav files are skipped both in analyzing, or if already analyzed, then from playing
 
 ## Support
 
