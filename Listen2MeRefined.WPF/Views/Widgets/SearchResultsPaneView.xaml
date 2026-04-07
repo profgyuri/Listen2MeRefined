@@ -135,5 +135,21 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!-- Empty state overlay -->
+        <components:EmptyStateOverlay Grid.Row="2"
+                                      IconKind="Magnify"
+                                      PrimaryText="No results found">
+            <components:EmptyStateOverlay.Style>
+                <Style TargetType="components:EmptyStateOverlay">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SearchResults.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </components:EmptyStateOverlay.Style>
+        </components:EmptyStateOverlay>
     </Grid>
 </UserControl>

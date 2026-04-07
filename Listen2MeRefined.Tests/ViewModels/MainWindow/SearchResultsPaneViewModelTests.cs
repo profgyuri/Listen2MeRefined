@@ -20,6 +20,38 @@ namespace Listen2MeRefined.Tests.ViewModels.MainWindow;
 public class SearchResultsPaneViewModelTests
 {
     [Fact]
+    public async Task InitializeAsync_PopulatesSearchResultsWithEmptyStringSearch()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueState = CreateQueueState();
+        var contextMenu = CreateSongContextMenuViewModel(logger.Object, messenger);
+        var audioSearch = new Mock<IAudioSearchExecutionService>();
+        var songs = new[] { new AudioModel { Title = "Song", Path = "song.mp3" } };
+        audioSearch.Setup(x => x.ExecuteQuickSearchAsync("")).ReturnsAsync(songs);
+
+        var vm = new SearchResultsPaneViewModel(
+            Mock.Of<IErrorHandler>(),
+            logger.Object,
+            messenger,
+            queueState,
+            CreateSettingsReader(SearchResultsTransferMode.Move).Object,
+            audioSearch.Object,
+            Mock.Of<ISearchResultsTransferService>(),
+            Mock.Of<IDefaultPlaylistService>(),
+            Mock.Of<IPlaybackQueueActionsService>(),
+            Mock.Of<Listen2MeRefined.Application.Playback.IMusicPlayerController>(),
+            Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
+            Mock.Of<Listen2MeRefined.Application.Utils.IObservableCollectionUpdater>(),
+            contextMenu);
+
+        await vm.EnsureInitializedAsync();
+
+        Assert.Single(vm.SearchResults);
+        Assert.Same(songs[0], vm.SearchResults[0]);
+    }
+
+    [Fact]
     public async Task SendSelectedToPlaylist_UsesTransferDecisionAndPublishesPlaylistRequest()
     {
         var logger = CreateLogger();
@@ -34,7 +66,7 @@ public class SearchResultsPaneViewModelTests
             messenger,
             queueState,
             settingsReader.Object,
-            Mock.Of<IAudioSearchExecutionService>(),
+            CreateAudioSearchService().Object,
             transferService.Object,
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
@@ -86,7 +118,7 @@ public class SearchResultsPaneViewModelTests
             messenger,
             queueState,
             CreateSettingsReader(SearchResultsTransferMode.Move).Object,
-            Mock.Of<IAudioSearchExecutionService>(),
+            CreateAudioSearchService().Object,
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
@@ -116,6 +148,9 @@ public class SearchResultsPaneViewModelTests
         var queueState = CreateQueueState();
         var contextMenu = CreateSongContextMenuViewModel(logger.Object, messenger);
         var audioSearchExecutionService = new Mock<IAudioSearchExecutionService>();
+        audioSearchExecutionService
+            .Setup(x => x.ExecuteQuickSearchAsync(It.IsAny<string>()))
+            .ReturnsAsync(Array.Empty<AudioModel>());
         var vm = new SearchResultsPaneViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
@@ -172,6 +207,14 @@ public class SearchResultsPaneViewModelTests
             messenger,
             Mock.Of<IPlaylistMembership>(),
             Mock.Of<ISongContextSelectionService>());
+    }
+
+    private static Mock<IAudioSearchExecutionService> CreateAudioSearchService()
+    {
+        var mock = new Mock<IAudioSearchExecutionService>();
+        mock.Setup(x => x.ExecuteQuickSearchAsync(It.IsAny<string>()))
+            .ReturnsAsync(Array.Empty<AudioModel>());
+        return mock;
     }
 
     private static Mock<IAppSettingsReader> CreateSettingsReader(SearchResultsTransferMode mode)

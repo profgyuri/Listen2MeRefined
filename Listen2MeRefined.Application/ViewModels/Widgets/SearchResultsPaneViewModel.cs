@@ -79,6 +79,9 @@ public partial class SearchResultsPaneViewModel : ViewModelBase, ISongContextMen
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
         
+        var initialResults = await _audioSearchExecutionService.ExecuteQuickSearchAsync("");
+        ApplySearchResultsUpdate(initialResults.ToArray());
+
         Logger.Debug("[SearchResultsPaneViewModel] Finished InitializeCoreAsync");
         await base.InitializeAsync(cancellationToken);
     }

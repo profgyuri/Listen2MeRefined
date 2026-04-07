@@ -53,7 +53,7 @@ public class SongContextMenuViewModelTests
             messenger,
             queueState,
             CreateSettingsReader(),
-            Mock.Of<IAudioSearchExecutionService>(),
+            CreateAudioSearchService(),
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
@@ -114,7 +114,7 @@ public class SongContextMenuViewModelTests
             messenger,
             queueState,
             CreateSettingsReader(),
-            Mock.Of<IAudioSearchExecutionService>(),
+            CreateAudioSearchService(),
             Mock.Of<ISearchResultsTransferService>(),
             Mock.Of<IDefaultPlaylistService>(),
             Mock.Of<IPlaybackQueueActionsService>(),
@@ -262,6 +262,14 @@ public class SongContextMenuViewModelTests
     }
 
     private static PlaylistQueueState CreateQueueState() => new(new PlaylistQueue());
+
+    private static IAudioSearchExecutionService CreateAudioSearchService()
+    {
+        var mock = new Mock<IAudioSearchExecutionService>();
+        mock.Setup(x => x.ExecuteQuickSearchAsync(It.IsAny<string>()))
+            .ReturnsAsync(Array.Empty<AudioModel>());
+        return mock.Object;
+    }
 
     private static IAppSettingsReader CreateSettingsReader()
     {

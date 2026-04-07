@@ -101,6 +101,22 @@
             </i:Interaction.Triggers>
         </ListView>
 
+        <!-- Empty state overlay -->
+        <components:EmptyStateOverlay Grid.Row="4"
+                                      IconKind="FolderOffOutline"
+                                      PrimaryText="No matching folders">
+            <components:EmptyStateOverlay.Style>
+                <Style TargetType="components:EmptyStateOverlay">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Folders.Count}" Value="0">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </components:EmptyStateOverlay.Style>
+        </components:EmptyStateOverlay>
+
         <Grid Grid.Row="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
