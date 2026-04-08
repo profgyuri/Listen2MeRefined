@@ -84,6 +84,12 @@
                                 Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
                     <KeyBinding Modifiers="Ctrl+Shift" Key="Delete"
                                 Command="{Binding RemoveSelectedFromActiveTabCommand}"/>
+                    <KeyBinding Key="Return"
+                                Command="{Binding PlaySelectedFromActiveTabCommand}"/>
+                    <KeyBinding Modifiers="Ctrl" Key="J"
+                                Command="{Binding JumpToSelectedSongCommand}"/>
+                    <KeyBinding Modifiers="Ctrl" Key="N"
+                                Command="{Binding SetSelectedSongAsNextCommand}"/>
                 </ListView.InputBindings>
 
                 <ListView.ContextMenu>

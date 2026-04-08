@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
@@ -84,6 +85,25 @@ public partial class MainShellDefaultHomeViewModel : ViewModelBase
     private void OnMainHomeContentToggleRequested(MainHomeContentToggleRequestedMessage message)
     {
         SetActiveContent(message.Value);
+    }
+
+    [RelayCommand]
+    private void FocusSearchBar()
+    {
+        Messenger.Send(new FocusSearchBarRequestedMessage());
+    }
+
+    [RelayCommand]
+    private async Task OpenAdvancedSearch()
+    {
+        await SearchbarViewModel.OpenAdvancedSearchWindowCommand.ExecuteAsync(null);
+    }
+
+    [RelayCommand]
+    private void CreatePlaylist()
+    {
+        SetActiveContent(MainHomeContentTarget.Playlist);
+        PlaylistPaneViewModel.PlaylistSidebarViewModel.CreatePlaylistCommand.Execute(null);
     }
 
     private void SetActiveContent(MainHomeContentTarget target)

@@ -12,6 +12,10 @@
         MinHeight="502" MinWidth="1030"
         Height="752" Width="1030">
 
+    <Window.InputBindings>
+        <KeyBinding Key="OemComma" Modifiers="Ctrl" Command="{Binding OpenSettingsWindowCommand}" />
+    </Window.InputBindings>
+
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />
     </WindowChrome.WindowChrome>

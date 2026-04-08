@@ -10,6 +10,8 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 public partial class NowPlayingVolumeViewModel : ViewModelBase
 {
     private const float VolumeEpsilon = 0.0001f;
+    private const float VolumeStep = 0.05f;
+    private const float VolumeWheelStep = 0.02f;
 
     private readonly ILogger _logger;
     private readonly IPlaybackVolumeSetter _playbackVolumeSetter;
@@ -65,6 +67,18 @@ public partial class NowPlayingVolumeViewModel : ViewModelBase
 
         _logger.Debug("[NowPlayingVolumeViewModel] Finished InitializeAsync");
         return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private void VolumeUp() => Volume = Math.Min(1f, Volume + VolumeStep);
+
+    [RelayCommand]
+    private void VolumeDown() => Volume = Math.Max(0f, Volume - VolumeStep);
+
+    public void AdjustVolumeByDelta(int delta)
+    {
+        var step = delta > 0 ? VolumeWheelStep : -VolumeWheelStep;
+        Volume = Math.Clamp(Volume + step, 0f, 1f);
     }
 
     [RelayCommand]
