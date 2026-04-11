@@ -35,6 +35,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IFileScanner _fileScanner;
     private readonly IObservableCollectionUpdater _collectionUpdater;
+    private readonly IPlaylistSortService _playlistSortService;
     private readonly ISongSelectionTracker _selectionTracker;
     private readonly Dictionary<int, ObservableCollection<AudioModel>> _playlistCache = new();
 
@@ -44,6 +45,8 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     [ObservableProperty] private string _activePlaylistName = "Default";
     [ObservableProperty] private ObservableCollection<AudioModel> _currentPlaylistSongs = [];
     [ObservableProperty] private bool _isCompactPlaylistView;
+    [ObservableProperty] private PlaylistSortProperty _selectedSortProperty = PlaylistSortProperty.Artist;
+    [ObservableProperty] private SortDirection _sortDirection = SortDirection.Ascending;
 
     public PlaylistSidebarViewModel PlaylistSidebarViewModel { get; }
     public SongContextMenuViewModel SongContextMenuViewModel { get; }
@@ -80,6 +83,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         IMusicPlayerController musicPlayerController,
         IFileScanner fileScanner,
         IObservableCollectionUpdater collectionUpdater,
+        IPlaylistSortService playlistSortService,
         IAppSettingsReader settingsReader,
         PlaylistSidebarViewModel playlistSidebarViewModel,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
@@ -98,6 +102,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         _musicPlayerController = musicPlayerController;
         _fileScanner = fileScanner;
         _collectionUpdater = collectionUpdater;
+        _playlistSortService = playlistSortService;
         _selectionTracker = new SongSelectionTracker(PublishSongContextSelectionChanged);
         PlaylistSidebarViewModel = playlistSidebarViewModel;
         SongContextMenuViewModel = songContextMenuViewModel;
@@ -348,6 +353,26 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
 
     public Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default) =>
         _externalDropImportService.HandleExternalFileDropAsync(droppedPaths, insertIndex, ct);
+
+    [RelayCommand]
+    private void SortCurrentPlaylist()
+    {
+        _playlistSortService.Sort(CurrentPlaylistSongs, SelectedSortProperty, SortDirection);
+    }
+
+    [RelayCommand]
+    private void ToggleSortDirection()
+    {
+        SortDirection = SortDirection == SortDirection.Ascending
+            ? SortDirection.Descending
+            : SortDirection.Ascending;
+        SortCurrentPlaylist();
+    }
+
+    partial void OnSelectedSortPropertyChanged(PlaylistSortProperty value)
+    {
+        SortCurrentPlaylist();
+    }
 
     private void PlaylistQueueStateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

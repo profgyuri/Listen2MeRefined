@@ -190,6 +190,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMusicPlayerController>(),
             Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
+            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -299,6 +300,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMusicPlayerController>(),
             Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
+            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -477,6 +479,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMusicPlayerController>(),
             fileScanner ?? Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
+            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger, messenger));
@@ -521,6 +524,90 @@ public class PlaylistPaneViewModelTests
                 reader.Object,
                 writer.Object,
                 prompt.Object));
+    }
+
+    [Fact]
+    public async Task SortCurrentPlaylistCommand_DelegatesToSortService()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var songC = new AudioModel { Title = "Cherry", Path = "c.mp3" };
+        var songA = new AudioModel { Title = "Apple", Path = "a.mp3" };
+        var songB = new AudioModel { Title = "Banana", Path = "b.mp3" };
+        queueServices.State.DefaultPlaylist.Add(songC);
+        queueServices.State.DefaultPlaylist.Add(songA);
+        queueServices.State.DefaultPlaylist.Add(songB);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSortProperty = PlaylistSortProperty.Title;
+        pane.SortDirection = SortDirection.Ascending;
+        pane.SortCurrentPlaylistCommand.Execute(null);
+
+        Assert.Equal(
+            ["Apple", "Banana", "Cherry"],
+            pane.CurrentPlaylistSongs.Select(x => x.Title ?? string.Empty).ToArray());
+    }
+
+    [Fact]
+    public async Task ToggleSortDirectionCommand_FlipsDirectionAndResorts()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var songA = new AudioModel { Title = "Apple", Path = "a.mp3" };
+        var songB = new AudioModel { Title = "Banana", Path = "b.mp3" };
+        var songC = new AudioModel { Title = "Cherry", Path = "c.mp3" };
+        queueServices.State.DefaultPlaylist.Add(songC);
+        queueServices.State.DefaultPlaylist.Add(songA);
+        queueServices.State.DefaultPlaylist.Add(songB);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SelectedSortProperty = PlaylistSortProperty.Title;
+        pane.SortDirection = SortDirection.Ascending;
+        pane.SortCurrentPlaylistCommand.Execute(null);
+
+        Assert.Equal(SortDirection.Ascending, pane.SortDirection);
+        Assert.Equal("Apple", pane.CurrentPlaylistSongs[0].Title);
+
+        pane.ToggleSortDirectionCommand.Execute(null);
+
+        Assert.Equal(SortDirection.Descending, pane.SortDirection);
+        Assert.Equal(
+            ["Cherry", "Banana", "Apple"],
+            pane.CurrentPlaylistSongs.Select(x => x.Title ?? string.Empty).ToArray());
+    }
+
+    [Fact]
+    public async Task SelectedSortPropertyChanged_AutomaticallyResorts()
+    {
+        var logger = CreateLogger();
+        var messenger = new WeakReferenceMessenger();
+        var queueServices = CreateQueueServices(logger.Object);
+        var pane = CreatePane(logger.Object, messenger, queueServices);
+
+        var song1 = new AudioModel { Title = "Zebra", Artist = "Alpha", Path = "1.mp3" };
+        var song2 = new AudioModel { Title = "Apple", Artist = "Zeta", Path = "2.mp3" };
+        queueServices.State.DefaultPlaylist.Add(song1);
+        queueServices.State.DefaultPlaylist.Add(song2);
+        queueServices.RoutingService.ActivateDefaultPlaylistQueue();
+
+        await pane.InitializeAsync();
+        pane.SortDirection = SortDirection.Ascending;
+
+        // Sort by Title: Apple comes first
+        pane.SelectedSortProperty = PlaylistSortProperty.Title;
+        Assert.Equal("Apple", pane.CurrentPlaylistSongs[0].Title);
+
+        // Switch to Artist: Alpha comes first (which has Title "Zebra")
+        pane.SelectedSortProperty = PlaylistSortProperty.Artist;
+        Assert.Equal("Zebra", pane.CurrentPlaylistSongs[0].Title);
     }
 
     private static SongContextMenuViewModel CreateSongContextMenuViewModel(ILogger logger, IMessenger messenger)

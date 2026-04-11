@@ -13,6 +13,7 @@
              xmlns:contextMenus="clr-namespace:Listen2MeRefined.WPF.Views.ContextMenus"
              xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
              xmlns:utils="clr-namespace:Listen2MeRefined.WPF.Utils"
+             xmlns:enums="clr-namespace:Listen2MeRefined.Core.Enums;assembly=Listen2MeRefined.Core"
              xmlns:widgetViewModels="clr-namespace:Listen2MeRefined.Application.ViewModels.Widgets;assembly=Listen2MeRefined.Application">
 
     <Grid>
@@ -37,16 +38,52 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Header: playlist name + Clear -->
+            <!-- Header: playlist name + Sort controls + Clear -->
             <Grid Margin="12,8,12,8" MinHeight="28">
-                <TextBlock Text="{Binding ActivePlaylistName}"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding ActivePlaylistName}"
                            Foreground="{DynamicResource SecondaryBrush}"
                            FontSize="14"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
 
-                <Button Content="Clear"
-                        HorizontalAlignment="Right"
+                <!-- Sort property selector -->
+                <ComboBox Grid.Column="2"
+                          Style="{DynamicResource PlaylistSortPropertyComboBox}"
+                          ItemsSource="{Binding Source={utils:EnumValues {x:Type enums:PlaylistSortProperty}}}"
+                          SelectedItem="{Binding SelectedSortProperty}"
+                          VerticalAlignment="Center"/>
+
+                <!-- Sort direction toggle -->
+                <Button Grid.Column="3"
+                        Style="{DynamicResource PlaylistPaneHeaderSortDirectionPill}"
+                        Command="{Binding ToggleSortDirectionCommand}"
+                        VerticalAlignment="Center">
+
+                    <materialDesign:PackIcon Width="14" Height="14">
+                        <materialDesign:PackIcon.Style>
+                            <Style TargetType="materialDesign:PackIcon">
+                                <Setter Property="Kind" Value="SortAscending"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SortDirection}" Value="Descending">
+                                        <Setter Property="Kind" Value="SortDescending"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </materialDesign:PackIcon.Style>
+                    </materialDesign:PackIcon>
+                </Button>
+
+                <Button Grid.Column="4"
+                        Content="Clear"
                         ToolTip="Remove selected or clear playlist"
                         Style="{DynamicResource PlaylistPaneHeaderClearPill}"
                         Command="{Binding RemoveSelectedFromActiveTabCommand}"/>

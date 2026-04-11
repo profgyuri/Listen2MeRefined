@@ -302,6 +302,7 @@ public sealed class MainShellDefaultHomeViewModelTests
             Mock.Of<IMusicPlayerController>(),
             Mock.Of<Listen2MeRefined.Application.Files.IFileScanner>(),
             Mock.Of<IObservableCollectionUpdater>(),
+            Mock.Of<IPlaylistSortService>(),
             settingsReader,
             playlistSidebarViewModel,
             songContextMenuViewModel)
