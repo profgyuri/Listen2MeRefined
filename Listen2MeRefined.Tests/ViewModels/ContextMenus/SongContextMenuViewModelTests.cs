@@ -333,6 +333,7 @@ public class SongContextMenuViewModelTests
             Mock.Of<IMusicPlayerController>(),
             fileScanner ?? Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
+            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             songContextMenuViewModel);

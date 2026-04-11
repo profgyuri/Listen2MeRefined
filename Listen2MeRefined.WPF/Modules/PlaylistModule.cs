@@ -29,6 +29,7 @@ public sealed class PlaylistModule : IModule
         services.AddTransient<IPlaylistMembership, PlaylistMembership>();
         services.AddTransient<ISongContextSelectionService, SongContextSelectionService>();
         services.AddTransient<IObservableCollectionUpdater, ObservableCollectionUpdater>();
+        services.AddTransient<IPlaylistSortService, PlaylistSortService>();
         services.AddSingleton<IDefaultPlaylistService, DefaultPlaylistService>();
 
         services.AddTransient<IDroppedSongFolderPromptService, DroppedSongFolderPromptService>();
