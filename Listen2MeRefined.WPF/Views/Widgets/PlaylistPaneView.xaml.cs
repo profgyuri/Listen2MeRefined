@@ -2,6 +2,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using CommunityToolkit.Mvvm.Messaging;
+using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.ViewModels.Widgets;
 
 namespace Listen2MeRefined.WPF.Views.Widgets;
@@ -11,6 +13,19 @@ public partial class PlaylistPaneView : UserControl
     public PlaylistPaneView()
     {
         InitializeComponent();
+
+        WeakReferenceMessenger.Default.Register<ScrollToPlaylistIndexRequestedMessage>(this, (_, msg) =>
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (msg.Value >= 0 && msg.Value < PlaylistListView.Items.Count)
+                {
+                    PlaylistListView.ScrollIntoView(PlaylistListView.Items[msg.Value]);
+                }
+            });
+        });
+
+        Unloaded += (_, _) => WeakReferenceMessenger.Default.Unregister<ScrollToPlaylistIndexRequestedMessage>(this);
     }
 
     private void PlaylistListView_OnPreviewDragOver(object sender, DragEventArgs e)

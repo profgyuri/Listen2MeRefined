@@ -11,7 +11,7 @@ Complete reference of all keyboard shortcuts and mouse interactions in Listen2Me
 | Key | Action |
 |---|---|
 | `Space` | Play / Pause (not when typing in a text field) |
-| `Ctrl+Space` | Stop |
+| `Ctrl+Q` | Stop |
 | `Ctrl+Right` | Next track |
 | `Ctrl+Left` | Previous track |
 | `Ctrl+S` | Shuffle playlist |
@@ -64,7 +64,7 @@ Complete reference of all keyboard shortcuts and mouse interactions in Listen2Me
 | Key | Action |
 |---|---|
 | `Enter` | Play selected track |
-| `Ctrl+J` | Jump to currently playing track |
+| `Ctrl+J` | Scroll to and select currently playing track |
 | `Ctrl+N` | Set selected track as next |
 | `Ctrl+Delete` | Remove selected from playlist |
 | `Ctrl+Shift+Delete` | Remove selected from playlist |

@@ -204,6 +204,20 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         ExecuteSafeAsync(_ => _playbackQueueActionsService.JumpToSelectedSongAsync());
 
     [RelayCommand]
+    private void ScrollToCurrentlyPlaying()
+    {
+        var currentIndex = _playlistQueueState.CurrentSongIndex;
+        if (currentIndex < 0 || currentIndex >= CurrentPlaylistSongs.Count)
+        {
+            return;
+        }
+
+        SelectedIndex = currentIndex;
+        SelectedSong = CurrentPlaylistSongs[currentIndex];
+        Messenger.Send(new ScrollToPlaylistIndexRequestedMessage(currentIndex));
+    }
+
+    [RelayCommand]
     private Task SetSelectedSongAsNext() =>
         ExecuteSafeAsync(_ =>
         {

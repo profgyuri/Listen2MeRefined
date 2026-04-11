@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.InputBindings>
         <!-- Playback -->
-        <KeyBinding Key="Space" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.StopCommand}" />
+        <KeyBinding Key="Q" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.StopCommand}" />
         <KeyBinding Key="Right" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.NextCommand}" />
         <KeyBinding Key="Left" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.PreviousCommand}" />
         <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.ShuffleCommand}" />
