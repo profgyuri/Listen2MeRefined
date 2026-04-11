@@ -20,7 +20,8 @@
                 Maximum="{Binding Maximum, ElementName=Root}"
                 TickFrequency="{Binding TickFrequency, ElementName=Root}"
                 IsSnapToTickEnabled="{Binding IsSnapToTickEnabled, ElementName=Root}"
-                Value="{Binding Value, ElementName=Root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                Value="{Binding Value, ElementName=Root, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                PreviewMouseWheel="Slider_OnPreviewMouseWheel" />
 
         <TextBlock Grid.Column="2"
                    Margin="8,0,0,0"

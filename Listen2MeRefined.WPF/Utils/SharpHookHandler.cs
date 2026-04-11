@@ -30,7 +30,8 @@ internal sealed class SharpHookHandler : IGlobalHook
         KeyCode.VcMediaPlay,
         KeyCode.VcMediaNext,
         KeyCode.VcMediaPrevious,
-        KeyCode.VcMediaStop
+        KeyCode.VcMediaStop,
+        KeyCode.VcN
     ];
 
     private readonly ILogger _logger;
@@ -44,6 +45,7 @@ internal sealed class SharpHookHandler : IGlobalHook
     private readonly SharpHook.IGlobalHook _hook;
     private bool _handlersAttached;
     private bool _runLoopStarted;
+    private bool _cornerWindowManuallyToggled;
     private DrawingPoint _lastMousePosition;
 
     public SharpHookHandler(
@@ -176,13 +178,26 @@ internal sealed class SharpHookHandler : IGlobalHook
 
     private void OnKeyDown(object? sender, KeyboardHookEventArgs e)
     {
-        if (!IsGlobalMediaKeysEnabled() ||
-            !LowLevelKeys.Contains(e.RawEvent.Keyboard.KeyCode))
+        var keyCode = e.RawEvent.Keyboard.KeyCode;
+
+        if (!LowLevelKeys.Contains(keyCode))
         {
             return;
         }
 
-        switch (e.RawEvent.Keyboard.KeyCode)
+        // Ctrl+Alt+N toggles corner window (independent of media key setting)
+        if (keyCode == KeyCode.VcN && e.RawEvent.Mask.HasCtrl() && e.RawEvent.Mask.HasAlt())
+        {
+            ToggleCornerWindow();
+            return;
+        }
+
+        if (!IsGlobalMediaKeysEnabled())
+        {
+            return;
+        }
+
+        switch (keyCode)
         {
             case KeyCode.VcMediaPlay:
                 _musicPlayerController.PlayPauseAsync();
@@ -266,8 +281,45 @@ internal sealed class SharpHookHandler : IGlobalHook
         return Math.Clamp(saved == 0 ? DefaultDebounceMs : saved, MinDebounceMs, MaxDebounceMs);
     }
 
+    private void ToggleCornerWindow()
+    {
+        _ui.InvokeAsync(() =>
+        {
+            try
+            {
+                if (_windowManager.IsOpen<CornerWindowShellViewModel>())
+                {
+                    _cornerWindowManuallyToggled = false;
+                    _windowManager.CloseWindow<CornerWindowShellViewModel>();
+                }
+                else
+                {
+                    _cornerWindowManuallyToggled = true;
+                    var pos = _lastMousePosition;
+                    var screenBounds = Screen.FromPoint(pos).Bounds;
+                    var triggerSize = GetTriggerAreaSizePx();
+                    var anchor = IsMouseInCorner(pos.X, pos.Y, triggerSize, screenBounds)
+                        ? ResolveCornerAnchor(pos.X, pos.Y, triggerSize, screenBounds)
+                        : WindowPositionAnchor.BottomRight;
+                    var (anchorX, anchorY) = ResolveCornerPoint(anchor, screenBounds);
+                    var options = WindowShowOptions.At(anchorX, anchorY, isModal: false, anchor: anchor);
+                    _ = _windowManager.ShowWindowAsync<CornerWindowShellViewModel>(options);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to toggle corner window");
+            }
+        });
+    }
+
     private void HideNowPlayingWindow()
     {
+        if (_cornerWindowManuallyToggled)
+        {
+            return;
+        }
+
         _ui.InvokeAsync(() =>
         {
             try

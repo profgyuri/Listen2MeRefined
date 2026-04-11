@@ -12,7 +12,17 @@
         ResizeMode="NoResize"
         Title="Settings"
         Height="620"
-        Width="920">
+        Width="920"
+        PreviewKeyDown="SettingsShell_OnPreviewKeyDown">
+
+    <Window.InputBindings>
+        <KeyBinding Key="D1" Modifiers="Ctrl" Command="{Binding NavigateToTabByIndexCommand}" CommandParameter="0" />
+        <KeyBinding Key="D2" Modifiers="Ctrl" Command="{Binding NavigateToTabByIndexCommand}" CommandParameter="1" />
+        <KeyBinding Key="D3" Modifiers="Ctrl" Command="{Binding NavigateToTabByIndexCommand}" CommandParameter="2" />
+        <KeyBinding Key="D4" Modifiers="Ctrl" Command="{Binding NavigateToTabByIndexCommand}" CommandParameter="3" />
+        <KeyBinding Key="D5" Modifiers="Ctrl" Command="{Binding NavigateToTabByIndexCommand}" CommandParameter="4" />
+        <KeyBinding Key="D6" Modifiers="Ctrl" Command="{Binding NavigateToTabByIndexCommand}" CommandParameter="5" />
+    </Window.InputBindings>
 
     <WindowChrome.WindowChrome>
         <WindowChrome x:Name="WindowChrome" CaptionHeight="40" />

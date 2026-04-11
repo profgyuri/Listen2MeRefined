@@ -7,7 +7,30 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance defaultHomeViewModels:MainShellDefaultHomeViewModel}"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <UserControl.InputBindings>
+        <!-- Playback -->
+        <KeyBinding Key="Q" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.StopCommand}" />
+        <KeyBinding Key="Right" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.NextCommand}" />
+        <KeyBinding Key="Left" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.PreviousCommand}" />
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.ShuffleCommand}" />
+        <KeyBinding Key="R" Modifiers="Ctrl" Command="{Binding PlaybackControlsViewModel.ToggleRepeatCommand}" />
+
+        <!-- Seek -->
+        <KeyBinding Key="Right" Modifiers="Shift" Command="{Binding PlaybackControlsViewModel.SeekForwardCommand}" />
+        <KeyBinding Key="Left" Modifiers="Shift" Command="{Binding PlaybackControlsViewModel.SeekBackwardCommand}" />
+        <KeyBinding Key="Right" Modifiers="Ctrl+Shift" Command="{Binding PlaybackControlsViewModel.SeekForwardLargeCommand}" />
+        <KeyBinding Key="Left" Modifiers="Ctrl+Shift" Command="{Binding PlaybackControlsViewModel.SeekBackwardLargeCommand}" />
+
+        <!-- Navigation -->
+        <KeyBinding Key="F" Modifiers="Ctrl" Command="{Binding FocusSearchBarCommand}" />
+        <KeyBinding Key="F" Modifiers="Ctrl+Shift" Command="{Binding OpenAdvancedSearchCommand}" />
+        <KeyBinding Key="D1" Modifiers="Ctrl" Command="{Binding MainHomeContentToggleViewModel.ShowPlaylistCommand}" />
+        <KeyBinding Key="D2" Modifiers="Ctrl" Command="{Binding MainHomeContentToggleViewModel.ShowSearchResultsCommand}" />
+
+        <!-- Playlist management -->
+        <KeyBinding Key="P" Modifiers="Ctrl" Command="{Binding CreatePlaylistCommand}" />
+    </UserControl.InputBindings>
+    <Grid PreviewKeyDown="OnPreviewKeyDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />

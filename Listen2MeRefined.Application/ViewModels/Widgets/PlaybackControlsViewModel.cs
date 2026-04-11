@@ -88,6 +88,21 @@ public partial class PlaybackControlsViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
+    private const double SeekSmallMs = 5000;
+    private const double SeekLargeMs = 30000;
+
+    [RelayCommand]
+    private void SeekForward() => CurrentTime = Math.Min(TotalTime, CurrentTime + SeekSmallMs);
+
+    [RelayCommand]
+    private void SeekBackward() => CurrentTime = Math.Max(0, CurrentTime - SeekSmallMs);
+
+    [RelayCommand]
+    private void SeekForwardLarge() => CurrentTime = Math.Min(TotalTime, CurrentTime + SeekLargeMs);
+
+    [RelayCommand]
+    private void SeekBackwardLarge() => CurrentTime = Math.Max(0, CurrentTime - SeekLargeMs);
+
     [RelayCommand]
     private async Task PlayPause()
     {

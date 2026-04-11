@@ -29,7 +29,8 @@
                                              VerticalAlignment="Center"
                                              Foreground="{DynamicResource SecondaryDarkBrush}" />
 
-                    <TextBox Grid.Column="1"
+                    <TextBox x:Name="SearchTextBox"
+                             Grid.Column="1"
                              Height="32"
                              BorderThickness="0"
                              Background="Transparent"
@@ -38,7 +39,8 @@
                              VerticalContentAlignment="Center"
                              materialDesign:HintAssist.Hint="Quick Search"
                              materialDesign:HintAssist.Foreground="{DynamicResource SecondaryDarkBrush}"
-                             Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding SearchTerm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewKeyDown="SearchTextBox_OnPreviewKeyDown" />
                 </Grid>
             </Border>
 

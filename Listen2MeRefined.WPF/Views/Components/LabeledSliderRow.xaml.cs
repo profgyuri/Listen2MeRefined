@@ -3,6 +3,7 @@ namespace Listen2MeRefined.WPF.Views.Components;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 public partial class LabeledSliderRow : UserControl
 {
@@ -171,5 +172,13 @@ public partial class LabeledSliderRow : UserControl
     {
         var formatted = Value.ToString(ValueFormat, CultureInfo.CurrentCulture);
         SetValue(ValueDisplayPropertyKey, string.Concat(formatted, ValueSuffix));
+    }
+
+    private void Slider_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        var step = TickFrequency > 0 ? TickFrequency : 1;
+        var delta = e.Delta > 0 ? step : -step;
+        Value = Math.Clamp(Value + delta, Minimum, Maximum);
+        e.Handled = true;
     }
 }
