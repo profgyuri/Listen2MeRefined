@@ -152,6 +152,7 @@
                                 </Grid.RowDefinitions>
 
                                 <resources:StoryboardTextBlock
+                                    x:Name="DetailedTitleText"
                                     Text="{Binding Display, FallbackValue=Track Title}"
                                     Foreground="{DynamicResource SecondaryBrush}"
                                     FontSize="14"
@@ -177,13 +178,14 @@
                             </Grid>
 
                             <!-- Compact view -->
-                            <Grid x:Name="CompactViewRoot" Visibility="Collapsed">
+                            <Grid x:Name="CompactViewRoot" Grid.Column="1" Visibility="Collapsed">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
                                 <resources:StoryboardTextBlock
+                                    x:Name="CompactTitleText"
                                     Text="{Binding Display, FallbackValue=Track Title}"
                                     Foreground="{DynamicResource SecondaryBrush}"
                                     FontSize="14"
@@ -208,6 +210,17 @@
                                          Value="True">
                                 <Setter TargetName="DetailedViewRoot" Property="Visibility" Value="Collapsed"/>
                                 <Setter TargetName="CompactViewRoot" Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <MultiBinding Converter="{StaticResource PathEqualsMultiConverter}">
+                                        <Binding Path="Path"/>
+                                        <Binding Path="DataContext.CurrentActiveSongPath"
+                                                 RelativeSource="{RelativeSource AncestorType=ListView}"/>
+                                    </MultiBinding>
+                                </DataTrigger.Binding>
+                                <Setter TargetName="DetailedTitleText" Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
+                                <Setter TargetName="CompactTitleText" Property="Foreground" Value="{DynamicResource TertiaryBrush}"/>
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>

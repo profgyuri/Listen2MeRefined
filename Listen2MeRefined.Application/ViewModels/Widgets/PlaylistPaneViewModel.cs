@@ -47,6 +47,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     [ObservableProperty] private bool _isCompactPlaylistView;
     [ObservableProperty] private PlaylistSortProperty _selectedSortProperty = PlaylistSortProperty.Artist;
     [ObservableProperty] private SortDirection _sortDirection = SortDirection.Ascending;
+    [ObservableProperty] private string? _currentActiveSongPath;
 
     public PlaylistSidebarViewModel PlaylistSidebarViewModel { get; }
     public SongContextMenuViewModel SongContextMenuViewModel { get; }
@@ -624,6 +625,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     private void OnCurrentSongChangedMessage(CurrentSongChangedMessage message)
     {
         Logger.Information("[PlaylistPaneViewModel] Current song changed to {@Audio}", message.Value);
+        CurrentActiveSongPath = message.Value?.Path;
         _externalAudioOpenService.SetCurrentSong(message.Value);
         _playbackContextSyncService.SetCurrentSong(message.Value);
     }

@@ -2,7 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:components="clr-namespace:Listen2MeRefined.WPF.Views.Components"
+    xmlns:wpf="clr-namespace:Listen2MeRefined.WPF"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <wpf:PathEqualsMultiConverter x:Key="PathEqualsMultiConverter" />
 
     <Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">
         <Setter Property="OverridesDefaultStyle" Value="True" />
@@ -1398,6 +1401,17 @@
                                             <Setter TargetName="ItemRowBorder" Property="BorderBrush" Value="{DynamicResource TertiaryLightBrush}"/>
                                             <Setter TargetName="ItemRowBorder" Property="Background" Value="{DynamicResource TertiaryDarkBrush}"/>
                                         </MultiTrigger>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource PathEqualsMultiConverter}">
+                                                    <Binding Path="Path"/>
+                                                    <Binding Path="DataContext.CurrentActiveSongPath"
+                                                             RelativeSource="{RelativeSource AncestorType=ListView}"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter TargetName="ItemRowBorder" Property="BorderThickness" Value="4,0,0,0"/>
+                                            <Setter TargetName="ItemRowBorder" Property="BorderBrush" Value="{DynamicResource TertiaryBrush}"/>
+                                        </DataTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
