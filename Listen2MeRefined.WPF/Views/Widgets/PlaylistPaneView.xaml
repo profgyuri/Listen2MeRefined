@@ -98,8 +98,13 @@
                       Grid.Row="2"
                       dd:DragDrop.IsDragSource="True"
                       dd:DragDrop.IsDropTarget="True"
+                      dd:DragDrop.DropTargetAdornerBrush="{DynamicResource TertiaryBrush}"
+                      dd:DragDrop.UseDefaultDragAdorner="True"
+                      dd:DragDrop.DefaultDragAdornerOpacity="0.85"
+                      dd:DragDrop.DragAdornerTemplate="{StaticResource DragDropDragAdornerTemplate}"
                       AllowDrop="True"
                       PreviewDragOver="PlaylistListView_OnPreviewDragOver"
+                      PreviewDragLeave="PlaylistListView_OnPreviewDragLeave"
                       PreviewDrop="PlaylistListView_OnPreviewDrop"
                       ItemsSource="{Binding CurrentPlaylistSongs}"
                       Style="{DynamicResource PlaylistListView}"
@@ -209,8 +214,37 @@
                 </ListView.ItemTemplate>
             </ListView>
 
+            <!-- External file drop overlay (shown when dragging files from Windows shell).
+                 Hidden when the playlist is empty because EmptyStateOverlay already
+                 shows a "Drop tracks here" prompt in that case. -->
+            <Border x:Name="ExternalDropOverlay"
+                    Grid.Row="2"
+                    Margin="8"
+                    Background="{DynamicResource TertiaryDarkBrush}"
+                    BorderBrush="{DynamicResource TertiaryBrush}"
+                    BorderThickness="2"
+                    CornerRadius="8"
+                    IsHitTestVisible="False"
+                    Visibility="Collapsed">
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                    <materialDesign:PackIcon Kind="FileMusic"
+                                             Width="36"
+                                             Height="36"
+                                             Foreground="{DynamicResource TertiaryBrush}"
+                                             HorizontalAlignment="Center"/>
+                    <TextBlock Text="Drop files here"
+                               Foreground="{DynamicResource SecondaryBrush}"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Margin="0,8,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
             <!-- Empty state overlay -->
-            <components:EmptyStateOverlay Grid.Row="2"
+            <components:EmptyStateOverlay x:Name="EmptyStateOverlay"
+                                          Grid.Row="2"
                                           IconKind="MusicNote"
                                           PrimaryText="Drop tracks here"
                                           SecondaryText="or double-click from the library">

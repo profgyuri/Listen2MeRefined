@@ -78,6 +78,9 @@
                 <ItemsControl ItemsSource="{Binding ManualPlaylists}"
                               dd:DragDrop.IsDragSource="True"
                               dd:DragDrop.IsDropTarget="True"
+                              dd:DragDrop.DropTargetAdornerBrush="{DynamicResource TertiaryBrush}"
+                              dd:DragDrop.UseDefaultDragAdorner="True"
+                              dd:DragDrop.DefaultDragAdornerOpacity="0.8"
                               Drop="ManualPlaylists_OnDrop"
                               x:Name="ManualPlaylistsControl">
                     <ItemsControl.ItemTemplate>

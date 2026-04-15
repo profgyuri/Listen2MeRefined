@@ -1507,4 +1507,27 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+    <!--#region Drag-and-Drop Feedback (gong-wpf-dragdrop) -->
+
+    <!-- Drag preview adorner: ghost card shown next to cursor while dragging.
+         Note: the insertion line between items is rendered by gong's built-in
+         DropTargetInsertionAdorner and is themed via DropTargetAdornerBrush. -->
+    <DataTemplate x:Key="DragDropDragAdornerTemplate">
+        <Border Background="{DynamicResource SurfaceElevatedBrush}"
+                BorderBrush="{DynamicResource TertiaryBrush}"
+                BorderThickness="2,0,0,0"
+                CornerRadius="4"
+                Padding="10,6"
+                Opacity="0.9"
+                MaxWidth="320">
+            <TextBlock Text="{Binding Display}"
+                       Foreground="{DynamicResource SecondaryBrush}"
+                       FontSize="13"
+                       FontWeight="SemiBold"
+                       TextTrimming="CharacterEllipsis"/>
+        </Border>
+    </DataTemplate>
+
+    <!--#endregion-->
 </ResourceDictionary>
