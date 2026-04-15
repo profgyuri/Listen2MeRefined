@@ -98,3 +98,32 @@ public sealed class StringToFontFamilyConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => value is FontFamily ff ? ff.Source : "Segoe UI";
 }
+
+/// <summary>
+///     Compares two string values for case-insensitive equality.
+///     Used to highlight the currently playing song in a playlist by comparing
+///     each item's path against the active song path held on the view model.
+/// </summary>
+public sealed class PathEqualsMultiConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values is null || values.Length < 2)
+        {
+            return false;
+        }
+
+        var itemPath = values[0] as string;
+        var activePath = values[1] as string;
+
+        if (string.IsNullOrEmpty(itemPath) || string.IsNullOrEmpty(activePath))
+        {
+            return false;
+        }
+
+        return string.Equals(itemPath, activePath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
