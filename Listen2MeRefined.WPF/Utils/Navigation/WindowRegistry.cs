@@ -7,7 +7,7 @@ namespace Listen2MeRefined.WPF.Utils.Navigation;
 public class WindowRegistry : IWindowRegistry
 {
     private readonly Dictionary<Type, Type> _map = new();
-    
+
     public void Register<TShellViewModel, TWindow>() where TShellViewModel : ShellViewModelBase where TWindow : class
     {
         if (!_map.TryAdd(typeof(TShellViewModel), typeof(TWindow)))

@@ -46,13 +46,13 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="1"
-                            Content="Confirm"
+                            Content="{Binding CurrentViewModel.PrimaryButtonText, FallbackValue=Confirm}"
                             MinWidth="120"
                             Style="{DynamicResource PopupFooterPrimaryActionButton}"
                             Click="FooterBar_OnPrimaryClick" />
 
                     <Button Grid.Column="2"
-                            Content="Cancel"
+                            Content="{Binding CurrentViewModel.SecondaryButtonText, FallbackValue=Cancel}"
                             MinWidth="120"
                             Margin="6,0,0,0"
                             Style="{DynamicResource PopupFooterActionButton}"

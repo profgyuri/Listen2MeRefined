@@ -15,7 +15,7 @@ public sealed class AppThemeService : IAppThemeService
     private readonly IEnumerable<IWaveformPaletteAware> _waveformPaletteAwareTargets;
 
     public AppThemeService(
-        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets, 
+        IEnumerable<IWaveformPaletteAware> waveformPaletteAwareTargets,
         IMessenger messenger)
     {
         _waveformPaletteAwareTargets = waveformPaletteAwareTargets;

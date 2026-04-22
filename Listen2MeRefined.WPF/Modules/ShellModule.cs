@@ -34,6 +34,8 @@ public sealed class ShellModule : IModule
         services.AddTransient<PopupShellViewModel>();
         services.AddTransient<SongDroppedPopup>();
         services.AddTransient<SongDroppedPopupViewModel>();
+        services.AddTransient<ReplaceDefaultPlaylistPopup>();
+        services.AddTransient<ReplaceDefaultPlaylistPopupViewModel>();
         services.AddTransient<CrashReportPopup>();
         services.AddTransient<CrashReportWindow>();
 
@@ -57,6 +59,7 @@ public sealed class ShellModule : IModule
     {
         registry.Register<MainShellDefaultHomeViewModel>("main/home");
         registry.Register<SongDroppedPopupViewModel>("popup/songDropped");
+        registry.Register<ReplaceDefaultPlaylistPopupViewModel>("popup/replaceDefaultPlaylist");
         registry.Register<CornerShellDefaultHomeViewModel>("corner/home");
     }
 

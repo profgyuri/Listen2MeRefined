@@ -20,19 +20,19 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
     private readonly IAppUpdateChecker _appUpdateChecker;
     private readonly IBackgroundTaskStatusService _backgroundTaskStatusService;
     private readonly IUiDispatcher _ui;
-    
+
     [ObservableProperty] private bool _isUpdateAvailable;
     [ObservableProperty] private bool _isTaskStatusVisible;
     [ObservableProperty] private string _taskStatusText = string.Empty;
     [ObservableProperty] private string _taskStatusTooltip = string.Empty;
     [ObservableProperty] private string _fontFamilyName = string.Empty;
-    
+
     public MainShellViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
-        IMessenger messenger, 
-        IShellContextFactory context, 
-        IWindowManager windowManager, 
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger,
+        IShellContextFactory context,
+        IWindowManager windowManager,
         IAppUpdateChecker appUpdateChecker,
         IBackgroundTaskStatusService backgroundTaskStatusService,
         IUiDispatcher ui) : base(errorHandler, logger, messenger, context.Create())
@@ -49,15 +49,15 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
-        
+
         IsUpdateAvailable = (await _appUpdateChecker.CheckForUpdatesAsync()).IsUpdateAvailable;
-        
+
         await NavigationService
             .NavigateAsync<MainShellDefaultHomeViewModel>(cancellationToken: cancellationToken)
             .ConfigureAwait(true);
-        
+
         await base.InitializeAsync(cancellationToken);
-        
+
         Logger.Debug("[MainShellViewModel] Finished InitializeAsync");
     }
 
@@ -131,7 +131,7 @@ public sealed partial class MainShellViewModel : ShellViewModelBase
             }
         });
     }
-    
+
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         Logger.Debug("[MainShellViewModel] Received FontFamily changed message: {message}", message.Value);

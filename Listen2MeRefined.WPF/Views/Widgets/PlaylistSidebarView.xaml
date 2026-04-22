@@ -9,7 +9,8 @@
              xmlns:resources="clr-namespace:Listen2MeRefined.WPF"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance widgetViewModels:PlaylistSidebarViewModel}"
-             d:DesignHeight="400" d:DesignWidth="180">
+             d:DesignHeight="400" d:DesignWidth="180"
+             x:Name="SidebarRoot">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -26,8 +27,29 @@
                            Style="{DynamicResource PlaylistSidebarGroupHeader}"/>
 
                 <Border DataContext="{Binding DefaultPlaylist}"
+                        Tag="{Binding DataContext, ElementName=SidebarRoot}"
                         Style="{DynamicResource PlaylistSidebarItem}"
                         MouseLeftButtonDown="SidebarItem_OnMouseLeftButtonDown">
+                    <Border.ContextMenu>
+                        <ContextMenu Style="{DynamicResource PlaylistContextMenuStyle}">
+                            <MenuItem Header="Export"
+                                      Style="{DynamicResource PlaylistContextMenuItemStyle}"
+                                      ItemsSource="{Binding PlacementTarget.Tag.ExportFormatOptions, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                      Tag="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="Export" Width="14" Height="14"
+                                                             Foreground="{DynamicResource SecondaryDarkBrush}"/>
+                                </MenuItem.Icon>
+                                <MenuItem.ItemContainerStyle>
+                                    <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
+                                        <Setter Property="Header" Value="{Binding DisplayName}"/>
+                                        <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
+                                        <EventSetter Event="Click" Handler="ExportFormatMenuItem_OnClick"/>
+                                    </Style>
+                                </MenuItem.ItemContainerStyle>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Border.ContextMenu>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -86,6 +108,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type widgetViewModels:PlaylistSidebarViewModel+PlaylistSidebarItem}">
                             <Border Style="{DynamicResource PlaylistSidebarItem}"
+                                    Tag="{Binding DataContext, ElementName=SidebarRoot}"
                                     MouseLeftButtonDown="SidebarItem_OnMouseLeftButtonDown"
                                     PreviewKeyDown="SidebarItem_OnPreviewKeyDown">
                                 <Border.ContextMenu>
@@ -115,6 +138,22 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </MenuItem.Style>
+                                        </MenuItem>
+                                        <MenuItem Header="Export"
+                                                  Style="{DynamicResource PlaylistContextMenuItemStyle}"
+                                                  ItemsSource="{Binding PlacementTarget.Tag.ExportFormatOptions, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                  Tag="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="Export" Width="14" Height="14"
+                                                                         Foreground="{DynamicResource SecondaryDarkBrush}"/>
+                                            </MenuItem.Icon>
+                                            <MenuItem.ItemContainerStyle>
+                                                <Style TargetType="MenuItem" BasedOn="{StaticResource PlaylistContextMenuItemStyle}">
+                                                    <Setter Property="Header" Value="{Binding DisplayName}"/>
+                                                    <Setter Property="ToolTip" Value="{Binding Tooltip}"/>
+                                                    <EventSetter Event="Click" Handler="ExportFormatMenuItem_OnClick"/>
+                                                </Style>
+                                            </MenuItem.ItemContainerStyle>
                                         </MenuItem>
                                         <Separator Style="{DynamicResource PlaylistContextMenuSeparator}"/>
                                         <MenuItem Header="Delete"
@@ -226,10 +265,15 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- New playlist button -->
-        <Button Grid.Row="1"
-                Content="+ New Playlist"
-                Style="{DynamicResource PlaylistSidebarNewButton}"
-                Command="{Binding CreatePlaylistCommand}"/>
+        <!-- Footer: New playlist + Import playlist -->
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <Button Content="+ New Playlist"
+                    Style="{DynamicResource PlaylistSidebarNewButton}"
+                    Command="{Binding CreatePlaylistCommand}"/>
+            <Button Content="Import Playlist"
+                    Style="{DynamicResource PlaylistSidebarNewButton}"
+                    ToolTip="{Binding ImportTooltip}"
+                    Command="{Binding ImportPlaylistCommand}"/>
+        </StackPanel>
     </Grid>
 </UserControl>

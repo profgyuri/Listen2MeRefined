@@ -1,10 +1,12 @@
 using Listen2MeRefined.Application;
 using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Formats;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
+using Serilog;
 
 namespace Listen2MeRefined.Infrastructure.Playlist;
 
@@ -22,35 +24,72 @@ public sealed class ExternalDropImportService : IExternalDropImportService
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAppSettingsWriter _settingsWriter;
     private readonly IDroppedSongFolderPromptService _droppedSongFolderPromptService;
+    private readonly IPlaylistFormatRegistry _formatRegistry;
+    private readonly IPlaylistImportService _playlistImportService;
+    private readonly ILogger _logger;
 
     public ExternalDropImportService(
         IPlaylistQueueState queueState,
         IFileScanner fileScanner,
         IAppSettingsReader settingsReader,
         IAppSettingsWriter settingsWriter,
-        IDroppedSongFolderPromptService droppedSongFolderPromptService)
+        IDroppedSongFolderPromptService droppedSongFolderPromptService,
+        IPlaylistFormatRegistry formatRegistry,
+        IPlaylistImportService playlistImportService,
+        ILogger logger)
     {
         _queueState = queueState;
         _fileScanner = fileScanner;
         _settingsReader = settingsReader;
         _settingsWriter = settingsWriter;
         _droppedSongFolderPromptService = droppedSongFolderPromptService;
+        _formatRegistry = formatRegistry;
+        _playlistImportService = playlistImportService;
+        _logger = logger;
     }
 
     /// <inheritdoc />
     public async Task HandleExternalFileDropAsync(IReadOnlyList<string> droppedPaths, int insertIndex, CancellationToken ct = default)
     {
-        var supportedFiles = droppedPaths
+        var existingFiles = droppedPaths
             .Where(x => !string.IsNullOrWhiteSpace(x) && File.Exists(x))
-            .Where(x => SupportedExtensions.Contains(Path.GetExtension(x)))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        if (supportedFiles.Count == 0)
+        var audioFiles = existingFiles
+            .Where(x => SupportedExtensions.Contains(Path.GetExtension(x)))
+            .ToList();
+
+        var playlistFiles = existingFiles
+            .Where(x => _formatRegistry.ResolveForPath(x) is not null)
+            .ToList();
+
+        if (audioFiles.Count == 0 && playlistFiles.Count == 0)
         {
             return;
         }
 
+        if (audioFiles.Count > 0)
+        {
+            if (playlistFiles.Count > 0)
+            {
+                _logger.Debug("Ignoring {Count} playlist file(s) in mixed audio+playlist drop.", playlistFiles.Count);
+            }
+
+            await ImportAudioFilesAsync(audioFiles, insertIndex, ct);
+            return;
+        }
+
+        if (playlistFiles.Count > 1)
+        {
+            _logger.Debug("Multiple playlist files dropped; only the first ({Path}) will be imported.", playlistFiles[0]);
+        }
+
+        await _playlistImportService.ImportAsync(playlistFiles[0], ct);
+    }
+
+    private async Task ImportAudioFilesAsync(IReadOnlyList<string> supportedFiles, int insertIndex, CancellationToken ct)
+    {
         var folders = supportedFiles
             .Select(Path.GetDirectoryName)
             .Where(x => !string.IsNullOrWhiteSpace(x))

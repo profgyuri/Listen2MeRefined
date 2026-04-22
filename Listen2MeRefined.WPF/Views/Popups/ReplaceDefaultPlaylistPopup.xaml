@@ -1,0 +1,28 @@
+<UserControl x:Class="Listen2MeRefined.WPF.Views.Popups.ReplaceDefaultPlaylistPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:popups="clr-namespace:Listen2MeRefined.Application.ViewModels.Popups;assembly=Listen2MeRefined.Application"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance popups:ReplaceDefaultPlaylistPopupViewModel}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Margin="14,10,14,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Foreground="{DynamicResource SecondaryBrush}"
+                   TextWrapping="Wrap"
+                   FontSize="14"
+                   Text="{Binding BodyText}" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,10,0,0"
+                   VerticalAlignment="Top"
+                   Foreground="{DynamicResource SecondaryDarkBrush}"
+                   TextWrapping="Wrap"
+                   Text="The currently playing track (if any) will finish before the new queue takes over." />
+    </Grid>
+</UserControl>

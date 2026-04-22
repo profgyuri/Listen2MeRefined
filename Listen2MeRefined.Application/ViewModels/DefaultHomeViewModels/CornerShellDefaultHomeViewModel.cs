@@ -22,8 +22,8 @@ public partial class CornerShellDefaultHomeViewModel : ViewModelBase
     private bool _isTopmost;
 
     public CornerShellDefaultHomeViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
         IMessenger messenger,
         TrackInfoViewModel trackInfoViewModel,
         IAppSettingsReader settingsReader,

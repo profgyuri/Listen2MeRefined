@@ -51,7 +51,7 @@ internal sealed class SharpHookHandler : IGlobalHook
     public SharpHookHandler(
         ILogger logger,
         IMusicPlayerController musicPlayerController,
-        ISettingsManager<AppSettings> settingsManager, 
+        ISettingsManager<AppSettings> settingsManager,
         IWindowManager windowManager,
         IUiDispatcher ui)
     {

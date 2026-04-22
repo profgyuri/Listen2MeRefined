@@ -16,7 +16,7 @@ public sealed class ShellContextFactory : IShellContextFactory
     private readonly ILogger _logger;
 
     public ShellContextFactory(
-        INavigationRegistry registry, 
+        INavigationRegistry registry,
         IServiceProvider services,
         IErrorHandler errorHandler,
         ILogger logger)

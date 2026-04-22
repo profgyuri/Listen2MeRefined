@@ -1,6 +1,6 @@
 namespace Listen2MeRefined.Application.Utils;
 
-public interface IWaveFormDrawer<TBitmap> 
+public interface IWaveFormDrawer<TBitmap>
     where TBitmap : class
 {
     /// <summary>

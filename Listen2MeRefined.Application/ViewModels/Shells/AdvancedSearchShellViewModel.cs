@@ -11,11 +11,11 @@ namespace Listen2MeRefined.Application.ViewModels.Shells;
 public partial class AdvancedSearchShellViewModel : ShellViewModelBase
 {
     [ObservableProperty] private string _fontFamilyName = string.Empty;
-    
+
     public AdvancedSearchShellViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
-        IMessenger messenger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger,
         IShellContextFactory context) : base(errorHandler, logger, messenger, context.Create())
     {
     }
@@ -23,9 +23,9 @@ public partial class AdvancedSearchShellViewModel : ShellViewModelBase
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
-        
+
         await NavigationService.NavigateAsync<AdvancedSearchShellDefaultHomeViewModel>(cancellationToken).ConfigureAwait(true);
-        
+
         await base.InitializeAsync(cancellationToken);
     }
 

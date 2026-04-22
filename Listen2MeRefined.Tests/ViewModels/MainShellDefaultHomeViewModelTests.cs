@@ -5,6 +5,7 @@ using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation.Windows;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Formats;
 using Listen2MeRefined.Application.Searching;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
@@ -129,12 +130,19 @@ public sealed class MainShellDefaultHomeViewModelTests
             messenger,
             musicPlayer.Object);
 
+        var formatRegistry = new Mock<IPlaylistFormatRegistry>();
+        formatRegistry.Setup(x => x.Formats).Returns(Array.Empty<IPlaylistFileFormat>());
+
         var playlistSidebarViewModel = new PlaylistSidebarViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
             messenger,
             Mock.Of<IPlaylistLibraryService>(),
-            queueState.Object);
+            queueState.Object,
+            formatRegistry.Object,
+            Mock.Of<IPlaylistImportService>(),
+            Mock.Of<IPlaylistExportService>(),
+            Mock.Of<IFileDialogService>());
 
         var playlistSongContextMenuViewModel = new SongContextMenuViewModel(
             Mock.Of<IErrorHandler>(),

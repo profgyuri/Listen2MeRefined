@@ -393,29 +393,29 @@ public sealed class BackgroundTaskStatusService : IBackgroundTaskStatusService
         switch (basis)
         {
             case TaskStatusCountBasis.Processed:
-            {
-                var previousBucket = previousProcessed / interval;
-                var currentBucket = currentProcessed / interval;
-                if (currentBucket > previousBucket)
                 {
-                    var latestBoundary = currentBucket * interval;
-                    task.MilestoneText = $"{latestBoundary} processed";
-                }
+                    var previousBucket = previousProcessed / interval;
+                    var currentBucket = currentProcessed / interval;
+                    if (currentBucket > previousBucket)
+                    {
+                        var latestBoundary = currentBucket * interval;
+                        task.MilestoneText = $"{latestBoundary} processed";
+                    }
 
-                break;
-            }
+                    break;
+                }
             case TaskStatusCountBasis.Remaining when previousRemaining is not null && currentRemaining is not null:
-            {
-                var previousBucket = previousRemaining.Value / interval;
-                var currentBucket = currentRemaining.Value / interval;
-                if (currentBucket < previousBucket)
                 {
-                    var latestBoundary = (currentBucket + 1) * interval;
-                    task.MilestoneText = $"{latestBoundary} remaining";
-                }
+                    var previousBucket = previousRemaining.Value / interval;
+                    var currentBucket = currentRemaining.Value / interval;
+                    if (currentBucket < previousBucket)
+                    {
+                        var latestBoundary = (currentBucket + 1) * interval;
+                        task.MilestoneText = $"{latestBoundary} remaining";
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
     }
 

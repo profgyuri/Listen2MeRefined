@@ -91,7 +91,7 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
         RegisterMessage<FolderBrowserPathSelectedMessage>(OnFolderBrowserPathSelectedMessage);
         RegisterMessage<PinnedFoldersChangedMessage>(OnPinnedFoldersChangedMessage);
-        
+
         _isLoadingSettings = true;
         try
         {
@@ -378,7 +378,7 @@ public partial class SettingsLibraryTabViewModel : ViewModelBase
             MutedDroppedSongFolders.Add(mutedFolder);
         }
     }
-    
+
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         FontFamilyName = message.Value;

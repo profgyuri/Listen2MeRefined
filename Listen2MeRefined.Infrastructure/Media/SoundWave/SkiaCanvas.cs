@@ -14,20 +14,21 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWavef
 
     public SkiaCanvas()
     {
-        _linePaint = new SKPaint{
+        _linePaint = new SKPaint
+        {
             Color = DefaultWaveLineColor,
             StrokeWidth = 1
         };
         _backgroundColor = DefaultWaveBackgroundColor;
     }
-    
+
     public void DrawLine(SKPoint p1, SKPoint p2, float? stroakWidth = null)
     {
         if (_canvas is null)
         {
             throw new InvalidOperationException("Canvas is not initialized");
         }
-        
+
         _linePaint.IsAntialias = true;
         _linePaint.Style = SKPaintStyle.Stroke;
 
@@ -42,9 +43,9 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWavef
             _canvas.DrawLine(p1, p2, _linePaint);
             _linePaint.StrokeWidth = oldStrokeWidth;
         }
-        
+
     }
-    
+
     public SKBitmap Finish()
     {
         _canvas?.Flush();
@@ -54,7 +55,7 @@ public sealed class SkiaCanvas : IDisposable, ICanvas<SKPoint, SKBitmap>, IWavef
     public void Reset(int width, int height)
     {
         var oldCanvas = _canvas;
-    
+
         _bitmap = new SKBitmap(width, height);
         _canvas = new SKCanvas(_bitmap);
         _canvas.Clear(_backgroundColor);

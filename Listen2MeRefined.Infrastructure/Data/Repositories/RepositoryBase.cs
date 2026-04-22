@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
 public abstract class RepositoryBase<T> : IRepository<T>
-    where T: ModelBase
+    where T : ModelBase
 {
     protected readonly ILogger _logger;
     protected readonly IDbContextFactory<DataContext> _dataContextFactory;
@@ -28,7 +28,7 @@ public abstract class RepositoryBase<T> : IRepository<T>
         using var context = _dataContextFactory.CreateDbContext();
         _tableName = context.Model.FindEntityType(typeof(T))!.GetTableName()!;
     }
-    
+
     public async Task SaveAsync(T data)
     {
         using var context = _dataContextFactory.CreateDbContext();

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 
 namespace Listen2MeRefined.WPF;
+
 using System.Windows;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
@@ -42,7 +43,7 @@ internal static class SkiaElementHelper
 
         var bitmap = (SKBitmap)element.GetValue(BitmapProperty);
         if (bitmap is null || bitmap.Handle == IntPtr.Zero) return;
-        
+
         try
         {
             e.Surface.Canvas.DrawBitmap(bitmap, 0, 0);

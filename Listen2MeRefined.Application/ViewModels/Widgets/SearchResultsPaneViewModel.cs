@@ -73,12 +73,12 @@ public partial class SearchResultsPaneViewModel : ViewModelBase, ISongContextMen
         RegisterMessage<AdvancedSearchRequestedMessage>(OnAdvancedSearchRequestedMessage);
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
         RegisterMessage<PlayerStateChangedMessage>(m => _playerState = m.Value);
-        
+
         FontFamilyName = _settingsReader.GetFontFamily();
-        
+
         SongContextMenuViewModel.SetHost(this);
         await SongContextMenuViewModel.EnsureInitializedAsync(cancellationToken);
-        
+
         var initialResults = await _audioSearchExecutionService.ExecuteQuickSearchAsync("");
         ApplySearchResultsUpdate(initialResults.ToArray());
 
@@ -146,13 +146,13 @@ public partial class SearchResultsPaneViewModel : ViewModelBase, ISongContextMen
     bool ISongContextMenuHost.ShowAddToDefaultPlaylistAction => true;
 
     bool ISongContextMenuHost.ArePlaybackActionsAvailable => _playlistQueueState.IsDefaultPlaylistActive;
-    
+
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         Logger.Debug("[SearchResultsPaneViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
         FontFamilyName = message.Value;
     }
-    
+
     private void OnQuickSearchExecutedMessage(QuickSearchExecutedMessage message)
     {
         var result = message.Value.ToArray();

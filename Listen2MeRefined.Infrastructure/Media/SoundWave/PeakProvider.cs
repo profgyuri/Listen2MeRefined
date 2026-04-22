@@ -8,7 +8,7 @@ public sealed class PeakProvider
     private ISampleProvider? _sampleProvider;
     private float[]? _buffer;
     private const int BlockSize = 200;
-    
+
     /// <summary>
     /// Gets the next peak value from the sample provider.
     /// </summary>
@@ -19,7 +19,7 @@ public sealed class PeakProvider
         {
             throw new InvalidOperationException("Sample provider is not set.");
         }
-        
+
         var max = 0.0f;
         var samplesRead = _sampleProvider.Read(_buffer, 0, _buffer?.Length ?? 0);
         for (var i = 0; i < samplesRead; i += BlockSize)
@@ -31,18 +31,18 @@ public sealed class PeakProvider
                 {
                     break;
                 }
-                
+
                 total += _buffer[i + y] * _buffer[i + y];
             }
 
-            var rms = (float) Math.Sqrt(total/BlockSize);
+            var rms = (float)Math.Sqrt(total / BlockSize);
 
             max = Math.Max(max, rms);
         }
-            
+
         return max;
     }
-    
+
     /// <summary>
     /// Gets the all peak values from the sample provider.
     /// </summary>

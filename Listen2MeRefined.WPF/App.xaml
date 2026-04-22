@@ -58,6 +58,9 @@
             <DataTemplate DataType="{x:Type popupViewModels:SongDroppedPopupViewModel}">
                 <popupViews:SongDroppedPopup/>
             </DataTemplate>
+            <DataTemplate DataType="{x:Type popupViewModels:ReplaceDefaultPlaylistPopupViewModel}">
+                <popupViews:ReplaceDefaultPlaylistPopup/>
+            </DataTemplate>
             
             <!-- Widgets -->
             <DataTemplate DataType="{x:Type widgetViewModels:NowPlayingWaveformViewModel}">

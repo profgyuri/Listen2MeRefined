@@ -25,7 +25,7 @@ public interface IModule
     /// </summary>
     /// <param name="registry">The navigation registry.</param>
     void RegisterNavigation(INavigationRegistry registry);
-    
+
     /// <summary>
     /// Pairs module windows with their view models.
     /// </summary>

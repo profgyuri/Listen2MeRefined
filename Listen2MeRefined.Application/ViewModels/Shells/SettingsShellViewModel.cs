@@ -13,18 +13,18 @@ namespace Listen2MeRefined.Application.ViewModels.Shells;
 public partial class SettingsShellViewModel : ShellViewModelBase
 {
     public IReadOnlyList<SettingsShellNavigationItem> NavigationItems { get; }
-    
+
     [ObservableProperty] private string _fontFamilyName = string.Empty;
 
     public SettingsShellViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
-        IMessenger messenger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger,
         IShellContextFactory context,
         ISettingsShellNavigationProvider navigationProvider) : base(errorHandler, logger, messenger, context.Create())
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
-        
+
         NavigationItems = navigationProvider.CreateNavigationItems();
 
         PropertyChanged += OnPropertyChanged;
@@ -34,7 +34,7 @@ public partial class SettingsShellViewModel : ShellViewModelBase
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         await NavigationService.NavigateAsync<SettingsGeneralTabViewModel>(cancellationToken).ConfigureAwait(true);
-        
+
         await base.InitializeAsync(cancellationToken);
     }
 
@@ -53,7 +53,7 @@ public partial class SettingsShellViewModel : ShellViewModelBase
             navigationItem.IsActive = string.Equals(navigationItem.Route, route, StringComparison.OrdinalIgnoreCase);
         }
     }
-    
+
     [RelayCommand]
     private Task NavigateToTabByIndex(string? indexStr)
     {

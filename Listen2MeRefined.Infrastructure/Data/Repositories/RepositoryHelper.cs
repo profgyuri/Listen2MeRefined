@@ -34,8 +34,8 @@ internal static class RepositoryHelper
         var sql = $"SELECT * FROM {tableName} WHERE {whereClause}";
         return new ParameterizedQuery(sql, whereParams);
     }
-    
-     /// <summary>
+
+    /// <summary>
     ///     Returns a parameterized query string and a dictionary of parameters using the properties of a given model.
     /// </summary>
     /// <param name="model">The not empty properties of this model will be used to build the query.</param>
@@ -82,7 +82,7 @@ internal static class RepositoryHelper
         var sql = $"SELECT * FROM {tableName} WHERE {whereClause}";
         return new ParameterizedQuery(sql, whereParams);
     }
-    
+
     private static IEnumerable<string> GetProperties<T>()
         where T : ModelBase
     {
@@ -91,7 +91,7 @@ internal static class RepositoryHelper
             .Select(p => p.Name)
             .Where(p =>
             {
-                var ignoredProperties = new HashSet<string> {"Id", "Display"};
+                var ignoredProperties = new HashSet<string> { "Id", "Display" };
                 return !ignoredProperties.Contains(p);
             });
 

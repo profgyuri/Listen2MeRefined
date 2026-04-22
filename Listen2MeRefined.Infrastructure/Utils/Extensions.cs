@@ -7,7 +7,7 @@ namespace Listen2MeRefined.Infrastructure.Utils;
 internal static class Extensions
 {
     private static readonly object _contextLock = new();
-    
+
     internal static void NotExistingFile(
         this IGuardClause guardClause,
         string path,

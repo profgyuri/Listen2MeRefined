@@ -1,4 +1,5 @@
 ﻿namespace Listen2MeRefined.WPF;
+
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -83,7 +84,7 @@ public class WindowResizer
                 break;
         }
 
-        return (IntPtr) 0;
+        return (IntPtr)0;
     }
 
     /// <summary>
@@ -104,7 +105,7 @@ public class WindowResizer
 
         var lCurrentScreen = MonitorFromPoint(lMousePosition, MonitorOptions.MonitorDefaulttonearest);
 
-        var lMmi = (MinMaxInfo) Marshal.PtrToStructure(lParam, typeof(MinMaxInfo))!;
+        var lMmi = (MinMaxInfo)Marshal.PtrToStructure(lParam, typeof(MinMaxInfo))!;
 
         if (lPrimaryScreen.Equals(lCurrentScreen))
         {

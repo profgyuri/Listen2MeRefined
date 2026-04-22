@@ -44,7 +44,7 @@ public partial class SettingsPlaybackTabViewModel : ViewModelBase
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
-        
+
         _isLoadingSettings = true;
         try
         {
@@ -149,7 +149,7 @@ public partial class SettingsPlaybackTabViewModel : ViewModelBase
 
         SelectedAudioOutputDevice = AudioOutputDevices[selectedIndex];
     }
-    
+
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         FontFamilyName = message.Value;

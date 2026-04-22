@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//e/!Programming/C#/My Apps/Listen2MeRefined/**)",
+      "Bash(dotnet build *)",
+      "Bash(ls Listen2MeRefined.Tests/Infrastructure/)",
+      "Bash(ls Listen2MeRefined.Tests/Playlist/)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet format *)"
+    ]
+  }
+}

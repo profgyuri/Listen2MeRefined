@@ -5,7 +5,7 @@ using Table = System.ComponentModel.DataAnnotations.Schema.TableAttribute;
 
 namespace Listen2MeRefined.Core.Models;
 
-[Table( "Songs")]
+[Table("Songs")]
 public sealed class AudioModel : ModelBase
 {
     public string? Artist { get; set; }

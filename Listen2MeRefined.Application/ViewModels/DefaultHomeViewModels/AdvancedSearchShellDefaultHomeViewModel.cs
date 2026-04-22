@@ -17,7 +17,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
     private readonly IUiDispatcher _ui;
     private readonly IAppSettingsReader _settingsReader;
     private readonly IAdvancedSearchCriteriaService _criteriaService;
-    
+
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private List<string> _columnName = [];
     [ObservableProperty] private List<string> _relation = [];
@@ -75,25 +75,25 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             }
         }
     }
-    
+
     public AdvancedSearchShellDefaultHomeViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
-        IMessenger messenger, 
-        IUiDispatcher ui, 
-        IAdvancedSearchCriteriaService criteriaService, 
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger,
+        IUiDispatcher ui,
+        IAdvancedSearchCriteriaService criteriaService,
         IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
     {
         _ui = ui;
         _criteriaService = criteriaService;
         _settingsReader = settingsReader;
     }
-    
+
     public override async Task InitializeAsync(CancellationToken ct = default)
     {
         RegisterMessage<AdvancedSearchCompletedMessage>(OnAdvancedSearchCompletedMessage);
         RegisterMessage<FontFamilyChangedMessage>(OnFontFamilyChangedMessage);
-        
+
         await _ui.InvokeAsync(() =>
         {
             Criterias.Clear();
@@ -133,7 +133,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             return Task.CompletedTask;
         });
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanDeleteItem))]
     private async Task DeleteItem(AdvancedSearchCriterion? criterion = null)
     {
@@ -161,7 +161,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             Logger.Debug("[AdvancedSearchViewModel] Deleted criteria: {Criteria}", target.Display);
         });
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanEditCriteria))]
     private async Task EditCriteria(AdvancedSearchCriterion? criterion = null)
     {
@@ -187,7 +187,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             }, ct);
         });
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanDuplicateCriteria))]
     private async Task DuplicateCriteria(AdvancedSearchCriterion? criterion = null)
     {
@@ -209,7 +209,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             }, ct);
         });
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanClearAll))]
     private async Task ClearAll()
     {
@@ -226,7 +226,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             HasSearchResults = false;
         });
     }
-    
+
     [RelayCommand(CanExecute = nameof(CanSearch))]
     private async Task Search()
     {
@@ -257,7 +257,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             }, ct);
         });
     }
-    
+
     private bool CanAddCriteria()
     {
         return _criteriaService.CanBuildCriterion(SelectedColumnName, SelectedRelation, InputText);
@@ -287,7 +287,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
     {
         return Criterias.Count > 0;
     }
-    
+
     partial void OnSelectedRelationChanged(string value)
     {
         AddCriteriaCommand.NotifyCanExecuteChanged();
@@ -331,7 +331,7 @@ public partial class AdvancedSearchShellDefaultHomeViewModel : ViewModelBase
             ? $"Found {message.Value} result(s)."
             : "No matches found. Adjust filters and try again.";
     }
-    
+
     private void OnFontFamilyChangedMessage(FontFamilyChangedMessage message)
     {
         Logger.Debug("[AdvancedSearchViewModel] Received FontFamilyChangedMessage: {message}", message.Value);

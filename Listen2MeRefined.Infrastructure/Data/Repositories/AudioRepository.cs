@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Listen2MeRefined.Infrastructure.Data.Repositories;
 
-public sealed class AudioRepository : 
+public sealed class AudioRepository :
     RepositoryBase<AudioModel>,
     IAudioRepository
 {
@@ -27,7 +27,7 @@ public sealed class AudioRepository :
         {
             return Enumerable.Empty<AudioModel>();
         }
-        
+
         var validFields = typeof(AudioModel)
             .GetProperties()
             .Select(x => x.Name)
@@ -61,7 +61,7 @@ public sealed class AudioRepository :
             .ToString();
 
         return await _dbConnection.QueryAsync<AudioModel>(query, parameters);
-        
+
         static string GetSqlOperator(AdvancedFilterOperator op)
         {
             return op switch

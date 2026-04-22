@@ -8,8 +8,8 @@ namespace Listen2MeRefined.Application.ViewModels.Popups;
 public partial class SongDroppedPopupViewModel : PopupViewModelBase
 {
     public SongDroppedPopupViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
         IMessenger messenger) : base(errorHandler, logger, messenger)
     { }
 

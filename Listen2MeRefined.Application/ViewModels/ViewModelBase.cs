@@ -38,7 +38,7 @@ public abstract class ViewModelBase : ObservableObject, IInitializeAsync, IDispo
     /// Gets the messenger used for decoupled communication.
     /// </summary>
     protected IMessenger Messenger { get; }
-    
+
     /// <summary>
     /// Gets the logger used for diagnostics.
     /// </summary>

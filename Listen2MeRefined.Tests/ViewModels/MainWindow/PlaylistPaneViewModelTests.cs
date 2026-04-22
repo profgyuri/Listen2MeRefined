@@ -5,6 +5,7 @@ using Listen2MeRefined.Application.Files;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Formats;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
@@ -171,7 +172,11 @@ public class PlaylistPaneViewModelTests
             logger.Object,
             messenger,
             playlistLibrary.Object,
-            queueServices.State);
+            queueServices.State,
+            CreateEmptyFormatRegistry(),
+            Mock.Of<IPlaylistImportService>(),
+            Mock.Of<IPlaylistExportService>(),
+            Mock.Of<IFileDialogService>());
 
         var pane = new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
@@ -281,7 +286,11 @@ public class PlaylistPaneViewModelTests
             logger.Object,
             messenger,
             playlistLibrary.Object,
-            queueServices.State);
+            queueServices.State,
+            CreateEmptyFormatRegistry(),
+            Mock.Of<IPlaylistImportService>(),
+            Mock.Of<IPlaylistExportService>(),
+            Mock.Of<IFileDialogService>());
 
         var pane = new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
@@ -460,7 +469,11 @@ public class PlaylistPaneViewModelTests
             logger,
             messenger,
             playlistLibrary.Object,
-            queueServices.State);
+            queueServices.State,
+            CreateEmptyFormatRegistry(),
+            Mock.Of<IPlaylistImportService>(),
+            Mock.Of<IPlaylistExportService>(),
+            Mock.Of<IFileDialogService>());
 
         return new PlaylistPaneViewModel(
             Mock.Of<IErrorHandler>(),
@@ -523,7 +536,10 @@ public class PlaylistPaneViewModelTests
                 scanner.Object,
                 reader.Object,
                 writer.Object,
-                prompt.Object));
+                prompt.Object,
+                CreateEmptyFormatRegistry(),
+                Mock.Of<IPlaylistImportService>(),
+                logger));
     }
 
     [Fact]
@@ -627,6 +643,13 @@ public class PlaylistPaneViewModelTests
             .Setup(x => x.ForContext(It.IsAny<Type>()))
             .Returns(logger.Object);
         return logger;
+    }
+
+    private static IPlaylistFormatRegistry CreateEmptyFormatRegistry()
+    {
+        var registry = new Mock<IPlaylistFormatRegistry>();
+        registry.Setup(x => x.Formats).Returns(Array.Empty<IPlaylistFileFormat>());
+        return registry.Object;
     }
 
     private sealed record QueueServices(

@@ -1,4 +1,5 @@
 ﻿namespace Listen2MeRefined.WPF;
+
 using System;
 using System.Data;
 using Dapper;
@@ -15,6 +16,6 @@ public sealed class TimeSpanTypeHandler : SqlMapper.TypeHandler<TimeSpan>
 
     public override TimeSpan Parse(object value)
     {
-        return TimeSpan.Parse((string) value);
+        return TimeSpan.Parse((string)value);
     }
 }

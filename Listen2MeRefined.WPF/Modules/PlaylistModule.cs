@@ -1,6 +1,7 @@
 using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Formats;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
@@ -9,7 +10,9 @@ using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Core.Repositories;
 using Listen2MeRefined.Infrastructure.Data.Repositories;
 using Listen2MeRefined.Infrastructure.Playlist;
+using Listen2MeRefined.Infrastructure.Playlist.Formats;
 using Listen2MeRefined.Infrastructure.Startup;
+using Listen2MeRefined.WPF.Utils;
 using Listen2MeRefined.WPF.Views.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,6 +34,17 @@ public sealed class PlaylistModule : IModule
         services.AddTransient<IObservableCollectionUpdater, ObservableCollectionUpdater>();
         services.AddTransient<IPlaylistSortService, PlaylistSortService>();
         services.AddSingleton<IDefaultPlaylistService, DefaultPlaylistService>();
+
+        // Playlist file formats (import / export)
+        services.AddSingleton<IPlaylistFileFormat, M3u8PlaylistFormat>();
+        services.AddSingleton<IPlaylistFileFormat, PlsPlaylistFormat>();
+        services.AddSingleton<IPlaylistFileFormat, JsonPlaylistFormat>();
+        services.AddSingleton<IPlaylistFormatRegistry, PlaylistFormatRegistry>();
+
+        services.AddSingleton<IPlaylistImportService, PlaylistImportService>();
+        services.AddSingleton<IPlaylistExportService, PlaylistExportService>();
+        services.AddSingleton<IReplaceDefaultPlaylistPrompt, ReplaceDefaultPlaylistPromptService>();
+        services.AddSingleton<IFileDialogService, FileDialogService>();
 
         services.AddTransient<IDroppedSongFolderPromptService, DroppedSongFolderPromptService>();
         services.AddSingleton<IExternalDropImportService, ExternalDropImportService>();

@@ -38,12 +38,12 @@ public interface IPlaylistQueueState : INotifyPropertyChanged
     /// Gets a value that indicates whether the default playlist is currently active.
     /// </summary>
     bool IsDefaultPlaylistActive { get; }
-    
+
     /// <summary>
     /// Gets or sets the current song index in the active playback queue.
     /// </summary>
     int CurrentSongIndex { get; set; }
-    
+
     /// <summary>
     /// Sets the active queue source identifier and notifies dependent properties when it changes.
     /// </summary>

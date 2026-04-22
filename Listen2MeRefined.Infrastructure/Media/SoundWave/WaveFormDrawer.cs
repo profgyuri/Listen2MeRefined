@@ -49,10 +49,10 @@ public sealed class WaveFormDrawer
             var lineHeight = peaks[i] * midPoint;
             var point1 = new SKPoint(i, midPoint + lineHeight);
             var point2 = new SKPoint(i, midPoint - lineHeight);
-            
+
             _canvas.DrawLine(point1, point2);
         }
-        
+
         return _canvas.Finish();
     }
 
@@ -60,11 +60,11 @@ public sealed class WaveFormDrawer
     public async Task<SKBitmap> LineAsync()
     {
         await Task.Run(() => _canvas.Reset(_width, _height));
-        
-        var p1 = new SKPoint(0, (float) _height / 2);
-        var p2 = new SKPoint(_width, (float) _height / 2);
+
+        var p1 = new SKPoint(0, (float)_height / 2);
+        var p2 = new SKPoint(_width, (float)_height / 2);
         _canvas.DrawLine(p1, p2, 6);
-        
+
         return _canvas.Finish();
     }
 
