@@ -16,17 +16,18 @@ public partial class TrackInfoViewModel : ViewModelBase
     [ObservableProperty] private string _fontFamilyName = string.Empty;
     [ObservableProperty] private PlayerState _playerState = PlayerState.Stopped;
     [ObservableProperty] private bool _autoFlowTrackText;
-    [ObservableProperty] private AudioModel _song = new()
+    [ObservableProperty]
+    private AudioModel _song = new()
     {
         Artist = "Artist",
         Title = "Title",
         Genre = "Genre",
         Path = ""
     };
-    
+
     public TrackInfoViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
         IMessenger messenger,
         IAppSettingsReader settingsReader) : base(errorHandler, logger, messenger)
     {
@@ -57,7 +58,7 @@ public partial class TrackInfoViewModel : ViewModelBase
         Logger.Debug("[TrackInfoViewModel] Received FontFamilyChangedMessage: {message}", message.Value);
         FontFamilyName = message.Value;
     }
-    
+
     private void OnPlayerStateChangedMessage(PlayerStateChangedMessage message)
     {
         Logger.Debug("[TrackInfoViewModel] Received PlayerStateChangedMessage: {state}", message.Value);

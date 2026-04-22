@@ -87,7 +87,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         _playbackOutput = playbackOutput;
         _playbackProgressMonitor = playbackProgressMonitor;
         _messenger = messenger;
-        
+
         InitializeStartupOutputDevice(settingsReader, outputDevice);
         _messenger.Register<NAudioMusicPlayer, AudioOutputDeviceChangedMessage>(
             this,

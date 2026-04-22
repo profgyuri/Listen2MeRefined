@@ -15,7 +15,7 @@ public interface IFolderScanner
     /// <param name="mode">Scan mode to use.</param>
     /// <param name="ct">Cancellation token.</param>
     Task ScanAsync(string path, ScanMode mode = ScanMode.Incremental, CancellationToken ct = default);
-    
+
     /// <summary>
     /// Creates or updates the database with the metadata of the media files,
     /// and also deletes the metadata of the files that are no longer in the folders.
@@ -24,7 +24,7 @@ public interface IFolderScanner
     /// <param name="mode">Scan mode to use.</param>
     /// <param name="ct">Cancellation token.</param>
     Task ScanAsync(IEnumerable<FolderScanRequest> requests, ScanMode mode = ScanMode.Incremental, CancellationToken ct = default);
-    
+
     /// <summary>
     /// Scans all the stored folders and updates the database.
     /// </summary>

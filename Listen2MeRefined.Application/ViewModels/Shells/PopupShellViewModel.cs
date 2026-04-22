@@ -8,9 +8,9 @@ namespace Listen2MeRefined.Application.ViewModels.Shells;
 public class PopupShellViewModel : ShellViewModelBase
 {
     public PopupShellViewModel(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
-        IMessenger messenger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
+        IMessenger messenger,
         IShellContextFactory context) : base(errorHandler, logger, messenger, context.Create())
     {
     }

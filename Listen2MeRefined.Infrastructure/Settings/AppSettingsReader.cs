@@ -13,7 +13,8 @@ public sealed class AppSettingsReader : IAppSettingsReader
         _settingsManager = settingsManager;
     }
 
-    public string GetFontFamily() {
+    public string GetFontFamily()
+    {
         var fontFamily = _settingsManager.Settings.FontFamily;
         return string.IsNullOrWhiteSpace(fontFamily) ? "Segoe UI" : fontFamily;
     }

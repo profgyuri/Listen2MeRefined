@@ -1,4 +1,5 @@
 namespace Listen2MeRefined.WPF;
+
 using System.Windows;
 using System.Windows.Controls;
 using SkiaSharp;

@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Formats;
 using Serilog;
 
 namespace Listen2MeRefined.Application.ViewModels.Widgets;
@@ -14,6 +15,10 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
 {
     private readonly IPlaylistLibraryService _playlistLibraryService;
     private readonly IPlaylistQueueState _playlistQueueState;
+    private readonly IPlaylistFormatRegistry _formatRegistry;
+    private readonly IPlaylistImportService _importService;
+    private readonly IPlaylistExportService _exportService;
+    private readonly IFileDialogService _fileDialogService;
 
     [ObservableProperty] private PlaylistSidebarItem? _selectedItem;
 
@@ -21,15 +26,39 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
 
     public ObservableCollection<PlaylistSidebarItem> ManualPlaylists { get; } = [];
 
+    /// <summary>
+    /// Format choices surfaced in the export submenu.
+    /// </summary>
+    public IReadOnlyList<PlaylistExportFormatOption> ExportFormatOptions { get; }
+
+    /// <summary>
+    /// Tooltip text for the Import Playlist button — enumerates accepted formats.
+    /// </summary>
+    public string ImportTooltip { get; }
+
     public PlaylistSidebarViewModel(
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
         IPlaylistLibraryService playlistLibraryService,
-        IPlaylistQueueState playlistQueueState) : base(errorHandler, logger, messenger)
+        IPlaylistQueueState playlistQueueState,
+        IPlaylistFormatRegistry formatRegistry,
+        IPlaylistImportService importService,
+        IPlaylistExportService exportService,
+        IFileDialogService fileDialogService) : base(errorHandler, logger, messenger)
     {
         _playlistLibraryService = playlistLibraryService;
         _playlistQueueState = playlistQueueState;
+        _formatRegistry = formatRegistry;
+        _importService = importService;
+        _exportService = exportService;
+        _fileDialogService = fileDialogService;
+
+        ExportFormatOptions = _formatRegistry.Formats
+            .Select(f => new PlaylistExportFormatOption(f))
+            .ToList();
+
+        ImportTooltip = BuildImportTooltip(_formatRegistry.Formats);
     }
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -46,6 +75,7 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
         RegisterMessage<PlaylistCreatedMessage>(OnPlaylistCreated);
         RegisterMessage<PlaylistDeletedMessage>(OnPlaylistDeleted);
         RegisterMessage<PlaylistRenamedMessage>(OnPlaylistRenamed);
+        RegisterMessage<SelectPlaylistRequestedMessage>(OnSelectPlaylistRequested);
 
         // Select default playlist on startup
         SelectPlaylist(DefaultPlaylist);
@@ -191,6 +221,49 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
         });
     }
 
+    [RelayCommand]
+    private async Task ImportPlaylist()
+    {
+        var filter = _formatRegistry.BuildOpenFilter();
+        var path = _fileDialogService.PickOpenFile("Import playlist", filter);
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        await ExecuteSafeAsync(ct => _importService.ImportAsync(path, ct));
+    }
+
+    [RelayCommand]
+    private async Task ExportPlaylist(PlaylistExportRequest? request)
+    {
+        if (request is null || request.Item is null || request.Format is null)
+        {
+            return;
+        }
+
+        var item = request.Item;
+        var format = request.Format;
+
+        var preferredExtension = format.Extensions.FirstOrDefault() ?? ".m3u8";
+        var filter = $"{format.DisplayName}|*{preferredExtension}";
+        var defaultFileName = BuildSafeFileName(item.Name) + preferredExtension;
+
+        var target = _fileDialogService.PickSaveFile(
+            $"Export {item.Name}",
+            filter,
+            defaultFileName,
+            preferredExtension);
+
+        if (string.IsNullOrWhiteSpace(target))
+        {
+            return;
+        }
+
+        var source = new PlaylistExportSource(item.PlaylistId, item.Name);
+        await ExecuteSafeAsync(ct => _exportService.ExportAsync(source, target, format, ct));
+    }
+
     private void OnPlaylistCreated(PlaylistCreatedMessage message)
     {
         var data = message.Value;
@@ -225,6 +298,27 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
         {
             item.Name = data.Name;
         }
+    }
+
+    private void OnSelectPlaylistRequested(SelectPlaylistRequestedMessage message)
+    {
+        var target = ResolveSidebarItemById(message.Value);
+        if (target is null)
+        {
+            return;
+        }
+
+        SelectPlaylist(target);
+    }
+
+    private PlaylistSidebarItem? ResolveSidebarItemById(int? playlistId)
+    {
+        if (playlistId is null)
+        {
+            return DefaultPlaylist;
+        }
+
+        return ManualPlaylists.FirstOrDefault(x => x.PlaylistId == playlistId);
     }
 
     private void OnQueueStatePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -264,6 +358,23 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
         }
     }
 
+    private static string BuildImportTooltip(IReadOnlyList<IPlaylistFileFormat> formats)
+    {
+        var accepted = string.Join(", ", formats.SelectMany(f => f.Extensions).Distinct(StringComparer.OrdinalIgnoreCase));
+        var hints = string.Join(
+            Environment.NewLine,
+            formats.Select(f => $"\u2022 {f.DisplayName} \u2014 {f.RecommendedUseCase}"));
+        return $"Import a playlist ({accepted})." + Environment.NewLine + hints;
+    }
+
+    private static string BuildSafeFileName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars();
+        var sanitized = new string(name.Select(c => invalid.Contains(c) ? '_' : c).ToArray());
+        sanitized = sanitized.Trim();
+        return string.IsNullOrWhiteSpace(sanitized) ? "Playlist" : sanitized;
+    }
+
     public sealed partial class PlaylistSidebarItem : ObservableObject
     {
         public PlaylistSidebarItem(int? playlistId, string name)
@@ -283,4 +394,24 @@ public sealed partial class PlaylistSidebarViewModel : ViewModelBase
         [ObservableProperty] private bool _isRenaming;
         [ObservableProperty] private bool _isSelected;
     }
+
+    /// <summary>
+    /// Describes a format option rendered inside the Export submenu.
+    /// </summary>
+    public sealed class PlaylistExportFormatOption
+    {
+        public PlaylistExportFormatOption(IPlaylistFileFormat format)
+        {
+            Format = format;
+        }
+
+        public IPlaylistFileFormat Format { get; }
+        public string DisplayName => Format.DisplayName;
+        public string Tooltip => Format.RecommendedUseCase;
+    }
+
+    /// <summary>
+    /// Parameter passed from the Export submenu bridging <see cref="PlaylistSidebarItem"/> and the chosen format.
+    /// </summary>
+    public sealed record PlaylistExportRequest(PlaylistSidebarItem? Item, IPlaylistFileFormat? Format);
 }

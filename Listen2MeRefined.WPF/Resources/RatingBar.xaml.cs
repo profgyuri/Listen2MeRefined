@@ -1,4 +1,5 @@
 ﻿namespace Listen2MeRefined.WPF.Resources;
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;

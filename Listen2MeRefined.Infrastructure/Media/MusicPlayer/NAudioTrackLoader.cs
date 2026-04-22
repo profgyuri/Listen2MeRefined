@@ -26,7 +26,7 @@ public sealed class NAudioTrackLoader : ITrackLoader
 
             return TrackLoadResult.Success(reader);
         }
-        catch (Exception e) 
+        catch (Exception e)
             when (e is FormatException or MmException or InvalidDataException
                       or COMException or ArgumentException or InvalidOperationException)
         {

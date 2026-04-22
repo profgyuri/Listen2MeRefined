@@ -18,7 +18,7 @@ namespace Listen2MeRefined.WPF.Modules;
 public class SettingsModule : IModule
 {
     public string Name { get; } = "Settings";
-    
+
     public void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<ISettingsManager<AppSettings>, DatabaseSettingsManager<AppSettings>>();
@@ -28,7 +28,7 @@ public class SettingsModule : IModule
         services.AddTransient<IPlaybackDefaultsService, PlaybackDefaultsService>();
         services.AddTransient<IWindowPositionPolicyService, WindowPositionPolicyService>();
         services.AddSingleton<IAppThemeService, AppThemeService>();
-        services.AddSingleton(_ => 
+        services.AddSingleton(_ =>
             new FontFamilies(Fonts.SystemFontFamilies
                 .Select(f => f.Source)
                 .OrderBy(f => f)));
@@ -39,19 +39,19 @@ public class SettingsModule : IModule
 
         services.AddTransient<SettingsAdvancedTabViewModel>();
         services.AddTransient<SettingsAdvancedTabView>();
-        
+
         services.AddTransient<SettingsGeneralTabViewModel>();
         services.AddTransient<SettingsGeneralTabView>();
-        
+
         services.AddTransient<SettingsHooksAndAlertsTabViewModel>();
         services.AddTransient<SettingsHooksAndAlertsTabView>();
-        
+
         services.AddTransient<SettingsLibraryTabViewModel>();
         services.AddTransient<SettingsLibraryTabView>();
-        
+
         services.AddTransient<SettingsPlaybackTabViewModel>();
         services.AddTransient<SettingsPlaybackTabView>();
-        
+
         services.AddTransient<SettingsPlaylistsTabViewModel>();
         services.AddTransient<SettingsPlaylistsTabView>();
     }

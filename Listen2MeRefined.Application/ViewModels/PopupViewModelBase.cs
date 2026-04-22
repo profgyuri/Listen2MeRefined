@@ -7,10 +7,14 @@ namespace Listen2MeRefined.Application.ViewModels;
 public abstract class PopupViewModelBase : ViewModelBase
 {
     public virtual string DisplayTitle { get; set; } = string.Empty;
-    
+
+    public virtual string PrimaryButtonText => "Confirm";
+
+    public virtual string SecondaryButtonText => "Cancel";
+
     protected PopupViewModelBase(
-        IErrorHandler errorHandler, 
-        ILogger logger, 
+        IErrorHandler errorHandler,
+        ILogger logger,
         IMessenger messenger) : base(errorHandler, logger, messenger)
     { }
 

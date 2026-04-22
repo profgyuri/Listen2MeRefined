@@ -21,7 +21,7 @@ public interface IWindowManager
     Task ShowMainWindowAsync<TShellViewModel>(
         CancellationToken cancellationToken = default)
         where TShellViewModel : ShellViewModelBase;
- 
+
     /// <summary>
     /// Opens a non-main window, optionally positioned relative to a point
     /// on screen.
@@ -59,7 +59,7 @@ public interface IWindowManager
         Action<TPopupViewModel>? configureViewModel = null,
         CancellationToken cancellationToken = default)
         where TPopupViewModel : PopupViewModelBase;
- 
+
     /// <summary>
     /// Closes and disposes a previously opened window identified by its
     /// shell ViewModel instance.
@@ -68,7 +68,7 @@ public interface IWindowManager
     /// The shell ViewModel whose window should be closed.
     /// </typeparam>
     void CloseWindow<TShellViewModel>() where TShellViewModel : ShellViewModelBase;
- 
+
     /// <summary>
     /// Returns <see langword="true"/> when at least one window driven by the
     /// specified shell ViewModel type is currently open.
@@ -76,4 +76,4 @@ public interface IWindowManager
     /// <typeparam name="TShellViewModel">The shell ViewModel type to check.</typeparam>
     bool IsOpen<TShellViewModel>() where TShellViewModel : ShellViewModelBase;
 }
- 
+

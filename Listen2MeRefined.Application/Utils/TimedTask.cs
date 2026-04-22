@@ -48,14 +48,14 @@ public sealed class TimedTask : IAsyncDisposable
         await _cts.CancelAsync();
         await _timerTask;
     }
-    
+
     private async Task DoWorkAsync(Action action)
     {
         if (_timer is null)
         {
             return;
         }
-        
+
         try
         {
             while (await _timer.WaitForNextTickAsync(_cts.Token))

@@ -12,7 +12,7 @@ public abstract partial class ShellViewModelBase : ViewModelBase
 {
     protected readonly INavigationService NavigationService;
     private readonly NavigationState _navigationState;
-    
+
     public ShellContext ShellContext { get; }
 
     [ObservableProperty]

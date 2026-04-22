@@ -14,9 +14,9 @@ public sealed class FileReader
     {
         _trackLoader = trackLoader;
     }
-    
+
     public ISampleProvider? SampleProvider { get; private set; }
-    
+
     public int SamplesPerPeak { get; private set; }
 
     public void Open(string fileName)
@@ -44,7 +44,7 @@ public sealed class FileReader
             SamplesPerPeak = 0;
             return;
         }
-        
+
         var bytesPerSample = _waveStream.WaveFormat.BitsPerSample / 8;
         if (bytesPerSample <= 0)
         {

@@ -38,7 +38,7 @@ public sealed class PlaylistQueue : IPlaylistQueue
     {
         return Items.Remove(audio);
     }
-    
+
     public void Move(int oldIndex, int newIndex)
     {
         if (oldIndex == newIndex)

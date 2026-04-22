@@ -34,7 +34,7 @@ public sealed record WindowShowOptions(
     /// </summary>
     public static WindowShowOptions CenteredOnMainWindow(bool isModal = true)
         => new WindowShowOptions(Left: null, Top: null, IsModal: isModal) with { CentreOnMainWindow = true };
- 
+
     /// <summary>
     /// Positions the window using the given anchor at the given screen point.
     /// </summary>
@@ -44,13 +44,13 @@ public sealed record WindowShowOptions(
         bool isModal = true,
         WindowPositionAnchor anchor = WindowPositionAnchor.Center)
         => new WindowShowOptions(Left: left, Top: top, IsModal: isModal) with { Anchor = anchor };
- 
+
     /// <summary>
     /// Shows a modeless window at the platform-default position.
     /// </summary>
     public static WindowShowOptions Modeless()
         => new(IsModal: false);
- 
+
     // Internal flag used by the WPF implementation — callers use the factory
     // methods above rather than setting this directly.
     public bool CentreOnMainWindow { get; private init; }

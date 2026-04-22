@@ -11,7 +11,7 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
     {
         _playlistQueue = playlistQueue;
     }
-    
+
     public AudioModel? GetCurrentTrack()
     {
         if (!_playlistQueue.Any())
@@ -20,14 +20,14 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
         }
 
         NormalizeCurrentIndex();
-        
+
         var track = _playlistQueue[_playlistQueue.CurrentIndex];
-        
+
         if (RemoveIfInvalid(track))
         {
             return null;
         }
-        
+
         return track;
     }
 
@@ -40,12 +40,12 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
         _playlistQueue.CurrentIndex = (_playlistQueue.CurrentIndex + 1) % _playlistQueue.Count;
         var track = _playlistQueue[_playlistQueue.CurrentIndex];
-        
+
         if (RemoveIfInvalid(track))
         {
             return null;
         }
-        
+
         return track;
     }
 
@@ -63,7 +63,7 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
         {
             return null;
         }
-        
+
         return track;
     }
 
@@ -87,7 +87,7 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
         {
             return null;
         }
-        
+
         return track;
     }
 
@@ -146,7 +146,7 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
 
         return true;
     }
-    
+
     /// <summary>
     ///     Removes the track from the playlist if the file is not found and moves the current index accordingly.
     /// </summary>

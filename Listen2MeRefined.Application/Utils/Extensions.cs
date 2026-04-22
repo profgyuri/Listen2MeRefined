@@ -11,7 +11,7 @@ public static class Extensions
             collection.Add(item);
         }
     }
-    
+
     /// <summary>
     ///     Adds the range of items to the collection.
     /// </summary>

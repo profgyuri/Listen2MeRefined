@@ -4,13 +4,13 @@ public sealed class MusicFolderModel : ModelBase
 {
     public string FullPath { get; init; }
     public bool IncludeSubdirectories { get; set; }
-    
+
     public MusicFolderModel()
     {
         FullPath = string.Empty;
         IncludeSubdirectories = false;
     }
-    
+
     public MusicFolderModel(string path, bool includeSubdirectories = false)
     {
         FullPath = path;

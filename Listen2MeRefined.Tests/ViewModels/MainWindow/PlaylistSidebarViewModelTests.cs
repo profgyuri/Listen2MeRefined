@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.ErrorHandling;
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Formats;
 using Listen2MeRefined.Application.ViewModels.Widgets;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 using Listen2MeRefined.Infrastructure.Playlist;
@@ -258,12 +259,19 @@ public class PlaylistSidebarViewModelTests
 
         var queueState = new PlaylistQueueState(new PlaylistQueue());
 
+        var formatRegistry = new Mock<IPlaylistFormatRegistry>();
+        formatRegistry.Setup(x => x.Formats).Returns(Array.Empty<IPlaylistFileFormat>());
+
         var vm = new PlaylistSidebarViewModel(
             Mock.Of<IErrorHandler>(),
             logger.Object,
             messenger,
             playlistLibrary.Object,
-            queueState);
+            queueState,
+            formatRegistry.Object,
+            Mock.Of<IPlaylistImportService>(),
+            Mock.Of<IPlaylistExportService>(),
+            Mock.Of<IFileDialogService>());
 
         return (vm, messenger, playlistLibrary, queueState);
     }

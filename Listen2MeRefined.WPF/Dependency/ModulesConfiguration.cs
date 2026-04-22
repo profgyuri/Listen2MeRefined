@@ -43,7 +43,7 @@ public static class ModulesConfiguration
             module.RegisterNavigation(navigationRegistry);
             module.RegisterWindows(windowRegistry);
         }
-        
+
         return host;
     }
 }

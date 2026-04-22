@@ -12,6 +12,31 @@ public partial class PlaylistSidebarView : UserControl
         InitializeComponent();
     }
 
+    private void ExportFormatMenuItem_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem { DataContext: PlaylistSidebarViewModel.PlaylistExportFormatOption option })
+        {
+            return;
+        }
+
+        // Walk up to the parent MenuItem ("Export" submenu) so we can read:
+        //  - ItemsControl.Parent chain → the root ContextMenu
+        //  - ContextMenu.PlacementTarget.DataContext → the PlaylistSidebarItem that opened the menu
+        var parentItem = ItemsControl.ItemsControlFromItemContainer(sender as DependencyObject) as MenuItem;
+        if (parentItem?.Tag is not PlaylistSidebarViewModel.PlaylistSidebarItem sidebarItem)
+        {
+            return;
+        }
+
+        if (DataContext is not PlaylistSidebarViewModel vm)
+        {
+            return;
+        }
+
+        var request = new PlaylistSidebarViewModel.PlaylistExportRequest(sidebarItem, option.Format);
+        vm.ExportPlaylistCommand.Execute(request);
+    }
+
     private void SidebarItem_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (sender is not FrameworkElement { DataContext: PlaylistSidebarViewModel.PlaylistSidebarItem item })

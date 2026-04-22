@@ -21,17 +21,17 @@ public sealed class WindowManager : IWindowManager
     private readonly ILogger _logger;
     private readonly IUiDispatcher _ui;
     private readonly IWindowRegistry _windowRegistry;
- 
+
     /// <summary>
     /// Live window registry keyed by shell ViewModel reference.
     /// </summary>
     private readonly ConcurrentDictionary<object, WindowDescriptor> _openWindows = new(ReferenceEqualityComparer.Instance);
- 
+
     public WindowManager(
         IErrorHandler errorHandler,
         IServiceProvider serviceProvider,
-        ILogger logger, 
-        IUiDispatcher ui, 
+        ILogger logger,
+        IUiDispatcher ui,
         IWindowRegistry windowRegistry)
     {
         _errorHandler = errorHandler;
@@ -40,7 +40,7 @@ public sealed class WindowManager : IWindowManager
         _ui = ui;
         _windowRegistry = windowRegistry;
     }
- 
+
     public async Task ShowMainWindowAsync<TShellViewModel>(
         CancellationToken cancellationToken = default)
         where TShellViewModel : ShellViewModelBase
@@ -62,7 +62,7 @@ public sealed class WindowManager : IWindowManager
 
         await _ui.InvokeAsync(ShowMainWindowCoreAsync, cancellationToken);
     }
- 
+
     public async Task<bool?> ShowWindowAsync<TShellViewModel>(
         WindowShowOptions options,
         CancellationToken cancellationToken = default)
@@ -71,7 +71,7 @@ public sealed class WindowManager : IWindowManager
         _logger.Information(
             "Showing window for ShellVM={ShellVMType} Modal={IsModal}",
             typeof(TShellViewModel).Name, options.IsModal);
- 
+
         bool? dialogResult = null;
 
         async Task ShowWindowCoreAsync()
@@ -142,7 +142,7 @@ public sealed class WindowManager : IWindowManager
         await _ui.InvokeAsync(ShowPopupCoreAsync, cancellationToken);
         return dialogResult;
     }
- 
+
     public void CloseWindow<TShellViewModel>() where TShellViewModel : ShellViewModelBase
     {
         var descriptor = _openWindows.Values
@@ -155,10 +155,10 @@ public sealed class WindowManager : IWindowManager
 
         _ui.InvokeAsync(() => ((Window)descriptor.Window).Close());
     }
- 
+
     public bool IsOpen<TShellViewModel>() where TShellViewModel : ShellViewModelBase
         => _openWindows.Values.Any(d => d.ShellViewModel is TShellViewModel);
- 
+
     private (object window, TShellViewModel shellVm, ShellContext context) BuildWindow<TShellViewModel>()
         where TShellViewModel : ShellViewModelBase
     {
@@ -171,26 +171,26 @@ public sealed class WindowManager : IWindowManager
 
         return (window, shellVm, context);
     }
- 
+
     private void Register(object window, object shellVm, ShellContext context)
     {
         var descriptor = new WindowDescriptor(window, shellVm, context);
         _openWindows[shellVm] = descriptor;
- 
+
         ((Window)window).Closed += (_, _) =>
         {
             _openWindows.TryRemove(shellVm, out _);
             _logger.Information(
                 "Window closed and unregistered. ShellVM={ShellVMType}",
                 shellVm.GetType().Name);
- 
+
             if (shellVm is IDisposable disposable)
             {
                 disposable.Dispose();
             }
         };
     }
- 
+
     /// <summary>
     /// Runs async initialization on the shell ViewModel (and therefore its
     /// current content ViewModel) after the window is shown.  Closes the
@@ -206,7 +206,7 @@ public sealed class WindowManager : IWindowManager
         {
             return;
         }
- 
+
         try
         {
             await context.InitializationTracker
@@ -217,7 +217,7 @@ public sealed class WindowManager : IWindowManager
         {
             _logger.Warning(
                 "Initialization was cancelled for {ShellVM}.", shellVm.GetType().Name);
- 
+
             await _ui.InvokeAsync(window.Close, cancellationToken);
         }
         catch (Exception ex)
@@ -252,7 +252,7 @@ public sealed class WindowManager : IWindowManager
             }
         }
     }
- 
+
     /// <summary>
     /// Positions <paramref name="window"/> according to <paramref name="options"/>.
     /// </summary>
@@ -263,12 +263,12 @@ public sealed class WindowManager : IWindowManager
             // Defer until layout pass so Width/Height are known.
             window.SourceInitialized += (_, _) =>
             {
-                window.Left = main.Left + (main.Width  - window.ActualWidth)  / 2;
-                window.Top  = main.Top  + (main.Height - window.ActualHeight) / 2;
+                window.Left = main.Left + (main.Width - window.ActualWidth) / 2;
+                window.Top = main.Top + (main.Height - window.ActualHeight) / 2;
             };
             return;
         }
- 
+
         if (options.Left.HasValue && options.Top.HasValue)
         {
             window.SourceInitialized += (_, _) =>
@@ -314,4 +314,4 @@ public sealed class WindowManager : IWindowManager
         return transform.Transform(new System.Windows.Point(deviceX, deviceY));
     }
 }
- 
+

@@ -62,7 +62,7 @@ public partial class TitleBar : UserControl
             typeof(string),
             typeof(TitleBar),
             new PropertyMetadata(string.Empty));
-    
+
     public static readonly DependencyProperty IsUpdateAvailableFeedbackVisibleProperty =
         DependencyProperty.Register(
             nameof(IsUpdateAvailableFeedbackVisible),
@@ -201,7 +201,7 @@ public partial class TitleBar : UserControl
         get => (string)GetValue(TaskStatusTooltipProperty);
         set => SetValue(TaskStatusTooltipProperty, value);
     }
-    
+
     public bool IsUpdateAvailableFeedbackVisible
     {
         get => (bool)GetValue(IsUpdateAvailableFeedbackVisibleProperty);

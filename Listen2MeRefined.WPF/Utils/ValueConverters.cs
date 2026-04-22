@@ -1,6 +1,7 @@
 ﻿using System.Windows.Media;
 
 namespace Listen2MeRefined.WPF;
+
 using System;
 using System.Globalization;
 using System.Windows;
@@ -20,7 +21,7 @@ internal sealed class IsFolderSelectedConverter : IValueConverter
         object parameter,
         CultureInfo culture)
     {
-        return !string.IsNullOrEmpty((string) value);
+        return !string.IsNullOrEmpty((string)value);
     }
 
     public object ConvertBack(
@@ -41,7 +42,7 @@ internal sealed class BoolToVisibilityConverter : IValueConverter
         object parameter,
         CultureInfo culture)
     {
-        return (bool) value ? Visibility.Visible : Visibility.Collapsed;
+        return (bool)value ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public object ConvertBack(
@@ -67,11 +68,11 @@ internal sealed class TrimmedTextBlockVisibilityConverter : IValueConverter
             return Visibility.Collapsed;
         }
 
-        var textBlock = (FrameworkElement) value;
+        var textBlock = (FrameworkElement)value;
 
         textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
-        return ((FrameworkElement) value).ActualWidth < ((FrameworkElement) value).DesiredSize.Width
+        return ((FrameworkElement)value).ActualWidth < ((FrameworkElement)value).DesiredSize.Width
             ? Visibility.Visible
             : Visibility.Collapsed;
     }
