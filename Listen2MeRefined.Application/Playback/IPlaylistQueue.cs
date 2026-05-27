@@ -23,6 +23,4 @@ public interface IPlaylistQueue
     /// </summary>
     void Move(int oldIndex, int newIndex);
 
-    void Shuffle();
-
 }

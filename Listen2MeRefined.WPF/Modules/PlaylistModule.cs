@@ -2,6 +2,9 @@ using Listen2MeRefined.Application.Modules;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Playlist.Formats;
+using Listen2MeRefined.Application.Playlist.Order;
+using Listen2MeRefined.Application.Playlist.Queuing;
+using Listen2MeRefined.Application.Playlist.Store;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Application.ViewModels.ContextMenus;
@@ -27,12 +30,16 @@ public sealed class PlaylistModule : IModule
         services.AddTransient<IRepository<PlaylistModel>, PlaylistRepository>();
         services.AddTransient<IRepository<MusicFolderModel>, MusicFolderRepository>();
 
+        services.AddSingleton<IPlaylistService, PlaylistService>();
+        services.AddSingleton<IOrder, Order>();
+        services.AddSingleton<IQueuing, Queuing>();
+        services.AddSingleton<IStore, Store>();
+
         services.AddTransient<IPlaylistLibraryService, PlaylistLibraryService>();
         services.AddTransient<IPlaylistSelectionService, PlaylistSelectionService>();
         services.AddTransient<IPlaylistMembership, PlaylistMembership>();
         services.AddTransient<ISongContextSelectionService, SongContextSelectionService>();
         services.AddTransient<IObservableCollectionUpdater, ObservableCollectionUpdater>();
-        services.AddTransient<IPlaylistSortService, PlaylistSortService>();
         services.AddSingleton<IDefaultPlaylistService, DefaultPlaylistService>();
 
         // Playlist file formats (import / export)

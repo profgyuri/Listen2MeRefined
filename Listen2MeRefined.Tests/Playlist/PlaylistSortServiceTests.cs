@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Order;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 
@@ -7,7 +7,7 @@ namespace Listen2MeRefined.Tests.Playlist;
 
 public class PlaylistSortServiceTests
 {
-    private readonly PlaylistSortService _service = new();
+    private readonly IOrder _service = new Order();
 
     [Fact]
     public void Sort_ByTitle_Ascending_SortsSongsAlphabetically()

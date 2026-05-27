@@ -182,6 +182,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IErrorHandler>(),
             logger.Object,
             messenger,
+            Mock.Of<IPlaylistService>(),
             queueServices.State,
             queueServices.RoutingService,
             queueServices.DefaultPlaylistService,
@@ -195,7 +196,6 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMusicPlayerController>(),
             Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
-            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -296,6 +296,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IErrorHandler>(),
             logger.Object,
             messenger,
+            Mock.Of<IPlaylistService>(),
             queueServices.State,
             queueServices.RoutingService,
             queueServices.DefaultPlaylistService,
@@ -309,7 +310,6 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMusicPlayerController>(),
             Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
-            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger.Object, messenger));
@@ -479,6 +479,7 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IErrorHandler>(),
             logger,
             messenger,
+            Mock.Of<IPlaylistService>(),
             queueServices.State,
             queueServices.RoutingService,
             queueServices.DefaultPlaylistService,
@@ -492,7 +493,6 @@ public class PlaylistPaneViewModelTests
             Mock.Of<IMusicPlayerController>(),
             fileScanner ?? Mock.Of<IFileScanner>(),
             new ObservableCollectionUpdater(),
-            new PlaylistSortService(),
             settingsReader.Object,
             sidebarViewModel,
             CreateSongContextMenuViewModel(logger, messenger));

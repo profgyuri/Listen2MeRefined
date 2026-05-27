@@ -21,6 +21,7 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 
 public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
 {
+    private readonly IPlaylistService _playlistService;
     private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IPlaylistQueueRoutingService _playlistQueueRoutingService;
     private readonly IDefaultPlaylistService _defaultPlaylistService;
@@ -35,7 +36,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     private readonly IMusicPlayerController _musicPlayerController;
     private readonly IFileScanner _fileScanner;
     private readonly IObservableCollectionUpdater _collectionUpdater;
-    private readonly IPlaylistSortService _playlistSortService;
     private readonly ISongSelectionTracker _selectionTracker;
     private readonly Dictionary<int, ObservableCollection<AudioModel>> _playlistCache = new();
 
@@ -71,6 +71,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         IErrorHandler errorHandler,
         ILogger logger,
         IMessenger messenger,
+        IPlaylistService playlistService,
         IPlaylistQueueState playlistQueueState,
         IPlaylistQueueRoutingService playlistQueueRoutingService,
         IDefaultPlaylistService defaultPlaylistService,
@@ -84,11 +85,11 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         IMusicPlayerController musicPlayerController,
         IFileScanner fileScanner,
         IObservableCollectionUpdater collectionUpdater,
-        IPlaylistSortService playlistSortService,
         IAppSettingsReader settingsReader,
         PlaylistSidebarViewModel playlistSidebarViewModel,
         SongContextMenuViewModel songContextMenuViewModel) : base(errorHandler, logger, messenger)
     {
+        _playlistService = playlistService;
         _playlistQueueState = playlistQueueState;
         _playlistQueueRoutingService = playlistQueueRoutingService;
         _defaultPlaylistService = defaultPlaylistService;
@@ -103,7 +104,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         _musicPlayerController = musicPlayerController;
         _fileScanner = fileScanner;
         _collectionUpdater = collectionUpdater;
-        _playlistSortService = playlistSortService;
         _selectionTracker = new SongSelectionTracker(PublishSongContextSelectionChanged);
         PlaylistSidebarViewModel = playlistSidebarViewModel;
         SongContextMenuViewModel = songContextMenuViewModel;
@@ -358,7 +358,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     [RelayCommand]
     private void SortCurrentPlaylist()
     {
-        _playlistSortService.Sort(CurrentPlaylistSongs, SelectedSortProperty, SortDirection);
+        _playlistService.Order.Sort(CurrentPlaylistSongs, SelectedSortProperty, SortDirection);
     }
 
     [RelayCommand]

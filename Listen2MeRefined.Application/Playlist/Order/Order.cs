@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 
-namespace Listen2MeRefined.Application.Playlist;
+namespace Listen2MeRefined.Application.Playlist.Order;
 
-/// <inheritdoc />
-public sealed class PlaylistSortService : IPlaylistSortService
+public class Order : IOrder
 {
     public void Sort(ObservableCollection<AudioModel> songs, PlaylistSortProperty property, SortDirection direction)
     {
@@ -29,7 +29,25 @@ public sealed class PlaylistSortService : IPlaylistSortService
         }
     }
 
-    internal static Func<AudioModel, IComparable> GetSortKeySelector(PlaylistSortProperty property) =>
+    public void Shuffle(ObservableCollection<AudioModel> songs)
+    {
+        if (songs.Count <= 1)
+        {
+            return;
+        }
+        
+        var n = songs.Count;
+
+        while (n > 1)
+        {
+            int k = RandomNumberGenerator.GetInt32(n);
+            n--;
+
+            (songs[k], songs[n]) = (songs[n], songs[k]);
+        }
+    }
+    
+    private Func<AudioModel, IComparable> GetSortKeySelector(PlaylistSortProperty property) =>
         property switch
         {
             PlaylistSortProperty.Artist => a => a.Artist ?? string.Empty,
