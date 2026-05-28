@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Listen2MeRefined.Application.Messages;
-using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Playback;
 using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
@@ -14,7 +13,7 @@ namespace Listen2MeRefined.Infrastructure.Media.MusicPlayer;
 /// <summary>
 /// Wrapper class for NAudio.
 /// </summary>
-public sealed partial class NAudioMusicPlayer : IMusicPlayerController
+public sealed class NAudioMusicPlayer : IMusicPlayerController
 {
     private bool _startSongAutomatically;
     private int _outputDeviceIndex = -1;
@@ -96,7 +95,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
             static (recipient, message) => recipient.OnAudioOutputDeviceChangedMessage(message));
 
         timedTask.Start(TimeSpan.FromMilliseconds(TimeCheckInterval), () => CheckPlaybackProgressAsync().GetAwaiter().GetResult());
-        _logger.Debug("[NAudioMMusicPlayer] initialized");
+        _logger.Debug("[NAudioMusicPlayer] initialized");
     }
 
     /// <summary>
@@ -133,7 +132,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         _startSongAutomatically = false;
         SetState(PlayerState.Stopped);
         _playbackProgressMonitor.Reset();
-        _logger.Debug("[NAudioMMusicPlayer] Playback stopped by user");
+        _logger.Debug("[NAudioMusicPlayer] Playback stopped by user");
     }
 
     /// <summary>
@@ -144,7 +143,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         var nextTrack = _playbackQueueService.GetNextTrack();
         if (nextTrack is null)
         {
-            _logger.Information("[NAudioMMusicPlayer] Playback is stopped, because the playlist is empty!");
+            _logger.Information("[NAudioMusicPlayer] Playback is stopped, because the playlist is empty!");
             Stop();
             return;
         }
@@ -160,7 +159,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         var previousTrack = _playbackQueueService.GetPreviousTrack();
         if (previousTrack is null)
         {
-            _logger.Warning("[NAudioMMusicPlayer] Cannot go to the previous song, because the playlist is empty!");
+            _logger.Warning("[NAudioMusicPlayer] Cannot go to the previous song, because the playlist is empty!");
             return;
         }
 
@@ -176,7 +175,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         var track = _playbackQueueService.GetTrackAtIndex(index);
         if (track is null)
         {
-            _logger.Warning("[NAudioMMusicPlayer] Cannot jump to song at index {Index}, because the playlist is empty!", index);
+            _logger.Warning("[NAudioMusicPlayer] Cannot jump to song at index {Index}, because the playlist is empty!", index);
             return;
         }
 
@@ -184,28 +183,11 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
             _currentSong is not null &&
             string.Equals(track.Path, _currentSong.Path, StringComparison.OrdinalIgnoreCase))
         {
-            _logger.Debug("[NAudioMMusicPlayer] Ignoring jump to already playing track at index {Index}", index);
+            _logger.Debug("[NAudioMusicPlayer] Ignoring jump to already playing track at index {Index}", index);
             return;
         }
 
         await LoadSongAsync(track);
-    }
-
-    /// <summary>
-    /// Shuffles the queue while keeping the current track consistent when available.
-    /// </summary>
-    public async Task Shuffle()
-    {
-        _playbackService.Order.Shuffle();
-        _logger.Information("[NAudioMMusicPlayer] Shuffled playlist");
-
-        _messenger.Send(new PlaylistShuffledMessage());
-        var selectedTrack = _playbackService.Queuing.SelectedSong;
-
-        if (_currentSong is null && selectedTrack is not null)
-        {
-            await LoadSongAsync(selectedTrack);
-        }
     }
 
     internal async Task CheckPlaybackProgressAsync()
@@ -220,7 +202,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
             return;
         }
 
-        _logger.Debug("[NAudioMMusicPlayer] Current song reached its end, repeat mode: {RepeatMode}", _repeatMode);
+        _logger.Debug("[NAudioMusicPlayer] Current song reached its end, repeat mode: {RepeatMode}", _repeatMode);
 
         if (_repeatMode == RepeatMode.One)
         {
@@ -232,7 +214,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 
         if (_repeatMode == RepeatMode.Off && _playbackQueueService.IsAtLastTrack())
         {
-            _logger.Information("[NAudioMMusicPlayer] End of playlist reached with repeat off, stopping.");
+            _logger.Information("[NAudioMusicPlayer] End of playlist reached with repeat off, stopping.");
             Stop();
             return;
         }
@@ -245,7 +227,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         var currentTrack = _playbackQueueService.GetCurrentTrack();
         if (currentTrack is null)
         {
-            _logger.Warning("[NAudioMMusicPlayer] Cannot start playback, because the playlist is empty!");
+            _logger.Warning("[NAudioMusicPlayer] Cannot start playback, because the playlist is empty!");
             return;
         }
 
@@ -329,7 +311,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
             var result = _playbackOutput.Reinitialize(_fileReader, _outputDeviceIndex);
             if (!result.IsSuccess)
             {
-                _logger.Warning(result.Exception, "[NAudioMMusicPlayer] Failed to reconfigure audio output: {Context}",
+                _logger.Warning(result.Exception, "[NAudioMusicPlayer] Failed to reconfigure audio output: {Context}",
                     result.Context);
                 if (!result.PreservedPreviousOutput)
                 {
@@ -360,14 +342,14 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         }
         catch (Exception e)
         {
-            _logger.Error(e, "[NAudioMMusicPlayer] Failed to reconfigure audio output");
+            _logger.Error(e, "[NAudioMusicPlayer] Failed to reconfigure audio output");
             return false;
         }
     }
 
     private async Task HandleUnplayableTrackAsync(AudioModel track, TrackLoadResult result)
     {
-        _logger.Warning("[NAudioMMusicPlayer] Skipping song {Path}. Status: {Status}. Reason: {Reason}", track.Path, result.Status, result.Reason);
+        _logger.Warning("[NAudioMusicPlayer] Skipping song {Path}. Status: {Status}. Reason: {Reason}", track.Path, result.Status, result.Reason);
         _playbackQueueService.RemoveTrack(track);
         await LoadCurrentSongAsync();
     }
@@ -386,7 +368,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
         }
         catch (Exception e)
         {
-            _logger.Error(e, "[NAudioMMusicPlayer] Failed to apply audio output device change");
+            _logger.Error(e, "[NAudioMusicPlayer] Failed to apply audio output device change");
         }
     }
 
@@ -412,18 +394,18 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
 
             if (selectedOutputDevice is null)
             {
-                _logger.Warning("[NAudioMMusicPlayer] No audio output devices were detected on startup.");
+                _logger.Warning("[NAudioMusicPlayer] No audio output devices were detected on startup.");
                 return;
             }
 
             _outputDeviceIndex = selectedOutputDevice.Index;
             _logger.Information(
-                "[NAudioMMusicPlayer] Selected startup audio output device: {DeviceName}.",
+                "[NAudioMusicPlayer] Selected startup audio output device: {DeviceName}.",
                 selectedOutputDevice.Name);
         }
         catch (Exception ex)
         {
-            _logger.Warning(ex, "[NAudioMMusicPlayer] Failed to resolve startup audio output device.");
+            _logger.Warning(ex, "[NAudioMusicPlayer] Failed to resolve startup audio output device.");
         }
     }
 }

@@ -328,60 +328,6 @@ public class NAudioMusicPlayerOrchestrationTests
     }
 
     [Fact]
-    public async Task Shuffle_WithCurrentSongLoaded_RepublishesCurrentSongChangedMessage()
-    {
-        var current = new AudioModel { Path = "current.mp3" };
-        using var currentStream = CreateWaveStream();
-
-        var queue = new Mock<IPlaybackQueueService>();
-        queue.Setup(x => x.GetCurrentTrack()).Returns(current);
-        //queue.Setup(x => x.Shuffle(It.Is<AudioModel?>(song => ReferenceEquals(song, current)))).Returns(current);
-
-        var loader = new Mock<ITrackLoader>();
-        loader.Setup(x => x.Load(current)).Returns(TrackLoadResult.Success(currentStream));
-
-        var output = new Mock<IPlaybackOutput>();
-        output.Setup(x => x.Reinitialize(It.IsAny<WaveStream>(), It.IsAny<int>()))
-            .Returns(new PlaybackOutputReconfigureResult(true, false));
-
-        var timedTask = new TimedTask();
-        var messenger = new WeakReferenceMessenger();
-        var probe = new CurrentSongProbe();
-        messenger.Register<CurrentSongProbe, CurrentSongChangedMessage>(
-            probe,
-            static (recipient, message) =>
-            {
-                recipient.Song = message.Value;
-                recipient.CurrentSongMessageCount++;
-            });
-        messenger.Register<CurrentSongProbe, PlaylistShuffledMessage>(
-            probe,
-            static (recipient, _) => recipient.PlaylistShuffledCount++);
-
-        var player = new NAudioMusicPlayer(
-            Mock.Of<ILogger>(),
-            timedTask,
-            queue.Object,
-            loader.Object,
-            output.Object,
-            new PlaybackProgressMonitor(),
-            CreateSettingsReader(),
-            CreateOutputDevice(),
-            messenger);
-
-        await player.PlayPauseAsync();
-        var currentSongMessagesBeforeShuffle = probe.CurrentSongMessageCount;
-
-        await player.Shuffle();
-
-        Assert.Equal(currentSongMessagesBeforeShuffle + 1, probe.CurrentSongMessageCount);
-        Assert.Equal(1, probe.PlaylistShuffledCount);
-        Assert.Same(current, probe.Song);
-
-        await timedTask.StopAsync();
-    }
-
-    [Fact]
     public async Task CheckPlaybackProgressAsync_RepeatOne_RestartsCurrentTrackWithoutAdvancing()
     {
         var track = new AudioModel { Path = "repeat-one-track.mp3" };

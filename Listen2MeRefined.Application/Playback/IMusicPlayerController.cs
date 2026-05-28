@@ -43,9 +43,4 @@ public interface IMusicPlayerController
     /// </summary>
     /// <param name="index">The position of the media element.</param>
     Task JumpToIndexAsync(int index);
-
-    /// <summary>
-    ///     Randomizes the order of the elements.
-    /// </summary>
-    Task Shuffle();
 }

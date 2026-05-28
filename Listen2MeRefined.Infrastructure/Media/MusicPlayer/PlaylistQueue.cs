@@ -49,11 +49,6 @@ public sealed class PlaylistQueue : IPlaylistQueue
         _items.Move(oldIndex, newIndex);
     }
 
-    public void Shuffle()
-    {
-        Items.Shuffle();
-    }
-
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (Count == 0)
