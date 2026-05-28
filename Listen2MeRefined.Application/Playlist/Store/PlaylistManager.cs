@@ -1,6 +1,6 @@
 namespace Listen2MeRefined.Application.Playlist.Store;
 
-public class Store : IStore
+public class PlaylistManager : IPlaylistManager
 {
     
 }

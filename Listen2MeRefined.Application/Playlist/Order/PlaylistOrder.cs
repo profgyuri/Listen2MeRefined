@@ -6,13 +6,13 @@ using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Application.Playlist.Order;
 
-public class Order : IOrder
+public class PlaylistOrder : IPlaylistOrder
 {
-    private readonly IQueuing _queuing;
+    private readonly IPlaylistQueuing _playlistQueuing;
 
-    public Order(IQueuing queuing)
+    public PlaylistOrder(IPlaylistQueuing playlistQueuing)
     {
-        _queuing = queuing;
+        _playlistQueuing = playlistQueuing;
     }
 
     public void Sort(ObservableCollection<AudioModel> songs, PlaylistSortProperty property, SortDirection direction)
@@ -39,11 +39,11 @@ public class Order : IOrder
 
     public void Shuffle()
     {
-        var queue = _queuing.ActiveQueue;
+        var queue = _playlistQueuing.ActiveQueue;
         
         if (!ShuffleOrder(queue.Items)) return;
         
-        var selected = _queuing.SelectedSong;
+        var selected = _playlistQueuing.SelectedSong;
         var currentIndex = queue.IndexOf(selected);
 
         if (currentIndex >= 0)
@@ -52,7 +52,7 @@ public class Order : IOrder
         }
         
         queue.CurrentIndex = 0;
-        _queuing.SelectedSong = queue[0];
+        _playlistQueuing.SelectedSong = queue[0];
     }
 
     private bool ShuffleOrder(ObservableCollection<AudioModel> songs)

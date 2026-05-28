@@ -31,9 +31,9 @@ public sealed class PlaylistModule : IModule
         services.AddTransient<IRepository<MusicFolderModel>, MusicFolderRepository>();
 
         services.AddSingleton<IPlaylistService, PlaylistService>();
-        services.AddSingleton<IOrder, Order>();
-        services.AddSingleton<IQueuing, Queuing>();
-        services.AddSingleton<IStore, Store>();
+        services.AddSingleton<IPlaylistOrder, PlaylistOrder>();
+        services.AddSingleton<IPlaylistQueuing, PlaylistQueuing>();
+        services.AddSingleton<IPlaylistManager, PlaylistManager>();
 
         services.AddTransient<IPlaylistLibraryService, PlaylistLibraryService>();
         services.AddTransient<IPlaylistSelectionService, PlaylistSelectionService>();

@@ -12,15 +12,15 @@ public interface IPlaylistService
     /// <summary>
     /// Gets the methods for ordering the playlist.
     /// </summary>
-    IOrder Order { get; }
+    IPlaylistOrder Order { get; }
     
     /// <summary>
     /// Gets the methods for handling the existence of playlists.
     /// </summary>
-    IStore Store { get; }
+    IPlaylistManager Manager { get; }
     
     /// <summary>
     /// Gets the services used for handling individual playlists.
     /// </summary>
-    IQueuing Queuing { get; }
+    IPlaylistQueuing Queuing { get; }
 }

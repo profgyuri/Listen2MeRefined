@@ -8,7 +8,7 @@ namespace Listen2MeRefined.Tests.Playlist;
 
 public class PlaylistSortServiceTests
 {
-    private readonly IOrder _service = Mock.Of<IOrder>();
+    private readonly IPlaylistOrder _service = Mock.Of<IPlaylistOrder>();
 
     [Fact]
     public void Sort_ByTitle_Ascending_SortsSongsAlphabetically()

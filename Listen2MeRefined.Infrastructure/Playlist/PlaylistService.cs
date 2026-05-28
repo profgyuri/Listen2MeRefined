@@ -7,14 +7,14 @@ namespace Listen2MeRefined.Infrastructure.Playlist;
 
 public class PlaylistService : IPlaylistService
 {
-    public PlaylistService(IOrder order, IStore store, IQueuing queuing)
+    public PlaylistService(IPlaylistOrder playlistOrder, IPlaylistManager playlistManager, IPlaylistQueuing playlistQueuing)
     {
-        Order = order;
-        Store = store;
-        Queuing = queuing;
+        Order = playlistOrder;
+        Manager = playlistManager;
+        Queuing = playlistQueuing;
     }
 
-    public IOrder Order { get; }
-    public IStore Store { get; }
-    public IQueuing Queuing { get; }
+    public IPlaylistOrder Order { get; }
+    public IPlaylistManager Manager { get; }
+    public IPlaylistQueuing Queuing { get; }
 }

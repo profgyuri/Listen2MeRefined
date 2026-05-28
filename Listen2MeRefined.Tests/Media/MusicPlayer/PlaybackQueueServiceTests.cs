@@ -18,12 +18,12 @@ public class PlaybackQueueServiceTests
         var playlist = CreatePlaylist(tracks);
         playlist.CurrentIndex = 2;
 
-        var queuing = new Queuing()
+        var queuing = new PlaylistQueuing()
         {
             ActiveQueue = playlist
         };
-        var order = new Order(queuing);
-        var store = new Store();
+        var order = new PlaylistOrder(queuing);
+        var store = new PlaylistManager();
         var playlistService = new PlaylistService(order, store, queuing);
 
         playlistService.Order.Shuffle();
