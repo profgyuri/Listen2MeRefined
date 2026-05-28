@@ -26,14 +26,6 @@ public interface IPlaybackQueueService
     AudioModel? GetTrackAtIndex(int index);
 
     /// <summary>
-    ///     Shuffles the playlist.
-    /// </summary>
-    /// <param name="currentTrack">The track that should stay the first in the playlist after shuffling.
-    /// Always should be the currently loaded song.</param>
-    /// <returns>The first song in the playlist after shuffling.</returns>
-    AudioModel? Shuffle(AudioModel? currentTrack);
-
-    /// <summary>
     ///     Removes the specified track from the queue.
     /// </summary>
     /// <param name="track">The track to remove.</param>

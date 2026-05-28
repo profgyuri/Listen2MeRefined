@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Security.Cryptography;
+using Listen2MeRefined.Application.Playlist.Queuing;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
 
@@ -7,6 +8,13 @@ namespace Listen2MeRefined.Application.Playlist.Order;
 
 public class Order : IOrder
 {
+    private readonly IQueuing _queuing;
+
+    public Order(IQueuing queuing)
+    {
+        _queuing = queuing;
+    }
+
     public void Sort(ObservableCollection<AudioModel> songs, PlaylistSortProperty property, SortDirection direction)
     {
         if (songs.Count <= 1)
@@ -29,24 +37,44 @@ public class Order : IOrder
         }
     }
 
-    public void Shuffle(ObservableCollection<AudioModel> songs)
+    public void Shuffle()
+    {
+        var queue = _queuing.ActiveQueue;
+        
+        if (!ShuffleOrder(queue.Items)) return;
+        
+        var selected = _queuing.SelectedSong;
+        var currentIndex = queue.IndexOf(selected);
+
+        if (currentIndex >= 0)
+        {
+            queue.Move(currentIndex, 0);
+        }
+        
+        queue.CurrentIndex = 0;
+        _queuing.SelectedSong = queue[0];
+    }
+
+    private bool ShuffleOrder(ObservableCollection<AudioModel> songs)
     {
         if (songs.Count <= 1)
         {
-            return;
+            return false;
         }
         
         var n = songs.Count;
 
         while (n > 1)
         {
-            int k = RandomNumberGenerator.GetInt32(n);
+            var k = RandomNumberGenerator.GetInt32(n);
             n--;
 
             (songs[k], songs[n]) = (songs[n], songs[k]);
         }
+
+        return true;
     }
-    
+
     private Func<AudioModel, IComparable> GetSortKeySelector(PlaylistSortProperty property) =>
         property switch
         {

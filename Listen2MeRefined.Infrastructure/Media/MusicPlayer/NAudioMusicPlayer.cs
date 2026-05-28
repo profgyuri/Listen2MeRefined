@@ -2,6 +2,7 @@
 using Listen2MeRefined.Application.Messages;
 using Listen2MeRefined.Application.Navigation;
 using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Application.Playlist;
 using Listen2MeRefined.Application.Settings;
 using Listen2MeRefined.Application.Utils;
 using Listen2MeRefined.Core.DomainObjects;
@@ -23,6 +24,7 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
     private RepeatMode _repeatMode = RepeatMode.Off;
 
     private readonly ILogger _logger;
+    private readonly IPlaylistService _playbackService;
     private readonly IPlaybackQueueService _playbackQueueService;
     private readonly ITrackLoader _trackLoader;
     private readonly IPlaybackOutput _playbackOutput;
@@ -194,23 +196,16 @@ public sealed partial class NAudioMusicPlayer : IMusicPlayerController
     /// </summary>
     public async Task Shuffle()
     {
-        var shuffledCurrentTrack = _playbackQueueService.Shuffle(_currentSong);
-        if (shuffledCurrentTrack is null)
-        {
-            _logger.Warning("[NAudioMMusicPlayer] Cannot shuffle an empty playlist!");
-            return;
-        }
+        _playbackService.Order.Shuffle();
+        _logger.Information("[NAudioMMusicPlayer] Shuffled playlist");
 
         _messenger.Send(new PlaylistShuffledMessage());
+        var selectedTrack = _playbackService.Queuing.SelectedSong;
 
-        if (_currentSong is null)
+        if (_currentSong is null && selectedTrack is not null)
         {
-            await LoadSongAsync(shuffledCurrentTrack);
-            return;
+            await LoadSongAsync(selectedTrack);
         }
-
-        // Re-publish current track so shared queue state can refresh CurrentSongIndex after reordering.
-        _messenger.Send(new CurrentSongChangedMessage(_currentSong));
     }
 
     internal async Task CheckPlaybackProgressAsync()

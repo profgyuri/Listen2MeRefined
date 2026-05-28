@@ -22,6 +22,7 @@ namespace Listen2MeRefined.Application.ViewModels.Widgets;
 public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
 {
     private readonly IPlaylistService _playlistService;
+    private readonly IPlaylistQueue _playlistQueue;
     private readonly IPlaylistQueueState _playlistQueueState;
     private readonly IPlaylistQueueRoutingService _playlistQueueRoutingService;
     private readonly IDefaultPlaylistService _defaultPlaylistService;
@@ -73,6 +74,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         IMessenger messenger,
         IPlaylistService playlistService,
         IPlaylistQueueState playlistQueueState,
+        IPlaylistQueue playlistQueue,
         IPlaylistQueueRoutingService playlistQueueRoutingService,
         IDefaultPlaylistService defaultPlaylistService,
         IPlaybackQueueActionsService playbackQueueActionsService,
@@ -91,6 +93,7 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     {
         _playlistService = playlistService;
         _playlistQueueState = playlistQueueState;
+        _playlistQueue = playlistQueue;
         _playlistQueueRoutingService = playlistQueueRoutingService;
         _defaultPlaylistService = defaultPlaylistService;
         _playbackQueueActionsService = playbackQueueActionsService;
@@ -117,7 +120,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         RegisterMessage<PlaylistMembershipChangedMessage>(OnPlaylistMembershipChangedMessage);
         RegisterMessage<SearchResultsToPlaylistRequestedMessage>(OnSearchResultsToPlaylistRequestedMessage);
         RegisterMessage<CurrentSongChangedMessage>(OnCurrentSongChangedMessage);
-        RegisterMessage<PlaylistShuffledMessage>(OnPlaylistShuffledMessage);
         RegisterMessage<PlaylistContextMenuActionRequestedMessage>(OnPlaylistContextMenuActionRequestedMessage);
         RegisterMessage<PlaylistSidebarSelectionChangedMessage>(OnPlaylistSidebarSelectionChanged);
         RegisterMessage<SongMetadataUpdatedMessage>(OnSongMetadataUpdatedMessage);
@@ -228,7 +230,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         ExecuteSafeAsync(_ =>
         {
             _playbackQueueActionsService.SetSelectedSongAsNext();
-            SyncVisiblePlaylistOrderWithActiveQueue();
             return Task.CompletedTask;
         });
 
@@ -485,43 +486,9 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         }
     }
 
-    private void OnPlaylistShuffledMessage(PlaylistShuffledMessage message)
-    {
-        try
-        {
-            SyncVisiblePlaylistOrderWithActiveQueue();
-        }
-        catch (Exception e)
-        {
-            Logger.Error(e, "Failed to shuffle playlist");
-        }
-    }
-
     private void OnSongMetadataUpdatedMessage(SongMetadataUpdatedMessage message)
     {
         _collectionUpdater.ReplaceIfPresent(CurrentPlaylistSongs, message.Value);
-    }
-
-    private void SyncVisiblePlaylistOrderWithActiveQueue()
-    {
-        _playlistQueueRoutingService.SyncDefaultPlaylistOrder();
-
-        if (IsDefaultPlaylist ||
-            _playlistQueueState.ActiveNamedPlaylistId != _currentPlaylistId)
-        {
-            return;
-        }
-
-        var target = _playlistQueueState.PlayList;
-        var songs = CurrentPlaylistSongs;
-        for (var index = 0; index < target.Count; index++)
-        {
-            var currentPos = songs.IndexOf(target[index]);
-            if (currentPos >= 0 && currentPos != index)
-            {
-                songs.Move(currentPos, index);
-            }
-        }
     }
 
     private void OnPlaylistContextMenuActionRequestedMessage(PlaylistContextMenuActionRequestedMessage message)
@@ -546,7 +513,8 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
     {
         try
         {
-            ShuffleCurrentPlaylistSongsInPlace();
+            _playlistService.Queuing.ActiveQueue = _playlistQueue;
+            _playlistService.Order.Shuffle();
 
             if (_musicPlayerController.HasCurrentSong)
             {
@@ -554,7 +522,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
             }
 
             ActivateViewedPlaylistAsQueue();
-            await _musicPlayerController.JumpToIndexAsync(0);
         }
         catch (Exception e)
         {
@@ -588,22 +555,6 @@ public partial class PlaylistPaneViewModel : ViewModelBase, ISongContextMenuHost
         else if (_currentPlaylistId is not null)
         {
             _playlistQueueRoutingService.ActivateNamedPlaylistQueue(_currentPlaylistId.Value, CurrentPlaylistSongs);
-        }
-    }
-
-    private void ShuffleCurrentPlaylistSongsInPlace()
-    {
-        var songs = CurrentPlaylistSongs;
-        var count = songs.Count;
-        var rng = Random.Shared;
-
-        for (var i = count - 1; i > 0; i--)
-        {
-            var j = rng.Next(i + 1);
-            if (i != j)
-            {
-                songs.Move(j, i);
-            }
         }
     }
 

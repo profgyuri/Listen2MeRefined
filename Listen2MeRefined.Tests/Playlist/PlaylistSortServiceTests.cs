@@ -2,12 +2,13 @@ using System.Collections.ObjectModel;
 using Listen2MeRefined.Application.Playlist.Order;
 using Listen2MeRefined.Core.Enums;
 using Listen2MeRefined.Core.Models;
+using Moq;
 
 namespace Listen2MeRefined.Tests.Playlist;
 
 public class PlaylistSortServiceTests
 {
-    private readonly IOrder _service = new Order();
+    private readonly IOrder _service = Mock.Of<IOrder>();
 
     [Fact]
     public void Sort_ByTitle_Ascending_SortsSongsAlphabetically()

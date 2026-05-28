@@ -1,5 +1,11 @@
+using Listen2MeRefined.Application.Playlist;
+using Listen2MeRefined.Application.Playlist.Order;
+using Listen2MeRefined.Application.Playlist.Queuing;
+using Listen2MeRefined.Application.Playlist.Store;
 using Listen2MeRefined.Core.Models;
 using Listen2MeRefined.Infrastructure.Media.MusicPlayer;
+using Listen2MeRefined.Infrastructure.Playlist;
+using Moq;
 
 namespace Listen2MeRefined.Tests.Media.MusicPlayer;
 
@@ -12,10 +18,16 @@ public class PlaybackQueueServiceTests
         var playlist = CreatePlaylist(tracks);
         playlist.CurrentIndex = 2;
 
-        var service = new PlaybackQueueService(playlist);
+        var queuing = new Queuing()
+        {
+            ActiveQueue = playlist
+        };
+        var order = new Order(queuing);
+        var store = new Store();
+        var playlistService = new PlaylistService(order, store, queuing);
 
-        var current = service.GetCurrentTrack();
-        var shuffledCurrent = service.Shuffle(current);
+        playlistService.Order.Shuffle();
+        var shuffledCurrent = playlistService.Queuing.SelectedSong;
 
         Assert.NotNull(shuffledCurrent);
         Assert.Same(shuffledCurrent, playlist[0]);

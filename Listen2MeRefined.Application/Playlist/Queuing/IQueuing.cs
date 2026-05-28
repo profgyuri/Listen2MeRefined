@@ -1,3 +1,6 @@
+using Listen2MeRefined.Application.Playback;
+using Listen2MeRefined.Core.Models;
+
 namespace Listen2MeRefined.Application.Playlist.Queuing;
 
 /// <summary>
@@ -5,5 +8,13 @@ namespace Listen2MeRefined.Application.Playlist.Queuing;
 /// </summary>
 public interface IQueuing
 {
+    /// <summary>
+    ///     Gets or sets the active playlist queue.
+    /// </summary>
+    IPlaylistQueue ActiveQueue { get; set; }
     
+    /// <summary>
+    ///     Gets or sets the currently selected song.
+    /// </summary>
+    AudioModel? SelectedSong { get; set; }
 }

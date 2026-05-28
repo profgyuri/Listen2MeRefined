@@ -1,10 +1,11 @@
+using System.Collections.ObjectModel;
 using Listen2MeRefined.Core.Models;
 
 namespace Listen2MeRefined.Application.Playback;
 
 public interface IPlaylistQueue
 {
-    IList<AudioModel> Items { get; }
+    ObservableCollection<AudioModel> Items { get; }
 
     int Count { get; }
 

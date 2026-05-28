@@ -335,7 +335,7 @@ public class NAudioMusicPlayerOrchestrationTests
 
         var queue = new Mock<IPlaybackQueueService>();
         queue.Setup(x => x.GetCurrentTrack()).Returns(current);
-        queue.Setup(x => x.Shuffle(It.Is<AudioModel?>(song => ReferenceEquals(song, current)))).Returns(current);
+        //queue.Setup(x => x.Shuffle(It.Is<AudioModel?>(song => ReferenceEquals(song, current)))).Returns(current);
 
         var loader = new Mock<ITrackLoader>();
         loader.Setup(x => x.Load(current)).Returns(TrackLoadResult.Success(currentStream));

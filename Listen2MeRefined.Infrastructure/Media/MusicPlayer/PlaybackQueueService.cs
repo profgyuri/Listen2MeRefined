@@ -91,25 +91,6 @@ public sealed class PlaybackQueueService : IPlaybackQueueService
         return track;
     }
 
-    public AudioModel? Shuffle(AudioModel? currentTrack)
-    {
-        if (!_playlistQueue.Any())
-        {
-            return null;
-        }
-
-        _playlistQueue.Shuffle();
-
-        var currentIndex = _playlistQueue.IndexOf(currentTrack);
-        if (currentIndex > 0)
-        {
-            _playlistQueue.Move(currentIndex, 0);
-        }
-
-        _playlistQueue.CurrentIndex = 0;
-        return _playlistQueue[0];
-    }
-
     public bool IsAtLastTrack()
     {
         return _playlistQueue.Any() && _playlistQueue.CurrentIndex == _playlistQueue.Count - 1;

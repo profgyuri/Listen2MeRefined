@@ -18,7 +18,7 @@ public interface IOrder
     void Sort(ObservableCollection<AudioModel> songs, PlaylistSortProperty property, SortDirection direction);
     
     /// <summary>
-    ///     Randomizes the order of the items in a playlist.
+    ///     Randomizes the order of the items in the active playlist.
     /// </summary>
-    void Shuffle(ObservableCollection<AudioModel> songs);
+    void Shuffle();
 }

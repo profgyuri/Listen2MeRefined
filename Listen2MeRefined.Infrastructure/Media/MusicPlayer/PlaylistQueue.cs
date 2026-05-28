@@ -14,7 +14,7 @@ public sealed class PlaylistQueue : IPlaylistQueue
         _items.CollectionChanged += OnItemsCollectionChanged;
     }
 
-    public IList<AudioModel> Items => _items;
+    public ObservableCollection<AudioModel> Items => _items;
     public int Count => Items.Count;
     public int CurrentIndex { get; set; }
 
@@ -47,6 +47,11 @@ public sealed class PlaylistQueue : IPlaylistQueue
         }
 
         _items.Move(oldIndex, newIndex);
+    }
+
+    public void Shuffle()
+    {
+        Items.Shuffle();
     }
 
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
