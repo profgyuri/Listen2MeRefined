@@ -1,3 +1,7 @@
+# Disclaimer
+
+Due to the accumulated tech debt I decided to start over. Find the new repo [here](https://github.com/profgyuri/Listen2Me).
+
 # Listen2MeRefined
 
 MIT License as per the License.md
